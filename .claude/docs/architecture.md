@@ -26,3 +26,8 @@ The transliterator picks the one table whose `script()` covers every letter of t
 `Document\DE\*`: `IdentityCardNumber` (+ `authorityCode()`), `PassportNumber`, `TaxIdentificationNumber` (format
 only), `PensionInsuranceNumber` (VKVV checksum; fields as strings, no `HasBirthDate`/`HasSex`). `Name\DE\*` mirrors
 `Name\AU\*` (Latin base, `TransliterationVariant`).
+
+`Document\FR\*`: `Nir` (`HasSex`; DSN field rules; key format only; `birthMonth()` nullable, `birthPlaceCode()`
+string), `LegacyIdentityCardNumber` (12-digit card issued until 2021; the 2021 card is not covered), `PassportNumber`
+(`99AA99999`), `TaxIdentificationNumber` (SPI, format only), `DriverLicenceNumber` (12 digits, format only).
+`Name\FR\*`: `AbstractFrenchNamePart` overrides `letters()` with the 2014 civil-status circular's list (no `\p{Latin}`).

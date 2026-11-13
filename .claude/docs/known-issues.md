@@ -118,3 +118,19 @@
 - Escaped equivalent mutant: `CastInt` in `Document\DE\PensionInsuranceNumber::checkDigit()` (numeric strings
   multiply the same). The character-class check uses `strspn` instead of an anchored regex because anchors on a
   fixed-length value left equivalent mutants.
+- **FR NIR key: format only.** INSEE, service-public, the ministries' leaflet and the DSN norm say "clé de contrôle
+  de 2 chiffres" but publish no computation; `97 − (n mod 97)` with `2A`→19, `2B`→18 is only on secondary sites (the
+  INSEE example `1 21 12 77 131 232 - 50` happens to satisfy it). Any two-digit key is accepted. Field rules (sex 1/2,
+  month 01-12/20/30-42/50-99, department 01-99/2A/2B, commune and order 001-999) come from the DSN cahier technique
+  S21.G00.30.001. No century in the NIR, so no `HasBirthDate` and the DSN rules tied to 1968/1976 are not applied.
+- **FR sources reachable from this environment:** `www.insee.fr`, `www.service-public.gouv.fr` (not `.fr`),
+  `www.net-entreprises.fr`, `www.plus.transformation.gouv.fr` (ANTS answers), `caf.fr`, `www.oecd.org`. Légifrance,
+  interieur.gouv.fr and PRADO answer 403 to curl; the Légifrance circular PDF (`/download/file/pdf/cir_38565/CIRC`)
+  came through the WebFetch tool. The CAF-hosted ministries' leaflet is a scan (render with `pdftoppm`).
+- **FR passport, licence and CNI formats come from ANTS answers on Services Publics+ and a 2000 Interior instruction**
+  (no format in a decree that could be read). The 2021 CNI (9 characters) is not covered; the old CNI is
+  "douze chiffres" per the instruction, so a Corsican place code with a letter is refused (unverified case).
+- **FR names use the circular's letter list, not `\p{Latin}`** (Circulaire 23 juillet 2014, § 1): `ñ`, `ł`, `ß`, `å`
+  are refused even in foreign names ("sans reproduire les éventuels signes diacritiques de la langue étrangère").
+- Escaped equivalent mutant: `CastInt` on the issue month in `Document\FR\LegacyIdentityCardNumber::parse()`
+  (a two-digit numeric string compares the same).
