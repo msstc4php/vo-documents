@@ -188,3 +188,19 @@
   accepted format-only without `faberPin()`; no check digit is published for either layout.
 - **CH names**: `µ` (U+00B5) is a compatibility character and is refused although it is in ISO 8859-1; `ſ`, `ŉ` the
   same. `Ŀ ŀ` stay (ICAO lists them).
+- **GB sources:** `www.gov.uk`, `assets.publishing.service.gov.uk` and `www.nidirect.gov.uk` answer to curl (gov.uk
+  asset URLs redirect: use `curl -L`). `www.datadictionary.nhs.uk` answers 403 to curl and WebFetch: read its Internet
+  Archive captures (`id_` form, gzip body). The PHS data dictionary (`www.ndc.scot.nhs.uk`) redirects to its home page.
+  The `@see` lines of `Name\GB\*` and `GreatBritainDriverLicenceNumber` exceed 120 characters (URLs cannot wrap).
+- **GB NINO:** HMRC's own illustration `QQ 12 34 56 A` is invalid (Q is excluded); `PZ`/`PY` administrative prefixes are
+  accepted (not in the exclusion list). **GB names use `AnyIcaoSpelling`**: HMPO writes a spelling from an official
+  document or foreign authority when the ICAO table has none the holder uses, or drops the accent.
+- **GB DVLA driver number:** the month field is month + 50 for women; 29 February only for a two-digit year divisible by
+  four (no century), as IT. The INS57P check characters are "randomly generated", so they are not verified; a holder
+  without first names has no published rule (initials must be a letter + letter or `9`).
+- **GB CHI:** check digit format only — no official algorithm text, and PHS accepts modulus 11 or (from August 2026)
+  modulus 10 check digits.
+- Escaped equivalent mutants in `Document\GB\*`: the `max(1, min(…))` clamps of the day and month getters of `ChiNumber`
+  and `GreatBritainDriverLicenceNumber`, `> 50` vs `>= 50` in the DVLA month field (50 is refused), and the `(int)` cast
+  of the H&C range check (numeric strings compare numerically). Fixed-length NINO shape: the pattern is unanchored on
+  purpose (anchors were equivalent mutants).

@@ -55,3 +55,13 @@ FABER-PIN + running number with `faberPin()`/`sequenceNumber()`, or 15 digits of
 `Name\CH\PersonName($family, ?$given, ?$latin)`: letters of ISO 8859-1 + Latin Extended-A
 (`Name\CH\AbstractSwissNamePart`, SR 143.111 Art. 22 / ZStV Art. 80); codec keys `family`, `given` (null without a
 given name), `latin`.
+
+`Document\GB\*`: `NationalInsuranceNumber` (HMRC NIM39110 prefix exclusions, suffix `A`-`D`, no check digit),
+`PassportNumber` (9 digits), `GreatBritainDriverLicenceNumber` (DVLA, 16 characters; `HasSex`, two-digit year,
+`birthMonth()`/`birthDay()`; check characters random, not verified), `NorthernIrelandDriverLicenceNumber` (DVA, 8
+digits; two plain classes, no `SubdivisionResolver`: the formats never overlap), `NhsNumber` and `HealthAndCareNumber`
+(NHS Modulus 11 verified through the internal `NhsCheckDigit`; H&C range 320000001-399999999), `ChiNumber` (Scotland;
+`HasSex`, `DDMMYY` date validated, check digit format only). `Internal\TwoDigitYearDate` validates a day/month with a
+century-less year (shared by the DVLA and CHI classes). `Name\GB\PersonName($family, ?$given, ?$latin)`: `\p{Latin}`
+parts, override policy `AnyIcaoSpelling` (HMPO writes a documented spelling), `given` null for a person with one name;
+codec keys `family`, `given`, `latin`.
