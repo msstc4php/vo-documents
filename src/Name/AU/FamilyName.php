@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MSSTC4PHP\ValueObject\Documents\Name\AU;
 
-use MSSTC4PHP\ValueObject\Documents\Name\AbstractNamePart;
+use MSSTC4PHP\ValueObject\Documents\Name\Latin\AbstractLatinNamePart;
 use Override;
 
 /**
@@ -13,14 +13,8 @@ use Override;
  *
  * @see https://www.icao.int/publications/Documents/9303_p3_cons_en.pdf ICAO Doc 9303 Part 3, 8th ed. (2021), §6.A
  */
-final class FamilyName extends AbstractNamePart
+final class FamilyName extends AbstractLatinNamePart
 {
-    #[Override]
-    protected function letters(): string
-    {
-        return '\p{Latin}';
-    }
-
     #[Override]
     protected function label(): string
     {

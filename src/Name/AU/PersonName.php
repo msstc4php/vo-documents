@@ -7,7 +7,7 @@ namespace MSSTC4PHP\ValueObject\Documents\Name\AU;
 use MSSTC4PHP\ValueObject\Contract\ValueObject;
 use MSSTC4PHP\ValueObject\Documents\Exception\InvalidPersonNameException;
 use MSSTC4PHP\ValueObject\Documents\Icao\PersonName as IcaoPersonName;
-use MSSTC4PHP\ValueObject\Documents\Icao\Transliterator;
+use MSSTC4PHP\ValueObject\Documents\Name\Latin\LatinPersonNameBuilder;
 use MSSTC4PHP\ValueObject\Documents\Name\PersonName as NationalPersonName;
 use MSSTC4PHP\ValueObject\Documents\Name\TransliterationVariant;
 use Override;
@@ -36,20 +36,11 @@ final readonly class PersonName implements NationalPersonName
         public GivenName $given,
         ?IcaoPersonName $latin = null,
     ) {
-        $transliterator = new Transliterator();
-        $this->derived = IcaoPersonName::fromParts(
-            $transliterator->toLatin($family->value),
-            [$transliterator->toLatin($given->value)],
-        );
-
-        $policy = new TransliterationVariant(
-            static fn (): array => [[
-                $transliterator->variants($family->value),
-                $transliterator->variants($given->value),
-            ]],
+        $builder = new LatinPersonNameBuilder([$family->value], [$given->value]);
+        $this->derived = $builder->derive();
+        $this->latin = $builder->resolve($latin, $builder->transliterationVariant(
             'Invalid Australian person name (the Latin form is not a transliteration of the name).',
-        );
-        $this->latin = $policy->resolve($latin, $this->derived);
+        ));
     }
 
     #[Override]
