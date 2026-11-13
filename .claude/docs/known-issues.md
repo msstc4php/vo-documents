@@ -151,3 +151,16 @@
   remainder mod 4 for every digit `b`). The lookup tables (`DIGITS`, `MONTHS`, `CHECK_VALUES`) replaced `strpos()`
   arithmetic whose casts and clamps left more equivalents; unreachable `?? throw` branches were dropped (PHPStan max
   accepts the string offsets).
+- **ES sources:** `www.interior.gob.es` (the NIF/NIE check-letter page) answers 403 with a Cloudflare challenge to
+  curl and WebFetch; it was read from the Internet Archive's unmodified capture (`/web/20260228172549id_/…`).
+  `revista.seg-social.es` and the Council's PRADO register also answer 403 (PRADO has no capture, so the Spanish
+  passport number `AAANNNNNN` could not be quoted and is not covered). The BOE PDFs are reachable.
+- **ES NUSS check digits** are format only: the `(province + number) mod 97` rule appears only on secondary sites;
+  the TGSS AFI message gives only "Provincia n..2 1..56" and "Número n..10".
+- **ES NIE before 2008** (`X` + eight digits, ten characters) stays valid per Orden INT/2058/2008 but has no published
+  check algorithm; `Nie` refuses it as "(10 characters)". The DNI requires eight digits (leading zeros kept).
+- **ES names:** the table default for `Ü` is `UE` (`Argüelles` → `ARGUEELLES`), not the Spanish `U`; `ARGUELLES` is an
+  accepted override. Catalan `l·l` with U+00B7 is refused (no ICAO row); `ŀ` (U+0140) is accepted.
+- Escaped equivalent mutants in `Document\ES\*`: the `(int)` casts in `ControlLetter::of()` and
+  `SocialSecurityNumber::parse()` (numeric strings compare and divide the same), and the `substr()` length / unwrap in
+  `Dni`/`Nie` (an `(int)` cast stops at the trailing check letter).

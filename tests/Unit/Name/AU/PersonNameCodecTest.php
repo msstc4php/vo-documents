@@ -19,6 +19,7 @@ use MSSTC4PHP\ValueObject\Documents\Name\AU\GivenName;
 use MSSTC4PHP\ValueObject\Documents\Name\AU\PersonName;
 use MSSTC4PHP\ValueObject\Documents\Name\AU\PersonNameCodec;
 use MSSTC4PHP\ValueObject\Documents\Name\DE\PersonNameCodec as DePersonNameCodec;
+use MSSTC4PHP\ValueObject\Documents\Name\ES\PersonNameCodec as EsPersonNameCodec;
 use MSSTC4PHP\ValueObject\Documents\Name\FR\PersonNameCodec as FrPersonNameCodec;
 use MSSTC4PHP\ValueObject\Documents\Name\IT\PersonNameCodec as ItPersonNameCodec;
 use MSSTC4PHP\ValueObject\Documents\Name\Latin\AbstractLatinNamePart;
@@ -40,6 +41,7 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(DePersonNameCodec::class)]
 #[UsesClass(FrPersonNameCodec::class)]
 #[UsesClass(ItPersonNameCodec::class)]
+#[UsesClass(EsPersonNameCodec::class)]
 #[UsesClass(PersonName::class)]
 #[UsesClass(AbstractNamePart::class)]
 #[UsesClass(AbstractLatinNamePart::class)]
