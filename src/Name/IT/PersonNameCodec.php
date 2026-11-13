@@ -20,7 +20,7 @@ use Override;
  */
 final readonly class PersonNameCodec implements PayloadCodec
 {
-    private const string SHAPE = 'Expected a Italian person name payload with string "family" and "given", '
+    private const string SHAPE = 'Expected an Italian person name payload with string "family" and "given", '
         . 'string or null "latin", and no other keys.';
 
     private const array KEYS = ['family', 'given', 'latin'];

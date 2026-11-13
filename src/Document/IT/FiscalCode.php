@@ -90,6 +90,7 @@ final class FiscalCode extends AbstractStringValueObject implements HasSex, Mask
      */
     public function birthDay(): int
     {
+        // parse() has validated the day; the clamp only narrows the type for PHPStan.
         return \max(1, \min(31, $this->dayOfMonth($this->value)));
     }
 
