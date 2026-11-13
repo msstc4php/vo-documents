@@ -63,6 +63,6 @@ final class DriverLicenceNumber extends AbstractStringValueObject implements Mas
             throw Digits::invalidLength($stripped, self::DOCUMENT);
         }
 
-        return Digits::exactly($stripped, $length, self::DOCUMENT);
+        return Digits::exactlyStripped($stripped, $length, self::DOCUMENT);
     }
 }

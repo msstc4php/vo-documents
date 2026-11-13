@@ -10,6 +10,7 @@ use MSSTC4PHP\ValueObject\Documents\Exception\InvalidDocumentNumberException;
 use MSSTC4PHP\ValueObject\Documents\Internal\Mask;
 use MSSTC4PHP\ValueObject\Documents\Internal\NumberFormat;
 use MSSTC4PHP\ValueObject\Documents\Internal\Text;
+use MSSTC4PHP\ValueObject\Documents\Internal\TwoDigitYearDate;
 use MSSTC4PHP\ValueObject\Documents\Sex;
 use MSSTC4PHP\ValueObject\Support\AbstractStringValueObject;
 use Override;
@@ -47,8 +48,6 @@ final class FiscalCode extends AbstractStringValueObject implements HasSex, Mask
         'A' => 1, 'B' => 2, 'C' => 3, 'D' => 4, 'E' => 5, 'H' => 6, 'L' => 7, 'M' => 8, 'P' => 9, 'R' => 10, 'S' => 11,
         'T' => 12,
     ];
-
-    private const array DAYS_IN_MONTH = [1 => 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 
     /** Art. 7: [value in an even position (table 1), value in an odd position (table 2)]. */
     private const array CHECK_VALUES = [
@@ -145,9 +144,7 @@ final class FiscalCode extends AbstractStringValueObject implements HasSex, Mask
         $message = \sprintf('Invalid %s (invalid birth month).', self::DOCUMENT);
         $month = self::MONTHS[$code[8]] ?? throw new InvalidDocumentNumberException($message);
         $year = $this->digitIn($code, 6) * 10 + $this->digitIn($code, 7);
-        $lastDay = $month === 2 && $year % 4 !== 0 ? 28 : self::DAYS_IN_MONTH[$month];
-        $day = $this->dayOfMonth($code);
-        if ($this->digitIn($code, 9) > 7 || $day === 0 || $day > $lastDay) {
+        if ($this->digitIn($code, 9) > 7 || !TwoDigitYearDate::exists($this->dayOfMonth($code), $month, $year)) {
             throw new InvalidDocumentNumberException(\sprintf('Invalid %s (invalid birth day).', self::DOCUMENT));
         }
     }

@@ -40,7 +40,21 @@ final class Digits
      */
     public static function exactly(string $input, int $length, string $document): string
     {
-        $digits = self::strip($input);
+        return self::exactlyStripped(self::strip($input), $length, $document);
+    }
+
+    /**
+     * {@see exactly()} for an input whose separators are already removed.
+     *
+     * @param positive-int $length
+     * @param non-empty-string $document the document's name in the exception message
+     *
+     * @return non-empty-string
+     *
+     * @throws InvalidDocumentNumberException as {@see exactly()}
+     */
+    public static function exactlyStripped(string $digits, int $length, string $document): string
+    {
         if (\mb_strlen($digits, 'UTF-8') !== $length) {
             throw self::invalidLength($digits, $document);
         }

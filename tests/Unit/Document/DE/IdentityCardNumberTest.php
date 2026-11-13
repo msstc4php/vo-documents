@@ -21,7 +21,7 @@ use PHPUnit\Framework\TestCase;
  * are built from the PAuswV alphabet).
  */
 #[CoversClass(IdentityCardNumber::class)]
-#[UsesClass(SerialNumberFormat::class)]
+#[CoversClass(SerialNumberFormat::class)]
 #[UsesClass(NumberFormat::class)]
 #[UsesClass(Digits::class)]
 #[UsesClass(Text::class)]

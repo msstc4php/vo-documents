@@ -43,7 +43,7 @@ final readonly class NumberFormat
     public function parse(string $input, string $document): string
     {
         $normalized = \strtoupper(Digits::strip($input));
-        if (!$this->fitsLength($normalized)) {
+        if (!$this->allowsLength(\mb_strlen($normalized, 'UTF-8'))) {
             throw Digits::invalidLength($normalized, $document);
         }
 
@@ -59,8 +59,11 @@ final readonly class NumberFormat
      */
     public function fitsLength(string $input): bool
     {
-        $length = \mb_strlen(Digits::strip($input), 'UTF-8');
+        return $this->allowsLength(\mb_strlen(Digits::strip($input), 'UTF-8'));
+    }
 
+    private function allowsLength(int $length): bool
+    {
         return $length >= $this->minLength && $length <= $this->maxLength;
     }
 }

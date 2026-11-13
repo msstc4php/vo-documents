@@ -9,6 +9,7 @@ use MSSTC4PHP\ValueObject\Documents\Internal\Digits;
 use MSSTC4PHP\ValueObject\Documents\Internal\Mask;
 use MSSTC4PHP\ValueObject\Documents\Internal\NumberFormat;
 use MSSTC4PHP\ValueObject\Documents\Internal\Text;
+use MSSTC4PHP\ValueObject\Documents\Internal\TwoDigitYearDate;
 use MSSTC4PHP\ValueObject\Documents\Sex;
 use MSSTC4PHP\ValueObject\Documents\Tests\Fixture\RefusesWithoutEchoingInput;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -23,6 +24,7 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(FiscalCode::class)]
 #[UsesClass(NumberFormat::class)]
 #[UsesClass(Digits::class)]
+#[UsesClass(TwoDigitYearDate::class)]
 #[UsesClass(Text::class)]
 #[UsesClass(Mask::class)]
 final class FiscalCodeTest extends TestCase
