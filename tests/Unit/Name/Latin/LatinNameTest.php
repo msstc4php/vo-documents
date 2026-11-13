@@ -96,11 +96,30 @@ final class LatinNameTest extends TestCase
         $builder->resolve(IcaoPersonName::from('SMITH<<ZOE'), $builder->transliterationVariant('Refused.'));
     }
 
-    public function testVariantsAreListedOnlyWhenAnOverrideIsGiven(): void
+    public function testVariantsAreNotListedUnlessAnOverrideDiffersFromTheDerivedForm(): void
     {
-        $builder = new LatinPersonNameBuilder(['Müller'], ['Zoë']);
+        $builder = new LatinPersonNameBuilder([\str_repeat('Ü', 13)], ['Ana']);
         $policy = $builder->transliterationVariant('Refused.');
 
-        self::assertNull($policy->resolve(null, $builder->derive()));
+        self::assertNull($builder->resolve(null, $policy));
+        self::assertNull($builder->resolve($builder->derive(), $policy));
+
+        $this->expectException(InvalidPersonNameException::class);
+        $this->expectExceptionMessage('too many transliteration variants');
+
+        $builder->resolve(IcaoPersonName::from(\str_repeat('U', 13) . '<<ANA'), $policy);
+    }
+
+    public function testResolveMatchesEachOfSeveralGivenPartsAgainstItsOwnVariants(): void
+    {
+        $builder = new LatinPersonNameBuilder(['Müller'], ['José', 'Zoë']);
+        $policy = $builder->transliterationVariant('Refused.');
+
+        $kept = $builder->resolve(IcaoPersonName::from('MULLER<<JOSE<ZOE'), $policy);
+        self::assertSame('MULLER<<JOSE<ZOE', $kept?->value);
+        self::assertSame('MUELLER<<JOSE<ZOE', $builder->derive()->value);
+
+        $this->expectException(InvalidPersonNameException::class);
+        $builder->resolve(IcaoPersonName::from('MULLER<<JOSE'), $policy);
     }
 }
