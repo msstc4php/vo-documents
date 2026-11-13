@@ -13,6 +13,10 @@ PHP >= 8.4. Namespace `MSSTC4PHP\ValueObject\Documents\`. Framework-agnostic; Do
 Local install against the sibling `../vo-base`: `COMPOSER=composer-local.json composer update
 --ignore-platform-req=php`. In CI the install is `composer-ci.json`.
 
+`composer-local.json` is gitignored. Create it from `composer-ci.json`: copy the file and add a path repository with
+`{"type": "path", "url": "../vo-base", "options": {"symlink": true}}` before the VCS entry, and require
+`msstc4php/vo-base` as `dev-main as 1.1.0`.
+
 - `COMPOSER=composer-local.json make check`, `make test`, `make infection`, `make fix`.
 
 ## Standard

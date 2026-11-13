@@ -112,7 +112,8 @@ final class PersonName extends AbstractStringValueObject
     protected function parse(string $value): string
     {
         $canonical = self::canonical($value);
-        if (\strlen($canonical) > self::MAX_LENGTH || \preg_match('/^' . self::IDENTIFIER . '(?:<<' . self::IDENTIFIER . ')?$/', $canonical) !== 1) {
+        $shape = '/^' . self::IDENTIFIER . '(?:<<' . self::IDENTIFIER . ')?$/';
+        if (\strlen($canonical) > self::MAX_LENGTH || \preg_match($shape, $canonical) !== 1) {
             throw new InvalidPersonNameException('Invalid ICAO personal name.');
         }
 

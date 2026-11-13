@@ -208,7 +208,7 @@ final class PersonNameTest extends TestCase
         ];
         // Default width is TD3's 39.
         yield 'exact fit' => [PersonName::from(\str_repeat('A', 39)), 39, \str_repeat('A', 39)];
-        // Derived examples from docs/sources/ICAO.md (procedure steps 3-4).
+        // Derived examples from docs/sources/ICAO.md ("Derived examples" table and the procedure's steps 2-4).
         yield 'primary cut, width 39' => [self::bennelong(), 39, 'BENNELONG<WOOLOOMOOLOO<WARRANDYTE<WA<<D'];
         yield 'primary cut, width 20' => [self::bennelong(), 20, 'BENNELONG<WOOLOOM<<D'];
         yield 'hyphenated secondary' => [

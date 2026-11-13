@@ -23,7 +23,7 @@ abstract class AbstractNamePart extends AbstractStringValueObject
     public const int MAX_LENGTH = 100;
 
     /**
-     * @return non-empty-string a regex class body, e.g. \p{Cyrillic}
+     * @return non-empty-string a regex class body, e.g. \p{Latin}
      */
     abstract protected function letters(): string;
 

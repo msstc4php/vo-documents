@@ -51,3 +51,16 @@
   class per jurisdiction, a factory with an exhaustive enum → class `match` delegating to `Internal\SubdivisionResolver`.
 - National name codecs validate payloads through `Internal\PayloadFields` (closed key set, string fields, one shape
   message).
+- **CI cannot pass until the `msstc4php/vo-documents` GitHub repository exists**: `composer-ci.json` and the
+  `vo-documents-doctrine` CI pull it from `github.com/msstc4php/vo-documents` (only a local `origin` is configured, no
+  push was made). Owner action: create the repository, push, tag `v0.1.x`.
+- **Length limits are a decision, not a source rule**: name parts 100 (`AbstractNamePart::MAX_LENGTH`),
+  `Icao\PersonName` 255; Doctrine columns follow the constants.
+- **OMS policy length (16) and the international passport 2 + 7 split are unverified** against an official text
+  (ffoms.gov.ru fails TLS); see RU.md.
+- **A checksum without a public text is still shipped** (INN, TFN, Medicare): dropping it would accept
+  most typos. The owner should confirm this against the spec's anti-goal.
+- `composer-local.json` is gitignored; `CLAUDE.md` says how to create it.
+- Deferred minors (not fixed): `isInScript` passes the letter class straight into a regex (constants only today);
+  `Subdivision` string backing is documented, not enforced; the "no number" ambiguity test is trivial; 8 escaped
+  Infection mutants in `Internal\*` (MSI 96% overall).
