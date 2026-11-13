@@ -47,3 +47,11 @@ parts (primary identifier joined by a space); codec keys `first`, `second`, `giv
 `O`, `0` allowed for model 2014). The rijbewijsnummer is not covered. `Name\NL\PersonName($family, ?$given, ?$latin)`:
 prefixes live inside `FamilyName` as typed; letters come from the BRP Teletex tables (`Name\NL\AbstractDutchNamePart`,
 which also overrides `word()` for apostrophe prefixes); codec keys `family`, `given` (null for one name), `latin`.
+
+`Document\CH\*`: `AhvNumber` (13 digits, `756` + 9 random + check digit verified per BSV WL VA/IK Anhang 7, weights
+1/3 mod 10; dots of `756.3047.5009.62` accepted; `formatted()` gives that form), `IdentityDocumentNumber` (passport and
+identity card: 8 characters, no `I`/`O`, format only), `DriverLicenceNumber` (federal, not per canton: 12 digits =
+FABER-PIN + running number with `faberPin()`/`sequenceNumber()`, or 15 digits of the 2003 card with both null).
+`Name\CH\PersonName($family, ?$given, ?$latin)`: letters of ISO 8859-1 + Latin Extended-A
+(`Name\CH\AbstractSwissNamePart`, SR 143.111 Art. 22 / ZStV Art. 80); codec keys `family`, `given` (null without a
+given name), `latin`.

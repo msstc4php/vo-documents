@@ -15,6 +15,7 @@ use MSSTC4PHP\ValueObject\Documents\Internal\PayloadFields;
 use MSSTC4PHP\ValueObject\Documents\Internal\UnicodeText;
 use MSSTC4PHP\ValueObject\Documents\Name\AbstractNamePart;
 use MSSTC4PHP\ValueObject\Documents\Name\AU\PersonNameCodec as AuPersonNameCodec;
+use MSSTC4PHP\ValueObject\Documents\Name\CH\PersonNameCodec as ChPersonNameCodec;
 use MSSTC4PHP\ValueObject\Documents\Name\DE\FamilyName;
 use MSSTC4PHP\ValueObject\Documents\Name\DE\GivenName;
 use MSSTC4PHP\ValueObject\Documents\Name\DE\PersonName;
@@ -44,6 +45,7 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(ItPersonNameCodec::class)]
 #[UsesClass(EsPersonNameCodec::class)]
 #[UsesClass(NlPersonNameCodec::class)]
+#[UsesClass(ChPersonNameCodec::class)]
 #[UsesClass(PersonName::class)]
 #[UsesClass(AbstractNamePart::class)]
 #[UsesClass(AbstractLatinNamePart::class)]

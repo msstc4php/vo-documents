@@ -176,3 +176,15 @@
   it through WebFetch. LO BRP 2025.Q4 PDF is 404 at its expected URL; 2025.Q2 is cited. RDW publishes no
   rijbewijsnummer format (not covered). The `@see` lines of `IdentityDocumentNumber` exceed 120 characters (URLs cannot
   wrap), as for ES.
+- **CH sources:** `www.fedlex.admin.ch` needs JavaScript; read act texts from the filestore HTML found through the
+  SPARQL endpoint `fedlex.data.admin.ch/sparqlendpoint` (`jolux:isMemberOf <…/eli/cc/…>`, DEU, `html`). fedpol, BJ and
+  ASTRA PDFs answer 404 at their published paths and PRADO answers 403: their Internet Archive copies are cited (use
+  the `id_` form for the raw bytes). The `@see` lines of `Document\CH\IdentityDocumentNumber` and
+  `DriverLicenceNumber` exceed 120 characters (URLs cannot wrap).
+- **CH AHV**: the UPI handbook's illustration rows `756.1234.5678.90` / `756.0123.4567.89` fail the official check
+  digit; use `756.3047.5009.62` (Rz 1201) and `756.1234.5678.97` (Anhang 7) as examples. Dots are stripped only in
+  `AhvNumber`, not added to `Digits::SEPARATORS`.
+- **CH driving licence**: the 15-digit 2003 layout (`000123456789003`) is known only from the ASTRA specimen, so it is
+  accepted format-only without `faberPin()`; no check digit is published for either layout.
+- **CH names**: `µ` (U+00B5) is a compatibility character and is refused although it is in ISO 8859-1; `ſ`, `ŉ` the
+  same. `Ŀ ŀ` stay (ICAO lists them).
