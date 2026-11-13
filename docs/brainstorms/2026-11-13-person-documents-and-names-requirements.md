@@ -90,8 +90,10 @@ Each value object (owner's decisions):
   `Icao\PersonName` value object. *(owner's decision)*
 - **Own Latin spelling** (owner's decision): for the algorithmically transliterated countries the Latin form is
   derived by default but may also be given explicitly (a Russian keeping the spelling of an earlier passport,
-  MUELLER or MULLER). A given form must be a valid `Icao\PersonName`. *(Designer's call: it must also be one of the
-  spellings the ICAO table allows for that national name, where the table has variants; anything else is refused.)*
+  MUELLER or MULLER). A given form must be a valid `Icao\PersonName`. *(Designer's call, revised 2026-11-13 after
+  the final review: the policy is per country. Latin-script countries require one of the spellings the ICAO table
+  allows for that national name; Russia accepts any valid ICAO name, because MVD Orders 996/186 let the passport
+  keep the spelling "так, как это указано в подтверждающем документе".)*
 - **`Icao\PersonName`** is its own value object, not tied to a country (owner's decision): Latin A-Z only, space and
   hyphen inside a part, upper case, primary identifier (surname) and secondary identifiers (given names) as separate
   parts, and it can produce the MRZ name field (`IVANOV<<IVAN<IVANOVICH`) truncated to a given width by the ICAO rule.
