@@ -18,6 +18,7 @@ use MSSTC4PHP\ValueObject\Documents\Name\Latin\AbstractFamilyGivenPersonName;
 use MSSTC4PHP\ValueObject\Documents\Name\Latin\AbstractLatinNamePart;
 use MSSTC4PHP\ValueObject\Documents\Name\Latin\AbstractLatinPersonName;
 use MSSTC4PHP\ValueObject\Documents\Name\Latin\LatinPersonNameBuilder;
+use MSSTC4PHP\ValueObject\Documents\Name\LatinForm;
 use MSSTC4PHP\ValueObject\Documents\Name\LatinOverridePolicy;
 use MSSTC4PHP\ValueObject\Documents\Name\LatinSpelling;
 use MSSTC4PHP\ValueObject\Documents\Name\NL\AbstractDutchNamePart;
@@ -54,6 +55,7 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(UnicodeText::class)]
 #[UsesClass(Text::class)]
 #[UsesClass(Optional::class)]
+#[UsesClass(LatinForm::class)]
 final class PersonNameTest extends TestCase
 {
     use RefusesNameWithoutEchoingInput;

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace MSSTC4PHP\ValueObject\Documents\Name;
 
+use LogicException;
+
 /**
  * The ICAO spellings of one identifier of a national name (the primary identifier, or all secondary identifiers) word
  * by word, with the national separator between two words: a space or a hyphen. A word is what the MRZ separates by
@@ -21,6 +23,9 @@ final readonly class IdentifierSpellings
         public array $words,
         public array $separators,
     ) {
+        if (\count($separators) !== \count($words) - 1) {
+            throw new LogicException('An identifier has one separator fewer than words.');
+        }
     }
 
     /**

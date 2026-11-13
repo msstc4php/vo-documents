@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace MSSTC4PHP\ValueObject\Documents\Tests\Unit\Name;
 
+use LogicException;
 use MSSTC4PHP\ValueObject\Documents\Icao\PersonName as IcaoPersonName;
+use MSSTC4PHP\ValueObject\Documents\Icao\Transliterator;
 use MSSTC4PHP\ValueObject\Documents\Internal\UnicodeText;
 use MSSTC4PHP\ValueObject\Documents\Name\IdentifierSpellings;
 use MSSTC4PHP\ValueObject\Documents\Name\LatinSpelling;
-use MSSTC4PHP\ValueObject\Documents\Tests\Fixture\RefusesNameWithoutEchoingInput;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
@@ -19,10 +20,6 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(UnicodeText::class)]
 final class LatinSpellingTest extends TestCase
 {
-    use RefusesNameWithoutEchoingInput;
-
-    private const string TOO_MANY = 'Invalid personal name (too many transliteration variants).';
-
     public function testFindsTheSpellingAmongTheVariantsOfEachWord(): void
     {
         $primary = new IdentifierSpellings([['MUELLER', 'MULLER']], []);
@@ -75,7 +72,7 @@ final class LatinSpellingTest extends TestCase
 
     public function testAWordWithExactlyTheCapIsSearched(): void
     {
-        $variants = $this->variants(LatinSpelling::MAX_SPELLINGS);
+        $variants = $this->variants(Transliterator::MAX_VARIANTS);
         $last = $variants[\count($variants) - 1];
 
         self::assertSame(
@@ -90,7 +87,7 @@ final class LatinSpellingTest extends TestCase
 
     public function testWordsWhoseProductIsFarAboveTheCapAreMatchedWordByWord(): void
     {
-        $variants = $this->variants(LatinSpelling::MAX_SPELLINGS);
+        $variants = $this->variants(Transliterator::MAX_VARIANTS);
         $last = $variants[\count($variants) - 1];
         $primary = new IdentifierSpellings([$variants, $variants], [' ']);
         $secondary = new IdentifierSpellings([$variants, $variants], [' ']);
@@ -100,30 +97,12 @@ final class LatinSpellingTest extends TestCase
         self::assertNull($this->find($last . '<' . $last . '<<' . $last . '<A', $primary, $secondary));
     }
 
-    public function testAPrimaryWordAboveTheCapIsRefused(): void
+    public function testSpellingsNeedOneSeparatorFewerThanWords(): void
     {
-        self::assertNameRefusedWithoutEcho(
-            fn (): ?string => $this->find(
-                'BA<BA<<BA',
-                new IdentifierSpellings([['BA'], $this->variants(LatinSpelling::MAX_SPELLINGS + 1)], [' ']),
-                new IdentifierSpellings([['BA']], []),
-            ),
-            '',
-            self::TOO_MANY,
-        );
-    }
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('An identifier has one separator fewer than words.');
 
-    public function testASecondaryWordAboveTheCapIsRefused(): void
-    {
-        self::assertNameRefusedWithoutEcho(
-            fn (): ?string => $this->find(
-                'BA<<BA<BA',
-                new IdentifierSpellings([['BA']], []),
-                new IdentifierSpellings([['BA'], $this->variants(LatinSpelling::MAX_SPELLINGS + 1)], [' ']),
-            ),
-            '',
-            self::TOO_MANY,
-        );
+        new IdentifierSpellings([['A'], ['B']], []);
     }
 
     private function find(string $latin, IdentifierSpellings $primary, ?IdentifierSpellings $secondary): ?string

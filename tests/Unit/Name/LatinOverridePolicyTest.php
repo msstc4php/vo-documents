@@ -10,6 +10,7 @@ use MSSTC4PHP\ValueObject\Documents\Icao\PersonName as IcaoPersonName;
 use MSSTC4PHP\ValueObject\Documents\Internal\UnicodeText;
 use MSSTC4PHP\ValueObject\Documents\Name\AnyIcaoSpelling;
 use MSSTC4PHP\ValueObject\Documents\Name\IdentifierSpellings;
+use MSSTC4PHP\ValueObject\Documents\Name\LatinForm;
 use MSSTC4PHP\ValueObject\Documents\Name\LatinOverridePolicy;
 use MSSTC4PHP\ValueObject\Documents\Name\LatinSpelling;
 use MSSTC4PHP\ValueObject\Documents\Name\TransliterationVariant;
@@ -21,6 +22,7 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(LatinOverridePolicy::class)]
 #[CoversClass(AnyIcaoSpelling::class)]
 #[CoversClass(TransliterationVariant::class)]
+#[CoversClass(LatinForm::class)]
 #[UsesClass(LatinSpelling::class)]
 #[UsesClass(IdentifierSpellings::class)]
 #[UsesClass(IcaoPersonName::class)]
@@ -136,6 +138,40 @@ final class LatinOverridePolicyTest extends TestCase
             static fn (): IcaoPersonName => $policy->withoutDerivedForm($override, $reason),
             'Smith Fred',
             $reason->getMessage(),
+        );
+    }
+
+    public function testEffectiveGivesTheDerivedFormOrTheKeptOverride(): void
+    {
+        $derived = IcaoPersonName::from('IVANOVA<<IULIIA');
+        $derive = static fn (): IcaoPersonName => $derived;
+        $override = IcaoPersonName::from('IVANOVA<<YULIYA');
+
+        $plain = new AnyIcaoSpelling()->effective($derive, null);
+        $kept = new AnyIcaoSpelling()->effective($derive, $override);
+
+        self::assertSame($derived, $plain->effective);
+        self::assertNull($plain->override);
+        self::assertSame($override, $kept->effective);
+        self::assertSame($override, $kept->override);
+    }
+
+    public function testEffectiveWithoutADerivedFormFollowsThePolicy(): void
+    {
+        $derive = static fn (): never => throw new InvalidPersonNameException('Invalid personal name (empty).');
+        $override = IcaoPersonName::from('SMITH<<FRED');
+
+        $form = new AnyIcaoSpelling()->effective($derive, $override);
+
+        self::assertSame($override, $form->effective);
+        self::assertSame($override, $form->override);
+        self::assertNameRefusedWithoutEcho(
+            static fn (): LatinForm => new TransliterationVariant(
+                static fn (): never => throw new LogicException('The spellings were computed.'),
+                self::REFUSAL,
+            )->effective($derive, $override),
+            'Smith Fred',
+            'Invalid personal name (empty).',
         );
     }
 }

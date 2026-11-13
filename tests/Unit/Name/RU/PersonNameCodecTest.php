@@ -24,6 +24,7 @@ use MSSTC4PHP\ValueObject\Documents\Name\FR\PersonNameCodec as FrPersonNameCodec
 use MSSTC4PHP\ValueObject\Documents\Name\GB\PersonNameCodec as GbPersonNameCodec;
 use MSSTC4PHP\ValueObject\Documents\Name\IdentifierSpellings;
 use MSSTC4PHP\ValueObject\Documents\Name\IT\PersonNameCodec as ItPersonNameCodec;
+use MSSTC4PHP\ValueObject\Documents\Name\LatinForm;
 use MSSTC4PHP\ValueObject\Documents\Name\LatinOverridePolicy;
 use MSSTC4PHP\ValueObject\Documents\Name\LatinSpelling;
 use MSSTC4PHP\ValueObject\Documents\Name\NL\PersonNameCodec as NlPersonNameCodec;
@@ -72,6 +73,7 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(UnicodeText::class)]
 #[UsesClass(PayloadFields::class)]
 #[UsesClass(Optional::class)]
+#[UsesClass(LatinForm::class)]
 final class PersonNameCodecTest extends TestCase
 {
     use RefusesNameWithoutEchoingInput;

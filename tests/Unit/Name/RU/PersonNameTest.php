@@ -13,6 +13,7 @@ use MSSTC4PHP\ValueObject\Documents\Internal\UnicodeText;
 use MSSTC4PHP\ValueObject\Documents\Name\AbstractNamePart;
 use MSSTC4PHP\ValueObject\Documents\Name\AnyIcaoSpelling;
 use MSSTC4PHP\ValueObject\Documents\Name\IdentifierSpellings;
+use MSSTC4PHP\ValueObject\Documents\Name\LatinForm;
 use MSSTC4PHP\ValueObject\Documents\Name\LatinOverridePolicy;
 use MSSTC4PHP\ValueObject\Documents\Name\LatinSpelling;
 use MSSTC4PHP\ValueObject\Documents\Name\RU\AbstractRussianNamePart;
@@ -47,6 +48,7 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(LatinMultinational::class)]
 #[UsesClass(UnicodeText::class)]
 #[UsesClass(Optional::class)]
+#[UsesClass(LatinForm::class)]
 final class PersonNameTest extends TestCase
 {
     use RefusesNameWithoutEchoingInput;

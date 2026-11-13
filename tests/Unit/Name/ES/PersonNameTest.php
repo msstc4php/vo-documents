@@ -19,6 +19,7 @@ use MSSTC4PHP\ValueObject\Documents\Name\IdentifierSpellings;
 use MSSTC4PHP\ValueObject\Documents\Name\Latin\AbstractLatinNamePart;
 use MSSTC4PHP\ValueObject\Documents\Name\Latin\AbstractLatinPersonName;
 use MSSTC4PHP\ValueObject\Documents\Name\Latin\LatinPersonNameBuilder;
+use MSSTC4PHP\ValueObject\Documents\Name\LatinForm;
 use MSSTC4PHP\ValueObject\Documents\Name\LatinOverridePolicy;
 use MSSTC4PHP\ValueObject\Documents\Name\LatinSpelling;
 use MSSTC4PHP\ValueObject\Documents\Name\TransliterationVariant;
@@ -49,6 +50,7 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(UnicodeText::class)]
 #[UsesClass(Optional::class)]
 #[UsesClass(Text::class)]
+#[UsesClass(LatinForm::class)]
 final class PersonNameTest extends TestCase
 {
     use RefusesNameWithoutEchoingInput;

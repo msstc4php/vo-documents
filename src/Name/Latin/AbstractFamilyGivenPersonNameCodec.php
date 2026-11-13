@@ -21,6 +21,7 @@ use Override;
  * @internal
  *
  * @template TName of AbstractFamilyGivenPersonName the country's composite name
+ * @template TGivenValue of string|null the stored "given": string where the country requires a given name
  *
  * @implements PayloadCodec<TName>
  */
@@ -29,7 +30,7 @@ abstract readonly class AbstractFamilyGivenPersonNameCodec implements PayloadCod
     private const array KEYS = ['family', 'given', 'latin'];
 
     /**
-     * @return array{family: string, given: string|null, latin: string|null}
+     * @return array{family: string, given: TGivenValue, latin: string|null}
      */
     #[Override]
     final public function encode(ValueObject $value): array
@@ -43,7 +44,7 @@ abstract readonly class AbstractFamilyGivenPersonNameCodec implements PayloadCod
 
         return [
             'family' => $value->family->value,
-            'given' => $value->given?->value,
+            'given' => $this->givenValue($value),
             'latin' => $value->latinOverride()?->value,
         ];
     }
@@ -83,6 +84,13 @@ abstract readonly class AbstractFamilyGivenPersonNameCodec implements PayloadCod
         ?string $given,
         ?IcaoPersonName $latin,
     ): AbstractFamilyGivenPersonName;
+
+    /**
+     * @param TName $name
+     *
+     * @return TGivenValue
+     */
+    abstract protected function givenValue(AbstractFamilyGivenPersonName $name): ?string;
 
     final protected function malformed(): InvalidPayloadException
     {

@@ -18,8 +18,8 @@ use MSSTC4PHP\ValueObject\Documents\Internal\UnicodeText;
  */
 final readonly class Transliterator
 {
-    /** Bounds variants() on untrusted input: 4096 = eight two-way or seven three-way characters. */
-    private const int MAX_VARIANTS = 4096;
+    /** Bounds variants() on untrusted input: 4096 = twelve two-way or seven three-way characters. */
+    public const int MAX_VARIANTS = 4096;
 
     /** Omitted without a filler, Doc 9303 Part 3 §4.6 ("D’ARTAGNAN" → "DARTAGNAN"). */
     private const array APOSTROPHES = ["'", "\u{2019}"];

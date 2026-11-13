@@ -32,18 +32,9 @@ abstract readonly class AbstractLatinPersonName implements NationalPersonName
     protected function __construct(array $familyParts, array $givenParts, ?IcaoPersonName $latin)
     {
         $builder = new LatinPersonNameBuilder($familyParts, $givenParts);
-        $policy = $this->overridePolicy($builder);
-        try {
-            $derived = $builder->derive();
-        } catch (InvalidPersonNameException $reason) {
-            $this->override = $policy->withoutDerivedForm($latin, $reason);
-            $this->effective = $this->override;
-
-            return;
-        }
-
-        $this->override = $policy->resolve($latin, $derived);
-        $this->effective = $this->override ?? $derived;
+        $form = $this->overridePolicy($builder)->effective($builder->derive(...), $latin);
+        $this->effective = $form->effective;
+        $this->override = $form->override;
     }
 
     #[Override]
@@ -61,5 +52,9 @@ abstract readonly class AbstractLatinPersonName implements NationalPersonName
         return $this->override;
     }
 
+    /**
+     * Called from the constructor before the subclass is fully built: build the policy from `$builder` and constants
+     * only, never from instance state.
+     */
     abstract protected function overridePolicy(LatinPersonNameBuilder $builder): LatinOverridePolicy;
 }

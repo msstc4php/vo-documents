@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MSSTC4PHP\ValueObject\Documents\Name;
 
+use Closure;
 use MSSTC4PHP\ValueObject\Documents\Exception\InvalidPersonNameException;
 use MSSTC4PHP\ValueObject\Documents\Icao\PersonName as IcaoPersonName;
 
@@ -31,6 +32,27 @@ abstract readonly class LatinOverridePolicy
         }
 
         return $this->spelling($override);
+    }
+
+    /**
+     * Derives the name's Latin form and applies the policy to the override.
+     *
+     * @param Closure(): IcaoPersonName $derive throws when the name has no derived form
+     *
+     * @throws InvalidPersonNameException when there is no derived form and the policy needs one, or the policy refuses
+     *                                    the override
+     */
+    final public function effective(Closure $derive, ?IcaoPersonName $override): LatinForm
+    {
+        try {
+            $derived = $derive();
+        } catch (InvalidPersonNameException $reason) {
+            return new LatinForm($this->withoutDerivedForm($override, $reason), $override);
+        }
+
+        $kept = $this->resolve($override, $derived);
+
+        return new LatinForm($kept ?? $derived, $kept);
     }
 
     /**

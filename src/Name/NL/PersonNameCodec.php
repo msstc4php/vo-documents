@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace MSSTC4PHP\ValueObject\Documents\Name\NL;
 
 use MSSTC4PHP\ValueObject\Documents\Icao\PersonName as IcaoPersonName;
+use MSSTC4PHP\ValueObject\Documents\Name\Latin\AbstractFamilyGivenPersonName;
 use MSSTC4PHP\ValueObject\Documents\Name\Latin\AbstractFamilyGivenPersonNameCodec;
 use Override;
 
@@ -14,7 +15,7 @@ use Override;
  * `family` as typed (`van der Berg`). Other keys are refused, so the {@see PersonName::jsonSerialize()} view (which has
  * `effectiveLatin`) is never read as a payload that silently drops an override.
  *
- * @extends AbstractFamilyGivenPersonNameCodec<PersonName>
+ * @extends AbstractFamilyGivenPersonNameCodec<PersonName, string|null>
  */
 final readonly class PersonNameCodec extends AbstractFamilyGivenPersonNameCodec
 {
@@ -37,5 +38,11 @@ final readonly class PersonNameCodec extends AbstractFamilyGivenPersonNameCodec
     protected function create(string $family, ?string $given, ?IcaoPersonName $latin): PersonName
     {
         return new PersonName(FamilyName::from($family), $given === null ? null : GivenName::from($given), $latin);
+    }
+
+    #[Override]
+    protected function givenValue(AbstractFamilyGivenPersonName $name): ?string
+    {
+        return $name->given?->value;
     }
 }

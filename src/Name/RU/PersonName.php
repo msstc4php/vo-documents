@@ -43,21 +43,15 @@ final readonly class PersonName implements NationalPersonName
         ?IcaoPersonName $latin = null,
     ) {
         $transliteration = new RussianTransliteration();
-        $policy = new AnyIcaoSpelling();
-        try {
-            $derived = IcaoPersonName::fromParts(
+        $form = new AnyIcaoSpelling()->effective(
+            static fn (): IcaoPersonName => IcaoPersonName::fromParts(
                 $transliteration->toLatin($family),
                 [$transliteration->toLatin($given)],
-            );
-        } catch (InvalidPersonNameException $reason) {
-            $this->latin = $policy->withoutDerivedForm($latin, $reason);
-            $this->effective = $this->latin;
-
-            return;
-        }
-
-        $this->latin = $policy->resolve($latin, $derived);
-        $this->effective = $this->latin ?? $derived;
+            ),
+            $latin,
+        );
+        $this->effective = $form->effective;
+        $this->latin = $form->override;
     }
 
     #[Override]
