@@ -7,4 +7,8 @@
 - `Internal\*` helpers are `final` classes with static methods marked `@internal`; `Contract\Subdivision` is an interface extending `\BackedEnum` (value = ISO 3166-2 code).
 - Name sources live in `docs/sources/<AREA>.md` with verbatim quotes and section numbers; code tables are copied from
   there and the class docblock cites the PDF (`@see`). ICAO "except …" (language-specific) spellings are not variants.
+- A national name part extends `Name\AbstractNamePart`; message `Invalid <label> (<n> characters).`; allowed
+  separators per part come from the country's source note (RU: given names and patronymics have no apostrophe).
+- A composite name is a `final readonly` class with public part properties, its codec stores only an explicit Latin
+  override (`latin: null` otherwise) and is listed in `Codecs::all()`.
 - `Icao\Transliterator::variants()` caps at 4096 combinations (untrusted input); `toLatin()` has no cap.

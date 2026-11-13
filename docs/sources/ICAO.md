@@ -216,8 +216,8 @@ of languages." The tables list upper-case characters only.
   (U+00D0); rows 0131 and 0474 lose their glyph on text extraction (`I`, `V`). The tables above and in code use the
   code point of the Unicode column: Ђ U+0402, Ў U+040E, Đ U+0110, ı U+0131, Ѵ U+0474. U+040B Ћ is not in the table.
 - **No soft sign.** Ь (U+042C) is **absent** from table 6.B (as are Ѐ, Ѓ, Ѝ, Ћ). Doc 9303 does not say whether an
-  absent character is dropped; this package therefore treats it as uncovered (the transliterator throws). A Russian
-  rule for Ь needs a Russian source (plan task 4, `RU.md`).
+  absent character is dropped; this package therefore treats it as uncovered (the transliterator throws). Russian names
+  omit Ь per the MVD table (`RU.md` §3), outside this table.
 - **Lower case** is not listed; the transliterator upper-cases its input (`mb_strtoupper`) before the lookup, so
   lower-case `ß` becomes `SS` (matching ẞ → SS) and `ı` becomes `I`.
 

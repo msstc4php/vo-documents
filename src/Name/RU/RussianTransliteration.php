@@ -1,0 +1,41 @@
+<?php
+
+declare(strict_types=1);
+
+namespace MSSTC4PHP\ValueObject\Documents\Name\RU;
+
+use MSSTC4PHP\ValueObject\Documents\Exception\InvalidPersonNameException;
+use MSSTC4PHP\ValueObject\Documents\Icao\Transliterator;
+use MSSTC4PHP\ValueObject\Documents\Name\AbstractNamePart;
+
+/**
+ * The Russian passport rule on top of ICAO table 6.B: the MVD table has the same spelling for every Russian letter
+ * and no row for Ь, which is therefore omitted (Игорь → IGOR). See docs/sources/RU.md §3.
+ *
+ * @see https://base.garant.ru/73680659/58db58f32c2e5d0082ad4f804e086668/ Order of the MVD of Russia No. 996 of
+ *      31.12.2019, appendix 9, "Транслитерация кириллических знаков (извлечение)"
+ *
+ * @internal
+ */
+final readonly class RussianTransliteration
+{
+    /** The 33 letters of the Russian alphabet as a regex class body. */
+    public const string LETTERS = 'А-ЯЁа-яё';
+
+    private const array SOFT_SIGNS = ['Ь', 'ь'];
+
+    public function __construct(
+        private Transliterator $transliterator = new Transliterator(),
+    ) {
+    }
+
+    /**
+     * @return non-empty-list<non-empty-string> the default spelling first
+     *
+     * @throws InvalidPersonNameException
+     */
+    public function variants(AbstractNamePart $part): array
+    {
+        return $this->transliterator->variants(\str_replace(self::SOFT_SIGNS, '', $part->value));
+    }
+}
