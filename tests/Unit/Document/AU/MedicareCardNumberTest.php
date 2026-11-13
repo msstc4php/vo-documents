@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace MSSTC4PHP\ValueObject\Documents\Tests\Unit\Document\AU;
 
 use MSSTC4PHP\ValueObject\Documents\Document\AU\MedicareCardNumber;
-use MSSTC4PHP\ValueObject\Documents\Internal\Checksum;
 use MSSTC4PHP\ValueObject\Documents\Internal\Digits;
 use MSSTC4PHP\ValueObject\Documents\Internal\Mask;
 use MSSTC4PHP\ValueObject\Documents\Internal\Text;
@@ -19,7 +18,6 @@ use PHPUnit\Framework\TestCase;
  * Expectations follow docs/sources/AU.md "Medicare card number".
  */
 #[CoversClass(MedicareCardNumber::class)]
-#[UsesClass(Checksum::class)]
 #[UsesClass(Digits::class)]
 #[UsesClass(Text::class)]
 #[UsesClass(Mask::class)]
@@ -34,8 +32,11 @@ final class MedicareCardNumberTest extends TestCase
     {
         yield 'worked example, issue 1' => ['3189 97702 1', '3189977021'];
         yield 'issue number 0' => ['3189977020', '3189977020'];
-        yield 'first digit 2, check digit 0' => ['2123 45670 1', '2123456701'];
-        yield 'first digit 6' => ['6000 00006 9', '6000000069'];
+        yield 'check digit changed' => ['3189 97703 1', '3189977031'];
+        yield 'card digit changed' => ['3189 97802 1', '3189978021'];
+        yield 'first digit 1' => ['1189 97702 1', '1189977021'];
+        yield 'first digit 7' => ['7189 97702 1', '7189977021'];
+        yield 'first digit 0' => ['0000 00000 1', '0000000001'];
         yield 'hyphens, tabs and NBSP' => ["3189-977\t02\u{00A0}1", '3189977021'];
     }
 
@@ -62,11 +63,6 @@ final class MedicareCardNumberTest extends TestCase
      */
     public static function invalidNumbers(): iterable
     {
-        yield 'check digit changed' => ['3189 97703 1', 'Invalid Medicare card number checksum.'];
-        yield 'card digit changed' => ['3189 97802 1', 'Invalid Medicare card number checksum.'];
-        yield 'first digit 1' => ['1189 97702 1', 'Invalid Medicare card number (first digit out of range).'];
-        yield 'first digit 7' => ['7189 97702 1', 'Invalid Medicare card number (first digit out of range).'];
-        yield 'first digit 0' => ['0000 00000 1', 'Invalid Medicare card number (first digit out of range).'];
         yield 'with the individual reference number' => [
             '3189 97702 1 1',
             'Invalid Medicare card number (11 characters).',

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace MSSTC4PHP\ValueObject\Documents\Tests\Unit\Document\RU;
 
 use MSSTC4PHP\ValueObject\Documents\Document\RU\Inn;
-use MSSTC4PHP\ValueObject\Documents\Internal\Checksum;
 use MSSTC4PHP\ValueObject\Documents\Internal\Digits;
 use MSSTC4PHP\ValueObject\Documents\Internal\Mask;
 use MSSTC4PHP\ValueObject\Documents\Internal\Text;
@@ -16,11 +15,9 @@ use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
 
 /**
- * Expectations follow docs/sources/RU.md "INN". The sources publish no example number; the numbers below are computed
- * with the control-digit rule.
+ * Expectations follow docs/sources/RU.md "INN". Format only: the control digits are not verified.
  */
 #[CoversClass(Inn::class)]
-#[UsesClass(Checksum::class)]
 #[UsesClass(Digits::class)]
 #[UsesClass(Text::class)]
 #[UsesClass(Mask::class)]
@@ -37,11 +34,9 @@ final class InnTest extends TestCase
         yield 'spaces' => ['5001 007322 59', '500100732259'];
         yield 'hyphens' => ['5001-007322-59', '500100732259'];
         yield 'tab and NBSP' => ["5001\t007322\u{00A0}59", '500100732259'];
-        yield 'both remainders 10 give 0' => ['381075632400', '381075632400'];
-        yield 'no zero digit 1' => ['637129261945', '637129261945'];
-        yield 'no zero digit 2' => ['412772429772', '412772429772'];
-        yield 'no zero digit 3' => ['124171419355', '124171419355'];
-        yield 'no zero digit 4' => ['573925932403', '573925932403'];
+        yield 'second control digit changed' => ['500100732258', '500100732258'];
+        yield 'first control digit changed' => ['500100732249', '500100732249'];
+        yield 'number digit changed' => ['500100732359', '500100732359'];
     }
 
     #[DataProvider('validNumbers')]
@@ -68,10 +63,6 @@ final class InnTest extends TestCase
      */
     public static function invalidNumbers(): iterable
     {
-        yield 'second control digit changed' => ['500100732258', 'Invalid INN checksum.'];
-        yield 'first control digit changed' => ['500100732249', 'Invalid INN checksum.'];
-        yield 'number digit changed' => ['500100732359', 'Invalid INN checksum.'];
-        yield 'remainder 10 written as 10 mod 11' => ['381075632410', 'Invalid INN checksum.'];
         yield 'zeros only' => ['000000000000', 'Invalid INN (zeros only).'];
         yield 'organisation INN length' => ['7707083893', 'Invalid INN (10 characters).'];
         yield 'too long' => ['5001007322590', 'Invalid INN (13 characters).'];

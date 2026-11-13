@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace MSSTC4PHP\ValueObject\Documents\Tests\Unit\Document\AU;
 
 use MSSTC4PHP\ValueObject\Documents\Document\AU\TaxFileNumber;
-use MSSTC4PHP\ValueObject\Documents\Internal\Checksum;
 use MSSTC4PHP\ValueObject\Documents\Internal\Digits;
 use MSSTC4PHP\ValueObject\Documents\Internal\Mask;
 use MSSTC4PHP\ValueObject\Documents\Internal\Text;
@@ -19,7 +18,6 @@ use PHPUnit\Framework\TestCase;
  * Expectations follow docs/sources/AU.md "Tax file number".
  */
 #[CoversClass(TaxFileNumber::class)]
-#[UsesClass(Checksum::class)]
 #[UsesClass(Digits::class)]
 #[UsesClass(Text::class)]
 #[UsesClass(Mask::class)]
@@ -36,6 +34,8 @@ final class TaxFileNumberTest extends TestCase
         yield '1982 notice of amended assessment' => ['330 600 376', '330600376'];
         yield 'digits only' => ['123456782', '123456782'];
         yield 'hyphens, tabs and NBSP' => ["123-456\t78\u{00A0}2", '123456782'];
+        yield 'last digit changed' => ['123 456 783', '123456783'];
+        yield 'first digit changed' => ['223 456 782', '223456782'];
     }
 
     #[DataProvider('validNumbers')]
@@ -61,9 +61,6 @@ final class TaxFileNumberTest extends TestCase
      */
     public static function invalidNumbers(): iterable
     {
-        yield 'last digit changed' => ['123 456 783', 'Invalid Australian tax file number checksum.'];
-        yield 'first digit changed' => ['223 456 782', 'Invalid Australian tax file number checksum.'];
-        yield 'two digits swapped' => ['213 456 782', 'Invalid Australian tax file number checksum.'];
         yield 'eight digits' => ['12 345 678', 'Invalid Australian tax file number (8 characters).'];
         yield 'ten digits' => ['123 456 7820', 'Invalid Australian tax file number (10 characters).'];
         yield 'letter' => ['123 456 78O', 'Invalid Australian tax file number (invalid character).'];

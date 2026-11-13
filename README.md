@@ -49,15 +49,15 @@ last four digits, the AU classes keep three (their numbers are at most 10 charac
 | Class | Document | Check | Source |
 |---|---|---|---|
 | `Document\RU\Snils` | SNILS, 11 digits | control number mod 101 (above 001-001-998) | SFR Order No. 1463 of 17.11.2025; PFR checking rules |
-| `Document\RU\Inn` | INN of an individual, 12 digits | two control digits | FNS Order ЕД-7-14/559@; weights quoted from practice (see below) |
+| `Document\RU\Inn` | INN of an individual, 12 digits | format only (no check digit verified) | FNS Order ЕД-7-14/559@ (algorithm not published) |
 | `Document\RU\InternalPassportNumber` | Internal passport, series + number, 10 digits | shape only | Government Decree No. 2267 of 23.12.2023 |
 | `Document\RU\PassportIssuingUnitCode` | Issuing unit code, `NNN-NNN` | shape only | MVD Order No. 773 of 16.11.2020 |
 | `Document\RU\InternationalPassportNumber` | Passport for travel abroad, 9 digits | shape only | MVD Orders No. 186 (2021), No. 996 (2019) |
 | `Document\RU\DriverLicenceNumber` | Driving licence, `00 00 000000` | shape only | MVD Order No. 365 of 13.05.2009 |
 | `Document\RU\DriverLicenceCategory` | Licence categories (enum) | n/a | MVD Order No. 365; Federal Law 196-FZ |
 | `Document\RU\OmsPolicyNumber` | OMS policy (ЕНП), 16 digits | HL7 Mod10 (Luhn) | FFOMS Order No. 79 of 07.04.2011 |
-| `Document\AU\TaxFileNumber` | Tax file number, 9 digits | weighted sum mod 11 | ATO (algorithm not public, see below) |
-| `Document\AU\MedicareCardNumber` | Medicare card, 10 digits | check digit | Australian Digital Health Agency (algorithm not public) |
+| `Document\AU\TaxFileNumber` | Tax file number, 9 digits | format only (no check digit verified) | ATO (algorithm not public) |
+| `Document\AU\MedicareCardNumber` | Medicare card, 10 digits | format only (no check digit verified) | Australian Digital Health Agency (algorithm not public) |
 | `Document\AU\DriverLicence\{Act,Nsw,Nt,Qld,Sa,Tas,Vic,Wa}DriverLicenceNumber` | Licence number per state or territory | shape only | Home Affairs DVS field rules |
 | `Document\AU\Jurisdiction` | The eight states and territories (enum, ISO 3166-2:AU) | n/a | ISO 3166-2:AU |
 
@@ -252,14 +252,14 @@ Collected from the source notes; each is a deliberate omission with its reason i
 - **RU old-form OMS policies** (series and number) and AU **11-digit Medicare individual numbers**.
 - **AU driving licence card numbers**: a different number on the same licence, left for a later release (`AU.md`).
 - **AU single names (mononyms)**: the constructor requires a given name (`AU.md`).
-- **AU 8-digit TFNs of non-individuals**: weights are not published anywhere official (`AU.md`).
+- **AU 8-digit TFNs of non-individuals**: no official format is published (`AU.md`).
 
 ## Limits to know about
 
-- **Checksums without a public official text.** The INN control-digit weights (FNS says only "по алгоритму,
-  определенному ФНС"), the TFN weights (ATO gives them to registered developers only) and the Medicare check digit
-  (ADHA appendix not reachable) are implemented from the algorithm used in practice. Each is flagged on its class and
-  in the source note; blogs appear there only as "quoted from".
+- **Format only, check digit not verified:** INN, TFN and Medicare card number. No official algorithm is published
+  (FNS says only "по алгоритму, определенному ФНС"; the ATO gives the TFN algorithm to registered developers only;
+  the ADHA appendix is not reachable), so a mistyped check digit is accepted. Only checksums quoted from an official
+  source are verified (SNILS, OMS policy).
 - **Not verified against the official PDF:** the 16-digit length of the OMS policy and the FFOMS Order 79 text it is
   checked against (www.ffoms.gov.ru is unreachable from here, the text is quoted from a copy), and the 2 + 7 split of
   the international passport number (no text read states it; `RU.md`).

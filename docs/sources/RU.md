@@ -214,10 +214,9 @@ refused. `formatted()` `112-233-445 95`; `masked()` `***-***-*45 95`.
    (twelve zeros are the "no INN" filler in FNS formats).
 
 **The control-digit algorithm is not published** in the order ("по алгоритму, определенному ФНС"), and no official
-publication of it was found (searched nalog.gov.ru, publication.pravo.gov.ru and the legal databases on 2026-11-13 UTC;
-only aggregator descriptions exist). The package implements the plan's weights — `7,2,4,10,3,5,9,4,6,8` (digit 11) and
-`3,7,2,4,10,3,5,9,4,6,8` (digit 12), sum mod 11 mod 10 — which every published description agrees on. This is the one
-rule in this file without an official text; see the report/known issues.
+publication of it was found (searched nalog.gov.ru, publication.pravo.gov.ru and the legal databases on 2026-11-13 UTC).
+Owner decision: a checksum is computed only when its algorithm is quoted from an official source. **Format only; the
+check digits are not verified because no official algorithm is published**: 12 digits, not all zeros (SFR 1.14).
 
 **Where the plan loses to the source:** the plan's `taxOfficeCode()` (first four digits) holds only for INNs assigned
 under Order ММВ-7-6/435@ (NNNN = code of the assigning tax office). Since 01.01.2026 digits 3–4 are an "индекс,
@@ -342,6 +341,6 @@ ISO 3166-2:RU. None does:
 |---|---|---|
 | `Inn::taxOfficeCode()` = first 4 digits | since 01.01.2026 NN = FNS directorate, YY = FNS index (ЕД-7-14/559@) | `taxAuthorityRegionCode()` (2 digits) |
 | SNILS rule wording | PFR §8 "mod 101, last two digits" | same function; zeros only refused (SFR 1.15) |
-| INN checksum "per source" | the algorithm is not published | plan weights, flagged |
+| INN checksum "per source" | the algorithm is not published | not verified; format only |
 | DL "older series with Cyrillic letters only if still recognised" | Order 365 §8: valid until expiry; all expired by 2021 | digits only |
 | `Region` | no published ISO mapping | not created |

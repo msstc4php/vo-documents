@@ -27,8 +27,6 @@
 - `Transliterator` omits only U+0027 and U+2019 apostrophes (Part 3 §4.6); U+02BC and other punctuation are refused.
 - `PersonName::fromParts()` refuses `<` inside a part (it would silently split identifiers); `from()` accepts the
   canonical `<`/`<<` form. `mrzField()` maps hyphens to `<` in both identifiers before cutting.
-- **INN control-digit weights have no official text**: FNS Order ЕД-7-14/559@ only says the control number is computed
-  "по алгоритму, определенному ФНС". `Document\RU\Inn` uses the universally described weights (RU.md "INN").
 - **INN digits 3-4 changed meaning on 2026-01-01** (Order ЕД-7-14/559@): NN = FNS directorate, YY = FNS index, so there
   is no `taxOfficeCode()`; `Inn::taxAuthorityRegionCode()` returns digits 1-2.
 - **HL7 Mod10 (OMS policy, FFOMS Order 79) is Luhn**: doubling the odd-position number has the same digit sum as
@@ -44,9 +42,9 @@
 - **No AU issuing authority publishes its licence format**; the source is the Commonwealth DVS rules on
   immi.homeaffairs.gov.au (the only AU gov site that reliably answers from this environment; most others reset HTTP/2
   or return 403).
-- **TFN and Medicare checksums: no public official text; algorithm as used in practice.** The ATO gives the TFN
-  algorithm to registered developers only; the Medicare check digit is ADHA Appendix E, served by no reachable official
-  host. Weights are quoted from secondary sources in AU.md only; the classes cite the official pages.
+- **TFN and Medicare: format only; the check digit is not verified because no official algorithm is published.** The
+  ATO gives the TFN algorithm to registered developers only; the Medicare check digit is ADHA Appendix E, served by no
+  reachable official host. Owner rule: a checksum is computed only when its algorithm is quoted from an official source.
 - Sub-national pattern (copy for US/CA/BR): `Document\<CC>\Jurisdiction` enum, `DriverLicenceNumber` interface with a
   covariant `jurisdiction()`, an abstract base per country with `static format(): Internal\NumberFormat` (character
   class + length range; messages "(N characters)" / "(invalid character)") and shared `masked()`/`parse()`, one final
@@ -61,8 +59,8 @@
   `Icao\PersonName` 255; Doctrine columns follow the constants.
 - **OMS policy length (16) and the international passport 2 + 7 split are unverified** against an official text
   (ffoms.gov.ru fails TLS); see RU.md.
-- **A checksum without a public text is still shipped** (INN, TFN, Medicare): dropping it would accept
-  most typos. The owner should confirm this against the spec's anti-goal.
+- **INN: format only** (12 digits, not all zeros); the FNS order does not publish the control-digit algorithm, so a
+  wrong check digit is accepted. SNILS (PFR act) and OMS (FFOMS Order 79 citing ISO/HL7 27931) keep their checksums.
 - `composer-local.json` is gitignored; `CLAUDE.md` says how to create it.
 - Deferred minors (not fixed): `isInScript` passes the letter class straight into a regex (constants only today);
   the "no number" ambiguity test is trivial. `Subdivision` string backing is enforced by

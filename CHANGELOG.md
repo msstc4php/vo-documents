@@ -19,7 +19,8 @@
 ### Notes
 
 - The Russian derived Latin name omits the patronymic and the soft sign Ь (MVD Orders 996 and 186).
-- INN, TFN and Medicare checksums have no public official text; implemented from the algorithm used in practice.
+- `Inn`, `TaxFileNumber` and `MedicareCardNumber` validate the format only; the check digit is not verified because no
+  official algorithm is published. Only checksums with an official source (`Snils`, `OmsPolicyNumber`) are verified.
 - `DriverLicenceNumberFactory::fromNumber()` is always ambiguous for AU with the published formats; use
   `fromNumberIn()`.
 - Name parts are limited to 100 characters, `Icao\PersonName` to 255.

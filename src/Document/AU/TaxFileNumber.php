@@ -5,17 +5,15 @@ declare(strict_types=1);
 namespace MSSTC4PHP\ValueObject\Documents\Document\AU;
 
 use MSSTC4PHP\ValueObject\Documents\Contract\Maskable;
-use MSSTC4PHP\ValueObject\Documents\Exception\InvalidDocumentNumberException;
-use MSSTC4PHP\ValueObject\Documents\Internal\Checksum;
 use MSSTC4PHP\ValueObject\Documents\Internal\Digits;
 use MSSTC4PHP\ValueObject\Documents\Internal\Mask;
 use MSSTC4PHP\ValueObject\Support\AbstractStringValueObject;
 use Override;
 
 /**
- * Tax file number: 9 digits whose sum weighted 1, 4, 3, 7, 5, 8, 6, 9, 10 is a multiple of 11. No public official
- * text; the algorithm is the one used in practice, as the ATO gives its TFN algorithm to registered software
- * developers only (AU.md). The 8-digit TFNs once issued to non-individuals are not accepted.
+ * Tax file number: 9 digits. Format only: the check digit is not verified because no official algorithm is
+ * published (the ATO gives its TFN algorithm to registered software developers only, AU.md). The 8-digit TFNs once
+ * issued to non-individuals are not accepted.
  *
  * `masked()` (no official rule) keeps the last three digits, not the package's usual four: AU numbers are short
  * (at most 10 characters), so four would show almost half of them. `*** *** 782`.
@@ -26,8 +24,6 @@ use Override;
 final class TaxFileNumber extends AbstractStringValueObject implements Maskable
 {
     private const string DOCUMENT = 'Australian tax file number';
-
-    private const array WEIGHTS = [1, 4, 3, 7, 5, 8, 6, 9, 10];
 
     /**
      * @return non-empty-string
@@ -46,12 +42,6 @@ final class TaxFileNumber extends AbstractStringValueObject implements Maskable
     #[Override]
     protected function parse(string $value): string
     {
-        $digits = Digits::exactly($value, 9, self::DOCUMENT);
-
-        if (Checksum::weightedMod($digits, self::WEIGHTS, 11) !== 0) {
-            throw new InvalidDocumentNumberException(\sprintf('Invalid %s checksum.', self::DOCUMENT));
-        }
-
-        return $digits;
+        return Digits::exactly($value, 9, self::DOCUMENT);
     }
 }

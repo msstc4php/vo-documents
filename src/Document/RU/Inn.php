@@ -6,7 +6,6 @@ namespace MSSTC4PHP\ValueObject\Documents\Document\RU;
 
 use MSSTC4PHP\ValueObject\Documents\Contract\Maskable;
 use MSSTC4PHP\ValueObject\Documents\Exception\InvalidDocumentNumberException;
-use MSSTC4PHP\ValueObject\Documents\Internal\Checksum;
 use MSSTC4PHP\ValueObject\Documents\Internal\Digits;
 use MSSTC4PHP\ValueObject\Documents\Internal\Mask;
 use MSSTC4PHP\ValueObject\Documents\Internal\Text;
@@ -14,10 +13,9 @@ use MSSTC4PHP\ValueObject\Support\AbstractStringValueObject;
 use Override;
 
 /**
- * ИНН of an individual: 12 digits `NNYYXXXXXXCC`. The two control digits are each a weighted sum mod 11 mod 10
- * (weights 7,2,4,10,3,5,9,4,6,8 over digits 1-10, then 3,7,2,4,10,3,5,9,4,6,8 over digits 1-11). The FNS order states
- * only that CC is "рассчитанное по алгоритму, определенному Федеральной налоговой службой" and does not publish the
- * weights (see RU.md). Twelve zeros, the "no INN" filler of the FNS formats, are refused (SFR check
+ * ИНН of an individual: 12 digits `NNYYXXXXXXCC`. Format only: the check digits are not verified because no official
+ * algorithm is published (the FNS order says only that CC is "рассчитанное по алгоритму, определенному Федеральной
+ * налоговой службой", see RU.md). Twelve zeros, the "no INN" filler of the FNS formats, are refused (SFR check
  * ВС.ЕФС-СЗВ-ТД.1.14). `masked()` keeps the last four digits (no official masking rule): `********2259`.
  *
  * @see http://publication.pravo.gov.ru/document/0001202510090011 FNS Order of 26.06.2025 No. ЕД-7-14/559@, §2-§3
@@ -61,13 +59,6 @@ final class Inn extends AbstractStringValueObject implements Maskable
 
         if ($digits === '000000000000') {
             throw new InvalidDocumentNumberException(\sprintf('Invalid %s (zeros only).', self::DOCUMENT));
-        }
-
-        $first = Checksum::weightedMod(\substr($digits, 0, 10), [7, 2, 4, 10, 3, 5, 9, 4, 6, 8], 11) % 10;
-        $second = Checksum::weightedMod(\substr($digits, 0, 11), [3, 7, 2, 4, 10, 3, 5, 9, 4, 6, 8], 11) % 10;
-
-        if (\substr($digits, 10) !== $first . $second) {
-            throw new InvalidDocumentNumberException(\sprintf('Invalid %s checksum.', self::DOCUMENT));
         }
 
         return $digits;
