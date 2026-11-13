@@ -1,6 +1,6 @@
 # Known issues
 
-- **Infection crashes on escaped mutants whose diff contains `<…`** ("Incorrectly nested style tag found"): the
+- **Infection crashes on escaped mutants whose diff contains `<<`** ("Incorrectly nested style tag found"): the
   console formatter reads MRZ strings such as `'<<'` as style tags. `make infection` exits 1 even though the run
   finished. Kill every mutant in files with `<` literals (Icao), or inspect with
   `vendor/bin/infection --show-mutations=0` + `var/infection/infection.json`.

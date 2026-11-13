@@ -120,7 +120,8 @@ spelling the table allows). Two rules that follow the sources, not the obvious g
 ### Canonical form and the override rule
 
 A person's Latin name is derived from the national one. A different official spelling (for example one printed in an
-existing passport) can be given as an override. It is accepted when it is one of the ICAO spellings of the name (case, spacing and
+existing passport) can be given as an override. It is accepted when it is one of the ICAO spellings of the name (case,
+spacing and
 `<` for a hyphen are normalised first) and refused otherwise:
 
 ```php
@@ -137,13 +138,15 @@ The storage payload of a composite name stores only the override (`latin: null` 
 
 ## Bridges
 
-The value objects are plain `vo-base` value objects, so every [`vo-base-*`](https://github.com/msstc4php/vo-base#framework-integration)
+The value objects are plain `vo-base` value objects, so every
+[`vo-base-*`](https://github.com/msstc4php/vo-base#framework-integration)
 bridge handles them without extra code:
 
 | Need | Where |
 |---|---|
 | Validation, request input, route parameters | Works as is in every vo-base bridge (Symfony bundle, Laravel, Yii 2, CodeIgniter 4, Spiral) |
 | Storage of string numbers and name parts | As is in Laravel (`AsValueObject`), Yii 2 (behavior), CodeIgniter 4 (casts) and Cycle (typecast) |
+| Storage and validation of composite names | Only with a mapper built from `Codecs::all()`, handed to the cast, rule or behavior (next section) |
 | Doctrine ORM / MongoDB ODM | [`msstc4php/vo-documents-doctrine`](https://github.com/msstc4php/vo-documents-doctrine): one type per class, named `vod_<cc>_<snake_name>` |
 
 ### Composite names need the codecs
@@ -159,21 +162,38 @@ use MSSTC4PHP\ValueObject\Payload\ValueObjectMapper;
 $mapper = new ValueObjectMapper(Codecs::all());
 ```
 
-Binding per bridge:
+Binding per bridge. The shared container binding is read by request input, route parameters and the Spiral/Yii 2
+validators, but some storage and validation classes build their own mapper, so give them yours.
 
 ```php
-// Laravel: AppServiceProvider::register(), before ValueObjectServiceProvider (it uses singletonIf)
+// Laravel: the container binding covers request input and route parameters.
 $this->app->singleton(ValueObjectMapper::class, static fn () => new ValueObjectMapper(Codecs::all()));
 
-// Spiral: a bootloader listed after ValueObjectBootloader (also feeds the Cycle typecast through the container)
+// Eloquent casts and the validation rule do NOT read it; hand them the mapper.
+final readonly class AsRuPersonName implements Castable
+{
+    public static function castUsing(array $arguments): AsValueObject
+    {
+        return new AsValueObject(PersonName::class, new ValueObjectMapper(Codecs::all()));
+    }
+}
+// casts(): 'name' => AsRuPersonName::class
+// rule:    new ValidValueObject(PersonName::class, mapper: new ValueObjectMapper(Codecs::all()))
+
+// Spiral (inside a Bootloader class listed after ValueObjectBootloader; the Cycle typecast reads the same container)
 public function defineSingletons(): array
 {
     return [ValueObjectMapper::class => static fn () => new ValueObjectMapper(Codecs::all())];
 }
 
-// Yii 2: config / bootstrap
+// Yii 2: the container binding covers the validator, ActiveRecord model values and action parameters
 Yii::$container->setSingleton(ValueObjectMapper::class, static fn () => new ValueObjectMapper(Codecs::all()));
+// ValueObjectAttributeBehavior ignores the container; pass the mapper to it:
+'mapper' => new ValueObjectMapper(Codecs::all()),
 ```
+
+Imports: `MSSTC4PHP\ValueObject\Documents\Codecs`, `MSSTC4PHP\ValueObject\Payload\ValueObjectMapper`,
+`MSSTC4PHP\ValueObject\Laravel\Casts\AsValueObject`, `MSSTC4PHP\ValueObject\Laravel\Rules\ValidValueObject`.
 
 ```yaml
 # Symfony (vo-base-bundle): every PayloadCodec service is autoconfigured and added to the mapper
@@ -204,7 +224,8 @@ Collected from the source notes; each is a deliberate omission with its reason i
 
 ## Limits to know about
 
-- **Checksums without a public official text.** The INN control-digit weights (FNS says only "по алгоритму, определенному
+- **Checksums without a public official text.** The INN control-digit weights (FNS says only "по алгоритму,
+  определенному
   ФНС"), the TFN weights (ATO gives them to registered developers only) and the Medicare check digit (ADHA appendix not
   reachable) are implemented from the algorithm used in practice. Each is flagged on its class and in the source note;
   blogs appear there only as "quoted from".
