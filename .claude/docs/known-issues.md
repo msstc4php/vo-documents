@@ -70,7 +70,7 @@
   `LatinMultinational::baseLetterSpellings()` (a one-byte base of an upper-case Latin letter is always A-Z).
 - **vo-base 1.1.0 reported interfaces as supported**: `ValueObjectMapper::supports(Document\AU\DriverLicenceNumber::class)`
   was true and reading it threw `\Error` ("Cannot call abstract method"). Fixed in vo-base 1.1.1 (CHANGELOG
-  `## [1.1.1] - 2026-11-13`, local commits only). `composer.json`/`composer-ci.json` require `^1.1.1`, the local
+  `## 1.1.1 - 2026-11-13`, local commits only). `composer.json`/`composer-ci.json` require `^1.1.1`, the local
   profile aliases `dev-main as 1.1.1`. **Release order (owner):** tag vo-base `v1.1.1` first, then vo-documents;
   until then the CI profile cannot resolve. Typed properties must use the concrete jurisdiction class.
 - `Icao\PersonName::from()` drops spaces next to `<` and trailing `<` padding before the shape check, so
