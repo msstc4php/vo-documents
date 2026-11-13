@@ -359,7 +359,8 @@ Collected from the source notes; each is a deliberate omission with its reason i
   the name is refused. An `AnyIcaoSpelling` override is stored as typed: `SMYTH<JONES<<MARY` and `SMYTH-JONES<<MARY`
   are two values. GB drops the `XXX` passport forename of a person with one name (`SMITH<<XXX` is `SMITH`).
 - **The transliteration variant cap (4096) is per ICAO word**, so a long list of given names with umlauts is accepted
-  with an override; a single word with more than twelve two-way letters is still refused with an override.
+  with an override. A single word with more than twelve two-way letters (`Ä` = `AE`/`A`) or more than seven three-way
+  letters (`Ü` = `UE`/`UXX`/`U`) is still refused when an override that differs from the derived form is given.
 
 ## Development
 

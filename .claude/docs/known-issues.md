@@ -92,10 +92,11 @@
   any pattern failure (also a misplaced separator).
 - `LatinSpelling::find()` matches word by word (`IdentifierSpellings`: the variants of each ICAO word, split at spaces
   and hyphens, plus the national separators to rebuild the canonical form), so the cost is the sum of variant counts and
-  the cap (`MAX_SPELLINGS` = 4096, also `Transliterator::variants()` per call) is per word: 13 × `Jürgen` with an
-  override is accepted, one word with 13 × `Ä` is still refused when an override differs from the derived form.
-  `LatinOverridePolicy::resolve()` compares with the derived form **before** computing spellings, so the derived
-  override of a name with too many spellings (13 × `Ä`) is accepted.
+  the cap (`Transliterator::MAX_VARIANTS` = 4096, the one source; `LatinSpelling` has no cap of its own) is per word: 13
+  × `Jürgen` with an override is accepted; one word with 13 two-way letters (`Ä`) or 8 three-way letters (`Ü` =
+  `UE`/`UXX`/`U`) is still refused when an override differs from the derived form. `LatinOverridePolicy::resolve()`
+  compares with the derived form **before** computing spellings, so the derived override of a name with too many
+  spellings (13 × `Ä`) is accepted.
 - `SubdivisionResolver` no-match message: "(fits no jurisdiction)" when the length fits at least one subdivision
   (`AbstractDriverLicenceNumber::fitsLength()`, `@internal`), else the length.
 - **Policy:** transliteration tables and override rules change only in a major version (stored overrides are
@@ -241,4 +242,9 @@
 - Name codecs document `InvalidPersonNameException` next to `InvalidPayloadException` on `decode()` (a payload of the
   right shape with an invalid part); the shape message says a nullable key may be missing (read as null).
 - The `Name\Latin` bases are `@internal`: public property types are the abstract part (`AbstractNamePart`) at runtime,
-  PHPStan sees the country's classes through `@extends AbstractFamilyGivenPersonName<FamilyName, GivenName>`.
+  PHPStan sees the country's classes through `@extends AbstractFamilyGivenPersonName<FamilyName, GivenName>`. The codec
+  base has a second template (`TGivenValue`: `string` for AU DE FR IT TR, `string|null` for NL CH GB) filled by each
+  country's `givenValue()`, so `encode()` keeps a precise `given` type.
+- `LatinOverridePolicy::effective(Closure $derive, ?override): LatinForm` is the one place that derives, falls back to
+  `withoutDerivedForm()` and resolves (RU and the Latin base). `overridePolicy()` runs inside the constructor: build the
+  policy from the builder and constants only. `IdentifierSpellings` refuses separators ≠ words − 1 (`LogicException`).

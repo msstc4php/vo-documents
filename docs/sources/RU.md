@@ -138,7 +138,7 @@ Such a spelling is not computable from the national form: an earlier passport ma
   "Двойные или сложные фамилии разделяются символом «<»"), and `latin()` then gives `RIMSKII-KORSAKOV<<NIKOLAI`.
 - No transliteration variants are computed for RU (Russian letters have one spelling each anyway). Latin-script
   countries (AU) use the stricter `Name\TransliterationVariant` policy instead: the override must be one of the table
-  spellings, capped at 4096 (`Name\LatinSpelling::MAX_SPELLINGS`).
+  spellings, capped at 4096 per word (`Icao\Transliterator::MAX_VARIANTS`).
 
 ### 5. Storage payload and JSON view
 

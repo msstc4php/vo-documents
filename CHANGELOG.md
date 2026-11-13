@@ -22,7 +22,10 @@
   T.C. Kimlik No, passport. Source notes `docs/sources/{DE,FR,IT,ES,NL,CH,GB,TR}.md`.
 - `Name\Latin\AbstractLatinNamePart` and internal bases shared by the Latin-script countries
   (`LatinPersonNameBuilder`, `AbstractLatinPersonName`, `AbstractFamilyGivenPersonName`,
-  `AbstractFamilyGivenPersonNameCodec`); `Name\AU\*` moved onto them without a public API change.
+  `AbstractFamilyGivenPersonNameCodec`); `Name\AU\*` moved onto them with the same class names, constructors and
+  methods. The public `family`/`given` properties of the family + given names are now declared on the base and typed
+  as the abstract part (`AbstractNamePart`) at runtime; static analysers see the country's classes through
+  `@extends`.
 - `Contract\HasSex` is implemented by `Nir`, `FiscalCode`, the DVLA licence number and `ChiNumber`.
 - Source notes in `docs/sources/` (RU, AU, ICAO, DE, FR, IT, ES, NL, CH, GB, TR).
 
