@@ -48,8 +48,16 @@ How the package applies this:
 | `FamilyName` | the 29 letters of (1) in both cases, and `Â â Î î Û û` | space | (1), (2); two surnames side by side (3) |
 | `GivenName` | the same | space | several given names (`Ahmet Can`) |
 
-- No act names a hyphen or an apostrophe inside a name; they are refused. `Q`, `W`, `X` are refused: Law 1353 does not
-  list them and no act read adds them (a recorded limitation: a name registered with them, if any exists, is refused).
+- No act names a hyphen or an apostrophe inside a name; they are refused.
+- **`Q`, `W`, `X` are refused.** Law 1353 does not list them, and registers are written in its letters (Madde 3).
+  The 2013 democratisation package lifted only the penal ban (Turkish Penal Code art. 222); it did not change the
+  register rule. Registry practice still refuses the three letters under Law 1353 Madde 3, as reported by:
+  - a note of the Turkish consulate general in Nantes (`nant-bk.mfa.gov.tr`, dated 11.05.2026);
+  - a Constitutional Court ruling reported on 2022-04-25 (secondary report only).
+  Both were supplied by the controller's review; I did not re-read them for this note (the consulate page did not
+  turn up in a search). A planned amendment of Law 1353 or 5490 that would admit the letters was not found enacted
+  in the texts on mevzuat.gov.tr. If a name with these letters exists in the register, it is refused (a recorded
+  limitation).
 - **Dotted and dotless I** are kept as typed: `Işık`, `İnci`, `ılgaz`, `irmak` are four different strings and never
   re-cased. A lower-case `i` followed by U+0307 (what full Unicode lower-casing makes of `İ`) is not one letter of the
   table and is refused; NFC does not compose it.

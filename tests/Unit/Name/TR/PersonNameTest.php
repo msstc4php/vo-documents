@@ -80,7 +80,9 @@ final class PersonNameTest extends TestCase
     public function testTheDerivationDoesNotDependOnTheLocale(): void
     {
         $previous = \setlocale(\LC_ALL, '0');
-        \setlocale(\LC_ALL, 'tr_TR.UTF-8', 'tr_TR.utf8', 'tr_TR', 'tr');
+        if (\setlocale(\LC_ALL, 'tr_TR.UTF-8', 'tr_TR.utf8', 'tr_TR', 'tr') === false) {
+            self::markTestSkipped('No Turkish locale is installed.');
+        }
 
         try {
             $name = new PersonName(FamilyName::from('ılgaz'), GivenName::from('irmak İnci'));

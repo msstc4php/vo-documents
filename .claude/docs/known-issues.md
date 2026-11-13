@@ -210,10 +210,14 @@
 - **TR T.C. Kimlik No is format only:** NVİ says the two check digits come from "bir algoritma" shared with public
   bodies, not published. The widely copied formula is not used, nor the "first digit not 0" rule; both PRADO specimen
   numbers (`12345678901`, `12345678902`) fail that formula anyway.
-- **TR names:** `Q W X` are refused (not in the Law 1353 table; no act adds them) and so are hyphen and apostrophe. The
-  dotted/dotless I are kept as typed; derivation relies on `mb_strtoupper()` being locale-independent (tested under
-  `tr_TR.UTF-8`). `i` + U+0307 (what `mb_strtolower('İ')` returns) is refused, NFC does not compose it. The derived
+- **TR names:** `Q W X` are refused (not in the Law 1353 table). The 2013 democratisation package lifted only the
+  penal ban (TCK art. 222). Registry practice still refuses them under Law 1353 art. 3 (Nantes consulate note
+  11.05.2026; Constitutional Court ruling reported 2022-04-25, secondary). No enacted amendment of 1353/5490 found.
+  Hyphen and apostrophe are refused too. The dotted/dotless I are kept as typed; derivation relies on
+  `mb_strtoupper()` being locale-independent (tested under `tr_TR.UTF-8`; the test is skipped where no Turkish locale
+  is installed). `i` + U+0307 (what `mb_strtolower('İ')` returns) is refused, NFC does not compose it. The derived
   form spells `Ö`/`Ü` as `OE`/`UE` (table default) while the passport specimens print `ORNEK` for `ÖRNEK`: pass the
-  passport's MRZ spelling as the override (`TransliterationVariant` accepts it).
+  passport's MRZ spelling as the override (`TransliterationVariant` accepts it; controller ruling: no TR-specific
+  derivation).
 - TR passport pattern `[A-Z][0-9]{8}` is unanchored on purpose (length fixed by `NumberFormat`; anchors were
   equivalent mutants).
