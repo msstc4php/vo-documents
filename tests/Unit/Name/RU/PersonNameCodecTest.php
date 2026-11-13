@@ -33,6 +33,7 @@ use MSSTC4PHP\ValueObject\Documents\Name\RU\Patronymic;
 use MSSTC4PHP\ValueObject\Documents\Name\RU\PersonName;
 use MSSTC4PHP\ValueObject\Documents\Name\RU\PersonNameCodec;
 use MSSTC4PHP\ValueObject\Documents\Name\RU\RussianTransliteration;
+use MSSTC4PHP\ValueObject\Documents\Name\TR\PersonNameCodec as TrPersonNameCodec;
 use MSSTC4PHP\ValueObject\Exception\InvalidPayloadException;
 use MSSTC4PHP\ValueObject\Payload\ValueObjectMapper;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -50,6 +51,7 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(NlPersonNameCodec::class)]
 #[UsesClass(ChPersonNameCodec::class)]
 #[UsesClass(GbPersonNameCodec::class)]
+#[UsesClass(TrPersonNameCodec::class)]
 #[UsesClass(PersonName::class)]
 #[UsesClass(RussianTransliteration::class)]
 #[UsesClass(AbstractNamePart::class)]

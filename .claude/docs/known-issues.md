@@ -204,3 +204,16 @@
   and `GreatBritainDriverLicenceNumber`, `> 50` vs `>= 50` in the DVLA month field (50 is refused), and the `(int)` cast
   of the H&C range check (numeric strings compare numerically). Fixed-length NINO shape: the pattern is unanchored on
   purpose (anchors were equivalent mutants).
+- **TR sources:** `www.mevzuat.gov.tr` and `www.nvi.gov.tr` answer to curl (allow the hosts in the sandbox); PRADO
+  (`consilium.europa.eu`) is read through Internet Archive captures (`id_` form; pages come gzip-compressed). The PRADO
+  passport specimens (images 265357, 306152) are the only official example numbers.
+- **TR T.C. Kimlik No is format only:** NVİ says the two check digits come from "bir algoritma" shared with public
+  bodies, not published. The widely copied formula is not used, nor the "first digit not 0" rule; both PRADO specimen
+  numbers (`12345678901`, `12345678902`) fail that formula anyway.
+- **TR names:** `Q W X` are refused (not in the Law 1353 table; no act adds them) and so are hyphen and apostrophe. The
+  dotted/dotless I are kept as typed; derivation relies on `mb_strtoupper()` being locale-independent (tested under
+  `tr_TR.UTF-8`). `i` + U+0307 (what `mb_strtolower('İ')` returns) is refused, NFC does not compose it. The derived
+  form spells `Ö`/`Ü` as `OE`/`UE` (table default) while the passport specimens print `ORNEK` for `ÖRNEK`: pass the
+  passport's MRZ spelling as the override (`TransliterationVariant` accepts it).
+- TR passport pattern `[A-Z][0-9]{8}` is unanchored on purpose (length fixed by `NumberFormat`; anchors were
+  equivalent mutants).

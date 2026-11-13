@@ -65,3 +65,9 @@ digits; two plain classes, no `SubdivisionResolver`: the formats never overlap),
 century-less year (shared by the DVLA and CHI classes). `Name\GB\PersonName($family, ?$given, ?$latin)`: `\p{Latin}`
 parts, override policy `AnyIcaoSpelling` (HMPO writes a documented spelling), `given` null for a person with one name;
 codec keys `family`, `given`, `latin`.
+
+`Document\TR\*`: `IdentityNumber` (T.C. Kimlik No, 11 digits, format only: NVİ does not publish the check-digit
+algorithm), `PassportNumber` (letter + 8 digits, PRADO composition). Sürücü belgesi number not covered (no published
+layout). `Name\TR\PersonName($family, $given, ?$latin)`: letters of the Law 1353 alphabet plus `â î û`
+(`Name\TR\AbstractTurkishNamePart`), space as the only separator, override policy `TransliterationVariant`; codec
+keys `family`, `given`, `latin`.

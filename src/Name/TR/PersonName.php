@@ -1,0 +1,95 @@
+<?php
+
+declare(strict_types=1);
+
+namespace MSSTC4PHP\ValueObject\Documents\Name\TR;
+
+use MSSTC4PHP\ValueObject\Contract\ValueObject;
+use MSSTC4PHP\ValueObject\Documents\Exception\InvalidPersonNameException;
+use MSSTC4PHP\ValueObject\Documents\Icao\PersonName as IcaoPersonName;
+use MSSTC4PHP\ValueObject\Documents\Internal\Optional;
+use MSSTC4PHP\ValueObject\Documents\Name\Latin\LatinPersonNameBuilder;
+use MSSTC4PHP\ValueObject\Documents\Name\PersonName as NationalPersonName;
+use MSSTC4PHP\ValueObject\Documents\Name\TransliterationVariant;
+use Override;
+
+/**
+ * Family name and given name(s). The derived Latin form is FAMILY<<GIVEN through the ICAO multinational Latin table:
+ * `İ`, `ı`, `I` and `i` all become `I`, `Ş` → `S`, `Ğ` → `G`, `Ö` → `OE` (`Işık İnci` → `ISIK<<INCI`, `Öztürk Ayşe`
+ * → `OEZTUERK<<AYSE`). Override policy {@see TransliterationVariant}: no Turkish rule lets a passport keep another
+ * Latin spelling, so an override must be another ICAO spelling of both parts, such as `ORNEK<<ZEYNEP` (the passport
+ * specimen's MRZ for `Örnek Zeynep`); an override equal to the derived form is not kept. See docs/sources/TR.md
+ * "Names".
+ *
+ * @see https://www.icao.int/publications/Documents/9303_p3_cons_en.pdf ICAO Doc 9303 Part 3, 8th ed. (2021), §4.6,
+ *      §6.A
+ */
+final readonly class PersonName implements NationalPersonName
+{
+    private IcaoPersonName $derived;
+
+    private ?IcaoPersonName $latin;
+
+    /**
+     * @throws InvalidPersonNameException when $latin is not a transliteration of the parts
+     */
+    public function __construct(
+        public FamilyName $family,
+        public GivenName $given,
+        ?IcaoPersonName $latin = null,
+    ) {
+        $builder = new LatinPersonNameBuilder([$family->value], [$given->value]);
+        $this->derived = $builder->derive();
+        $this->latin = $builder->resolve($latin, $builder->transliterationVariant(
+            'Invalid Turkish person name (the Latin form is not a transliteration of the name).',
+        ));
+    }
+
+    #[Override]
+    public function latin(): IcaoPersonName
+    {
+        return $this->latin ?? $this->derived;
+    }
+
+    /**
+     * The Latin form given to the constructor, null when {@see latin()} is derived (also when the given form was the
+     * derived one).
+     */
+    public function latinOverride(): ?IcaoPersonName
+    {
+        return $this->latin;
+    }
+
+    /**
+     * @return non-empty-string e.g. "Ayşe Öztürk"
+     */
+    #[Override]
+    public function full(): string
+    {
+        return $this->given->value . ' ' . $this->family->value;
+    }
+
+    #[Override]
+    public function equals(ValueObject $other): bool
+    {
+        return $other instanceof self
+            && $this->family->equals($other->family)
+            && $this->given->equals($other->given)
+            && Optional::equal($this->latin, $other->latin);
+    }
+
+    /**
+     * A view, not the storage payload ({@see PersonNameCodec}): `effectiveLatin` is {@see latin()}, derived or not.
+     *
+     * @return array{family: string, given: string, effectiveLatin: string}
+     */
+    #[Override]
+    public function jsonSerialize(): array
+    {
+        return [
+            'family' => $this->family->value,
+            'given' => $this->given->value,
+            'effectiveLatin' => $this->latin()->value,
+        ];
+    }
+}

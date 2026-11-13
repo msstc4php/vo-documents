@@ -32,6 +32,7 @@ use MSSTC4PHP\ValueObject\Documents\Name\LatinOverridePolicy;
 use MSSTC4PHP\ValueObject\Documents\Name\LatinSpelling;
 use MSSTC4PHP\ValueObject\Documents\Name\NL\PersonNameCodec as NlPersonNameCodec;
 use MSSTC4PHP\ValueObject\Documents\Name\RU\PersonNameCodec as RuPersonNameCodec;
+use MSSTC4PHP\ValueObject\Documents\Name\TR\PersonNameCodec as TrPersonNameCodec;
 use MSSTC4PHP\ValueObject\Documents\Name\TransliterationVariant;
 use MSSTC4PHP\ValueObject\Exception\InvalidPayloadException;
 use MSSTC4PHP\ValueObject\Payload\ValueObjectMapper;
@@ -50,6 +51,7 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(EsPersonNameCodec::class)]
 #[UsesClass(NlPersonNameCodec::class)]
 #[UsesClass(GbPersonNameCodec::class)]
+#[UsesClass(TrPersonNameCodec::class)]
 #[UsesClass(PersonName::class)]
 #[UsesClass(AbstractNamePart::class)]
 #[UsesClass(AbstractLatinNamePart::class)]
