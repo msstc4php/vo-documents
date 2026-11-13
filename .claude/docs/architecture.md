@@ -31,3 +31,7 @@ only), `PensionInsuranceNumber` (VKVV checksum; fields as strings, no `HasBirthD
 string), `LegacyIdentityCardNumber` (12-digit card issued until 2021; the 2021 card is not covered), `PassportNumber`
 (`99AA99999`), `TaxIdentificationNumber` (SPI, format only), `DriverLicenceNumber` (12 digits, format only).
 `Name\FR\*`: `AbstractFrenchNamePart` overrides `letters()` with the 2014 civil-status circular's list (no `\p{Latin}`).
+
+`Document\IT\*`: `FiscalCode` (codice fiscale; `HasSex`; DM 1976 art. 7 check letter verified; omocodia letters read
+through lookup tables; year as two digits, `birthMonth()`/`birthDay()` ints, `birthPlaceCode()` string),
+`PassportNumber` (`AA9999999`). CIE and patente numbers are not covered. `Name\IT\*` mirrors `Name\DE\*`.

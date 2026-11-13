@@ -136,3 +136,18 @@
   are refused even in foreign names ("sans reproduire les éventuels signes diacritiques de la langue étrangère").
 - `Document\FR\LegacyIdentityCardNumber` does not validate the issue-month field (the instruction defines the field,
   not its values); `issueMonth()` is a plain `int` that may lie outside 1-12.
+- **IT codice fiscale source:** the DM 23 dicembre 1976 is not in the online index of its own Gazzetta (n. 345 of
+  1976); it is read from its official reprints as an annex of later decrees (GU 27-4-1999 S.O. 83, `099A3188`, and
+  the 1995/1997/1998 ones). The 1997 reprint misprints `4 = O` (omocodia) and `r = 19`; the others read `4 = Q` and
+  `T = 19`. `def.finanze.it` and `www.mit.gov.it` fail TLS verification; `www.cartaidentita.interno.gov.it` resets
+  connections (the CIE number `CA00000AA` form could not be quoted, so the CIE is not covered).
+- **IT omocodia:** any combination of the seven numeric positions may hold the letter `L M N P Q R S T U V`; the art. 6
+  "a partire da quella di destra" is read as the office's order, not a validity rule. The check letter is computed on
+  the characters as written, the fields through `FiscalCode::DIGITS`.
+- **IT February 29** is accepted when the two-digit year is divisible by four (`00` too, 2000), refused otherwise: no
+  century is encoded, so only dates impossible in every century are refused.
+- Escaped equivalent mutants in `Document\IT\FiscalCode`: the `max(1, min(31, …))` clamp of `birthDay()` (types only;
+  the day is validated in `parse()`) and `+` → `-` in the year of the leap check (`10a + b` and `10a - b` have the same
+  remainder mod 4 for every digit `b`). The lookup tables (`DIGITS`, `MONTHS`, `CHECK_VALUES`) replaced `strpos()`
+  arithmetic whose casts and clamps left more equivalents; unreachable `?? throw` branches were dropped (PHPStan max
+  accepts the string offsets).
