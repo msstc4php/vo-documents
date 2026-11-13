@@ -33,4 +33,19 @@ final class Mask
 
         return $masked;
     }
+
+    /**
+     * Masks every character of an ASCII value except the last `$visible`; a negative count shows none.
+     *
+     * @param non-empty-string $value
+     *
+     * @return non-empty-string
+     */
+    public static function keepLastCharacters(string $value, int $visible): string
+    {
+        $hidden = \strlen($value) - \max(0, \min($visible, \strlen($value)));
+        $masked = \str_repeat('*', $hidden) . \substr($value, $hidden);
+
+        return $masked === '' ? $value : $masked;
+    }
 }

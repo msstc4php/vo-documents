@@ -31,4 +31,21 @@ final class MaskTest extends TestCase
     {
         self::assertSame('AB**-**56', Mask::keepLastDigits('AB12-3456', 2));
     }
+
+    public function testKeepLastCharactersMasksLettersToo(): void
+    {
+        self::assertSame('*****9B7', Mask::keepLastCharacters('AB12C9B7', 3));
+    }
+
+    public function testKeepLastCharactersWithZeroOrNegativeVisibleMasksEverything(): void
+    {
+        self::assertSame('***', Mask::keepLastCharacters('A12', 0));
+        self::assertSame('***', Mask::keepLastCharacters('A12', -1));
+    }
+
+    public function testKeepLastCharactersNeverShowsMoreThanTheValue(): void
+    {
+        self::assertSame('A12', Mask::keepLastCharacters('A12', 3));
+        self::assertSame('A12', Mask::keepLastCharacters('A12', 5));
+    }
 }

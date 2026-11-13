@@ -97,4 +97,11 @@ final class DigitsTest extends TestCase
 
         Digits::nonEmpty('');
     }
+
+    public function testInvalidLengthGivesTheCountOrTooLong(): void
+    {
+        self::assertSame('Invalid X (3 characters).', Digits::invalidLength('A1é', 'X')->getMessage());
+        self::assertSame('Invalid X (40 characters).', Digits::invalidLength(\str_repeat('1', 40), 'X')->getMessage());
+        self::assertSame('Invalid X (too long).', Digits::invalidLength(\str_repeat('1', 41), 'X')->getMessage());
+    }
 }

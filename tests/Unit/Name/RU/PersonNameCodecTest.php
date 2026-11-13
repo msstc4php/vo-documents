@@ -13,6 +13,7 @@ use MSSTC4PHP\ValueObject\Documents\Icao\Table\LatinMultinational;
 use MSSTC4PHP\ValueObject\Documents\Icao\Transliterator;
 use MSSTC4PHP\ValueObject\Documents\Internal\UnicodeText;
 use MSSTC4PHP\ValueObject\Documents\Name\AbstractNamePart;
+use MSSTC4PHP\ValueObject\Documents\Name\AU\PersonNameCodec as AuPersonNameCodec;
 use MSSTC4PHP\ValueObject\Documents\Name\LatinSpelling;
 use MSSTC4PHP\ValueObject\Documents\Name\RU\AbstractRussianNamePart;
 use MSSTC4PHP\ValueObject\Documents\Name\RU\FamilyName;
@@ -30,6 +31,7 @@ use PHPUnit\Framework\TestCase;
 
 #[CoversClass(PersonNameCodec::class)]
 #[UsesClass(Codecs::class)]
+#[UsesClass(AuPersonNameCodec::class)]
 #[UsesClass(PersonName::class)]
 #[UsesClass(RussianTransliteration::class)]
 #[UsesClass(AbstractNamePart::class)]

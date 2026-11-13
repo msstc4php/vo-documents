@@ -41,12 +41,21 @@ final class Digits
         $digits = self::strip($input);
 
         if (\preg_match('/^[0-9]{' . $length . '}$/D', $digits) !== 1) {
-            $count = \mb_strlen($digits, 'UTF-8');
-
-            throw new InvalidDocumentNumberException($count > self::MAX_REPORTED_LENGTH ? \sprintf('Invalid %s (too long).', $document) : \sprintf('Invalid %s (%d characters).', $document, $count));
+            throw self::invalidLength($digits, $document);
         }
 
         return self::nonEmpty($digits);
+    }
+
+    /**
+     * @param string $normalized the input with the separators removed
+     * @param non-empty-string $document the document's name in the exception message
+     */
+    public static function invalidLength(string $normalized, string $document): InvalidDocumentNumberException
+    {
+        $count = \mb_strlen($normalized, 'UTF-8');
+
+        return new InvalidDocumentNumberException($count > self::MAX_REPORTED_LENGTH ? \sprintf('Invalid %s (too long).', $document) : \sprintf('Invalid %s (%d characters).', $document, $count));
     }
 
     /**

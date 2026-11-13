@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace MSSTC4PHP\ValueObject\Documents;
 
 use MSSTC4PHP\ValueObject\Contract\ValueObject;
+use MSSTC4PHP\ValueObject\Documents\Name\AU\PersonNameCodec as AuPersonNameCodec;
 use MSSTC4PHP\ValueObject\Documents\Name\RU\PersonNameCodec as RuPersonNameCodec;
 use MSSTC4PHP\ValueObject\Payload\PayloadCodec;
 
@@ -18,6 +19,6 @@ final class Codecs
      */
     public static function all(): array
     {
-        return [new RuPersonNameCodec()];
+        return [new RuPersonNameCodec(), new AuPersonNameCodec()];
     }
 }
