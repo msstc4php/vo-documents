@@ -7,6 +7,7 @@ namespace MSSTC4PHP\ValueObject\Documents\Tests\Unit\Document\RU;
 use MSSTC4PHP\ValueObject\Documents\Document\RU\DriverLicenceNumber;
 use MSSTC4PHP\ValueObject\Documents\Internal\Digits;
 use MSSTC4PHP\ValueObject\Documents\Internal\Mask;
+use MSSTC4PHP\ValueObject\Documents\Internal\Text;
 use MSSTC4PHP\ValueObject\Documents\Tests\Fixture\RefusesWithoutEchoingInput;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -19,6 +20,7 @@ use PHPUnit\Framework\TestCase;
  */
 #[CoversClass(DriverLicenceNumber::class)]
 #[UsesClass(Digits::class)]
+#[UsesClass(Text::class)]
 #[UsesClass(Mask::class)]
 final class DriverLicenceNumberTest extends TestCase
 {
@@ -60,8 +62,8 @@ final class DriverLicenceNumberTest extends TestCase
     {
         yield 'too short' => ['99 99 12345', 'Invalid Russian driving licence number (9 characters).'];
         yield 'too long' => ['99 99 1234567', 'Invalid Russian driving licence number (11 characters).'];
-        yield '1999 form with Cyrillic series' => ['77 АВ 123456', 'Invalid Russian driving licence number (10 characters).'];
-        yield 'Latin letters' => ['77 AB 123456', 'Invalid Russian driving licence number (10 characters).'];
+        yield '1999 form with Cyrillic series' => ['77 АВ 123456', 'Invalid Russian driving licence number (invalid character).'];
+        yield 'Latin letters' => ['77 AB 123456', 'Invalid Russian driving licence number (invalid character).'];
     }
 
     #[DataProvider('invalidNumbers')]

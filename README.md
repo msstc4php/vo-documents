@@ -43,7 +43,7 @@ checksum."); **it never contains the input or any part of it**.
 
 `__toString()` and `jsonSerialize()` return the full canonical value. Masking is an explicit, separate call,
 `masked()` (interface `Contract\Maskable`). No masking rule is official unless the class says so; the default keeps the
-last four digits.
+last four digits, the AU classes keep three (their numbers are at most 10 characters long, `docs/sources/AU.md`).
 
 | Class | Document | Check | Source |
 |---|---|---|---|
@@ -120,18 +120,28 @@ spelling the table allows). Two rules that follow the sources, not the obvious g
 ### Canonical form and the override rule
 
 A person's Latin name is derived from the national one. A different official spelling (for example one printed in an
-existing passport) can be given as an override. It is accepted when it is one of the ICAO spellings of the name (case,
-spacing and
-`<` for a hyphen are normalised first) and refused otherwise:
+existing passport) can be given as an override. `Icao\PersonName::from()` normalises it first: letter case, spaces
+next to a `<` (`IVANOV << IVAN`) and the trailing `<` padding of an MRZ field (`IVANOV<<IVAN<<<<`). What is accepted
+then depends on the country's sources:
+
+| Country | Accepted override | Why |
+|---|---|---|
+| RU | any valid ICAO name (`IVANOVA<<YULIYA` for Иванова Юлия, where the table gives `IVANOVA<<IULIIA`) | MVD Orders 996/186 (§32, §140) write the name "так, как это указано в подтверждающем документе" |
+| AU | only an ICAO spelling of the name (`MULLER<<ZOE` for Müller Zoë); `<` for a hyphen is stored as the hyphen | Latin-script names: the table spellings are the only ones |
+
+An override that is the derived form (also when it writes a hyphen as `<`) is not kept, so `latinOverride()` is null
+and the name equals the one built without it. Text that is no ICAO name (`IVANOV1<<IVAN`) is refused by
+`Icao\PersonName::from()` in every country.
 
 ```php
 $name = new PersonName(
-    FamilyName::from('Иванов'),
-    GivenName::from('Иван'),
+    FamilyName::from('Иванова'),
+    GivenName::from('Юлия'),
     null,
-    IcaoPersonName::from('ivanov<<ivan'),   // normalised to IVANOV<<IVAN; must be a valid spelling
+    IcaoPersonName::from('Ivanova << Yuliya'),   // normalised to IVANOVA<<YULIYA
 );
-$name->latinOverride();   // null when the Latin form is derived
+$name->latin();           // IVANOVA<<YULIYA
+$name->latinOverride();   // the same; null when the Latin form is derived
 ```
 
 The storage payload of a composite name stores only the override (`latin: null` otherwise), never the derived form.
@@ -139,8 +149,7 @@ The storage payload of a composite name stores only the override (`latin: null` 
 ## Bridges
 
 The value objects are plain `vo-base` value objects, so every
-[`vo-base-*`](https://github.com/msstc4php/vo-base#framework-integration)
-bridge handles them without extra code:
+[`vo-base-*`](https://github.com/msstc4php/vo-base#framework-integration) bridge handles them without extra code:
 
 | Need | Where |
 |---|---|
@@ -148,6 +157,11 @@ bridge handles them without extra code:
 | Storage of string numbers and name parts | As is in Laravel (`AsValueObject`), Yii 2 (behavior), CodeIgniter 4 (casts) and Cycle (typecast) |
 | Storage and validation of composite names | Only with a mapper built from `Codecs::all()`, handed to the cast, rule or behavior (next section) |
 | Doctrine ORM / MongoDB ODM | [`msstc4php/vo-documents-doctrine`](https://github.com/msstc4php/vo-documents-doctrine): one type per class, named `vod_<cc>_<snake_name>` |
+
+Typed properties, route parameters and casts must name the concrete class (`NswDriverLicenceNumber`, not the
+`Document\AU\DriverLicenceNumber` interface): the mapper cannot build an interface, so since vo-base 1.1.1 it reports
+it as unsupported (a configuration error, not a 500 on request input). The interface is the type of
+`DriverLicenceNumberFactory` results.
 
 ### Composite names need the codecs
 
@@ -162,8 +176,9 @@ use MSSTC4PHP\ValueObject\Payload\ValueObjectMapper;
 $mapper = new ValueObjectMapper(Codecs::all());
 ```
 
-Binding per bridge. The shared container binding is read by request input, route parameters and the Spiral/Yii 2
-validators, but some storage and validation classes build their own mapper, so give them yours.
+Binding per bridge. The shared container binding is read by request input and route parameters, by the Yii 2
+validator, and in Spiral by the caster, the interceptor and the checker; some storage and validation classes build
+their own mapper, so give them yours.
 
 ```php
 // Laravel: the container binding covers request input and route parameters.
@@ -225,10 +240,9 @@ Collected from the source notes; each is a deliberate omission with its reason i
 ## Limits to know about
 
 - **Checksums without a public official text.** The INN control-digit weights (FNS says only "по алгоритму,
-  определенному
-  ФНС"), the TFN weights (ATO gives them to registered developers only) and the Medicare check digit (ADHA appendix not
-  reachable) are implemented from the algorithm used in practice. Each is flagged on its class and in the source note;
-  blogs appear there only as "quoted from".
+  определенному ФНС"), the TFN weights (ATO gives them to registered developers only) and the Medicare check digit
+  (ADHA appendix not reachable) are implemented from the algorithm used in practice. Each is flagged on its class and
+  in the source note; blogs appear there only as "quoted from".
 - The 16-digit length of the OMS policy and the 2 + 7 split of the international passport number are not stated in
   a text read (`RU.md`).
 - Name parts are limited to 100 characters, `Icao\PersonName` to 255 (a very long real name is refused).

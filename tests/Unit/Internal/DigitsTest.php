@@ -4,13 +4,16 @@ declare(strict_types=1);
 
 namespace MSSTC4PHP\ValueObject\Documents\Tests\Unit\Internal;
 
-use LogicException;
 use MSSTC4PHP\ValueObject\Documents\Exception\InvalidDocumentNumberException;
 use MSSTC4PHP\ValueObject\Documents\Internal\Digits;
+use MSSTC4PHP\ValueObject\Documents\Internal\Text;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(Digits::class)]
+#[UsesClass(Text::class)]
 final class DigitsTest extends TestCase
 {
     public function testStripRemovesDefaultSeparators(): void
@@ -67,9 +70,28 @@ final class DigitsTest extends TestCase
 
     public function testExactlyCountsMultibyteCharactersOnce(): void
     {
-        $this->expectExceptionMessage('Invalid test number (4 characters).');
+        $this->expectExceptionMessage('Invalid test number (5 characters).');
 
-        Digits::exactly('12ЗО', 4, 'test number');
+        Digits::exactly('12ЗО3', 4, 'test number');
+    }
+
+    /**
+     * @return iterable<string, array{string}>
+     */
+    public static function rightLengthWithANonDigit(): iterable
+    {
+        yield 'Cyrillic letters at the end' => ['12ЗО'];
+        yield 'Latin letter first' => ['A234'];
+        yield 'letter inside' => ['12A4'];
+    }
+
+    #[DataProvider('rightLengthWithANonDigit')]
+    public function testExactlySaysInvalidCharacterForTheRightLength(string $input): void
+    {
+        $this->expectException(InvalidDocumentNumberException::class);
+        $this->expectExceptionMessage('Invalid test number (invalid character).');
+
+        Digits::exactly($input, 4, 'test number');
     }
 
     public function testExactlyRefusesEmptyInput(): void
@@ -84,18 +106,6 @@ final class DigitsTest extends TestCase
         $this->expectException(InvalidDocumentNumberException::class);
 
         Digits::exactly("1234\u{0000}", 4, 'test number');
-    }
-
-    public function testNonEmptyReturnsTheDigits(): void
-    {
-        self::assertSame('12', Digits::nonEmpty('12'));
-    }
-
-    public function testNonEmptyRefusesTheEmptyString(): void
-    {
-        $this->expectException(LogicException::class);
-
-        Digits::nonEmpty('');
     }
 
     public function testInvalidLengthGivesTheCountOrTooLong(): void

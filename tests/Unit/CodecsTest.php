@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace MSSTC4PHP\ValueObject\Documents\Tests\Unit;
 
 use MSSTC4PHP\ValueObject\Documents\Codecs;
+use MSSTC4PHP\ValueObject\Documents\Document\AU\DriverLicence\NswDriverLicenceNumber;
+use MSSTC4PHP\ValueObject\Documents\Document\AU\DriverLicenceNumber;
 use MSSTC4PHP\ValueObject\Documents\Name\AU\PersonName as AuPersonName;
 use MSSTC4PHP\ValueObject\Documents\Name\AU\PersonNameCodec as AuPersonNameCodec;
 use MSSTC4PHP\ValueObject\Documents\Name\RU\PersonName;
@@ -36,5 +38,17 @@ final class CodecsTest extends TestCase
         self::assertTrue($mapper->supportsUntrusted(PersonName::class));
         self::assertTrue($mapper->isComposite(AuPersonName::class));
         self::assertTrue($mapper->supportsUntrusted(AuPersonName::class));
+    }
+
+    /**
+     * Needs vo-base 1.1.1: 1.1.0 reported the interface as supported and failed on reading it.
+     */
+    public function testTheMapperSupportsTheConcreteLicenceClassNotTheInterface(): void
+    {
+        $mapper = new ValueObjectMapper(Codecs::all());
+
+        self::assertFalse($mapper->supports(DriverLicenceNumber::class));
+        self::assertFalse($mapper->supportsUntrusted(DriverLicenceNumber::class));
+        self::assertTrue($mapper->supportsUntrusted(NswDriverLicenceNumber::class));
     }
 }

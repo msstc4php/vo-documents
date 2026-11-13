@@ -8,14 +8,15 @@ use MSSTC4PHP\ValueObject\Contract\ValueObject;
 use MSSTC4PHP\ValueObject\Documents\Exception\InvalidPersonNameException;
 use MSSTC4PHP\ValueObject\Documents\Icao\PersonName as IcaoPersonName;
 use MSSTC4PHP\ValueObject\Documents\Icao\Transliterator;
-use MSSTC4PHP\ValueObject\Documents\Name\LatinSpelling;
 use MSSTC4PHP\ValueObject\Documents\Name\PersonName as NationalPersonName;
+use MSSTC4PHP\ValueObject\Documents\Name\TransliterationVariant;
 use Override;
 
 /**
  * Family name and given name(s). The derived Latin form is FAMILY<<GIVEN through the ICAO multinational Latin table
- * (`Zoë` → `ZOE`, `Müller` → `MUELLER`); a Latin override must be another ICAO spelling of both parts (`MULLER<<ZOE`)
- * and an MRZ-style `<` for a hyphen is stored as the hyphen. See docs/sources/AU.md "Names".
+ * (`Zoë` → `ZOE`, `Müller` → `MUELLER`). Override policy {@see TransliterationVariant}: a Latin override must be
+ * another ICAO spelling of both parts (`MULLER<<ZOE`), an MRZ-style `<` for a hyphen is stored as the hyphen, and an
+ * override equal to the derived form is not kept. See docs/sources/AU.md "Names".
  *
  * @see https://www.icao.int/publications/Documents/9303_p3_cons_en.pdf ICAO Doc 9303 Part 3, 8th ed. (2021), §4.6,
  *      §6.A
@@ -36,18 +37,19 @@ final readonly class PersonName implements NationalPersonName
         ?IcaoPersonName $latin = null,
     ) {
         $transliterator = new Transliterator();
-        $families = $transliterator->variants($family->value);
-        $givens = $transliterator->variants($given->value);
-        $this->derived = IcaoPersonName::fromParts($families[0], [$givens[0]]);
+        $this->derived = IcaoPersonName::fromParts(
+            $transliterator->toLatin($family->value),
+            [$transliterator->toLatin($given->value)],
+        );
 
-        if (!$latin instanceof IcaoPersonName) {
-            $this->latin = null;
-
-            return;
-        }
-
-        $this->latin = LatinSpelling::find($latin, [[$families, $givens]])
-            ?? throw new InvalidPersonNameException('Invalid Australian person name (the Latin form is not a transliteration of the name).');
+        $policy = new TransliterationVariant(
+            static fn (): array => [[
+                $transliterator->variants($family->value),
+                $transliterator->variants($given->value),
+            ]],
+            'Invalid Australian person name (the Latin form is not a transliteration of the name).',
+        );
+        $this->latin = $policy->resolve($latin, $this->derived);
     }
 
     #[Override]
@@ -57,7 +59,8 @@ final readonly class PersonName implements NationalPersonName
     }
 
     /**
-     * The Latin form given to the constructor, null when {@see latin()} is derived.
+     * The Latin form given to the constructor, null when {@see latin()} is derived (also when the given form was the
+     * derived one).
      */
     public function latinOverride(): ?IcaoPersonName
     {

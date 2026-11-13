@@ -20,8 +20,9 @@ final class LatinSpelling
     public const int MAX_SPELLINGS = 4096;
 
     /**
-     * @param non-empty-list<non-empty-list<non-empty-list<non-empty-string>>> $forms each accepted form of the name: the
-     *                                                                                variants of the primary identifier, then of each secondary identifier
+     * Each accepted form lists the variants of the primary identifier, then of each secondary identifier.
+     *
+     * @param non-empty-list<non-empty-list<non-empty-list<non-empty-string>>> $forms
      *
      * @throws InvalidPersonNameException when the forms have more than {@see self::MAX_SPELLINGS} spellings
      */
@@ -56,6 +57,11 @@ final class LatinSpelling
         return null;
     }
 
+    private static function mrzEquivalent(string $canonical): string
+    {
+        return \str_replace('-', '<', $canonical);
+    }
+
     /**
      * @param list<non-empty-list<non-empty-string>> $identifiers
      *
@@ -76,10 +82,5 @@ final class LatinSpelling
         }
 
         return $combinations;
-    }
-
-    private static function mrzEquivalent(string $canonical): string
-    {
-        return \str_replace('-', '<', $canonical);
     }
 }

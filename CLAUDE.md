@@ -19,6 +19,9 @@ Local install against the sibling `../vo-base`: `COMPOSER=composer-local.json co
 
 - `COMPOSER=composer-local.json make check`, `make test`, `make infection`, `make fix`.
 
+`composer-ci.lock` (written by the `composer-ci.json` install) is intentionally untracked and not ignored, as in
+`vo-base-spiral`; never commit it.
+
 ## Standard
 
 Tool configuration is byte-identical to the `php84` templates of `msstc4symfony/bundle-standard`; CI's `templates` job

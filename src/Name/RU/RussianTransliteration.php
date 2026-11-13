@@ -27,12 +27,12 @@ final readonly class RussianTransliteration
     }
 
     /**
-     * @return non-empty-list<non-empty-string> the default spelling first
+     * @return non-empty-string
      *
      * @throws InvalidPersonNameException
      */
-    public function variants(AbstractNamePart $part): array
+    public function toLatin(AbstractNamePart $part): string
     {
-        return $this->transliterator->variants(\str_replace(self::SOFT_SIGNS, '', $part->value));
+        return $this->transliterator->toLatin(\str_replace(self::SOFT_SIGNS, '', $part->value));
     }
 }

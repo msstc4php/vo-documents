@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace MSSTC4PHP\ValueObject\Documents\Internal;
 
-use LogicException;
 use MSSTC4PHP\ValueObject\Documents\Exception\InvalidDocumentNumberException;
 
 /**
@@ -34,17 +33,21 @@ final class Digits
      *
      * @return non-empty-string
      *
-     * @throws InvalidDocumentNumberException with the document name and the character count (or "too long") only
+     * @throws InvalidDocumentNumberException "(N characters)" or "(too long)" for a wrong length, "(invalid
+     *                                        character)" for a right length with a character other than a digit
      */
     public static function exactly(string $input, int $length, string $document): string
     {
         $digits = self::strip($input);
-
-        if (\preg_match('/^[0-9]{' . $length . '}$/D', $digits) !== 1) {
+        if (\mb_strlen($digits, 'UTF-8') !== $length) {
             throw self::invalidLength($digits, $document);
         }
 
-        return self::nonEmpty($digits);
+        if (\strspn($digits, '0123456789') !== $length) {
+            throw new InvalidDocumentNumberException(\sprintf('Invalid %s (invalid character).', $document));
+        }
+
+        return Text::nonEmpty($digits);
     }
 
     /**
@@ -55,20 +58,10 @@ final class Digits
     {
         $count = \mb_strlen($normalized, 'UTF-8');
 
-        return new InvalidDocumentNumberException($count > self::MAX_REPORTED_LENGTH ? \sprintf('Invalid %s (too long).', $document) : \sprintf('Invalid %s (%d characters).', $document, $count));
-    }
-
-    /**
-     * Types a stored, already validated digit string for PHPStan.
-     *
-     * @return non-empty-string
-     */
-    public static function nonEmpty(string $digits): string
-    {
-        if ($digits === '') {
-            throw new LogicException('A stored document number is never empty.');
-        }
-
-        return $digits;
+        return new InvalidDocumentNumberException(
+            $count > self::MAX_REPORTED_LENGTH
+                ? \sprintf('Invalid %s (too long).', $document)
+                : \sprintf('Invalid %s (%d characters).', $document, $count),
+        );
     }
 }

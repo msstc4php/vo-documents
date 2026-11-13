@@ -18,8 +18,10 @@ use MSSTC4PHP\ValueObject\Documents\Name\AU\FamilyName;
 use MSSTC4PHP\ValueObject\Documents\Name\AU\GivenName;
 use MSSTC4PHP\ValueObject\Documents\Name\AU\PersonName;
 use MSSTC4PHP\ValueObject\Documents\Name\AU\PersonNameCodec;
+use MSSTC4PHP\ValueObject\Documents\Name\LatinOverridePolicy;
 use MSSTC4PHP\ValueObject\Documents\Name\LatinSpelling;
 use MSSTC4PHP\ValueObject\Documents\Name\RU\PersonNameCodec as RuPersonNameCodec;
+use MSSTC4PHP\ValueObject\Documents\Name\TransliterationVariant;
 use MSSTC4PHP\ValueObject\Exception\InvalidPayloadException;
 use MSSTC4PHP\ValueObject\Payload\ValueObjectMapper;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -33,6 +35,8 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(PersonName::class)]
 #[UsesClass(AbstractNamePart::class)]
 #[UsesClass(LatinSpelling::class)]
+#[UsesClass(LatinOverridePolicy::class)]
+#[UsesClass(TransliterationVariant::class)]
 #[UsesClass(FamilyName::class)]
 #[UsesClass(GivenName::class)]
 #[UsesClass(IcaoPersonName::class)]

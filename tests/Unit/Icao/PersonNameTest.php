@@ -70,6 +70,27 @@ final class PersonNameTest extends TestCase
         self::assertSame('VAN<DER<BERG<<JAN', PersonName::from('van der Berg<<Jan')->value);
     }
 
+    /**
+     * @return iterable<string, array{string, non-empty-string}>
+     */
+    public static function spacedOrPaddedNames(): iterable
+    {
+        yield 'spaces around the separator' => ['IVANOV << IVAN', 'IVANOV<<IVAN'];
+        yield 'space before the separator' => ['ivanov <<ivan', 'IVANOV<<IVAN'];
+        yield 'spaces around a filler' => ['VAN < DER<<JAN', 'VAN<DER<<JAN'];
+        yield 'tab and NBSP around the separator' => ["IVANOV\t<<\u{00A0}IVAN", 'IVANOV<<IVAN'];
+        yield 'MRZ padding' => ['IVANOV<<IVAN<<<<<', 'IVANOV<<IVAN'];
+        yield 'one trailing filler' => ['IVANOV<<IVAN<', 'IVANOV<<IVAN'];
+        yield 'padding after a space' => ['IVANOV<<IVAN <<<', 'IVANOV<<IVAN'];
+        yield 'padded mononym' => ['MADONNA<<<<', 'MADONNA'];
+    }
+
+    #[DataProvider('spacedOrPaddedNames')]
+    public function testSpacesNextToFillersAndTrailingPaddingAreDropped(string $input, string $expected): void
+    {
+        self::assertSame($expected, PersonName::from($input)->value);
+    }
+
     public function testEqualityIsByCanonicalValue(): void
     {
         self::assertTrue(PersonName::from('ivanov<<ivan')->equals(PersonName::fromParts('Ivanov', ['Ivan'])));
@@ -83,7 +104,7 @@ final class PersonNameTest extends TestCase
     {
         yield 'triple filler' => ['IVANOV<<<IVAN'];
         yield 'diacritic' => ['IVÁNOV'];
-        yield 'empty secondary' => ['IVANOV<<'];
+        yield 'only fillers' => ['<<<'];
         yield 'leading hyphen' => ['-IVANOV'];
         yield 'trailing hyphen' => ['IVANOV-'];
         yield 'leading filler' => ['<<IVAN'];
@@ -148,7 +169,7 @@ final class PersonNameTest extends TestCase
 
     public function testTryFromReturnsNullForInvalidInput(): void
     {
-        self::assertNull(PersonName::tryFrom('IVANOV<<'));
+        self::assertNull(PersonName::tryFrom('IVANOV<<<IVAN'));
         self::assertTrue(PersonName::isValid('IVANOV<<IVAN'));
     }
 
@@ -263,7 +284,8 @@ final class PersonNameTest extends TestCase
 
         self::assertSame(PersonName::MAX_LENGTH, \strlen($longest));
         self::assertSame($longest, PersonName::from($longest)->value);
-        self::assertFalse(PersonName::isValid($longest . 'B'));
+        $this->expectExceptionMessage('Invalid ICAO personal name (Latin form too long).');
+        PersonName::from($longest . 'B');
     }
 
     public function testTooLongANameIsRefusedWithoutEchoingIt(): void
@@ -272,8 +294,15 @@ final class PersonNameTest extends TestCase
             PersonName::fromParts(\str_repeat('Q', PersonName::MAX_LENGTH), ['X']);
             self::fail('A name over the limit was accepted.');
         } catch (InvalidPersonNameException $exception) {
-            self::assertStringNotContainsString('QQQ', $exception->getMessage());
+            self::assertSame('Invalid ICAO personal name (Latin form too long).', $exception->getMessage());
         }
+    }
+
+    public function testFromPartsAcceptsExactlyMaxLengthCharacters(): void
+    {
+        $name = PersonName::fromParts(\str_repeat('A', 127), [\str_repeat('B', PersonName::MAX_LENGTH - 129)]);
+
+        self::assertSame(PersonName::MAX_LENGTH, \strlen($name->value));
     }
 
     private static function bennelong(): PersonName

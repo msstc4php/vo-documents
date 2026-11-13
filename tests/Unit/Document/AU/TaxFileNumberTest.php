@@ -8,6 +8,7 @@ use MSSTC4PHP\ValueObject\Documents\Document\AU\TaxFileNumber;
 use MSSTC4PHP\ValueObject\Documents\Internal\Checksum;
 use MSSTC4PHP\ValueObject\Documents\Internal\Digits;
 use MSSTC4PHP\ValueObject\Documents\Internal\Mask;
+use MSSTC4PHP\ValueObject\Documents\Internal\Text;
 use MSSTC4PHP\ValueObject\Documents\Tests\Fixture\RefusesWithoutEchoingInput;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -20,6 +21,7 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(TaxFileNumber::class)]
 #[UsesClass(Checksum::class)]
 #[UsesClass(Digits::class)]
+#[UsesClass(Text::class)]
 #[UsesClass(Mask::class)]
 final class TaxFileNumberTest extends TestCase
 {
@@ -64,7 +66,7 @@ final class TaxFileNumberTest extends TestCase
         yield 'two digits swapped' => ['213 456 782', 'Invalid Australian tax file number checksum.'];
         yield 'eight digits' => ['12 345 678', 'Invalid Australian tax file number (8 characters).'];
         yield 'ten digits' => ['123 456 7820', 'Invalid Australian tax file number (10 characters).'];
-        yield 'letter' => ['123 456 78O', 'Invalid Australian tax file number (9 characters).'];
+        yield 'letter' => ['123 456 78O', 'Invalid Australian tax file number (invalid character).'];
         yield 'empty' => ['', 'Invalid Australian tax file number (0 characters).'];
     }
 

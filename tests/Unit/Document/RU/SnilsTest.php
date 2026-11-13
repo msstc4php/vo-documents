@@ -8,6 +8,7 @@ use MSSTC4PHP\ValueObject\Documents\Document\RU\Snils;
 use MSSTC4PHP\ValueObject\Documents\Internal\Checksum;
 use MSSTC4PHP\ValueObject\Documents\Internal\Digits;
 use MSSTC4PHP\ValueObject\Documents\Internal\Mask;
+use MSSTC4PHP\ValueObject\Documents\Internal\Text;
 use MSSTC4PHP\ValueObject\Documents\Tests\Fixture\RefusesWithoutEchoingInput;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -20,6 +21,7 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(Snils::class)]
 #[UsesClass(Checksum::class)]
 #[UsesClass(Digits::class)]
+#[UsesClass(Text::class)]
 #[UsesClass(Mask::class)]
 final class SnilsTest extends TestCase
 {
@@ -75,8 +77,8 @@ final class SnilsTest extends TestCase
         yield 'zeros only' => ['000-000-000 00', 'Invalid SNILS (zeros only).'];
         yield 'too short' => ['112-233-445 9', 'Invalid SNILS (10 characters).'];
         yield 'too long' => ['112-233-445 950', 'Invalid SNILS (12 characters).'];
-        yield 'letters' => ['112-233-445 9O', 'Invalid SNILS (11 characters).'];
-        yield 'Cyrillic letter' => ['112-233-445 9О', 'Invalid SNILS (11 characters).'];
+        yield 'letters' => ['112-233-445 9O', 'Invalid SNILS (invalid character).'];
+        yield 'Cyrillic letter' => ['112-233-445 9О', 'Invalid SNILS (invalid character).'];
         yield 'other separator' => ['112.233.445 95', 'Invalid SNILS (13 characters).'];
         yield 'empty' => ['', 'Invalid SNILS (0 characters).'];
         yield 'pasted several times' => [\str_repeat('112-233-445 95 ', 4), 'Invalid SNILS (too long).'];

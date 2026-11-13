@@ -24,7 +24,7 @@ final readonly class SubdivisionResolver
     /**
      * @param non-empty-string $document the document's name in exception messages, e.g. "Australian driver licence"
      * @param list<TSubdivision> $subdivisions in the order matches are reported
-     * @param Closure(TSubdivision, string): ?TNumber $tryParse the number of that subdivision, null when it does not fit
+     * @param Closure(TSubdivision, string): ?TNumber $tryParse the subdivision's number, null if it does not fit
      */
     public function __construct(
         private string $document,
@@ -51,7 +51,9 @@ final readonly class SubdivisionResolver
             throw Digits::invalidLength(Digits::strip($number), $this->document . ' number');
         }
 
-        throw new AmbiguousJurisdictionException($this->document, \array_map(static fn (array $match): Subdivision => $match[0], $matches));
+        $subdivisions = \array_map(static fn (array $match): Subdivision => $match[0], $matches);
+
+        throw new AmbiguousJurisdictionException($this->document, $subdivisions);
     }
 
     /**

@@ -9,6 +9,7 @@ use MSSTC4PHP\ValueObject\Documents\Exception\InvalidDocumentNumberException;
 use MSSTC4PHP\ValueObject\Documents\Internal\Checksum;
 use MSSTC4PHP\ValueObject\Documents\Internal\Digits;
 use MSSTC4PHP\ValueObject\Documents\Internal\Mask;
+use MSSTC4PHP\ValueObject\Documents\Internal\Text;
 use MSSTC4PHP\ValueObject\Support\AbstractStringValueObject;
 use Override;
 
@@ -36,7 +37,7 @@ final class OmsPolicyNumber extends AbstractStringValueObject implements Maskabl
      */
     public function formatted(): string
     {
-        return Digits::nonEmpty($this->value);
+        return Text::nonEmpty($this->value);
     }
 
     #[Override]

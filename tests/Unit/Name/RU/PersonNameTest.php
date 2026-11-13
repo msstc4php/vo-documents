@@ -11,6 +11,8 @@ use MSSTC4PHP\ValueObject\Documents\Icao\Table\LatinMultinational;
 use MSSTC4PHP\ValueObject\Documents\Icao\Transliterator;
 use MSSTC4PHP\ValueObject\Documents\Internal\UnicodeText;
 use MSSTC4PHP\ValueObject\Documents\Name\AbstractNamePart;
+use MSSTC4PHP\ValueObject\Documents\Name\AnyIcaoSpelling;
+use MSSTC4PHP\ValueObject\Documents\Name\LatinOverridePolicy;
 use MSSTC4PHP\ValueObject\Documents\Name\LatinSpelling;
 use MSSTC4PHP\ValueObject\Documents\Name\RU\AbstractRussianNamePart;
 use MSSTC4PHP\ValueObject\Documents\Name\RU\FamilyName;
@@ -31,6 +33,8 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(AbstractNamePart::class)]
 #[UsesClass(AbstractRussianNamePart::class)]
 #[UsesClass(LatinSpelling::class)]
+#[UsesClass(LatinOverridePolicy::class)]
+#[UsesClass(AnyIcaoSpelling::class)]
 #[UsesClass(FamilyName::class)]
 #[UsesClass(GivenName::class)]
 #[UsesClass(Patronymic::class)]
@@ -85,62 +89,63 @@ final class PersonNameTest extends TestCase
         self::assertSame('IVANOV<<IVAN<IVANOVICH', $name->latinOverride()?->value);
     }
 
-    public function testOverrideEqualToTheDerivedFormIsAccepted(): void
-    {
-        self::assertSame('IVANOV<<IVAN', $this->ivanov(latin: IcaoPersonName::from('Ivanov<<Ivan'))->latin()->value);
-    }
-
-    public function testOverrideWithASoftSignSpellingIsAccepted(): void
-    {
-        $name = new PersonName(
-            FamilyName::from('Ильин'),
-            GivenName::from('Игорь'),
-            Patronymic::from('Игоревич'),
-            IcaoPersonName::from('ILIN<<IGOR<IGOREVICH'),
-        );
-
-        self::assertSame('ILIN<<IGOR<IGOREVICH', $name->latin()->value);
-    }
-
     /**
-     * @return iterable<string, array{non-empty-string, bool}>
+     * @return iterable<string, array{string, string, non-empty-string}>
      */
-    public static function refusedOverrides(): iterable
+    public static function derivedOverrides(): iterable
     {
-        yield 'other spelling' => ['IWANOW<<IWAN', true];
-        yield 'other family name' => ['PETROV<<IVAN', true];
-        yield 'patronymic only' => ['IVANOV<<IVANOVICH', true];
-        yield 'patronymic first' => ['IVANOV<<IVANOVICH<IVAN', true];
-        yield 'mononym' => ['IVANOV', true];
-        yield 'patronymic not in the national name' => ['IVANOV<<IVAN<IVANOVICH', false];
+        yield 'same spelling in another case' => ['Иванов', 'Иван', 'Ivanov<<Ivan'];
+        yield 'filler for the hyphen' => ['Римский-Корсаков', 'Николай', 'RIMSKII<KORSAKOV<<NIKOLAI'];
+        yield 'hyphen for a space' => ['фон Визин', 'Анна-Мария', 'FON-VIZIN<<ANNA<MARIIA'];
+        yield 'spaced and padded' => ['Иванов', 'Иван', 'IVANOV << IVAN<<<<'];
     }
 
-    #[DataProvider('refusedOverrides')]
-    public function testOverrideThatIsNoTransliterationIsRefused(string $latin, bool $withPatronymic): void
+    #[DataProvider('derivedOverrides')]
+    public function testAnOverrideThatIsTheDerivedFormIsNotKept(string $family, string $given, string $latin): void
     {
-        $this->expectException(InvalidPersonNameException::class);
-        $this->expectExceptionMessage('Invalid Russian person name (the Latin form is not a transliteration of the name).');
+        $name = new PersonName(FamilyName::from($family), GivenName::from($given), null, IcaoPersonName::from($latin));
+        $derived = new PersonName(FamilyName::from($family), GivenName::from($given));
 
-        $this->ivanov($withPatronymic, IcaoPersonName::from($latin));
+        self::assertNull($name->latinOverride());
+        self::assertSame($derived->latin()->value, $name->latin()->value);
+        self::assertTrue($name->equals($derived));
     }
 
     /**
      * @return iterable<string, array{string, string, non-empty-string, non-empty-string}>
      */
-    public static function mrzStyleOverrides(): iterable
+    public static function documentedSpellings(): iterable
     {
-        yield 'filler for the hyphen' => ['Римский-Корсаков', 'Николай', 'RIMSKII<KORSAKOV<<NIKOLAI', 'RIMSKII-KORSAKOV<<NIKOLAI'];
-        yield 'hyphen form as is' => ['Римский-Корсаков', 'Николай', 'RIMSKII-KORSAKOV<<NIKOLAI', 'RIMSKII-KORSAKOV<<NIKOLAI'];
-        yield 'hyphen for a space' => ['фон Визин', 'Анна-Мария', 'FON-VIZIN<<ANNA<MARIIA', 'FON<VIZIN<<ANNA-MARIIA'];
+        // Order 996 §32 / Order 186 §140: the spelling of a supporting document, not of the table.
+        yield 'earlier passport spelling' => ['Иванова', 'Юлия', 'IVANOVA<<YULIYA', 'IVANOVA<<YULIYA'];
+        yield 'German civil-status spelling' => ['Шмидт', 'Юрий', 'schmidt<<jurij', 'SCHMIDT<<JURIJ'];
+        yield 'MRZ-form spelling kept as given' => ['Римский-Корсаков', 'Николай', 'RIMSKY<KORSAKOV<<NIKOLAY', 'RIMSKY<KORSAKOV<<NIKOLAY'];
+        yield 'mononym' => ['Иванов', 'Иван', 'IVANOV', 'IVANOV'];
     }
 
-    #[DataProvider('mrzStyleOverrides')]
-    public function testOverrideInMrzFormIsStoredInTheNationalForm(string $family, string $given, string $latin, string $stored): void
+    #[DataProvider('documentedSpellings')]
+    public function testAnyValidIcaoNameIsKeptAsTheOverride(string $family, string $given, string $latin, string $stored): void
     {
         $name = new PersonName(FamilyName::from($family), GivenName::from($given), null, IcaoPersonName::from($latin));
 
         self::assertSame($stored, $name->latin()->value);
         self::assertSame($stored, $name->latinOverride()?->value);
+    }
+
+    public function testAnOverrideThatIsNoIcaoNameIsRefusedBeforeTheName(): void
+    {
+        $this->expectException(InvalidPersonNameException::class);
+        $this->expectExceptionMessage('Invalid ICAO personal name.');
+
+        $this->ivanov(latin: IcaoPersonName::from('IVANOV1<<IVAN'));
+    }
+
+    public function testAPartWhoseLatinFormIsTooLongIsRefused(): void
+    {
+        $this->expectException(InvalidPersonNameException::class);
+        $this->expectExceptionMessage('Invalid ICAO personal name (Latin form too long).');
+
+        new PersonName(FamilyName::from(\str_repeat('Щ', 100)), GivenName::from('Иван'));
     }
 
     public function testDisplayForms(): void
@@ -191,10 +196,11 @@ final class PersonNameTest extends TestCase
         self::assertFalse($name->equals(new PersonName(FamilyName::from('Петров'), GivenName::from('Иван'), Patronymic::from('Иванович'))));
         self::assertFalse($name->equals(new PersonName(FamilyName::from('Иванов'), GivenName::from('Пётр'), Patronymic::from('Иванович'))));
         self::assertFalse($name->equals(new PersonName(FamilyName::from('Иванов'), GivenName::from('Иван'), Patronymic::from('Петрович'))));
-        self::assertFalse($name->equals($this->ivanov(latin: IcaoPersonName::from('IVANOV<<IVAN'))));
-        self::assertFalse($this->ivanov(latin: IcaoPersonName::from('IVANOV<<IVAN'))->equals($name));
-        self::assertTrue($this->ivanov(latin: IcaoPersonName::from('IVANOV<<IVAN'))->equals($this->ivanov(latin: IcaoPersonName::from('ivanov<<ivan'))));
-        self::assertFalse($this->ivanov(latin: IcaoPersonName::from('IVANOV<<IVAN'))->equals($this->ivanov(latin: IcaoPersonName::from('IVANOV<<IVAN<IVANOVICH'))));
+        self::assertFalse($name->equals($this->ivanov(latin: IcaoPersonName::from('IWANOW<<IWAN'))));
+        self::assertFalse($this->ivanov(latin: IcaoPersonName::from('IWANOW<<IWAN'))->equals($name));
+        self::assertTrue($this->ivanov(latin: IcaoPersonName::from('IWANOW<<IWAN'))->equals($this->ivanov(latin: IcaoPersonName::from('iwanow<<iwan'))));
+        self::assertFalse($this->ivanov(latin: IcaoPersonName::from('IWANOW<<IWAN'))->equals($this->ivanov(latin: IcaoPersonName::from('IVANOV<<IVAN<IVANOVICH'))));
+        self::assertTrue($name->equals($this->ivanov(latin: IcaoPersonName::from('IVANOV<<IVAN'))));
         self::assertFalse($name->equals(GivenName::from('Иван')));
     }
 

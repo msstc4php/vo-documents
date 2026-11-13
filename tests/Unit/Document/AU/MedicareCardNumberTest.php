@@ -8,6 +8,7 @@ use MSSTC4PHP\ValueObject\Documents\Document\AU\MedicareCardNumber;
 use MSSTC4PHP\ValueObject\Documents\Internal\Checksum;
 use MSSTC4PHP\ValueObject\Documents\Internal\Digits;
 use MSSTC4PHP\ValueObject\Documents\Internal\Mask;
+use MSSTC4PHP\ValueObject\Documents\Internal\Text;
 use MSSTC4PHP\ValueObject\Documents\Tests\Fixture\RefusesWithoutEchoingInput;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -20,6 +21,7 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(MedicareCardNumber::class)]
 #[UsesClass(Checksum::class)]
 #[UsesClass(Digits::class)]
+#[UsesClass(Text::class)]
 #[UsesClass(Mask::class)]
 final class MedicareCardNumberTest extends TestCase
 {
@@ -67,7 +69,7 @@ final class MedicareCardNumberTest extends TestCase
         yield 'first digit 0' => ['0000 00000 1', 'Invalid Medicare card number (first digit out of range).'];
         yield 'with the individual reference number' => ['3189 97702 1 1', 'Invalid Medicare card number (11 characters).'];
         yield 'nine digits' => ['3189 97702', 'Invalid Medicare card number (9 characters).'];
-        yield 'letter' => ['3189 97702 I', 'Invalid Medicare card number (10 characters).'];
+        yield 'letter' => ['3189 97702 I', 'Invalid Medicare card number (invalid character).'];
     }
 
     #[DataProvider('invalidNumbers')]

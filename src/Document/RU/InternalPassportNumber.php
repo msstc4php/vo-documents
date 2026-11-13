@@ -7,6 +7,7 @@ namespace MSSTC4PHP\ValueObject\Documents\Document\RU;
 use MSSTC4PHP\ValueObject\Documents\Contract\Maskable;
 use MSSTC4PHP\ValueObject\Documents\Internal\Digits;
 use MSSTC4PHP\ValueObject\Documents\Internal\Mask;
+use MSSTC4PHP\ValueObject\Documents\Internal\Text;
 use MSSTC4PHP\ValueObject\Support\AbstractStringValueObject;
 use Override;
 
@@ -30,7 +31,7 @@ final class InternalPassportNumber extends AbstractStringValueObject implements 
      */
     public function series(): string
     {
-        return Digits::nonEmpty(\substr($this->value, 0, 4));
+        return Text::nonEmpty(\substr($this->value, 0, 4));
     }
 
     /**
@@ -38,7 +39,7 @@ final class InternalPassportNumber extends AbstractStringValueObject implements 
      */
     public function number(): string
     {
-        return Digits::nonEmpty(\substr($this->value, 4));
+        return Text::nonEmpty(\substr($this->value, 4));
     }
 
     /**

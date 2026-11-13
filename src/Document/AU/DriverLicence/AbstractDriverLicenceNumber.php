@@ -13,8 +13,10 @@ use Override;
 
 /**
  * A licence number checked against its jurisdiction's published shape ({@see format()}, cited on each class) after the
- * separators are removed and ASCII letters upper-cased; no jurisdiction publishes a check digit. `masked()` (no
- * official rule) hides every character but the last min(3, ⌊length / 2⌋): `*******890`, `*2`.
+ * separators are removed and ASCII letters upper-cased; no jurisdiction publishes a check digit.
+ *
+ * `masked()` (no official rule) hides every character but the last min(3, ⌊length / 2⌋): `*******890`, `*2`. Three,
+ * not the package's usual four, because AU numbers are short (at most 10 characters).
  *
  * @see docs/sources/AU.md "Driving licence numbers"
  */

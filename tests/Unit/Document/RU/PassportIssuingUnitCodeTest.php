@@ -7,6 +7,7 @@ namespace MSSTC4PHP\ValueObject\Documents\Tests\Unit\Document\RU;
 use MSSTC4PHP\ValueObject\Documents\Document\RU\PassportIssuingUnitCode;
 use MSSTC4PHP\ValueObject\Documents\Internal\Digits;
 use MSSTC4PHP\ValueObject\Documents\Internal\Mask;
+use MSSTC4PHP\ValueObject\Documents\Internal\Text;
 use MSSTC4PHP\ValueObject\Documents\Tests\Fixture\RefusesWithoutEchoingInput;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -19,6 +20,7 @@ use PHPUnit\Framework\TestCase;
  */
 #[CoversClass(PassportIssuingUnitCode::class)]
 #[UsesClass(Digits::class)]
+#[UsesClass(Text::class)]
 #[UsesClass(Mask::class)]
 final class PassportIssuingUnitCodeTest extends TestCase
 {
@@ -60,7 +62,7 @@ final class PassportIssuingUnitCodeTest extends TestCase
     {
         yield 'too short' => ['772-07', 'Invalid Russian passport issuing unit code (5 characters).'];
         yield 'too long' => ['772-0789', 'Invalid Russian passport issuing unit code (7 characters).'];
-        yield 'letters' => ['77A-078', 'Invalid Russian passport issuing unit code (6 characters).'];
+        yield 'letters' => ['77A-078', 'Invalid Russian passport issuing unit code (invalid character).'];
     }
 
     #[DataProvider('invalidNumbers')]

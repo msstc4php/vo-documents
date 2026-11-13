@@ -24,6 +24,8 @@ final readonly class Transliterator
     /** Omitted without a filler, Doc 9303 Part 3 §4.6 ("D’ARTAGNAN" → "DARTAGNAN"). */
     private const array APOSTROPHES = ["'", "\u{2019}"];
 
+    private const string NO_SPELLING = 'Invalid personal name (no ICAO transliteration for a character).';
+
     /** @var non-empty-list<TransliterationTable> */
     private array $tables;
 
@@ -97,7 +99,7 @@ final readonly class Transliterator
         foreach (\mb_str_split(\mb_strtoupper($text)) as $character) {
             $spellings = $character === ' ' || $character === '-' ? [$character] : $table->spellings($character);
             if ($spellings === null) {
-                throw new InvalidPersonNameException('Invalid personal name (no ICAO transliteration for a character).');
+                throw new InvalidPersonNameException(self::NO_SPELLING);
             }
 
             $segments[] = $spellings;
@@ -128,6 +130,6 @@ final readonly class Transliterator
             throw new InvalidPersonNameException('Invalid personal name (mixed scripts).');
         }
 
-        throw new InvalidPersonNameException('Invalid personal name (no ICAO transliteration for a character).');
+        throw new InvalidPersonNameException(self::NO_SPELLING);
     }
 }

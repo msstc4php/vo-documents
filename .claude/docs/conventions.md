@@ -12,15 +12,23 @@
 - A national name part extends `Name\AbstractNamePart` (hooks: `letters()`, `word()`, `innerSeparators()`, `label()`); message `Invalid <label> (<n> characters).`; allowed
   separators per part come from the country's source note (RU: given names and patronymics have no apostrophe).
 - A composite name is a `final readonly` class with public part properties, its codec stores only an explicit Latin
-  override (`latin: null` otherwise) and is listed in `Codecs::all()`.
+  override (`latin: null` otherwise) and is listed in `Codecs::all()`. The derived form uses `toLatin()` (never
+  `variants()`); the override goes through a `Name\LatinOverridePolicy` subclass chosen per country:
+  `AnyIcaoSpelling` when the passport authority writes a documented spelling (RU), `TransliterationVariant` with a
+  lazy `Closure` of the forms when only table spellings are acceptable (AU). `resolve()` drops an override equal to
+  the derived form in MRZ terms (hyphen ≡ `<`), so equality and the codec payload agree.
 - `Icao\Transliterator::variants()` caps at 4096 combinations (untrusted input); `toLatin()` has no cap.
 - A document number VO parses with `Internal\Digits::exactly($input, $length, $label)` (strips `Digits::SEPARATORS`:
   space, `-`, tab, CR/LF, NBSP, U+2007, U+202F; message `Invalid <label> (<n> characters).`, or `(too long)` above
-  `Digits::MAX_REPORTED_LENGTH` = 40), then its checksum (`Invalid <label> checksum.`). The label is a
+  `Digits::MAX_REPORTED_LENGTH` = 40; right length with a non-digit: `(invalid character)`), then its checksum (`Invalid <label> checksum.`). The label is a
   `private const string DOCUMENT` per class, used in every message. `masked()` is `Mask::keepLastDigits(formatted(), 4)` unless the source note records an
-  official rule. A field without a published check digit is shape-only, said on the class and in the source note.
+  official rule; AU classes keep 3 (numbers of at most 10 characters, AU.md "Masking rule"). A field without a published check digit is shape-only, said on the class and in the source note.
 - `AbstractStringValueObject::$value` is a plain `string`; where a getter must return `non-empty-string` without a
-  literal in a `sprintf()` format, wrap it in `Digits::nonEmpty()` (readonly helper properties assigned in `parse()`
+  literal in a `sprintf()` format, wrap it in `Internal\Text::nonEmpty()` (the only such helper) (readonly helper properties assigned in `parse()`
   fail PHPStan `property.readOnlyAssignNotInConstructor`).
 - Document tests use `Tests\Fixture\RefusesWithoutEchoingInput::assertRefusedWithoutEcho()`: exact message and no three
   consecutive input digits in it (as typed and with separators removed).
+- Every enum implementing `Contract\Subdivision` is string-backed with `value === isoCode()`;
+  `tests/Unit/Contract/SubdivisionTest.php` scans `src/` and checks new enums automatically.
+- Source lines stay within 120 characters. php-cs-fixer re-joins a call with a single wrapped argument and an arrow
+  function body moved to its own line; extract a `$message` variable, a constant or a first-class callable instead.

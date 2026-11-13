@@ -8,6 +8,7 @@ use MSSTC4PHP\ValueObject\Documents\Document\RU\OmsPolicyNumber;
 use MSSTC4PHP\ValueObject\Documents\Internal\Checksum;
 use MSSTC4PHP\ValueObject\Documents\Internal\Digits;
 use MSSTC4PHP\ValueObject\Documents\Internal\Mask;
+use MSSTC4PHP\ValueObject\Documents\Internal\Text;
 use MSSTC4PHP\ValueObject\Documents\Tests\Fixture\RefusesWithoutEchoingInput;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -21,6 +22,7 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(OmsPolicyNumber::class)]
 #[UsesClass(Checksum::class)]
 #[UsesClass(Digits::class)]
+#[UsesClass(Text::class)]
 #[UsesClass(Mask::class)]
 final class OmsPolicyNumberTest extends TestCase
 {
@@ -64,7 +66,7 @@ final class OmsPolicyNumberTest extends TestCase
         yield 'number digit changed' => ['7700000000133453', 'Invalid OMS policy number checksum.'];
         yield 'too short' => ['770000000012345', 'Invalid OMS policy number (15 characters).'];
         yield 'too long' => ['77000000001234530', 'Invalid OMS policy number (17 characters).'];
-        yield 'letters' => ['770000000012345O', 'Invalid OMS policy number (16 characters).'];
+        yield 'letters' => ['770000000012345O', 'Invalid OMS policy number (invalid character).'];
     }
 
     #[DataProvider('invalidNumbers')]

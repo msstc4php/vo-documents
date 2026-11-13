@@ -20,7 +20,8 @@ use Override;
  */
 final readonly class PersonNameCodec implements PayloadCodec
 {
-    private const string SHAPE = 'Expected a Russian person name payload with string "family" and "given", string or null "patronymic" and "latin", and no other keys.';
+    private const string SHAPE = 'Expected a Russian person name payload with string "family" and "given", '
+        . 'string or null "patronymic" and "latin", and no other keys.';
 
     private const array KEYS = ['family', 'given', 'patronymic', 'latin'];
 
@@ -37,7 +38,9 @@ final readonly class PersonNameCodec implements PayloadCodec
     public function encode(ValueObject $value): array
     {
         if (!$value instanceof PersonName) {
-            throw new LogicException(\sprintf('%s encodes %s, %s given.', self::class, PersonName::class, $value::class));
+            $message = \sprintf('%s encodes %s, %s given.', self::class, PersonName::class, $value::class);
+
+            throw new LogicException($message);
         }
 
         return [

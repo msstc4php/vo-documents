@@ -32,9 +32,11 @@ How the package applies this (designer's calls, no official character rule found
   ICAO spelling.
 - **Derived Latin:** `FAMILY<<GIVEN` with the default spelling of each character (`Zoë` → `ZOE`,
   `Müller` → `MUELLER`); apostrophes are omitted (`O'Brien` → `OBRIEN`, ICAO Part 3 §4.6).
-- **Override:** a Latin form is accepted when it is one of the ICAO spellings of the parts (`MULLER<<ZOE` for
-  `Müller Zoë`), compared like the RU override (case, spaces and `<` for a hyphen normalised; `Name\LatinSpelling`, at
-  most 4096 spellings).
+- **Override** (policy `Name\TransliterationVariant`): a Latin form is accepted only when it is one of the ICAO
+  spellings of the parts (`MULLER<<ZOE` for `Müller Zoë`); case, spaces next to `<`, MRZ padding and `<` for a hyphen
+  are normalised (`Name\LatinSpelling`, at most 4096 spellings, computed only when an override is given). An
+  override equal to the derived form is not kept. Unlike RU (any valid ICAO name, RU.md §4), a Latin-script name keeps
+  this table rule: its Latin form is the name itself up to the table's spellings.
 - **Display order** (`full()`): given names then family name (`Joan Catherine Citizen`), the order of the passport
   application form and of the licences of every jurisdiction except the ACT, Northern Territory and Tasmania, which
   print the family name first.
@@ -108,7 +110,7 @@ Implemented (`Document\AU\DriverLicence\<Abbrev>DriverLicenceNumber`, all `Docum
   only**.
 - "Alphanumeric" is taken literally: an all-letter or all-digit value of the stated length is accepted.
 - `masked()` (no official rule): every character but the last `min(3, ⌊length / 2⌋)` becomes `*`
-  (`1234567890` → `*******890`, `01234567` → `*****567`, `12` → `*2`, `7` → `*`).
+  (`1234567890` → `*******890`, `01234567` → `*****567`, `12` → `*2`, `7` → `*`). See "Masking rule" below.
 - Messages: "Invalid AU-NSW driver licence number (9 characters)." — the ISO 3166-2 code, the document name and the
   character count after normalisation ("(too long)" above 40) when the length is wrong, or "Invalid AU-NSW driver
   licence number (invalid character)." when the length fits but a character is outside the jurisdiction's set
@@ -198,6 +200,13 @@ The first digit is 2–6; digit 9 = (Σ dᵢ·wᵢ over digits 1–8, w = 1, 3, 
 number) is any digit (ADHA: "is a digit"). Test number: `3189 97702 1` (the worked example's first nine digits, issue
 number 1 added). `formatted()` `3189 97702 1` (the card prints 4-5-1); `masked()` (no official rule) keeps the last
 three digits: `**** ***02 1`.
+
+## Masking rule
+
+No AU source publishes a masking rule. Every AU `masked()` keeps the last **three** characters, not the four that plan
+1 set as the package default (and that every RU class keeps): AU numbers are short (driver licences 1-10 characters,
+TFN 9, Medicare 10), so four would show almost half of a short number. Licence numbers keep at most half of their
+length (`min(3, ⌊length / 2⌋)`), so a 2-character number shows one.
 
 ## Where this note departs from plan 1, task 6 (the source wins)
 

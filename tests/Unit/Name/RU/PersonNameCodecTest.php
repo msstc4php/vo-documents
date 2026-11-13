@@ -14,7 +14,9 @@ use MSSTC4PHP\ValueObject\Documents\Icao\Transliterator;
 use MSSTC4PHP\ValueObject\Documents\Internal\PayloadFields;
 use MSSTC4PHP\ValueObject\Documents\Internal\UnicodeText;
 use MSSTC4PHP\ValueObject\Documents\Name\AbstractNamePart;
+use MSSTC4PHP\ValueObject\Documents\Name\AnyIcaoSpelling;
 use MSSTC4PHP\ValueObject\Documents\Name\AU\PersonNameCodec as AuPersonNameCodec;
+use MSSTC4PHP\ValueObject\Documents\Name\LatinOverridePolicy;
 use MSSTC4PHP\ValueObject\Documents\Name\LatinSpelling;
 use MSSTC4PHP\ValueObject\Documents\Name\RU\AbstractRussianNamePart;
 use MSSTC4PHP\ValueObject\Documents\Name\RU\FamilyName;
@@ -38,6 +40,8 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(AbstractNamePart::class)]
 #[UsesClass(AbstractRussianNamePart::class)]
 #[UsesClass(LatinSpelling::class)]
+#[UsesClass(LatinOverridePolicy::class)]
+#[UsesClass(AnyIcaoSpelling::class)]
 #[UsesClass(FamilyName::class)]
 #[UsesClass(GivenName::class)]
 #[UsesClass(Patronymic::class)]
@@ -70,14 +74,21 @@ final class PersonNameCodecTest extends TestCase
     public function testRoundTripWithOverrideAndNoPatronymic(): void
     {
         $codec = new PersonNameCodec();
-        $name = new PersonName(FamilyName::from('Иванов'), GivenName::from('Иван'), null, IcaoPersonName::from('IVANOV<<IVAN'));
+        $name = new PersonName(FamilyName::from('Иванова'), GivenName::from('Юлия'), null, IcaoPersonName::from('IVANOVA<<YULIYA'));
 
         $payload = $codec->encode($name);
 
-        self::assertSame(['family' => 'Иванов', 'given' => 'Иван', 'patronymic' => null, 'latin' => 'IVANOV<<IVAN'], $payload);
+        self::assertSame(['family' => 'Иванова', 'given' => 'Юлия', 'patronymic' => null, 'latin' => 'IVANOVA<<YULIYA'], $payload);
         $decoded = $codec->decode($payload);
         self::assertTrue($decoded->equals($name));
-        self::assertSame('IVANOV<<IVAN', $decoded->latinOverride()?->value);
+        self::assertSame('IVANOVA<<YULIYA', $decoded->latinOverride()?->value);
+    }
+
+    public function testAnOverrideThatIsTheDerivedFormIsStoredAsNull(): void
+    {
+        $name = new PersonName(FamilyName::from('Иванов'), GivenName::from('Иван'), null, IcaoPersonName::from('IVANOV<<IVAN'));
+
+        self::assertNull(new PersonNameCodec()->encode($name)['latin']);
     }
 
     public function testDecodeAcceptsMissingOptionalKeys(): void

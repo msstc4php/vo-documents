@@ -14,7 +14,8 @@ use Override;
 /**
  * Latin personal name as written in an ICAO Doc 9303 MRZ, e.g. VAN<DER<BERG<<JAN<PIETER: A-Z, `-` and `<`; `<<`
  * separates the primary identifier from the secondary identifiers and `<` stands for a space. Hyphens are kept
- * (visual zone form) and become `<` only in {@see mrzField()}. Input is upper-cased and spaces become `<`.
+ * (visual zone form) and become `<` only in {@see mrzField()}. Input is upper-cased, spaces next to a `<` are dropped,
+ * other spaces become `<` and trailing `<` fillers of an MRZ field are removed (`IVANOV << IVAN`, `IVANOV<<IVAN<<<`).
  *
  * @see https://www.icao.int/publications/Documents/9303_p3_cons_en.pdf ICAO Doc 9303 Part 3, 8th ed. (2021), §4.6
  * @see https://www.icao.int/sites/default/files/publications/DocSeries/9303_p4_cons_en.pdf ICAO Doc 9303 Part 4,
@@ -32,22 +33,17 @@ final class PersonName extends AbstractStringValueObject
     /**
      * @param list<string> $secondary
      *
-     * @throws InvalidPersonNameException
+     * @throws InvalidPersonNameException "(Latin form too long)" above {@see self::MAX_LENGTH} characters
      */
     public static function fromParts(string $primary, array $secondary = []): self
     {
         foreach ([$primary, ...$secondary] as $part) {
-            if (\str_contains($part, '<')) {
+            if (\str_contains($part, '<') || UnicodeText::normalizeName($part) === '') {
                 throw new InvalidPersonNameException('Invalid ICAO personal name.');
             }
         }
 
-        $value = self::canonical($primary);
-        if ($secondary !== []) {
-            $value .= '<<' . \implode('<', \array_map(self::canonical(...), $secondary));
-        }
-
-        return new self($value);
+        return new self($secondary === [] ? $primary : $primary . '<<' . \implode('<', $secondary));
     }
 
     /**
@@ -111,16 +107,20 @@ final class PersonName extends AbstractStringValueObject
     #[Override]
     protected function parse(string $value): string
     {
-        $canonical = self::canonical($value);
+        $canonical = \rtrim($this->canonical(\str_replace([' <', '< '], '<', UnicodeText::normalizeName($value))), '<');
+        if (\strlen($canonical) > self::MAX_LENGTH) {
+            throw new InvalidPersonNameException('Invalid ICAO personal name (Latin form too long).');
+        }
+
         $shape = '/^' . self::IDENTIFIER . '(?:<<' . self::IDENTIFIER . ')?$/';
-        if (\strlen($canonical) > self::MAX_LENGTH || \preg_match($shape, $canonical) !== 1) {
+        if (\preg_match($shape, $canonical) !== 1) {
             throw new InvalidPersonNameException('Invalid ICAO personal name.');
         }
 
         return $canonical;
     }
 
-    private static function canonical(string $part): string
+    private function canonical(string $part): string
     {
         return \str_replace(' ', '<', \strtoupper(UnicodeText::normalizeName($part)));
     }

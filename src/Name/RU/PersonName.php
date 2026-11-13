@@ -8,20 +8,21 @@ use MSSTC4PHP\ValueObject\Contract\ValueObject;
 use MSSTC4PHP\ValueObject\Documents\Exception\InvalidPersonNameException;
 use MSSTC4PHP\ValueObject\Documents\Icao\PersonName as IcaoPersonName;
 use MSSTC4PHP\ValueObject\Documents\Name\AbstractNamePart;
-use MSSTC4PHP\ValueObject\Documents\Name\LatinSpelling;
+use MSSTC4PHP\ValueObject\Documents\Name\AnyIcaoSpelling;
 use MSSTC4PHP\ValueObject\Documents\Name\PersonName as NationalPersonName;
 use Override;
 
 /**
  * Фамилия, имя, отчество (при наличии). The derived Latin form is FAMILY<<GIVEN: the passport for travel abroad
- * omits the patronymic. A Latin override must be an ICAO spelling of the family name, the given name and, optionally,
- * the patronymic (docs/sources/RU.md §2, §4); an MRZ-style `<` for a hyphen of the national name is accepted and the
- * override is stored with the hyphen.
+ * omits the patronymic (docs/sources/RU.md §2). Override policy {@see AnyIcaoSpelling}: any valid ICAO name is kept as
+ * the Latin form, because the MVD writes the name in Latin "так, как это указано в подтверждающем документе" (an
+ * earlier passport may say IVANOVA<<YULIYA for Иванова Юлия; RU.md §4). An override with the derived form's MRZ
+ * spelling (`RIMSKII<KORSAKOV<<NIKOLAI` for Римский-Корсаков Николай) is the derived form and is not kept.
  *
  * @see http://publication.pravo.gov.ru/document/0001202002280021 Order of the MVD of Russia No. 996 of 31.12.2019
- *      (Ministry of Justice reg. No. 57627), appendix 9, §1, §3, §16.1.1
+ *      (Ministry of Justice reg. No. 57627), appendix 9, §1, §3, §16.1.1, §32
  * @see http://publication.pravo.gov.ru/document/0001202105190040 Order of the MVD of Russia No. 186 of 31.03.2021
- *      (Ministry of Justice reg. No. 63515), §139.2, §139.3
+ *      (Ministry of Justice reg. No. 63515), §139.2, §139.3, §140
  */
 final readonly class PersonName implements NationalPersonName
 {
@@ -30,7 +31,7 @@ final readonly class PersonName implements NationalPersonName
     private ?IcaoPersonName $latin;
 
     /**
-     * @throws InvalidPersonNameException when $latin is not a transliteration of the parts
+     * @throws InvalidPersonNameException when a part has no ICAO spelling or its Latin form is too long
      */
     public function __construct(
         public FamilyName $family,
@@ -39,23 +40,11 @@ final readonly class PersonName implements NationalPersonName
         ?IcaoPersonName $latin = null,
     ) {
         $transliteration = new RussianTransliteration();
-        $families = $transliteration->variants($family);
-        $givens = $transliteration->variants($given);
-        $this->derived = IcaoPersonName::fromParts($families[0], [$givens[0]]);
-
-        if (!$latin instanceof IcaoPersonName) {
-            $this->latin = null;
-
-            return;
-        }
-
-        $forms = [[$families, $givens]];
-        if ($patronymic instanceof Patronymic) {
-            $forms[] = [$families, $givens, $transliteration->variants($patronymic)];
-        }
-
-        $this->latin = LatinSpelling::find($latin, $forms)
-            ?? throw new InvalidPersonNameException('Invalid Russian person name (the Latin form is not a transliteration of the name).');
+        $this->derived = IcaoPersonName::fromParts(
+            $transliteration->toLatin($family),
+            [$transliteration->toLatin($given)],
+        );
+        $this->latin = new AnyIcaoSpelling()->resolve($latin, $this->derived);
     }
 
     #[Override]
@@ -65,7 +54,8 @@ final readonly class PersonName implements NationalPersonName
     }
 
     /**
-     * The Latin form given to the constructor, null when {@see latin()} is derived.
+     * The Latin form given to the constructor, null when {@see latin()} is derived (also when the given form was the
+     * derived one).
      */
     public function latinOverride(): ?IcaoPersonName
     {
@@ -148,6 +138,8 @@ final readonly class PersonName implements NationalPersonName
 
     private function sameOrBothNull(?ValueObject $one, ?ValueObject $other): bool
     {
-        return $one instanceof ValueObject ? $other instanceof ValueObject && $one->equals($other) : !$other instanceof ValueObject;
+        return $one instanceof ValueObject
+            ? $other instanceof ValueObject && $one->equals($other)
+            : !$other instanceof ValueObject;
     }
 }

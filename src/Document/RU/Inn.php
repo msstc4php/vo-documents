@@ -9,6 +9,7 @@ use MSSTC4PHP\ValueObject\Documents\Exception\InvalidDocumentNumberException;
 use MSSTC4PHP\ValueObject\Documents\Internal\Checksum;
 use MSSTC4PHP\ValueObject\Documents\Internal\Digits;
 use MSSTC4PHP\ValueObject\Documents\Internal\Mask;
+use MSSTC4PHP\ValueObject\Documents\Internal\Text;
 use MSSTC4PHP\ValueObject\Support\AbstractStringValueObject;
 use Override;
 
@@ -36,7 +37,7 @@ final class Inn extends AbstractStringValueObject implements Maskable
      */
     public function taxAuthorityRegionCode(): string
     {
-        return Digits::nonEmpty(\substr($this->value, 0, 2));
+        return Text::nonEmpty(\substr($this->value, 0, 2));
     }
 
     /**
@@ -44,7 +45,7 @@ final class Inn extends AbstractStringValueObject implements Maskable
      */
     public function formatted(): string
     {
-        return Digits::nonEmpty($this->value);
+        return Text::nonEmpty($this->value);
     }
 
     #[Override]

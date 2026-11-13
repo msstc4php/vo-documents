@@ -21,7 +21,10 @@ final class AmbiguousJurisdictionException extends InvalidValueObjectException
         parent::__construct(\sprintf(
             '%s number fits several jurisdictions: %s.',
             $document,
-            \implode(', ', \array_map(static fn (Subdivision $subdivision): string => $subdivision->isoCode(), $jurisdictions)),
+            \implode(', ', \array_map(
+                static fn (Subdivision $subdivision): string => $subdivision->isoCode(),
+                $jurisdictions,
+            )),
         ));
     }
 

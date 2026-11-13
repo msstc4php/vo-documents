@@ -7,6 +7,7 @@ namespace MSSTC4PHP\ValueObject\Documents\Tests\Unit\Document\RU;
 use MSSTC4PHP\ValueObject\Documents\Document\RU\InternationalPassportNumber;
 use MSSTC4PHP\ValueObject\Documents\Internal\Digits;
 use MSSTC4PHP\ValueObject\Documents\Internal\Mask;
+use MSSTC4PHP\ValueObject\Documents\Internal\Text;
 use MSSTC4PHP\ValueObject\Documents\Tests\Fixture\RefusesWithoutEchoingInput;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -19,6 +20,7 @@ use PHPUnit\Framework\TestCase;
  */
 #[CoversClass(InternationalPassportNumber::class)]
 #[UsesClass(Digits::class)]
+#[UsesClass(Text::class)]
 #[UsesClass(Mask::class)]
 final class InternationalPassportNumberTest extends TestCase
 {
@@ -60,7 +62,7 @@ final class InternationalPassportNumberTest extends TestCase
     {
         yield 'too short' => ['75 123456', 'Invalid Russian international passport number (8 characters).'];
         yield 'internal passport length' => ['45 08 123456', 'Invalid Russian international passport number (10 characters).'];
-        yield 'letters' => ['75 123456A', 'Invalid Russian international passport number (9 characters).'];
+        yield 'letters' => ['75 123456A', 'Invalid Russian international passport number (invalid character).'];
     }
 
     #[DataProvider('invalidNumbers')]

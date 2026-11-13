@@ -8,6 +8,7 @@ use MSSTC4PHP\ValueObject\Documents\Exception\AmbiguousJurisdictionException;
 use MSSTC4PHP\ValueObject\Documents\Exception\InvalidDocumentNumberException;
 use MSSTC4PHP\ValueObject\Documents\Internal\Digits;
 use MSSTC4PHP\ValueObject\Documents\Internal\SubdivisionResolver;
+use MSSTC4PHP\ValueObject\Documents\Internal\Text;
 use MSSTC4PHP\ValueObject\Documents\Tests\Fixture\PackageString;
 use MSSTC4PHP\ValueObject\Documents\Tests\Fixture\TestSubdivision;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -17,6 +18,7 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(SubdivisionResolver::class)]
 #[UsesClass(AmbiguousJurisdictionException::class)]
 #[UsesClass(Digits::class)]
+#[UsesClass(Text::class)]
 final class SubdivisionResolverTest extends TestCase
 {
     /** @var list<array{TestSubdivision, string}> */

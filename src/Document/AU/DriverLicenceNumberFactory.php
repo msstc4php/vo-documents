@@ -59,8 +59,13 @@ final class DriverLicenceNumberFactory
         return new SubdivisionResolver(
             'Australian driver licence',
             Jurisdiction::cases(),
-            static fn (Jurisdiction $jurisdiction, string $number): ?DriverLicenceNumber => self::classFor($jurisdiction)::tryFrom($number),
+            self::tryIn(...),
         );
+    }
+
+    private static function tryIn(Jurisdiction $jurisdiction, string $number): ?DriverLicenceNumber
+    {
+        return self::classFor($jurisdiction)::tryFrom($number);
     }
 
     /**

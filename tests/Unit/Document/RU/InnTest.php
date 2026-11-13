@@ -8,6 +8,7 @@ use MSSTC4PHP\ValueObject\Documents\Document\RU\Inn;
 use MSSTC4PHP\ValueObject\Documents\Internal\Checksum;
 use MSSTC4PHP\ValueObject\Documents\Internal\Digits;
 use MSSTC4PHP\ValueObject\Documents\Internal\Mask;
+use MSSTC4PHP\ValueObject\Documents\Internal\Text;
 use MSSTC4PHP\ValueObject\Documents\Tests\Fixture\RefusesWithoutEchoingInput;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -21,6 +22,7 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(Inn::class)]
 #[UsesClass(Checksum::class)]
 #[UsesClass(Digits::class)]
+#[UsesClass(Text::class)]
 #[UsesClass(Mask::class)]
 final class InnTest extends TestCase
 {
@@ -73,7 +75,7 @@ final class InnTest extends TestCase
         yield 'zeros only' => ['000000000000', 'Invalid INN (zeros only).'];
         yield 'organisation INN length' => ['7707083893', 'Invalid INN (10 characters).'];
         yield 'too long' => ['5001007322590', 'Invalid INN (13 characters).'];
-        yield 'letters' => ['50010073225O', 'Invalid INN (12 characters).'];
+        yield 'letters' => ['50010073225O', 'Invalid INN (invalid character).'];
     }
 
     #[DataProvider('invalidNumbers')]

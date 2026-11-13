@@ -14,9 +14,11 @@ use Override;
 
 /**
  * Tax file number: 9 digits whose sum weighted 1, 4, 3, 7, 5, 8, 6, 9, 10 is a multiple of 11. No public official
- * text; algorithm as used in practice: the ATO gives its TFN algorithm to registered software developers only
- * (AU.md). The 8-digit TFNs once issued to non-individuals are not accepted. `masked()` keeps the last three digits
- * (no official rule): `*** *** 782`.
+ * text; the algorithm is the one used in practice, as the ATO gives its TFN algorithm to registered software
+ * developers only (AU.md). The 8-digit TFNs once issued to non-individuals are not accepted.
+ *
+ * `masked()` (no official rule) keeps the last three digits, not the package's usual four: AU numbers are short
+ * (at most 10 characters), so four would show almost half of them. `*** *** 782`.
  *
  * @see https://softwaredevelopers.ato.gov.au/obtainTFNalgorithm ATO, "How to obtain the tax file number algorithm"
  * @see docs/sources/AU.md "Tax file number"

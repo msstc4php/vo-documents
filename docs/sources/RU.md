@@ -127,14 +127,18 @@ before handing the part to `Icao\Transliterator`; the ICAO Cyrillic table is not
 Order 996 / Order 186 §32 and §140: on an application ("заявление об изменении написания фамилии и (или) имени буквами
 латинского алфавита", Order 186 appendix 4) with a supporting document (an earlier passport, a foreign civil-status
 record, …), the surname and/or given name are written in Latin "так, как это указано в подтверждающем документе".
-Such a spelling is not computable from the national form. The package accepts an override only when it is one of the
-ICAO spellings of the national parts (requirements: designer's call); any other spelling is refused.
+Such a spelling is not computable from the national form: an earlier passport may say `IVANOVA<<YULIYA` for Иванова
+Юлия, where the table gives `IVANOVA<<IULIIA`. The package therefore accepts **any valid ICAO name** as the override
+(policy `Name\AnyIcaoSpelling`); the source sets no other condition on the documented spelling.
 
-- An override may write a hyphen of the national form as the MRZ filler (`RIMSKII<KORSAKOV<<NIKOLAI`, Order 996
-  §16.1.1: "Двойные или сложные фамилии разделяются символом «<»"); hyphen and filler inside an identifier are
-  equivalent, and the override is stored in the national form's spelling (`RIMSKII-KORSAKOV<<NIKOLAI`).
-- The search over the ICAO spellings of all parts is capped at 4096 spellings (`Name\LatinSpelling::MAX_SPELLINGS`),
-  like `Icao\Transliterator::variants()`. Russian letters have one spelling each, so a Russian name always has 1–2.
+- The override is normalised by `Icao\PersonName::from()` (letter case, spaces next to `<`, trailing MRZ padding);
+  text that is no ICAO name (`IVANOV1<<IVAN`, Cyrillic letters) is refused there.
+- An override with the derived form's MRZ spelling is the derived form and is not kept (`latinOverride()` is null):
+  a hyphen of the national form may be written as the MRZ filler (`RIMSKII<KORSAKOV<<NIKOLAI`, Order 996 §16.1.1:
+  "Двойные или сложные фамилии разделяются символом «<»"), and `latin()` then gives `RIMSKII-KORSAKOV<<NIKOLAI`.
+- No transliteration variants are computed for RU (Russian letters have one spelling each anyway). Latin-script
+  countries (AU) use the stricter `Name\TransliterationVariant` policy instead: the override must be one of the table
+  spellings, capped at 4096 (`Name\LatinSpelling::MAX_SPELLINGS`).
 
 ### 5. Storage payload and JSON view
 
@@ -148,7 +152,7 @@ refused by the codec instead of being read back as "no override".
 | Plan expectation | Source | Implemented |
 |---|---|---|
 | derived `latin()` = `IVANOV<<IVAN<IVANOVICH` | Orders 996/186: "отчество не указывается" | `IVANOV<<IVAN` |
-| override "given + patronymic → secondary" | §32/§140 allow a documented spelling | an override with or without the patronymic is accepted when every part is an ICAO spelling (`ivanov<<ivan<ivanovich` and `IVANOV<<IVAN`) |
+| override "given + patronymic → secondary" | §32/§140 allow a documented spelling | any valid ICAO name is accepted, with or without the patronymic (`ivanov<<ivan<ivanovich`, `IVANOVA<<YULIYA`) |
 | Ь (absent from ICAO 6.B) | Order 996 table: no row, simple replacement | omitted |
 | letters `\p{Cyrillic}` | Russian alphabet only (Order 996 §14 excludes even І) | `А-ЯЁа-яё` |
 

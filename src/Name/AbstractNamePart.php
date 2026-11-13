@@ -61,7 +61,9 @@ abstract class AbstractNamePart extends AbstractStringValueObject
             : '/^' . $word . '(?:[' . \preg_quote($separators, '/') . ']' . $word . ')*$/u';
 
         if (\mb_strlen($normalized) > self::MAX_LENGTH || \preg_match($pattern, $normalized) !== 1) {
-            throw new InvalidPersonNameException(\sprintf('Invalid %s (%d characters).', $this->label(), \mb_strlen($normalized)));
+            $message = \sprintf('Invalid %s (%d characters).', $this->label(), \mb_strlen($normalized));
+
+            throw new InvalidPersonNameException($message);
         }
 
         return $normalized;
