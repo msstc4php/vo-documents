@@ -103,6 +103,44 @@ final class NamePartsTest extends TestCase
         FamilyName::from($input);
     }
 
+    /**
+     * @return iterable<string, array{string, string}>
+     */
+    public static function validGivenNames(): iterable
+    {
+        yield 'small eth of table 5.2' => ['Sigurðr', 'Sigurðr'];
+        yield 'dotless i of table 5.2' => ['Aylın', 'Aylın'];
+        yield 'leading apostrophe, as the shared word rule allows' => ["'Anna", "'Anna"];
+        yield 'leading right single quotation mark' => ["\u{2019}Anna Marie", "'Anna Marie"];
+    }
+
+    #[DataProvider('validGivenNames')]
+    public function testGivenNameAcceptsTableLetters(string $input, string $expected): void
+    {
+        self::assertSame($expected, GivenName::from($input)->value);
+    }
+
+    /**
+     * @return iterable<string, array{string}>
+     */
+    public static function invalidGivenNames(): iterable
+    {
+        yield 'capital eth, not in table 5.2' => ['ÐORÐE'];
+        yield 'small dotted i with dot above, not in table 5.3' => ["i\u{0307}lse"];
+        yield 'apostrophe after a hyphen' => ["Anna-'Marie"];
+        yield 'two leading apostrophes' => ["''Anna"];
+        yield 'trailing apostrophe' => ["Anna'"];
+    }
+
+    #[DataProvider('invalidGivenNames')]
+    public function testGivenNameRefusesCharactersOutsideTheBrpSet(string $input): void
+    {
+        $this->expectException(InvalidPersonNameException::class);
+        $this->expectExceptionMessage('Invalid Dutch given name (invalid character).');
+
+        GivenName::from($input);
+    }
+
     public function testGivenNameRefusesOtherScripts(): void
     {
         $this->expectException(InvalidPersonNameException::class);

@@ -66,7 +66,7 @@ How the package applies this:
 | Part | Letters | Separators inside | Why |
 |---|---|---|---|
 | `FamilyName` | table 5.2 + 5.3 letters | hyphen, apostrophe, space; a word may start with `'` (at the start or after a space) and end with `'` before a space | prefixes are part of the geslachtsnaam (art. 23 lid 3): `van der Berg`, `'t Hart`, `van 't Hof`, `d' Ancona`, `d'Ancona`, `Jansen-de Vries` |
-| `GivenName` | the same | the same | several given names (`Willeke Liselotte`), `Hendrik-Jan` (LO BRP example) |
+| `GivenName` | the same | the same | several given names (`Willeke Liselotte`), `Hendrik-Jan` (LO BRP example); the apostrophe is a BRP character (table 5.2, code 27) and the shared word rule also accepts it leading a given name (`'Anna`) |
 
 - **Prefixes (plan decision, binding):** no separate class; the prefix is stored inside the family name as typed, so
   `van der Berg` and `Van der Berg` are different values (table 36 lists both) with the same Latin form. The codec
@@ -74,7 +74,7 @@ How the package applies this:
 - **`ĳ` / `Ĳ` are refused** ("(invalid character)"): the BRP forbids the Hollandse IJ, names are written `ij`. This
   overrides the plan's hint that the ligature is accepted. `ŉ` (table 5.2) is a compatibility character
   (`ʼn`) and is refused as such; `ª º` are not letters of a name and are not accepted. Letter case follows the tables:
-  `İ` and `ı` are accepted, a small dotted `i` is plain `i`; `Ð` (capital eth) and `Ș`/`Ț` (comma below) are
+  `İ`, `ı` and `ð` are accepted, a small dotted `i` is plain `i`; `Ð` (capital eth) and `Ș`/`Ț` (comma below) are
   refused.
 - `ĸ` is accepted by the parts but has no ICAO spelling (table 6.A), so `PersonName` refuses a name with it.
 - **Given names optional:** a person with one name has it as the family name (art. 23 lid 4): `PersonName($family,

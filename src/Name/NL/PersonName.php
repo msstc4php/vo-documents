@@ -7,6 +7,7 @@ namespace MSSTC4PHP\ValueObject\Documents\Name\NL;
 use MSSTC4PHP\ValueObject\Contract\ValueObject;
 use MSSTC4PHP\ValueObject\Documents\Exception\InvalidPersonNameException;
 use MSSTC4PHP\ValueObject\Documents\Icao\PersonName as IcaoPersonName;
+use MSSTC4PHP\ValueObject\Documents\Internal\Optional;
 use MSSTC4PHP\ValueObject\Documents\Internal\Text;
 use MSSTC4PHP\ValueObject\Documents\Name\Latin\LatinPersonNameBuilder;
 use MSSTC4PHP\ValueObject\Documents\Name\PersonName as NationalPersonName;
@@ -82,8 +83,8 @@ final readonly class PersonName implements NationalPersonName
     {
         return $other instanceof self
             && $this->family->equals($other->family)
-            && $this->sameOptional($this->given, $other->given)
-            && $this->sameOptional($this->latin, $other->latin);
+            && Optional::equal($this->given, $other->given)
+            && Optional::equal($this->latin, $other->latin);
     }
 
     /**
@@ -99,14 +100,5 @@ final readonly class PersonName implements NationalPersonName
             'given' => $this->given?->value,
             'effectiveLatin' => $this->latin()->value,
         ];
-    }
-
-    private function sameOptional(?ValueObject $one, ?ValueObject $other): bool
-    {
-        if (!$one instanceof ValueObject) {
-            return !$other instanceof ValueObject;
-        }
-
-        return $other instanceof ValueObject && $one->equals($other);
     }
 }

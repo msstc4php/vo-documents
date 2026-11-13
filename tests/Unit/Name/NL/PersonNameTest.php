@@ -9,6 +9,7 @@ use MSSTC4PHP\ValueObject\Documents\Icao\PersonName as IcaoPersonName;
 use MSSTC4PHP\ValueObject\Documents\Icao\Table\Cyrillic;
 use MSSTC4PHP\ValueObject\Documents\Icao\Table\LatinMultinational;
 use MSSTC4PHP\ValueObject\Documents\Icao\Transliterator;
+use MSSTC4PHP\ValueObject\Documents\Internal\Optional;
 use MSSTC4PHP\ValueObject\Documents\Internal\Text;
 use MSSTC4PHP\ValueObject\Documents\Internal\UnicodeText;
 use MSSTC4PHP\ValueObject\Documents\Name\AbstractNamePart;
@@ -45,6 +46,7 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(Cyrillic::class)]
 #[UsesClass(UnicodeText::class)]
 #[UsesClass(Text::class)]
+#[UsesClass(Optional::class)]
 final class PersonNameTest extends TestCase
 {
     private const string NOT_A_TRANSLITERATION =
