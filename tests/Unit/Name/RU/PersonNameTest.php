@@ -11,6 +11,8 @@ use MSSTC4PHP\ValueObject\Documents\Icao\Table\LatinMultinational;
 use MSSTC4PHP\ValueObject\Documents\Icao\Transliterator;
 use MSSTC4PHP\ValueObject\Documents\Internal\UnicodeText;
 use MSSTC4PHP\ValueObject\Documents\Name\AbstractNamePart;
+use MSSTC4PHP\ValueObject\Documents\Name\LatinSpelling;
+use MSSTC4PHP\ValueObject\Documents\Name\RU\AbstractRussianNamePart;
 use MSSTC4PHP\ValueObject\Documents\Name\RU\FamilyName;
 use MSSTC4PHP\ValueObject\Documents\Name\RU\GivenName;
 use MSSTC4PHP\ValueObject\Documents\Name\RU\Patronymic;
@@ -27,6 +29,8 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(PersonName::class)]
 #[CoversClass(RussianTransliteration::class)]
 #[UsesClass(AbstractNamePart::class)]
+#[UsesClass(AbstractRussianNamePart::class)]
+#[UsesClass(LatinSpelling::class)]
 #[UsesClass(FamilyName::class)]
 #[UsesClass(GivenName::class)]
 #[UsesClass(Patronymic::class)]
@@ -120,6 +124,25 @@ final class PersonNameTest extends TestCase
         $this->ivanov($withPatronymic, IcaoPersonName::from($latin));
     }
 
+    /**
+     * @return iterable<string, array{string, string, non-empty-string, non-empty-string}>
+     */
+    public static function mrzStyleOverrides(): iterable
+    {
+        yield 'filler for the hyphen' => ['Римский-Корсаков', 'Николай', 'RIMSKII<KORSAKOV<<NIKOLAI', 'RIMSKII-KORSAKOV<<NIKOLAI'];
+        yield 'hyphen form as is' => ['Римский-Корсаков', 'Николай', 'RIMSKII-KORSAKOV<<NIKOLAI', 'RIMSKII-KORSAKOV<<NIKOLAI'];
+        yield 'hyphen for a space' => ['фон Визин', 'Анна-Мария', 'FON-VIZIN<<ANNA<MARIIA', 'FON<VIZIN<<ANNA-MARIIA'];
+    }
+
+    #[DataProvider('mrzStyleOverrides')]
+    public function testOverrideInMrzFormIsStoredInTheNationalForm(string $family, string $given, string $latin, string $stored): void
+    {
+        $name = new PersonName(FamilyName::from($family), GivenName::from($given), null, IcaoPersonName::from($latin));
+
+        self::assertSame($stored, $name->latin()->value);
+        self::assertSame($stored, $name->latinOverride()?->value);
+    }
+
     public function testDisplayForms(): void
     {
         $name = $this->ivanov();
@@ -149,11 +172,11 @@ final class PersonNameTest extends TestCase
     public function testJsonSerializeGivesTheFullValue(): void
     {
         self::assertSame(
-            ['family' => 'Иванов', 'given' => 'Иван', 'patronymic' => 'Иванович', 'latin' => 'IVANOV<<IVAN'],
+            ['family' => 'Иванов', 'given' => 'Иван', 'patronymic' => 'Иванович', 'effectiveLatin' => 'IVANOV<<IVAN'],
             $this->ivanov()->jsonSerialize(),
         );
         self::assertSame(
-            ['family' => 'Иванов', 'given' => 'Иван', 'patronymic' => null, 'latin' => 'IVANOV<<IVAN'],
+            ['family' => 'Иванов', 'given' => 'Иван', 'patronymic' => null, 'effectiveLatin' => 'IVANOV<<IVAN'],
             $this->ivanov(withPatronymic: false)->jsonSerialize(),
         );
     }

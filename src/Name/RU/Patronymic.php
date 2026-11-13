@@ -4,23 +4,17 @@ declare(strict_types=1);
 
 namespace MSSTC4PHP\ValueObject\Documents\Name\RU;
 
-use MSSTC4PHP\ValueObject\Documents\Name\AbstractNamePart;
 use Override;
 
 /**
- * Letters of the Russian alphabet only (А-Я, Ё), words joined by a hyphen or a space (patronymics of national custom,
+ * Words joined by a hyphen or a space (patronymics of national custom,
  * Гусейн оглы; 143-FZ Art. 18 §4). No apostrophe. See docs/sources/RU.md §1.
  *
- * @see https://legalacts.ru/doc/federalnyi-zakon-ot-15111997-n-143-fz-ob/ Federal Law No. 143-FZ of 15.11.1997, Art. 18
+ * @see Federal Law No. 143-FZ of 15.11.1997 "Об актах гражданского состояния", Art. 18; official publication:
+ *      Собрание законодательства Российской Федерации, 1997, No. 47, item 5340
  */
-final class Patronymic extends AbstractNamePart
+final class Patronymic extends AbstractRussianNamePart
 {
-    #[Override]
-    protected function letters(): string
-    {
-        return RussianTransliteration::LETTERS;
-    }
-
     #[Override]
     protected function label(): string
     {

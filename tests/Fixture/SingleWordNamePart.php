@@ -21,6 +21,15 @@ final class SingleWordNamePart extends AbstractNamePart
         return 'single-word name';
     }
 
+    /**
+     * An alternation, to prove AbstractNamePart groups the word pattern.
+     */
+    #[Override]
+    protected function word(): string
+    {
+        return 'x[a-z]*|y';
+    }
+
     #[Override]
     protected function innerSeparators(): string
     {

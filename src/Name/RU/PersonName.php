@@ -8,20 +8,26 @@ use MSSTC4PHP\ValueObject\Contract\ValueObject;
 use MSSTC4PHP\ValueObject\Documents\Exception\InvalidPersonNameException;
 use MSSTC4PHP\ValueObject\Documents\Icao\PersonName as IcaoPersonName;
 use MSSTC4PHP\ValueObject\Documents\Name\AbstractNamePart;
+use MSSTC4PHP\ValueObject\Documents\Name\LatinSpelling;
 use MSSTC4PHP\ValueObject\Documents\Name\PersonName as NationalPersonName;
 use Override;
 
 /**
  * Фамилия, имя, отчество (при наличии). The derived Latin form is FAMILY<<GIVEN: the passport for travel abroad
  * omits the patronymic. A Latin override must be an ICAO spelling of the family name, the given name and, optionally,
- * the patronymic (docs/sources/RU.md §2, §4).
+ * the patronymic (docs/sources/RU.md §2, §4); an MRZ-style `<` for a hyphen of the national name is accepted and the
+ * override is stored with the hyphen.
  *
- * @see https://base.garant.ru/73680659/e21d36dd59d557f67db63a47391d35b1/ Order of the MVD of Russia No. 996 of
- *      31.12.2019, appendix 9, §1, §3
+ * @see http://publication.pravo.gov.ru/document/0001202002280021 Order of the MVD of Russia No. 996 of 31.12.2019
+ *      (Ministry of Justice reg. No. 57627), appendix 9, §1, §3, §16.1.1
+ * @see http://publication.pravo.gov.ru/document/0001202105190040 Order of the MVD of Russia No. 186 of 31.03.2021
+ *      (Ministry of Justice reg. No. 63515), §139.2, §139.3
  */
 final readonly class PersonName implements NationalPersonName
 {
     private IcaoPersonName $derived;
+
+    private ?IcaoPersonName $latin;
 
     /**
      * @throws InvalidPersonNameException when $latin is not a transliteration of the parts
@@ -30,16 +36,26 @@ final readonly class PersonName implements NationalPersonName
         public FamilyName $family,
         public GivenName $given,
         public ?Patronymic $patronymic = null,
-        private ?IcaoPersonName $latin = null,
+        ?IcaoPersonName $latin = null,
     ) {
         $transliteration = new RussianTransliteration();
         $families = $transliteration->variants($family);
         $givens = $transliteration->variants($given);
         $this->derived = IcaoPersonName::fromParts($families[0], [$givens[0]]);
 
-        if ($latin instanceof IcaoPersonName && !\in_array($latin->value, $this->spellings($transliteration, $families, $givens), true)) {
-            throw new InvalidPersonNameException('Invalid Russian person name (the Latin form is not a transliteration of the name).');
+        if (!$latin instanceof IcaoPersonName) {
+            $this->latin = null;
+
+            return;
         }
+
+        $forms = [[$families, $givens]];
+        if ($patronymic instanceof Patronymic) {
+            $forms[] = [$families, $givens, $transliteration->variants($patronymic)];
+        }
+
+        $this->latin = LatinSpelling::find($latin, $forms)
+            ?? throw new InvalidPersonNameException('Invalid Russian person name (the Latin form is not a transliteration of the name).');
     }
 
     #[Override]
@@ -90,7 +106,9 @@ final readonly class PersonName implements NationalPersonName
     }
 
     /**
-     * @return array{family: string, given: string, patronymic: string|null, latin: string}
+     * A view, not the storage payload ({@see PersonNameCodec}): `effectiveLatin` is {@see latin()}, derived or not.
+     *
+     * @return array{family: string, given: string, patronymic: string|null, effectiveLatin: string}
      */
     #[Override]
     public function jsonSerialize(): array
@@ -99,32 +117,8 @@ final readonly class PersonName implements NationalPersonName
             'family' => $this->family->value,
             'given' => $this->given->value,
             'patronymic' => $this->patronymic?->value,
-            'latin' => $this->latin()->value,
+            'effectiveLatin' => $this->latin()->value,
         ];
-    }
-
-    /**
-     * @param non-empty-list<non-empty-string> $families
-     * @param non-empty-list<non-empty-string> $givens
-     *
-     * @return list<string> every accepted canonical Latin form
-     *
-     * @throws InvalidPersonNameException
-     */
-    private function spellings(RussianTransliteration $transliteration, array $families, array $givens): array
-    {
-        $patronymics = $this->patronymic instanceof Patronymic ? $transliteration->variants($this->patronymic) : [];
-        $spellings = [];
-        foreach ($families as $family) {
-            foreach ($givens as $given) {
-                $spellings[] = IcaoPersonName::fromParts($family, [$given])->value;
-                foreach ($patronymics as $patronymic) {
-                    $spellings[] = IcaoPersonName::fromParts($family, [$given, $patronymic])->value;
-                }
-            }
-        }
-
-        return $spellings;
     }
 
     /**

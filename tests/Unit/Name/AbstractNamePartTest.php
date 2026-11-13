@@ -25,7 +25,15 @@ final class AbstractNamePartTest extends TestCase
 
     public function testNoSeparatorsMeansOneWord(): void
     {
-        self::assertSame('abc', SingleWordNamePart::from('abc')->value);
-        self::assertFalse(SingleWordNamePart::isValid('ab c'));
+        self::assertSame('xabc', SingleWordNamePart::from('xabc')->value);
+        self::assertSame('y', SingleWordNamePart::from('y')->value);
+        self::assertFalse(SingleWordNamePart::isValid('xa c'));
+    }
+
+    public function testTheWordPatternIsAppliedAsAWhole(): void
+    {
+        self::assertFalse(SingleWordNamePart::isValid('abc'));
+        self::assertFalse(SingleWordNamePart::isValid('xab1'));
+        self::assertFalse(SingleWordNamePart::isValid('1y'));
     }
 }

@@ -13,6 +13,8 @@ use MSSTC4PHP\ValueObject\Documents\Icao\Table\LatinMultinational;
 use MSSTC4PHP\ValueObject\Documents\Icao\Transliterator;
 use MSSTC4PHP\ValueObject\Documents\Internal\UnicodeText;
 use MSSTC4PHP\ValueObject\Documents\Name\AbstractNamePart;
+use MSSTC4PHP\ValueObject\Documents\Name\LatinSpelling;
+use MSSTC4PHP\ValueObject\Documents\Name\RU\AbstractRussianNamePart;
 use MSSTC4PHP\ValueObject\Documents\Name\RU\FamilyName;
 use MSSTC4PHP\ValueObject\Documents\Name\RU\GivenName;
 use MSSTC4PHP\ValueObject\Documents\Name\RU\Patronymic;
@@ -31,6 +33,8 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(PersonName::class)]
 #[UsesClass(RussianTransliteration::class)]
 #[UsesClass(AbstractNamePart::class)]
+#[UsesClass(AbstractRussianNamePart::class)]
+#[UsesClass(LatinSpelling::class)]
 #[UsesClass(FamilyName::class)]
 #[UsesClass(GivenName::class)]
 #[UsesClass(Patronymic::class)]
@@ -41,7 +45,7 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(UnicodeText::class)]
 final class PersonNameCodecTest extends TestCase
 {
-    private const string SHAPE = 'Expected a Russian person name payload with string "family" and "given" and string or null "patronymic" and "latin".';
+    private const string SHAPE = 'Expected a Russian person name payload with string "family" and "given", string or null "patronymic" and "latin", and no other keys.';
 
     public function testMapsItsClass(): void
     {
@@ -91,6 +95,8 @@ final class PersonNameCodecTest extends TestCase
         yield 'given is an int' => [['family' => 'Иванов', 'given' => 1]];
         yield 'patronymic is an int' => [['family' => 'Иванов', 'given' => 'Иван', 'patronymic' => 1]];
         yield 'latin is an int' => [['family' => 'Иванов', 'given' => 'Иван', 'latin' => 1]];
+        yield 'unknown key' => [['family' => 'Иванов', 'given' => 'Иван', 'patronymic' => null, 'latin' => null, 'extra' => 'x']];
+        yield 'int key' => [['family' => 'Иванов', 'given' => 'Иван', 0 => 'x']];
     }
 
     /**
@@ -103,6 +109,16 @@ final class PersonNameCodecTest extends TestCase
         $this->expectExceptionMessage(self::SHAPE);
 
         new PersonNameCodec()->decode($payload);
+    }
+
+    public function testTheJsonViewIsNotACodecPayload(): void
+    {
+        $name = new PersonName(FamilyName::from('Иванов'), GivenName::from('Иван'), null, IcaoPersonName::from('IVANOV<<IVAN'));
+
+        $this->expectException(InvalidPayloadException::class);
+        $this->expectExceptionMessage(self::SHAPE);
+
+        new PersonNameCodec()->decode($name->jsonSerialize());
     }
 
     public function testDecodeRefusesAnInvalidPart(): void

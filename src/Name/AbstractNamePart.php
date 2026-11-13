@@ -11,8 +11,9 @@ use Override;
 
 /**
  * One part of a national personal name (a family name, a given name, …): NFC-normalised, trimmed, inner whitespace
- * collapsed, letter case kept. Every word starts and ends with a letter of {@see letters()}; words are joined by one
- * of {@see innerSeparators()}, never two in a row.
+ * collapsed, letter case kept. Every word matches {@see word()} (by default letters of {@see letters()}); words are
+ * joined by one of {@see innerSeparators()}, never two in a row. Where the apostrophe is a separator, U+2019 (’) is
+ * stored as U+0027 (').
  */
 abstract class AbstractNamePart extends AbstractStringValueObject
 {
@@ -34,13 +35,22 @@ abstract class AbstractNamePart extends AbstractStringValueObject
         return "-' ";
     }
 
+    /**
+     * @return non-empty-string a regex matching one word
+     */
+    protected function word(): string
+    {
+        return '[' . $this->letters() . ']+';
+    }
+
     #[Override]
     protected function parse(string $value): string
     {
-        $normalized = UnicodeText::normalizeName($value);
-        $letters = $this->letters();
-        $word = '[' . $letters . ']+';
         $separators = $this->innerSeparators();
+        $normalized = UnicodeText::normalizeName(
+            \str_contains($separators, "'") ? \str_replace("\u{2019}", "'", $value) : $value,
+        );
+        $word = '(?:' . $this->word() . ')';
         $pattern = $separators === ''
             ? '/^' . $word . '$/u'
             : '/^' . $word . '(?:[' . \preg_quote($separators, '/') . ']' . $word . ')*$/u';

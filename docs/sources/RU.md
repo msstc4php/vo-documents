@@ -2,22 +2,29 @@
 
 ## Names
 
-Sources (read 2026-11-13 UTC; the official texts are published on the Official Internet Portal of Legal Information
-<http://pravo.gov.ru>, the URLs below are the copies the quotes were taken from):
+Sources (read 2026-11-13 UTC). The official publication comes first; the "quoted from" copies are secondary and
+are where the quotes below were taken from (the official pages serve the signed text as a PDF/scan).
 
 1. **Federal Law of 15.11.1997 No. 143-FZ "Об актах гражданского состояния"**, Art. 18 (as in force on 2026-11-13).
-   Copy: <https://legalacts.ru/doc/federalnyi-zakon-ot-15111997-n-143-fz-ob/>
+   Official publication: Собрание законодательства Российской Федерации, 1997, No. 47, item 5340. The Official
+   Publication Portal (<http://publication.pravo.gov.ru>) starts in 2011 and has no entry for the 1997 act (searched by
+   number and date on 2026-11-13 UTC), so it is cited by number and gazette.
+   Quoted from: <https://legalacts.ru/doc/federalnyi-zakon-ot-15111997-n-143-fz-ob/>
 2. **Order of the MVD of Russia of 31.12.2019 No. 996** — administrative regulation for passports for travel abroad
-   *with an electronic chip* (registered by the Ministry of Justice 27.02.2020, No. 57627; in force since 10.03.2020;
-   published on pravo.gov.ru 28.02.2020). Appendix No. 9 "Алгоритм ввода персональных данных…" and its appendix
-   "Транслитерация кириллических знаков (извлечение)".
-   Copies: <https://base.garant.ru/73680659/e21d36dd59d557f67db63a47391d35b1/> (appendix 9),
+   *with an electronic chip* (registered by the Ministry of Justice 27.02.2020, No. 57627; in force since 10.03.2020).
+   Appendix No. 9 "Алгоритм ввода персональных данных…" and its appendix "Транслитерация кириллических знаков
+   (извлечение)".
+   Official publication: <http://publication.pravo.gov.ru/document/0001202002280021> (28.02.2020).
+   Quoted from: <https://base.garant.ru/73680659/e21d36dd59d557f67db63a47391d35b1/> (appendix 9),
    <https://base.garant.ru/73680659/58db58f32c2e5d0082ad4f804e086668/> (table).
 3. **Order of the MVD of Russia of 31.03.2021 No. 186** — the same regulation for the passport *without* a chip
-   (repeals Order No. 864 of 16.11.2017; in force since 30.05.2021). §139.2, §139.3, appendix No. 12.
-   Copy: <https://legalacts.ru/doc/prikaz-mvd-rossii-ot-31032021-n-186-ob-utverzhdenii/>
-4. **Civil Code of the Russian Federation**, Art. 19 §1 (a person's name consists of the surname, the given name and
-   the patronymic "если иное не вытекает из закона или национального обычая").
+   (registered by the Ministry of Justice, No. 63515; repeals Order No. 864 of 16.11.2017; in force since 30.05.2021).
+   §139.2, §139.3, appendix No. 12.
+   Official publication: <http://publication.pravo.gov.ru/document/0001202105190040> (19.05.2021).
+   Quoted from: <https://legalacts.ru/doc/prikaz-mvd-rossii-ot-31032021-n-186-ob-utverzhdenii/>
+4. **Civil Code of the Russian Federation**, Part One, Art. 19 §1 (a person's name consists of the surname, the given
+   name and the patronymic "если иное не вытекает из закона или национального обычая"). Official publication:
+   Собрание законодательства Российской Федерации, 1994, No. 32, item 3301.
 
 ### 1. Letters and separators in the national form
 
@@ -45,6 +52,14 @@ How the package applies this (`Name\RU\*`):
 | `FamilyName` | hyphen, apostrophe, space | Art. 18 §1 joins double surnames by a hyphen; the law sets no character rule for surnames as such, and the MVD MRZ rule "апострофы исключаются" (below) shows that surnames with an apostrophe (`д'Артаньян`) are written in passports. |
 | `GivenName` | hyphen, space | Art. 18 §2 allows only the hyphen as a non-letter sign. The space is kept because the MVD orders speak of "имя (имена)" (several given names), which are written separated by a space. No apostrophe. |
 | `Patronymic` | hyphen, space | "по имени отца, если иное не основано на национальном обычае" (Art. 18 §4): patronymics of national custom are written in two words (`Гусейн оглы`) or hyphenated. No apostrophe. |
+
+Further rules of the package (designer's calls, not quoted from a source):
+
+- **No word starts with Ъ or Ь** (`Ь`, `Ь-Иванов`, `Иван Ь` are refused): Russian orthography never begins a word with
+  them, and Ь has no Latin spelling (§3), so such a word would leave an empty or hyphen-led Latin identifier. Ы may
+  start a word (names of Turkic and Yakut origin) and transliterates as `Y`.
+- **U+2019 (’) is stored as U+0027 (')** where the apostrophe is allowed (FamilyName): `д’Артаньян` → `д'Артаньян`.
+  Where it is not allowed (GivenName, Patronymic) both are refused.
 
 The patronymic is optional: Civil Code Art. 19 §1 ("если иное не вытекает из закона или национального обычая"), and the
 MVD orders write "отчество (при наличии)".
@@ -115,7 +130,20 @@ record, …), the surname and/or given name are written in Latin "так, как
 Such a spelling is not computable from the national form. The package accepts an override only when it is one of the
 ICAO spellings of the national parts (requirements: designer's call); any other spelling is refused.
 
-### 5. Where this note departs from plan 1, task 4 (the source wins)
+- An override may write a hyphen of the national form as the MRZ filler (`RIMSKII<KORSAKOV<<NIKOLAI`, Order 996
+  §16.1.1: "Двойные или сложные фамилии разделяются символом «<»"); hyphen and filler inside an identifier are
+  equivalent, and the override is stored in the national form's spelling (`RIMSKII-KORSAKOV<<NIKOLAI`).
+- The search over the ICAO spellings of all parts is capped at 4096 spellings (`Name\LatinSpelling::MAX_SPELLINGS`),
+  like `Icao\Transliterator::variants()`. Russian letters have one spelling each, so a Russian name always has 1–2.
+
+### 5. Storage payload and JSON view
+
+`PersonNameCodec` stores `{family, given, patronymic, latin}` where `latin` is the **override only** (`null` when the
+Latin form is derived) and refuses any other key. `PersonName::jsonSerialize()` is a view
+`{family, given, patronymic, effectiveLatin}` with the Latin form actually in use; because of the different key it is
+refused by the codec instead of being read back as "no override".
+
+### 6. Where this note departs from plan 1, task 4 (the source wins)
 
 | Plan expectation | Source | Implemented |
 |---|---|---|

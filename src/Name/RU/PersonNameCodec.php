@@ -13,12 +13,17 @@ use Override;
 
 /**
  * {family: string, given: string, patronymic: string|null, latin: string|null}; latin holds only an override, the
- * derived form is never stored.
+ * derived form is never stored. Other keys are refused, so the {@see PersonName::jsonSerialize()} view (which has
+ * `effectiveLatin`) is never read as a payload that silently drops an override.
  *
  * @implements PayloadCodec<PersonName>
  */
 final readonly class PersonNameCodec implements PayloadCodec
 {
+    private const string SHAPE = 'Expected a Russian person name payload with string "family" and "given", string or null "patronymic" and "latin", and no other keys.';
+
+    private const array KEYS = ['family', 'given', 'patronymic', 'latin'];
+
     #[Override]
     public function valueObjectClass(): string
     {
@@ -46,13 +51,17 @@ final readonly class PersonNameCodec implements PayloadCodec
     #[Override]
     public function decode(array $payload): PersonName
     {
+        if (\array_diff(\array_keys($payload), self::KEYS) !== []) {
+            throw new InvalidPayloadException(self::SHAPE);
+        }
+
         $family = $payload['family'] ?? null;
         $given = $payload['given'] ?? null;
         $patronymic = $payload['patronymic'] ?? null;
         $latin = $payload['latin'] ?? null;
         if (!\is_string($family) || !\is_string($given)
             || ($patronymic !== null && !\is_string($patronymic)) || ($latin !== null && !\is_string($latin))) {
-            throw new InvalidPayloadException('Expected a Russian person name payload with string "family" and "given" and string or null "patronymic" and "latin".');
+            throw new InvalidPayloadException(self::SHAPE);
         }
 
         return new PersonName(

@@ -7,6 +7,7 @@ namespace MSSTC4PHP\ValueObject\Documents\Tests\Unit\Name\RU;
 use MSSTC4PHP\ValueObject\Documents\Exception\InvalidPersonNameException;
 use MSSTC4PHP\ValueObject\Documents\Internal\UnicodeText;
 use MSSTC4PHP\ValueObject\Documents\Name\AbstractNamePart;
+use MSSTC4PHP\ValueObject\Documents\Name\RU\AbstractRussianNamePart;
 use MSSTC4PHP\ValueObject\Documents\Name\RU\FamilyName;
 use MSSTC4PHP\ValueObject\Documents\Name\RU\GivenName;
 use MSSTC4PHP\ValueObject\Documents\Name\RU\Patronymic;
@@ -19,6 +20,7 @@ use PHPUnit\Framework\TestCase;
  * Expectations follow docs/sources/RU.md §1.
  */
 #[CoversClass(AbstractNamePart::class)]
+#[CoversClass(AbstractRussianNamePart::class)]
 #[CoversClass(FamilyName::class)]
 #[CoversClass(GivenName::class)]
 #[CoversClass(Patronymic::class)]
@@ -43,6 +45,9 @@ final class NamePartsTest extends TestCase
         yield 'whitespace normalised' => [GivenName::class, " Анна\u{00A0}\t Мария ", 'Анна Мария'];
         yield 'NFC й' => [GivenName::class, "Андреи\u{0306}", 'Андрей'];
         yield 'NFC ё' => [FamilyName::class, "Фе\u{0308}доров", 'Фёдоров'];
+        yield 'U+2019 apostrophe stored as U+0027' => [FamilyName::class, "д\u{2019}Артаньян", "д'Артаньян"];
+        yield 'word starting with Ы' => [FamilyName::class, 'Ытыкова', 'Ытыкова'];
+        yield 'Ь and Ъ inside a word' => [FamilyName::class, 'Объедков-Ильин', 'Объедков-Ильин'];
     }
 
     /**
@@ -73,6 +78,12 @@ final class NamePartsTest extends TestCase
         yield 'apostrophe in a given name' => [GivenName::class, "Д'Анна", 'Invalid Russian given name (6 characters).'];
         yield 'apostrophe in a patronymic' => [Patronymic::class, "Д'Иванович", 'Invalid Russian patronymic (10 characters).'];
         yield 'other punctuation' => [FamilyName::class, 'Иванов.', 'Invalid Russian family name (7 characters).'];
+        yield 'soft sign alone' => [FamilyName::class, 'Ь', 'Invalid Russian family name (1 characters).'];
+        yield 'word starting with Ь' => [FamilyName::class, 'Ь-Иванов', 'Invalid Russian family name (8 characters).'];
+        yield 'second word starting with Ь' => [GivenName::class, 'Иван Ь', 'Invalid Russian given name (6 characters).'];
+        yield 'word starting with Ъ' => [Patronymic::class, 'Ъеремеевич', 'Invalid Russian patronymic (10 characters).'];
+        yield 'lower-case ь first' => [GivenName::class, 'ьван', 'Invalid Russian given name (4 characters).'];
+        yield 'U+2019 in a given name' => [GivenName::class, "Д\u{2019}Анна", 'Invalid Russian given name (6 characters).'];
         yield 'separator alone' => [FamilyName::class, "'", 'Invalid Russian family name (1 characters).'];
     }
 

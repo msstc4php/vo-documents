@@ -15,7 +15,12 @@
 - **Russian passports omit the patronymic in Latin** (MVD Orders 996/186): `Name\RU\PersonName::latin()` derives
   `IVANOV<<IVAN`, not the plan's `IVANOV<<IVAN<IVANOVICH`; an override may include the patronymic. `equals()` compares
   the stored override, so an explicit override equal to the derived form is not equal to no override.
-- `Name\RU\*` letters are the 33 Russian letters (`А-ЯЁа-яё`), not `\p{Cyrillic}`: Ukrainian/Belarusian letters are refused.
+- `Name\RU\*` letters are the 33 Russian letters (`А-ЯЁа-яё`), not `\p{Cyrillic}`: Ukrainian/Belarusian letters are refused;
+  no word starts with Ъ/Ь (`AbstractRussianNamePart::word()`), otherwise `PersonName` failed later with a transliteration message.
+- `PersonName::jsonSerialize()` uses `effectiveLatin`, the codec payload `latin` (override only); the codec refuses
+  unknown keys so the JSON view can never be decoded as "no override".
+- Infection only runs tests that cover a mutated line: a base-class hook overridden in every real subclass needs a
+  `tests/Fixture` subclass that uses the default (see `LatinNamePart`, `SingleWordNamePart`).
 - php-cs-fixer rewrites `@link <url>` to `@see <url>` in class docblocks; source citations therefore use `@see`.
 - `Transliterator` omits only U+0027 and U+2019 apostrophes (Part 3 §4.6); U+02BC and other punctuation are refused.
 - `PersonName::fromParts()` refuses `<` inside a part (it would silently split identifiers); `from()` accepts the
