@@ -1,0 +1,192 @@
+<?php
+
+declare(strict_types=1);
+
+namespace MSSTC4PHP\ValueObject\Documents\Tests\Unit\Icao;
+
+use InvalidArgumentException;
+use MSSTC4PHP\ValueObject\Documents\Exception\InvalidPersonNameException;
+use MSSTC4PHP\ValueObject\Documents\Icao\PersonName;
+use MSSTC4PHP\ValueObject\Documents\Internal\UnicodeText;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\UsesClass;
+use PHPUnit\Framework\TestCase;
+
+#[CoversClass(PersonName::class)]
+#[UsesClass(UnicodeText::class)]
+final class PersonNameTest extends TestCase
+{
+    public function testFromPartsBuildsTheCanonicalForm(): void
+    {
+        $name = PersonName::fromParts('Rimsky-Korsakov', ['Nikolai', 'Andreevich']);
+
+        self::assertSame('RIMSKY-KORSAKOV<<NIKOLAI<ANDREEVICH', $name->value);
+        self::assertSame('RIMSKY-KORSAKOV', $name->primaryIdentifier());
+        self::assertSame(['NIKOLAI', 'ANDREEVICH'], $name->secondaryIdentifiers());
+        self::assertSame('RIMSKY-KORSAKOV, NIKOLAI ANDREEVICH', $name->visualZone());
+    }
+
+    public function testFromPartsMapsSpacesToFillers(): void
+    {
+        $name = PersonName::fromParts('van der Berg', ['Jan']);
+
+        self::assertSame('VAN<DER<BERG<<JAN', $name->value);
+        self::assertSame('VAN DER BERG', $name->primaryIdentifier());
+        self::assertSame('VAN DER BERG, JAN', $name->visualZone());
+    }
+
+    public function testFromPartsNormalisesWhitespace(): void
+    {
+        self::assertSame(
+            'VAN<DER<BERG<<JAN<PIETER',
+            PersonName::fromParts("  van\u{00A0}der\tBerg ", [' Jan ', 'Pieter'])->value,
+        );
+    }
+
+    public function testFromPartsWithoutSecondaryIsAMononym(): void
+    {
+        self::assertSame('MADONNA', PersonName::fromParts('Madonna')->value);
+    }
+
+    public function testMononym(): void
+    {
+        $name = PersonName::from('MADONNA');
+
+        self::assertSame([], $name->secondaryIdentifiers());
+        self::assertSame('MADONNA', $name->primaryIdentifier());
+        self::assertSame('MADONNA', $name->visualZone());
+    }
+
+    public function testFromNormalisesCaseAndSurroundingWhitespace(): void
+    {
+        self::assertSame('IVANOV<<IVAN', PersonName::from(' ivanov<<ivan ')->value);
+        self::assertSame('VAN<DER<BERG<<JAN', PersonName::from('van der Berg<<Jan')->value);
+    }
+
+    public function testEqualityIsByCanonicalValue(): void
+    {
+        self::assertTrue(PersonName::from('ivanov<<ivan')->equals(PersonName::fromParts('Ivanov', ['Ivan'])));
+        self::assertFalse(PersonName::from('IVANOV<<IVAN')->equals(PersonName::from('IVANOV<IVAN')));
+    }
+
+    /**
+     * @return iterable<string, array{string}>
+     */
+    public static function refusedNames(): iterable
+    {
+        yield 'triple filler' => ['IVANOV<<<IVAN'];
+        yield 'diacritic' => ['IVÁNOV'];
+        yield 'empty secondary' => ['IVANOV<<'];
+        yield 'leading hyphen' => ['-IVANOV'];
+        yield 'trailing hyphen' => ['IVANOV-'];
+        yield 'leading filler' => ['<<IVAN'];
+        yield 'double secondary separator' => ['IVANOV<<IVAN<<IVANOVICH'];
+        yield 'hyphen next to filler' => ['IVANOV-<IVAN'];
+        yield 'double hyphen' => ['IVANOV--PETROV'];
+        yield 'empty' => [''];
+        yield 'blank' => ['   '];
+        yield 'digits' => ['IVANOV2<<IVAN'];
+        yield 'Cyrillic' => ['ИВАНОВ'];
+        yield 'apostrophe' => ["O'BRIEN"];
+    }
+
+    #[DataProvider('refusedNames')]
+    public function testRefusedWithoutEchoingTheInput(string $input): void
+    {
+        try {
+            PersonName::from($input);
+            self::fail('Expected exception.');
+        } catch (InvalidPersonNameException $e) {
+            self::assertSame('Invalid ICAO personal name.', $e->getMessage());
+        }
+    }
+
+    public function testFromPartsRefusesAnEmptySecondaryIdentifier(): void
+    {
+        $this->expectException(InvalidPersonNameException::class);
+
+        PersonName::fromParts('Ivanov', ['Ivan', ' ']);
+    }
+
+    public function testTryFromReturnsNullForInvalidInput(): void
+    {
+        self::assertNull(PersonName::tryFrom('IVANOV<<'));
+        self::assertTrue(PersonName::isValid('IVANOV<<IVAN'));
+    }
+
+    /**
+     * @return iterable<string, array{PersonName, int<2, max>, non-empty-string}>
+     */
+    public static function mrzFields(): iterable
+    {
+        // Doc 9303 Part 4 §4.2.3.1-§4.2.3.2, copied from docs/sources/ICAO.md.
+        yield '4.2.3.1 a' => [
+            PersonName::fromParts('Eriksson', ['Anna', 'Maria']), 39, 'ERIKSSON<<ANNA<MARIA<<<<<<<<<<<<<<<<<<<',
+        ];
+        yield '4.2.3.1 c hyphen' => [
+            PersonName::fromParts('Smith-Jones', ['Susie', 'Margaret']), 39, 'SMITH<JONES<<SUSIE<MARGARET<<<<<<<<<<<<',
+        ];
+        yield '4.2.3.1 f no secondary' => [
+            PersonName::from('ARKFREITH'), 39, 'ARKFREITH<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<',
+        ];
+        yield '4.2.3.2 a initial' => [
+            PersonName::fromParts('Nilavadhanananda', ['Chayapa', 'Dejthamrong', 'Krasuang']),
+            39,
+            'NILAVADHANANANDA<<CHAYAPA<DEJTHAMRONG<K',
+        ];
+        yield '4.2.3.2 b component cut' => [
+            PersonName::fromParts('Nilavadhanananda', ['Arnpol', 'Petch', 'Charonguang']),
+            39,
+            'NILAVADHANANANDA<<ARNPOL<PETCH<CHARONGU',
+        ];
+        // Default width is TD3's 39.
+        yield 'exact fit' => [PersonName::from(\str_repeat('A', 39)), 39, \str_repeat('A', 39)];
+        // Derived examples from docs/sources/ICAO.md (procedure steps 3-4).
+        yield 'primary cut, width 39' => [self::bennelong(), 39, 'BENNELONG<WOOLOOMOOLOO<WARRANDYTE<WA<<D'];
+        yield 'primary cut, width 20' => [self::bennelong(), 20, 'BENNELONG<WOOLOOM<<D'];
+        yield 'cut landing on a filler' => [PersonName::fromParts('Eriksson', ['Anna', 'Maria']), 15, 'ERIKSSON<<ANN<M'];
+        yield 'mononym cut' => [PersonName::from('ARKFREITH'), 5, 'ARKFR'];
+        yield 'mononym cut landing on a filler' => [PersonName::from('ANNA<MARIA'), 5, 'ANN<M'];
+        yield 'primary cut landing on a filler' => [PersonName::fromParts('Anna Maria', ['Eva']), 8, 'ANN<M<<E'];
+        yield 'secondary room after a short primary' => [PersonName::fromParts('Lo', ['Deborah']), 5, 'LO<<D'];
+        yield 'secondary component of one letter is skipped over' => [
+            PersonName::fromParts('Lo', ['Ann', 'B', 'Carl']), 10, 'LO<<AN<B<C',
+        ];
+        yield 'every component a single letter' => [PersonName::fromParts('A', ['B', 'C']), 5, 'A<<B<'];
+        yield 'primary of initials cut on a filler' => [PersonName::fromParts('A B C', ['D']), 7, 'A<B<<D<'];
+        yield 'width 4 keeps << and an initial' => [PersonName::fromParts('Ivanov', ['Ivan']), 4, 'I<<I'];
+        yield 'width below the secondary rule' => [PersonName::fromParts('Ivanov', ['Ivan']), 3, 'IVA'];
+        yield 'width 2' => [PersonName::from('IVANOV'), 2, 'IV'];
+    }
+
+    /**
+     * @param int<2, max> $width
+     * @param non-empty-string $expected
+     */
+    #[DataProvider('mrzFields')]
+    public function testMrzField(PersonName $name, int $width, string $expected): void
+    {
+        self::assertSame($expected, $name->mrzField($width));
+        self::assertSame($width, \strlen($name->mrzField($width)));
+    }
+
+    public function testMrzFieldDefaultsToTd3Width(): void
+    {
+        self::assertSame('ERIKSSON<<ANNA<MARIA<<<<<<<<<<<<<<<<<<<', PersonName::from('ERIKSSON<<ANNA<MARIA')->mrzField());
+    }
+
+    public function testMrzFieldRefusesAWidthBelowTwo(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+
+        // Reason: the int<2, max> contract is what this test violates on purpose.
+        // @phpstan-ignore argument.type
+        PersonName::from('IVANOV')->mrzField(1);
+    }
+
+    private static function bennelong(): PersonName
+    {
+        return PersonName::fromParts('Bennelong Wooloomooloo Warrandyte Warnambool', ['Dingo', 'Potoroo']);
+    }
+}
