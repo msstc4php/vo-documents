@@ -12,7 +12,7 @@ use MSSTC4PHP\ValueObject\Documents\Internal\UnicodeText;
 
 /**
  * Latin spelling of a national name part per the ICAO Doc 9303 transliteration tables (see docs/sources/ICAO.md).
- * The whole part must be written in the script of one table; spaces and hyphens are kept.
+ * The whole part must be written in the script of one table; spaces and hyphens are kept, apostrophes omitted.
  *
  * @see https://www.icao.int/publications/Documents/9303_p3_cons_en.pdf ICAO Doc 9303 Part 3, 8th ed. (2021), §6
  */
@@ -20,6 +20,9 @@ final readonly class Transliterator
 {
     /** Bounds variants() on untrusted input: 4096 = eight two-way or seven three-way characters. */
     private const int MAX_VARIANTS = 4096;
+
+    /** Omitted without a filler, Doc 9303 Part 3 §4.6 ("D’ARTAGNAN" → "DARTAGNAN"). */
+    private const array APOSTROPHES = ["'", "\u{2019}"];
 
     /** @var non-empty-list<TransliterationTable> */
     private array $tables;
@@ -72,7 +75,8 @@ final readonly class Transliterator
             $variants = $next;
         }
 
-        return $variants;
+        // Different characters can share a spelling (Å = AA or A, then A): keep the first occurrence.
+        return \array_values(\array_unique($variants));
     }
 
     /**
@@ -82,7 +86,7 @@ final readonly class Transliterator
      */
     private function segments(string $nationalPart): array
     {
-        $text = UnicodeText::normalizeName($nationalPart);
+        $text = UnicodeText::normalizeName(\str_replace(self::APOSTROPHES, '', $nationalPart));
         $letters = \str_replace([' ', '-'], '', $text);
         if ($letters === '') {
             throw new InvalidPersonNameException('Invalid personal name (empty).');

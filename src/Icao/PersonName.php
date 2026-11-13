@@ -31,6 +31,12 @@ final class PersonName extends AbstractStringValueObject
      */
     public static function fromParts(string $primary, array $secondary = []): self
     {
+        foreach ([$primary, ...$secondary] as $part) {
+            if (\str_contains($part, '<')) {
+                throw new InvalidPersonNameException('Invalid ICAO personal name.');
+            }
+        }
+
         $value = self::canonical($primary);
         if ($secondary !== []) {
             $value .= '<<' . \implode('<', \array_map(self::canonical(...), $secondary));
@@ -94,7 +100,7 @@ final class PersonName extends AbstractStringValueObject
             $primary = $this->cut($primary, $width - 3);
         }
 
-        return \str_pad($this->cut($primary . '<<' . $secondary, $width), $width, '<');
+        return \str_pad($this->cut($primary . '<<' . \str_replace('-', '<', $secondary), $width), $width, '<');
     }
 
     #[Override]

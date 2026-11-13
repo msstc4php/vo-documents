@@ -24,6 +24,12 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(UnicodeText::class)]
 final class TransliteratorTest extends TestCase
 {
+    private const string EMPTY = 'Invalid personal name (empty).';
+
+    private const string MIXED = 'Invalid personal name (mixed scripts).';
+
+    private const string UNCOVERED = 'Invalid personal name (no ICAO transliteration for a character).';
+
     private Transliterator $transliterator;
 
     #[Override]
@@ -93,35 +99,49 @@ final class TransliteratorTest extends TestCase
     }
 
     /**
-     * @return iterable<string, array{string}>
+     * @return iterable<string, array{string, non-empty-string}>
      */
     public static function refusedInput(): iterable
     {
-        yield 'Han script' => ['李'];
-        yield 'soft sign is not in table 6.B' => ['Игорь'];
-        yield 'Latin a inside Cyrillic' => ["Ив\u{0061}нов"];
-        yield 'Cyrillic а inside Latin' => ["Iv\u{0430}nov"];
-        yield 'digit' => ['Ivanov2'];
-        yield 'apostrophe' => ["O'Brien"];
-        yield 'Ћ U+040B is not in table 6.B' => ['Ћирић'];
-        yield 'empty' => [''];
-        yield 'blank' => [" \t "];
-        yield 'separator only' => ['-'];
+        yield 'Han script' => ['李', self::UNCOVERED];
+        yield 'soft sign is not in table 6.B' => ['Игорь', self::UNCOVERED];
+        yield 'soft sign after an apostrophe' => ["д'Артаньян", self::UNCOVERED];
+        yield 'Latin a inside Cyrillic' => ["Ив\u{0061}нов", self::MIXED];
+        yield 'Cyrillic а inside Latin' => ["Iv\u{0430}nov", self::MIXED];
+        yield 'digit' => ['Ivanov2', self::UNCOVERED];
+        yield 'modifier letter apostrophe U+02BC' => ["O\u{02BC}Brien", self::UNCOVERED];
+        yield 'other punctuation' => ['O.Brien', self::UNCOVERED];
+        yield 'Ћ U+040B is not in table 6.B' => ['Ћирић', self::UNCOVERED];
+        yield 'empty' => ['', self::EMPTY];
+        yield 'blank' => [" \t ", self::EMPTY];
+        yield 'separators only' => [' - ', self::EMPTY];
+        yield 'apostrophe only' => ["'\u{2019}", self::EMPTY];
     }
 
+    /**
+     * @param non-empty-string $message
+     */
     #[DataProvider('refusedInput')]
-    public function testUncoveredInputIsRefusedWithoutEchoingIt(string $national): void
+    public function testUncoveredInputIsRefusedWithoutEchoingIt(string $national, string $message): void
     {
-        try {
-            $this->transliterator->toLatin($national);
-            self::fail('Expected exception.');
-        } catch (InvalidPersonNameException $e) {
-            self::assertContains($e->getMessage(), [
-                'Invalid personal name (empty).',
-                'Invalid personal name (mixed scripts).',
-                'Invalid personal name (no ICAO transliteration for a character).',
-            ]);
-        }
+        $this->expectException(InvalidPersonNameException::class);
+        $this->expectExceptionMessage($message);
+
+        $this->transliterator->toLatin($national);
+    }
+
+    public function testApostrophesAreOmitted(): void
+    {
+        // Doc 9303 Part 3 §4.6 and Part 4 §4.2.3.1 d: O’CONNOR -> OCONNOR.
+        self::assertSame('OCONNOR', $this->transliterator->toLatin("O'Connor"));
+        self::assertSame('OCONNOR', $this->transliterator->toLatin("O\u{2019}Connor"));
+        self::assertSame('DARK', $this->transliterator->toLatin("Д'Арк"));
+        self::assertSame(['DARTAGNAN'], $this->transliterator->variants("D\u{2019}Artagnan"));
+    }
+
+    public function testVariantsAreUniqueWithTheDefaultFirst(): void
+    {
+        self::assertSame(['AAAA', 'AAA', 'AA'], $this->transliterator->variants('Åå'));
     }
 
     public function testVariantsRefuseUncoveredInput(): void
@@ -130,22 +150,6 @@ final class TransliteratorTest extends TestCase
         $this->expectExceptionMessage('Invalid personal name (no ICAO transliteration for a character).');
 
         $this->transliterator->variants('李');
-    }
-
-    public function testMixedScriptsAreReportedAsSuch(): void
-    {
-        $this->expectException(InvalidPersonNameException::class);
-        $this->expectExceptionMessage('Invalid personal name (mixed scripts).');
-
-        $this->transliterator->toLatin("Ив\u{0061}нов");
-    }
-
-    public function testEmptyInputIsReportedAsSuch(): void
-    {
-        $this->expectException(InvalidPersonNameException::class);
-        $this->expectExceptionMessage('Invalid personal name (empty).');
-
-        $this->transliterator->toLatin(' - ');
     }
 
     public function testTooManyVariantsAreRefused(): void

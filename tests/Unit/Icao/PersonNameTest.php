@@ -7,6 +7,9 @@ namespace MSSTC4PHP\ValueObject\Documents\Tests\Unit\Icao;
 use InvalidArgumentException;
 use MSSTC4PHP\ValueObject\Documents\Exception\InvalidPersonNameException;
 use MSSTC4PHP\ValueObject\Documents\Icao\PersonName;
+use MSSTC4PHP\ValueObject\Documents\Icao\Table\Cyrillic;
+use MSSTC4PHP\ValueObject\Documents\Icao\Table\LatinMultinational;
+use MSSTC4PHP\ValueObject\Documents\Icao\Transliterator;
 use MSSTC4PHP\ValueObject\Documents\Internal\UnicodeText;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -15,6 +18,9 @@ use PHPUnit\Framework\TestCase;
 
 #[CoversClass(PersonName::class)]
 #[UsesClass(UnicodeText::class)]
+#[UsesClass(Transliterator::class)]
+#[UsesClass(LatinMultinational::class)]
+#[UsesClass(Cyrillic::class)]
 final class PersonNameTest extends TestCase
 {
     public function testFromPartsBuildsTheCanonicalForm(): void
@@ -102,6 +108,37 @@ final class PersonNameTest extends TestCase
         }
     }
 
+    /**
+     * @return iterable<string, array{string, list<string>}>
+     */
+    public static function partsWithFillers(): iterable
+    {
+        yield 'in the primary' => ['Ivanov<<Ivan', []];
+        yield 'single in the primary' => ['Van<Der<Berg', ['Jan']];
+        yield 'in a secondary' => ['Ivanov', ['Ivan<Ivanovich']];
+    }
+
+    /**
+     * @param list<string> $secondary
+     */
+    #[DataProvider('partsWithFillers')]
+    public function testFromPartsRefusesFillersInsideAPart(string $primary, array $secondary): void
+    {
+        $this->expectException(InvalidPersonNameException::class);
+        $this->expectExceptionMessage('Invalid ICAO personal name.');
+
+        PersonName::fromParts($primary, $secondary);
+    }
+
+    public function testMrzFieldOfTheTruncationExampleNameFollowsTheRule(): void
+    {
+        // §4.2.3.3 a-c print three valid results for this name; ours is a fourth (docs/sources/ICAO.md).
+        $field = self::bennelong()->mrzField();
+
+        self::assertSame(39, \strlen($field));
+        self::assertMatchesRegularExpression('/^BENNELONG<[A-Z<]*[A-Z]<<D(?:[A-Z<]*[A-Z])?$/', $field);
+    }
+
     public function testFromPartsRefusesAnEmptySecondaryIdentifier(): void
     {
         $this->expectException(InvalidPersonNameException::class);
@@ -127,6 +164,35 @@ final class PersonNameTest extends TestCase
         yield '4.2.3.1 c hyphen' => [
             PersonName::fromParts('Smith-Jones', ['Susie', 'Margaret']), 39, 'SMITH<JONES<<SUSIE<MARGARET<<<<<<<<<<<<',
         ];
+        yield '4.2.3.1 b' => [
+            PersonName::fromParts('Heng', ['Deborah', 'Ming', 'Lo']), 39, 'HENG<<DEBORAH<MING<LO<<<<<<<<<<<<<<<<<<',
+        ];
+        yield '4.2.3.1 d apostrophe' => [
+            PersonName::fromParts(new Transliterator()->toLatin("O\u{2019}Connor"), ['Enya', 'Siobhan']),
+            39,
+            'OCONNOR<<ENYA<SIOBHAN<<<<<<<<<<<<<<<<<<',
+        ];
+        yield '4.2.3.1 e prefixes' => [
+            PersonName::fromParts('Van Der Muellen', ['Martin']), 39, 'VAN<DER<MUELLEN<<MARTIN<<<<<<<<<<<<<<<<',
+        ];
+        yield '4.2.3.1 e hyphen' => [
+            PersonName::fromParts('Al-Basri', ['Huda', 'Muhammad', 'Jawad']),
+            39,
+            'AL<BASRI<<HUDA<MUHAMMAD<JAWAD<<<<<<<<<<',
+        ];
+        yield '4.2.3.1 e two primary components' => [
+            PersonName::fromParts('Vilarchao Fernandez', ['Jose', 'Ramon']),
+            39,
+            'VILARCHAO<FERNANDEZ<<JOSE<RAMON<<<<<<<<',
+        ];
+        yield '4.2.3.1 f two components, no secondary' => [
+            PersonName::from('SATRIYA SUDARPA'), 39, 'SATRIYA<SUDARPA<<<<<<<<<<<<<<<<<<<<<<<<',
+        ];
+        yield '4.2.3.4 exact fit, not truncated' => [
+            PersonName::fromParts('Papandropoulous', ['Jonathon', 'Warren', 'Trevor']),
+            39,
+            'PAPANDROPOULOUS<<JONATHON<WARREN<TREVOR',
+        ];
         yield '4.2.3.1 f no secondary' => [
             PersonName::from('ARKFREITH'), 39, 'ARKFREITH<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<',
         ];
@@ -145,6 +211,10 @@ final class PersonNameTest extends TestCase
         // Derived examples from docs/sources/ICAO.md (procedure steps 3-4).
         yield 'primary cut, width 39' => [self::bennelong(), 39, 'BENNELONG<WOOLOOMOOLOO<WARRANDYTE<WA<<D'];
         yield 'primary cut, width 20' => [self::bennelong(), 20, 'BENNELONG<WOOLOOM<<D'];
+        yield 'hyphenated secondary' => [
+            PersonName::fromParts('Ivanov', ['Jean-Pierre']), 39, 'IVANOV<<JEAN<PIERRE<<<<<<<<<<<<<<<<<<<<',
+        ];
+        yield 'cut landing on a secondary hyphen' => [PersonName::fromParts('Ivanov', ['Jean-Pierre']), 13, 'IVANOV<<JEA<P'];
         yield 'cut landing on a filler' => [PersonName::fromParts('Eriksson', ['Anna', 'Maria']), 15, 'ERIKSSON<<ANN<M'];
         yield 'mononym cut' => [PersonName::from('ARKFREITH'), 5, 'ARKFR'];
         yield 'mononym cut landing on a filler' => [PersonName::from('ANNA<MARIA'), 5, 'ANN<M'];

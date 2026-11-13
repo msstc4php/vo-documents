@@ -4,9 +4,12 @@ Sources (free PDFs published by ICAO, both "Eighth Edition, 2021"; fetched 2026-
 
 - Doc 9303 Part 3, *Specifications Common to all MRTDs*:
   <https://www.icao.int/publications/Documents/9303_p3_cons_en.pdf>
-  (the file served as of 2026-11-13 UTC is the consolidated 8th edition incl. Amendment No. 1).
+  (that URL answered 404 on 2026-11-13 UTC; the same file was fetched from
+  `https://www.icao.int/sites/default/files/publications/DocSeries/9303_p3_cons_en.pdf`;
+  its record of amendments lists No. 1 of 14/11/22 and No. 2 of 20/3/24, and the pages carry "No. 2" markers).
 - Doc 9303 Part 4, *Specifications for Machine Readable Passports (MRPs) and other TD3 Size MRTDs*:
   <https://www.icao.int/sites/default/files/publications/DocSeries/9303_p4_cons_en.pdf>
+  (record of amendments: No. 1 of 20/3/24, No. 2 of 20/2/26; the §4.2.3 pages carry the "20/2/26 No. 2" marker).
 
 Part 3 §4.6 delegates truncation to "the form factor specific Parts 4 to 7"; the truncation rule and the
 examples below therefore come from **Part 4 §4.2.2 / §4.2.3** (TD3, 39-character name field).
@@ -39,8 +42,14 @@ examples below therefore come from **Part 4 §4.2.2 / §4.2.3** (TD3, 39-charact
 > character (<). (i.e. hyphenated names shall be represented as separate components).
 > Example VIZ: MARIE-ELISE MRZ: MARIE<ELISE
 
-Comma (VIZ `ERIKSSON, ANNA MARIA` → MRZ `ERIKSSON<<ANNA<MARIA`) and apostrophe (`D’ARTAGNAN` → `DARTAGNAN`, omitted
-without filler) rules are in the same section.
+Comma (VIZ `ERIKSSON, ANNA MARIA` → MRZ `ERIKSSON<<ANNA<MARIA`) and apostrophe rules are in the same section:
+
+> Apostrophe: This shall be omitted; name components separated by the apostrophe shall be combined, and no filler
+> character shall be inserted in its place in the MRZ.
+> Example VIZ: D’ARTAGNAN MRZ: DARTAGNAN
+
+`Transliterator` omits two apostrophe characters: U+0027 APOSTROPHE (`'`) and U+2019 RIGHT SINGLE QUOTATION MARK (`’`,
+the one printed in the ICAO examples). Others (e.g. U+02BC MODIFIER LETTER APOSTROPHE) are not covered and are refused.
 
 ## 2. Transliteration tables (Part 3 §6)
 
@@ -258,35 +267,49 @@ Part 4 §4.2.3:
 > In truncating the name components, the last character of the name field shall be an alphabetic character (A to Z
 > inclusive) as an indication that truncation has occurred [...].
 
-Examples, §4.2.3.1–§4.2.3.3 (name field only, i.e. without the `PPUTO` prefix of the PDF; width 39):
+Examples, §4.2.3.1–§4.2.3.4 (name field only, i.e. without the `PPUTO` prefix of the PDF; width 39):
 
 | § | VIZ | MRZ name field |
 |---|---|---|
 | 4.2.3.1 a | ERIKSSON, ANNA MARIA | `ERIKSSON<<ANNA<MARIA<<<<<<<<<<<<<<<<<<<` |
+| 4.2.3.1 b | HENG, DEBORAH MING LO | `HENG<<DEBORAH<MING<LO<<<<<<<<<<<<<<<<<<` |
 | 4.2.3.1 c | SMITH-JONES, SUSIE MARGARET | `SMITH<JONES<<SUSIE<MARGARET<<<<<<<<<<<<` |
+| 4.2.3.1 d | O’CONNOR, ENYA SIOBHAN | `OCONNOR<<ENYA<SIOBHAN<<<<<<<<<<<<<<<<<<` |
+| 4.2.3.1 e | VAN DER MUELLEN, MARTIN | `VAN<DER<MUELLEN<<MARTIN<<<<<<<<<<<<<<<<` |
+| 4.2.3.1 e | AL-BASRI, HUDA MUHAMMAD JAWAD | `AL<BASRI<<HUDA<MUHAMMAD<JAWAD<<<<<<<<<<` |
+| 4.2.3.1 e | VILARCHAO FERNANDEZ, JOSE RAMON | `VILARCHAO<FERNANDEZ<<JOSE<RAMON<<<<<<<<` |
 | 4.2.3.1 f | ARKFREITH | `ARKFREITH<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<` |
+| 4.2.3.1 f | SATRIYA SUDARPA | `SATRIYA<SUDARPA<<<<<<<<<<<<<<<<<<<<<<<<` |
 | 4.2.3.2 a | NILAVADHANANANDA, CHAYAPA DEJTHAMRONG KRASUANG | `NILAVADHANANANDA<<CHAYAPA<DEJTHAMRONG<K` |
 | 4.2.3.2 b | NILAVADHANANANDA, ARNPOL PETCH CHARONGUANG | `NILAVADHANANANDA<<ARNPOL<PETCH<CHARONGU` |
 | 4.2.3.3 a | BENNELONG WOOLOOMOOLOO WARRANDYTE WARNAMBOOL, DINGO POTOROO | `BENNELONG<WOOLOOMOOLOO<WARRANDYTE<W<<DI` |
 | 4.2.3.3 b | (same) | `BENNELONG<WOOLOOM<WARRAND<WARNAM<<DINGO` |
+| 4.2.3.3 c | (same) | `BENNEL<WOOLOO<WARRAN<WARNAM<<DINGO<POTO` |
+| 4.2.3.4 | PAPANDROPOULOUS, JONATHON WARREN TREVOR | `PAPANDROPOULOUS<<JONATHON<WARREN<TREVOR` |
 
-The two §4.2.3.3 results for the same name show that the rule allows several truncations. Part 4 fixes the 39-character
-TD3 width; TD1 (30) and TD2 (31) are in Parts 5 and 6 and use the same procedure.
+§4.2.3.3 a–c are titled "One or more components truncated to initials", "… truncated", "… truncated to a fixed number
+of characters": three valid results for one name, so the rule allows several truncations. §4.2.3.4 is a name of exactly
+39 characters: "Even though there is an alphabetic character in the 44th position [...] this name has not been truncated
+but it must be assumed that it has been truncated." Part 4 fixes the 39-character TD3 width; TD1 (30) and TD2 (31) are
+in Parts 5 and 6 and use the same procedure.
 
 ### The deterministic procedure `PersonName::mrzField(width)` implements
 
-1. Write the name: hyphens and spaces become `<`, primary `<<` secondary.
-2. If it fits in `width`, pad with `<` and stop (no truncation).
-3. If the primary identifier plus `<<` plus one character fits (`len(primary) + 3 <= width`), keep the primary
-   identifier whole and cut the secondary identifiers (§4.2.3.2). Otherwise (`width >= 4`) cut the primary identifier to
-   `width - 3` characters, then `<<`, then the secondary identifiers cut to the room left — one character (§4.2.3.3,
-   first paragraph of the rule).
+1. Write the name: hyphens and spaces in every identifier become `<`, primary `<<` secondary.
+2. When there is a secondary identifier and `width >= 4`, cut the primary identifier to `width - 3` characters (a
+   shorter primary is unchanged), so `<<` and at least the first secondary character fit (§4.2.2, first paragraph of
+   the rule).
+3. Cut the whole name to `width` and pad with `<`. A name that fits is unchanged (§4.2.3.1, §4.2.3.4).
 4. A cut is the first N characters. When the cut would end on a filler, the last letter of the nearest earlier
-   component that has two or more letters is removed and the cut is retried, so the field always ends with A–Z.
+   component that has two or more letters is removed and the cut is retried.
 
-Steps 3–4 reproduce §4.2.3.2 a and b exactly. For the §4.2.3.3 name they give
+Step 4 makes the field end with A–Z **unless every component before the cut is a single letter** (e.g. `A<<B<C` at
+width 5 → `A<<B<`): no letter can then be removed without dropping a component, the cut keeps its trailing filler
+stripped and the field is padded. ICAO gives no rule for that case.
+
+Steps 2–4 reproduce §4.2.3.2 a and b exactly. For the §4.2.3.3 name they give
 `BENNELONG<WOOLOOMOOLOO<WARRANDYTE<WA<<D`, which satisfies the rule (primary shortened until `<<` and the first secondary
-character fit, last character alphabetic) but is neither of the two PDF examples.
+character fit, last character alphabetic) but is none of the three PDF results.
 
 Derived examples (computed with the procedure above, not printed by ICAO; used in `PersonNameTest`):
 
@@ -294,6 +317,7 @@ Derived examples (computed with the procedure above, not printed by ICAO; used i
 |---|---|---|
 | BENNELONG WOOLOOMOOLOO WARRANDYTE WARNAMBOOL, DINGO POTOROO | 20 | `BENNELONG<WOOLOOM<<D` |
 | ERIKSSON, ANNA MARIA | 15 | `ERIKSSON<<ANN<M` |
+| IVANOV, JEAN-PIERRE | 13 | `IVANOV<<JEA<P` |
 
 ## 4. Where this note departs from plan 1, task 3 (the source wins)
 
