@@ -158,6 +158,8 @@ Sources read 2026-11-13 UTC. Official publications first; "quoted from" copies a
 taken from. No source found publishes an official masking rule for any of these numbers, so every `masked()` keeps the
 last four digits of `formatted()` (`Mask::keepLastDigits(formatted(), 4)`). No source publishes an example number
 except the SNILS rules (`112-233-445 95`); the other test numbers are synthetic and are computed with the rule given.
+Messages give the document name and the character count after separators are removed, or "(too long)" above 40
+characters, so a message never holds a run of three digits.
 
 ### SNILS (`Document\RU\Snils`)
 
@@ -215,7 +217,7 @@ rule in this file without an official text; see the report/known issues.
 
 **Where the plan loses to the source:** the plan's `taxOfficeCode()` (first four digits) holds only for INNs assigned
 under Order ММВ-7-6/435@ (NNNN = code of the assigning tax office). Since 01.01.2026 digits 3–4 are an "индекс,
-определяемый ФНС", not part of a tax office code. The class therefore offers `regionCode()` (digits 1–2: the FNS code of
+определяемый ФНС", not part of a tax office code. The class therefore offers `taxAuthorityRegionCode()` (digits 1–2: the FNS code of
 the constituent entity) instead. `formatted()` is the 12 digits (`500100732259`); `masked()` `********2259`.
 
 ### Internal passport (`Document\RU\InternalPassportNumber`)
@@ -263,8 +265,10 @@ seven-digit number (`75 1234567`) is the printed convention the plan uses; no so
 ### Driving licence (`Document\RU\DriverLicenceNumber`, `Document\RU\DriverLicenceCategory`)
 
 **MVD Order of 13.05.2009 No. 365** "О введении в действие водительского удостоверения" (registered 10.07.2009,
-No. 14302; consolidated text "ред. от 09.01.2024" as published by the aggregator; the order predates the publication
-portal and is cited by number). Quoted from: <https://legalacts.ru/doc/prikaz-mvd-rf-ot-13052009-n-365/>
+No. 14302; amended by MVD Orders No. 974 of 29.08.2011, No. 6 of 09.01.2014, No. 995 of 20.10.2015, No. 905 of
+01.12.2017, No. 676 of 28.09.2020 and No. 1 of 09.01.2024). **Cited by number; predates the portal**
+(publication.pravo.gov.ru starts in 2011): no official gazette reference (Российская газета issue or БНА number) for
+the 2009 publication was found on 2026-11-13 UTC. Quoted from: <https://legalacts.ru/doc/prikaz-mvd-rf-ot-13052009-n-365/>
 Appendix 1 "Описание образца водительского удостоверения":
 
 > В нижней правой части оборотной стороны красным цветом выполнены четырехзначная цифровая серия и шестизначный номер
@@ -276,8 +280,11 @@ Appendix 1 "Описание образца водительского удос�
 > [section 9] Указанные категории и подкатегории печатаются в отдельных рамках, которые располагаются в одну строку с
 > соблюдением следующей последовательности: A, A1, B, B1, C, C1, D, D1, BE, CE, C1E, DE, D1E, M, Tm, Tb.
 
-The sample blank prints the number as `00 00 000000`. The order repealed MVD Order No. 120 of 19.02.1999, whose form
-had Cyrillic letters in the series; the order in force recognises digits only, so letters are refused. No check digit:
+The sample blank prints the number as `00 00 000000`. §10 repealed MVD Order No. 120 of 19.02.1999 (whose forms had
+Cyrillic letters in the series) from 01.03.2011, and §8 keeps those licences "действительны до окончания указанного в
+них срока действия". A licence is issued for ten years (196-FZ Art. 25 §6), so the last 1999-form licence expired by
+01.03.2021 — before the 2022–2023 extension of Government Decree No. 353 of 12.03.2022 — and none is valid on
+2026-11-13. Letters are therefore refused. No check digit:
 **shape only** (10 digits). `formatted()` `99 99 123456`, `masked()` `** ** **3456`. The categories are those of
 Federal Law of 10.12.1995 No. 196-FZ "О безопасности дорожного движения", Art. 25 §1 (СЗ РФ 1995, No. 50, art. 4873);
 the enum keeps the print order above, which equals the plan's set.
@@ -286,7 +293,11 @@ the enum keeps the print order above, which equals the plan's set.
 
 1. **FFOMS Order of 07.04.2011 No. 79** "Об утверждении Общих принципов построения и функционирования информационных
    систем и порядка информационного взаимодействия в сфере обязательного медицинского страхования" (as amended).
-   Quoted from: <https://legalacts.ru/doc/prikaz-ffoms-ot-07042011-n-79-ob/>; table of the register data, row
+   Official text on the agency site: <https://www.ffoms.gov.ru/upload/iblock/56d/56d1f4edbcb3a5d37d20328a012d4e17.pdf>
+   ("Приказ ФФОМС от 07.04.2011 N 79 (ред. от 05.03.2020)"; an FFOMS order is not registered by the Ministry of Justice
+   and is not on publication.pravo.gov.ru). **Not reachable from this environment** on 2026-11-13 UTC: www.ffoms.gov.ru
+   serves a certificate that does not verify (curl error 60), so the quotes come from
+   <https://legalacts.ru/doc/prikaz-ffoms-ot-07042011-n-79-ob/>; table of the register data, row
    "Единый номер полиса ОМС <1>", note 1:
 
    > Контрольный разряд номера полиса обязательного медицинского страхования, вычисляется арифметически в соответствии
@@ -294,9 +305,10 @@ the enum keeps the print order above, which equals the plan's set.
 2. **Minzdrav Order of 21.08.2025 No. 496н** "Об утверждении Правил обязательного медицинского страхования"
    (registered 29.08.2025, No. 83407), §35: "Полис представляет собой уникальную последовательность символов в
    машиночитаемом виде…". Quoted from: <https://legalacts.ru/doc/prikaz-minzdrava-rossii-ot-21082025-n-496n-ob-utverzhdenii/>
-3. Length: the FFOMS describes the ЕНП as "единый номер полиса из 16 цифр" (ffoms.gov.ru news "Пациент в сети. Пять
-   главных вопросов про электронный полис ОМС", seen in a search result on 2026-11-13 UTC; the page itself could not
-   be fetched). Neither act above states the length in the text read.
+3. **Length: no official text reachable.** The FFOMS describes the ЕНП as "единый номер полиса из 16 цифр" on
+   <https://www.ffoms.gov.ru/news/monitoring-smi/patsient-v-seti-pyat-glavnykh-voprosov-pro-elektronnyy-polis-oms/>
+   (seen only as a search snippet; same certificate failure). Neither Order 79 nor Order 496н states the length in
+   the text read; 16 digits is the plan's value.
 
 HL7 v2.5 Mod10 (ISO/HL7 27931:2009 is HL7 v2.5; data type CX, check digit scheme `M10` of table 0061; recalled from
 the standard, which is not freely published): take the digits in odd positions counting from the right, read them
@@ -324,8 +336,8 @@ ISO 3166-2:RU. None does:
 
 | Plan | Source | Implemented |
 |---|---|---|
-| `Inn::taxOfficeCode()` = first 4 digits | since 01.01.2026 NN = FNS directorate, YY = FNS index (ЕД-7-14/559@) | `regionCode()` (2 digits) |
+| `Inn::taxOfficeCode()` = first 4 digits | since 01.01.2026 NN = FNS directorate, YY = FNS index (ЕД-7-14/559@) | `taxAuthorityRegionCode()` (2 digits) |
 | SNILS rule wording | PFR §8 "mod 101, last two digits" | same function; zeros only refused (SFR 1.15) |
 | INN checksum "per source" | the algorithm is not published | plan weights, flagged |
-| DL "older series with Cyrillic letters only if still recognised" | Order 365 describes digits only | digits only |
+| DL "older series with Cyrillic letters only if still recognised" | Order 365 §8: valid until expiry; all expired by 2021 | digits only |
 | `Region` | no published ISO mapping | not created |

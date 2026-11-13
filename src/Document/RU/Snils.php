@@ -27,7 +27,7 @@ final class Snils extends AbstractStringValueObject implements Maskable
 {
     private const string DOCUMENT = 'SNILS';
 
-    private const string LAST_UNCHECKED_NUMBER = '001001998';
+    private const int LAST_UNCHECKED_NUMBER = 1001998;
 
     /**
      * @return non-empty-string
@@ -56,13 +56,13 @@ final class Snils extends AbstractStringValueObject implements Maskable
         $number = \substr($digits, 0, 9);
 
         if ($digits === '00000000000') {
-            throw new InvalidDocumentNumberException('Invalid SNILS (zeros only).');
+            throw new InvalidDocumentNumberException(\sprintf('Invalid %s (zeros only).', self::DOCUMENT));
         }
 
-        if ($number > self::LAST_UNCHECKED_NUMBER) {
+        if ((int) $number > self::LAST_UNCHECKED_NUMBER) {
             $control = Checksum::weightedMod($number, [9, 8, 7, 6, 5, 4, 3, 2, 1], 101) % 100;
             if ($control !== (int) \substr($digits, 9)) {
-                throw new InvalidDocumentNumberException('Invalid SNILS checksum.');
+                throw new InvalidDocumentNumberException(\sprintf('Invalid %s checksum.', self::DOCUMENT));
             }
         }
 

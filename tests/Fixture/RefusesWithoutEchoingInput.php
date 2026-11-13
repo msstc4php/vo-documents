@@ -11,8 +11,9 @@ use PHPUnit\Framework\Assert;
 trait RefusesWithoutEchoingInput
 {
     /**
-     * Asserts that `$create($input)` throws the expected message and that the message holds no three consecutive
-     * digits of the input, neither as typed nor with the separators removed.
+     * Asserts that `$create($input)` throws the expected message, that the message holds no three consecutive digits
+     * of the input (as typed or with the separators removed) and no run of three or more digits at all, so a
+     * character count can never pass for part of the input.
      *
      * @param Closure(string): mixed $create
      */
@@ -23,6 +24,7 @@ trait RefusesWithoutEchoingInput
         } catch (InvalidDocumentNumberException $exception) {
             Assert::assertSame($expectedMessage, $exception->getMessage());
             self::assertMessageHidesInput($input, $exception->getMessage());
+            Assert::assertDoesNotMatchRegularExpression('/[0-9]{3}/', $exception->getMessage());
 
             return;
         }

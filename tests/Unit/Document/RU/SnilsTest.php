@@ -79,6 +79,7 @@ final class SnilsTest extends TestCase
         yield 'Cyrillic letter' => ['112-233-445 9О', 'Invalid SNILS (11 characters).'];
         yield 'other separator' => ['112.233.445 95', 'Invalid SNILS (13 characters).'];
         yield 'empty' => ['', 'Invalid SNILS (0 characters).'];
+        yield 'pasted several times' => [\str_repeat('112-233-445 95 ', 4), 'Invalid SNILS (too long).'];
     }
 
     #[DataProvider('invalidNumbers')]

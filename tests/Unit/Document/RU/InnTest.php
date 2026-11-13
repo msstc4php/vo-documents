@@ -52,11 +52,11 @@ final class InnTest extends TestCase
         self::assertSame($expected, $inn->jsonSerialize());
     }
 
-    public function testExposesRegionCodeFormatsAndMasks(): void
+    public function testExposesTaxAuthorityRegionCodeFormatsAndMasks(): void
     {
         $inn = Inn::from('500100732259');
 
-        self::assertSame('50', $inn->regionCode());
+        self::assertSame('50', $inn->taxAuthorityRegionCode());
         self::assertSame('500100732259', $inn->formatted());
         self::assertSame('********2259', $inn->masked());
     }

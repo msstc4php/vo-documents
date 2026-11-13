@@ -23,6 +23,8 @@ use Override;
  */
 final class PassportIssuingUnitCode extends AbstractStringValueObject implements Maskable
 {
+    private const string DOCUMENT = 'Russian passport issuing unit code';
+
     /**
      * @return non-empty-string
      */
@@ -40,6 +42,6 @@ final class PassportIssuingUnitCode extends AbstractStringValueObject implements
     #[Override]
     protected function parse(string $value): string
     {
-        return Digits::exactly($value, 6, 'Russian passport issuing unit code');
+        return Digits::exactly($value, 6, self::DOCUMENT);
     }
 }

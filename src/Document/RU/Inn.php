@@ -28,14 +28,13 @@ final class Inn extends AbstractStringValueObject implements Maskable
     private const string DOCUMENT = 'INN';
 
     /**
-     * NN: the code of the FNS directorate of the constituent entity where the INN was assigned (FNS Order
-     * ЕД-7-14/559@ §3). In an INN assigned before 2026 (Order ММВ-7-6/435@) the first four digits are the code of the
-     * assigning tax office, and its first two digits are the code of the constituent entity in the FNS code list.
-     * This is an FNS code, not an ISO 3166-2 code.
+     * The first two digits: the region code of the FNS territorial body (since 2026 "код управления ФНС России по
+     * субъекту", FNS Order ЕД-7-14/559@ §3; before, the first two digits of the assigning tax office's code). An FNS
+     * code, not an ISO 3166-2 code.
      *
      * @return non-empty-string two digits
      */
-    public function regionCode(): string
+    public function taxAuthorityRegionCode(): string
     {
         return Digits::nonEmpty(\substr($this->value, 0, 2));
     }
@@ -60,14 +59,14 @@ final class Inn extends AbstractStringValueObject implements Maskable
         $digits = Digits::exactly($value, 12, self::DOCUMENT);
 
         if ($digits === '000000000000') {
-            throw new InvalidDocumentNumberException('Invalid INN (zeros only).');
+            throw new InvalidDocumentNumberException(\sprintf('Invalid %s (zeros only).', self::DOCUMENT));
         }
 
         $first = Checksum::weightedMod(\substr($digits, 0, 10), [7, 2, 4, 10, 3, 5, 9, 4, 6, 8], 11) % 10;
         $second = Checksum::weightedMod(\substr($digits, 0, 11), [3, 7, 2, 4, 10, 3, 5, 9, 4, 6, 8], 11) % 10;
 
         if (\substr($digits, 10) !== $first . $second) {
-            throw new InvalidDocumentNumberException('Invalid INN checksum.');
+            throw new InvalidDocumentNumberException(\sprintf('Invalid %s checksum.', self::DOCUMENT));
         }
 
         return $digits;

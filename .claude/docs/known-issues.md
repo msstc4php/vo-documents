@@ -28,9 +28,11 @@
 - **INN control-digit weights have no official text**: FNS Order ЕД-7-14/559@ only says the control number is computed
   "по алгоритму, определенному ФНС". `Document\RU\Inn` uses the universally described weights (RU.md "INN").
 - **INN digits 3-4 changed meaning on 2026-01-01** (Order ЕД-7-14/559@): NN = FNS directorate, YY = FNS index, so there is
-  no `taxOfficeCode()`; `Inn::regionCode()` returns digits 1-2.
+  no `taxOfficeCode()`; `Inn::taxAuthorityRegionCode()` returns digits 1-2.
 - **HL7 Mod10 (OMS policy, FFOMS Order 79) is Luhn**: doubling the odd-position number has the same digit sum as
   doubling each digit; `OmsPolicyNumber` uses `Checksum::luhn()` over all 16 digits.
 - `Checksum` refuses `''` (was accepted before task 5: `luhn('')` returned true).
 - Equivalent mutants in number formatting: give the last `substr()` no length (`substr($v, 9)`), otherwise
   `substr($v, 9, 3)` mutants escape on a fixed-length value.
+- **www.ffoms.gov.ru fails TLS verification** (curl error 60) from this environment: FFOMS sources are cited by URL and
+  quoted from legalacts.ru copies.

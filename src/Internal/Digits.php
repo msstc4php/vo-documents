@@ -14,6 +14,11 @@ final class Digits
 {
     public const string SEPARATORS = " -\t\r\n\u{00A0}\u{2007}\u{202F}";
 
+    /**
+     * Above this the message says "too long": a count of 100 or more would be a three-digit run.
+     */
+    public const int MAX_REPORTED_LENGTH = 40;
+
     public static function strip(string $input, string $separators = self::SEPARATORS): string
     {
         $characters = \mb_str_split($separators);
@@ -29,17 +34,19 @@ final class Digits
      *
      * @return non-empty-string
      *
-     * @throws InvalidDocumentNumberException with the document name and the character count only
+     * @throws InvalidDocumentNumberException with the document name and the character count (or "too long") only
      */
     public static function exactly(string $input, int $length, string $document): string
     {
         $digits = self::strip($input);
 
-        if ($digits === '' || \preg_match('/^[0-9]{' . $length . '}$/D', $digits) !== 1) {
-            throw new InvalidDocumentNumberException(\sprintf('Invalid %s (%d characters).', $document, \mb_strlen($digits, 'UTF-8')));
+        if (\preg_match('/^[0-9]{' . $length . '}$/D', $digits) !== 1) {
+            $count = \mb_strlen($digits, 'UTF-8');
+
+            throw new InvalidDocumentNumberException($count > self::MAX_REPORTED_LENGTH ? \sprintf('Invalid %s (too long).', $document) : \sprintf('Invalid %s (%d characters).', $document, $count));
         }
 
-        return $digits;
+        return self::nonEmpty($digits);
     }
 
     /**

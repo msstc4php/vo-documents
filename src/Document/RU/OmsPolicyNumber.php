@@ -19,11 +19,18 @@ use Override;
  * (series and number, issued before 2011) are not this value object. `masked()` keeps the last four digits (no
  * official masking rule): `************3453`.
  *
- * @see docs/sources/RU.md "OMS policy" — FFOMS Order of 07.04.2011 No. 79 "Общие принципы построения и
- *      функционирования информационных систем и порядок информационного взаимодействия в сфере ОМС", table 8, note 1
+ * The 16-digit length is not stated in the text of either act read (only an FFOMS news page says "из 16 цифр"); it is
+ * the plan's value, see RU.md.
+ *
+ * @see https://www.ffoms.gov.ru/upload/iblock/56d/56d1f4edbcb3a5d37d20328a012d4e17.pdf FFOMS Order of 07.04.2011
+ *      No. 79 (as amended 05.03.2020), register data table, note 1 (not reachable from the build environment; quoted
+ *      from an aggregator copy in RU.md)
+ * @see docs/sources/RU.md "OMS policy"
  */
 final class OmsPolicyNumber extends AbstractStringValueObject implements Maskable
 {
+    private const string DOCUMENT = 'OMS policy number';
+
     /**
      * @return non-empty-string
      */
@@ -41,10 +48,10 @@ final class OmsPolicyNumber extends AbstractStringValueObject implements Maskabl
     #[Override]
     protected function parse(string $value): string
     {
-        $digits = Digits::exactly($value, 16, 'OMS policy number');
+        $digits = Digits::exactly($value, 16, self::DOCUMENT);
 
         if (!Checksum::luhn($digits)) {
-            throw new InvalidDocumentNumberException('Invalid OMS policy number checksum.');
+            throw new InvalidDocumentNumberException(\sprintf('Invalid %s checksum.', self::DOCUMENT));
         }
 
         return $digits;

@@ -23,6 +23,8 @@ use Override;
  */
 final class InternalPassportNumber extends AbstractStringValueObject implements Maskable
 {
+    private const string DOCUMENT = 'Russian internal passport number';
+
     /**
      * @return non-empty-string four digits
      */
@@ -56,6 +58,6 @@ final class InternalPassportNumber extends AbstractStringValueObject implements 
     #[Override]
     protected function parse(string $value): string
     {
-        return Digits::exactly($value, 10, 'Russian internal passport number');
+        return Digits::exactly($value, 10, self::DOCUMENT);
     }
 }

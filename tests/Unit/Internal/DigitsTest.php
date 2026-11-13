@@ -51,6 +51,20 @@ final class DigitsTest extends TestCase
         Digits::exactly('123', 4, 'test number');
     }
 
+    public function testExactlyReportsTheCountUpToTheCap(): void
+    {
+        $this->expectExceptionMessage('Invalid test number (40 characters).');
+
+        Digits::exactly(\str_repeat('1', 40), 4, 'test number');
+    }
+
+    public function testExactlySaysTooLongAboveTheCap(): void
+    {
+        $this->expectExceptionMessage('Invalid test number (too long).');
+
+        Digits::exactly(\str_repeat('1', 41), 4, 'test number');
+    }
+
     public function testExactlyCountsMultibyteCharactersOnce(): void
     {
         $this->expectExceptionMessage('Invalid test number (4 characters).');
