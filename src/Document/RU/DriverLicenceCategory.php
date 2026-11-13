@@ -9,8 +9,7 @@ namespace MSSTC4PHP\ValueObject\Documents\Document\RU;
  * C1, D, D1, BE, CE, C1E, DE, D1E, M, Tm, Tb". The values are the Latin designations printed on the licence.
  *
  * @see docs/sources/RU.md "Driving licence" — MVD Order of 13.05.2009 No. 365 (cited by number, predates the portal),
- *      appendix 1, section 9; Federal Law of
- *      10.12.1995 No. 196-FZ, Art. 25 §1
+ *      appendix 1, section 9; Federal Law of 10.12.1995 No. 196-FZ, Art. 25 §1
  */
 enum DriverLicenceCategory: string
 {

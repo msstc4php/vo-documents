@@ -5,10 +5,13 @@ declare(strict_types=1);
 namespace MSSTC4PHP\ValueObject\Documents\Tests\Unit\Internal;
 
 use MSSTC4PHP\ValueObject\Documents\Internal\Mask;
+use MSSTC4PHP\ValueObject\Documents\Internal\Text;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(Mask::class)]
+#[UsesClass(Text::class)]
 final class MaskTest extends TestCase
 {
     public function testKeepLastDigitsKeepsSeparatorsInPlace(): void

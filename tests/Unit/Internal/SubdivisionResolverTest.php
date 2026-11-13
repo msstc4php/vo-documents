@@ -52,6 +52,7 @@ final class SubdivisionResolverTest extends TestCase
             'Test licence',
             [TestSubdivision::Vic, TestSubdivision::Nsw],
             static fn (TestSubdivision $subdivision, string $number): PackageString => PackageString::from($number),
+            static fn (TestSubdivision $subdivision, string $number): bool => true,
         );
 
         try {
@@ -66,12 +67,27 @@ final class SubdivisionResolverTest extends TestCase
         self::fail('Expected an AmbiguousJurisdictionException.');
     }
 
-    public function testRefusesANumberValidNowhereWithItsLength(): void
+    public function testRefusesANumberValidNowhereWithItsLengthWhenNoSubdivisionHasThatLength(): void
     {
         $this->expectException(InvalidDocumentNumberException::class);
         $this->expectExceptionMessage('Invalid Test licence number (3 characters).');
 
         $this->resolver()->resolve(' X-12 ');
+    }
+
+    public function testRefusesANumberValidNowhereAsAnInvalidCharacterWhenALengthFits(): void
+    {
+        $this->expectException(InvalidDocumentNumberException::class);
+        $this->expectExceptionMessage('Invalid Test licence number (invalid character).');
+
+        $this->resolver()->resolve('X-1234');
+    }
+
+    public function testTheLengthIsCheckedForEverySubdivision(): void
+    {
+        $this->expectExceptionMessage('Invalid Test licence number (invalid character).');
+
+        $this->resolver()->resolve('X-12345');
     }
 
     /**
@@ -88,6 +104,9 @@ final class SubdivisionResolverTest extends TestCase
 
                 return \str_contains($number, $letter) ? PackageString::from($subdivision->name . ':' . $number) : null;
             },
+            // Nsw takes 5 characters, Vic 6, after the separators are removed.
+            static fn (TestSubdivision $subdivision, string $number): bool => \strlen(Digits::strip($number))
+                === ($subdivision === TestSubdivision::Nsw ? 5 : 6),
         );
     }
 }

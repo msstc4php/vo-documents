@@ -120,7 +120,8 @@ final class DriverLicenceNumberFactoryTest extends TestCase
     public static function numbersValidNowhere(): iterable
     {
         yield 'eleven digits' => ['12345678901', 'Invalid Australian driver licence number (11 characters).'];
-        yield 'nine characters with a letter' => ['A12-345-678', 'Invalid Australian driver licence number (9 characters).'];
+        yield 'nine characters with a letter, a length some jurisdiction has' => ['A12-345-678', 'Invalid Australian driver licence number (invalid character).'];
+        yield 'punctuation at a length every format allows' => ['12345.78', 'Invalid Australian driver licence number (invalid character).'];
         yield 'empty' => ['', 'Invalid Australian driver licence number (0 characters).'];
         yield 'pasted several times' => [\str_repeat('1234567890 ', 5), 'Invalid Australian driver licence number (too long).'];
     }

@@ -41,9 +41,7 @@ final readonly class NumberFormat
     public function parse(string $input, string $document): string
     {
         $normalized = \strtoupper(Digits::strip($input));
-        $length = \mb_strlen($normalized, 'UTF-8');
-
-        if ($length < $this->minLength || $length > $this->maxLength) {
+        if (!$this->fitsLength($normalized)) {
             throw Digits::invalidLength($normalized, $document);
         }
 
@@ -52,5 +50,15 @@ final readonly class NumberFormat
         }
 
         return Text::nonEmpty($normalized);
+    }
+
+    /**
+     * Whether `$input`, with the separators removed, has a length this format allows.
+     */
+    public function fitsLength(string $input): bool
+    {
+        $length = \mb_strlen(Digits::strip($input), 'UTF-8');
+
+        return $length >= $this->minLength && $length <= $this->maxLength;
     }
 }

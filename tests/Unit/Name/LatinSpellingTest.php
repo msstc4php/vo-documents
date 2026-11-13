@@ -39,49 +39,69 @@ final class LatinSpellingTest extends TestCase
         self::assertNull(LatinSpelling::find(IcaoPersonName::from('RIMSKII<<KORSAKOV<ANNA<MARIIA'), $forms));
     }
 
-    public function testExactlyTheCapIsSearched(): void
+    public function testAPartWithExactlyTheCapIsSearched(): void
     {
-        $forms = [[$this->variants(64), $this->variants(64)]];
+        $variants = $this->variants(LatinSpelling::MAX_SPELLINGS);
+        $last = $variants[\count($variants) - 1];
 
-        self::assertSame('BL<<BL', LatinSpelling::find(IcaoPersonName::from('BL<<BL'), $forms)?->value);
+        self::assertSame($last . '<<BA', LatinSpelling::find(IcaoPersonName::from($last . '<<BA'), [[$variants, ['BA']]])?->value);
     }
 
-    public function testOneFormAboveTheCapIsRefused(): void
+    public function testAPartAboveTheCapIsRefused(): void
     {
         $this->expectException(InvalidPersonNameException::class);
         $this->expectExceptionMessage('Invalid personal name (too many transliteration variants).');
 
-        LatinSpelling::find(IcaoPersonName::from('BA<<BA'), [[$this->variants(64), $this->variants(65)]]);
+        LatinSpelling::find(IcaoPersonName::from('BA<<BA'), [[['BA'], $this->variants(LatinSpelling::MAX_SPELLINGS + 1)]]);
     }
 
-    public function testFormsTogetherAboveTheCapAreRefused(): void
+    public function testAPartAboveTheCapInALaterFormIsRefused(): void
     {
         $this->expectException(InvalidPersonNameException::class);
 
-        LatinSpelling::find(
-            IcaoPersonName::from('BA<<BA'),
-            [[$this->variants(64), $this->variants(32)], [$this->variants(64), $this->variants(32)], [['BA'], ['BA']]],
-        );
+        LatinSpelling::find(IcaoPersonName::from('BA<<BA'), [[['BA'], ['BA']], [$this->variants(LatinSpelling::MAX_SPELLINGS + 1)]]);
     }
 
-    public function testAHugeFormDoesNotOverflowTheCount(): void
+    public function testPartsWhoseProductIsFarAboveTheCapAreMatchedPartByPart(): void
     {
-        $this->expectException(InvalidPersonNameException::class);
+        $variants = $this->variants(LatinSpelling::MAX_SPELLINGS);
+        $last = $variants[\count($variants) - 1];
+        $forms = [[$variants, $variants, $variants]];
 
-        LatinSpelling::find(IcaoPersonName::from('BA<<BA'), [[$this->variants(4097), ['BA'], ['BA']]]);
+        self::assertSame($last . '<<' . $last . '<' . $last, LatinSpelling::find(IcaoPersonName::from($last . '<<' . $last . '<' . $last), $forms)?->value);
+        self::assertNull(LatinSpelling::find(IcaoPersonName::from($last . '<<' . $last . '<A'), $forms));
+    }
+
+    public function testTheWordsOfTheSecondaryIdentifiersMustFitTheParts(): void
+    {
+        $forms = [[['SMITH'], ['ANNA MARIA'], ['JO']]];
+
+        self::assertSame('SMITH<<ANNA<MARIA<JO', LatinSpelling::find(IcaoPersonName::from('SMITH<<ANNA<MARIA<JO'), $forms)?->value);
+        self::assertNull(LatinSpelling::find(IcaoPersonName::from('SMITH<<ANNA<MARIA'), $forms));
+        self::assertNull(LatinSpelling::find(IcaoPersonName::from('SMITH<<ANNA<MARIA<JO<JO'), $forms));
+        self::assertNull(LatinSpelling::find(IcaoPersonName::from('SMITH'), $forms));
+        self::assertNull(LatinSpelling::find(IcaoPersonName::from('SMITH<<JO'), [[['SMITH']]]));
+        self::assertSame('SMITH', LatinSpelling::find(IcaoPersonName::from('smith'), [[['SMITH']]])?->value);
+    }
+
+    public function testVariantsAreComparedInUpperCase(): void
+    {
+        self::assertSame('VAN<DER<BERG<<ANN', LatinSpelling::find(IcaoPersonName::from('VAN<DER<BERG<<ANN'), [[['van der Berg'], ['Ann']]])?->value);
     }
 
     /**
      * @param positive-int $count
      *
-     * @return non-empty-list<non-empty-string> distinct two-character spellings: BA, BB, …, BZ, CA, …
+     * @return non-empty-list<non-empty-string> distinct spellings: BAAA, BAAB, …, BAAZ, BABA, …
      */
     private function variants(int $count): array
     {
-        $variants = ['BA'];
-        for ($i = 1; $i < $count; $i++) {
-            $variants[] = \chr(66 + intdiv($i, 26)) . \chr(65 + $i % 26);
+        $variants = [];
+        for ($i = 0; $i < $count; $i++) {
+            $variants[] = 'B' . \chr(65 + intdiv($i, 676) % 26) . \chr(65 + intdiv($i, 26) % 26) . \chr(65 + $i % 26);
         }
+
+        \assert($variants !== []);
 
         return $variants;
     }

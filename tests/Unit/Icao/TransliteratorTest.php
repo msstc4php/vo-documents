@@ -61,6 +61,9 @@ final class TransliteratorTest extends TestCase
         yield 'ASCII is upper-cased' => ['Rimsky-Korsakov', 'RIMSKY-KORSAKOV'];
         yield 'whitespace normalised' => ["  van\u{00A0}der\tBerg ", 'VAN DER BERG'];
         yield 'decomposed input' => ["Андреи\u{0306}", 'ANDREI'];
+        yield 'Ễ U+1EC4 outside table 6.A is its base letter' => ['Nguyễn', 'NGUYEN'];
+        yield 'Ș U+0218 and Ț U+021A (comma below) are S and T' => ['Ștefan Țurcanu', 'STEFAN TURCANU'];
+        yield 'Ǿ U+01FE has the table letter Ø as its base' => ['Ǿ', 'OE'];
     }
 
     /**
@@ -96,6 +99,7 @@ final class TransliteratorTest extends TestCase
         self::assertSame(['AABERG', 'ABERG'], $this->transliterator->variants('Åberg'));
         self::assertSame(['SOEDER', 'SODER'], $this->transliterator->variants('Söder'));
         self::assertSame(['HAEN', 'HAN'], $this->transliterator->variants('Hän'));
+        self::assertSame(['NGUYEN'], $this->transliterator->variants('Nguyễn'));
     }
 
     /**
@@ -112,6 +116,8 @@ final class TransliteratorTest extends TestCase
         yield 'modifier letter apostrophe U+02BC' => ["O\u{02BC}Brien", self::UNCOVERED];
         yield 'other punctuation' => ['O.Brien', self::UNCOVERED];
         yield 'Ћ U+040B is not in table 6.B' => ['Ћирић', self::UNCOVERED];
+        yield 'Ƒ U+0191 has no base letter' => ['ƒred', self::UNCOVERED];
+        yield 'Ʒ U+01B7 (ezh) has no base letter' => ['Ʒ', self::UNCOVERED];
         yield 'empty' => ['', self::EMPTY];
         yield 'blank' => [" \t ", self::EMPTY];
         yield 'separators only' => [' - ', self::EMPTY];

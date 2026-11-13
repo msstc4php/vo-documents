@@ -12,75 +12,117 @@ use MSSTC4PHP\ValueObject\Documents\Icao\PersonName as IcaoPersonName;
  * equivalent (the MRZ writes RIMSKII-KORSAKOV as RIMSKII<KORSAKOV); the match is returned in the canonical form of
  * the national name.
  *
+ * The override is split into one group per part (the primary identifier, then as many words per secondary part as
+ * that part has) and each group is looked up among its own part's variants, so the work is the sum of the variant
+ * counts, not their product.
+ *
  * @internal
  */
 final class LatinSpelling
 {
-    /** Bounds the spellings tried for untrusted input, as Icao\Transliterator::variants() does. */
+    /** Bounds the variants of one part for untrusted input, as Icao\Transliterator::variants() does. */
     public const int MAX_SPELLINGS = 4096;
 
     /**
-     * Each accepted form lists the variants of the primary identifier, then of each secondary identifier.
+     * Each accepted form lists the variants of the primary identifier, then of each secondary part; all variants of
+     * a part have the same words (only letters differ).
      *
      * @param non-empty-list<non-empty-list<non-empty-list<non-empty-string>>> $forms
      *
-     * @throws InvalidPersonNameException when the forms have more than {@see self::MAX_SPELLINGS} spellings
+     * @throws InvalidPersonNameException when a part has more than {@see self::MAX_SPELLINGS} variants
      */
     public static function find(IcaoPersonName $latin, array $forms): ?IcaoPersonName
     {
-        $count = 0;
         foreach ($forms as $form) {
-            $product = 1;
             foreach ($form as $variants) {
-                $product *= \count($variants);
-            }
-
-            $count += $product;
-            if ($count > self::MAX_SPELLINGS) {
-                throw new InvalidPersonNameException('Invalid personal name (too many transliteration variants).');
+                if (\count($variants) > self::MAX_SPELLINGS) {
+                    throw new InvalidPersonNameException('Invalid personal name (too many transliteration variants).');
+                }
             }
         }
 
-        $wanted = self::mrzEquivalent($latin->value);
+        $identifiers = \explode('<<', self::mrzEquivalent($latin->value));
         foreach ($forms as $form) {
-            $secondaries = self::combinations(\array_slice($form, 1));
-            foreach ($form[0] as $primary) {
-                foreach ($secondaries as $secondary) {
-                    $candidate = IcaoPersonName::fromParts($primary, $secondary);
-                    if (self::mrzEquivalent($candidate->value) === $wanted) {
-                        return $candidate;
-                    }
-                }
+            $match = self::match($identifiers, $form);
+            if ($match !== null) {
+                return IcaoPersonName::fromParts($match[0], \array_slice($match, 1));
             }
         }
 
         return null;
     }
 
-    private static function mrzEquivalent(string $canonical): string
+    /**
+     * @param non-empty-list<string> $identifiers the override's primary and, if any, secondary identifiers
+     * @param non-empty-list<non-empty-list<non-empty-string>> $form
+     *
+     * @return non-empty-list<non-empty-string>|null the matching variant of each part
+     */
+    private static function match(array $identifiers, array $form): ?array
     {
-        return \str_replace('-', '<', $canonical);
+        $groups = self::groups($identifiers, $form);
+        if ($groups === null) {
+            return null;
+        }
+
+        $match = [];
+        foreach ($form as $index => $variants) {
+            $variant = self::variantSpelled($groups[$index], $variants);
+            if ($variant === null) {
+                return null;
+            }
+
+            $match[] = $variant;
+        }
+
+        return $match;
     }
 
     /**
-     * @param list<non-empty-list<non-empty-string>> $identifiers
+     * @param non-empty-list<string> $identifiers
+     * @param non-empty-list<non-empty-list<non-empty-string>> $form
      *
-     * @return list<list<non-empty-string>>
+     * @return non-empty-list<string>|null the override's MRZ text for each part, null when the words do not fit
      */
-    private static function combinations(array $identifiers): array
+    private static function groups(array $identifiers, array $form): ?array
     {
-        $combinations = [[]];
-        foreach ($identifiers as $variants) {
-            $next = [];
-            foreach ($combinations as $prefix) {
-                foreach ($variants as $variant) {
-                    $next[] = [...$prefix, $variant];
-                }
-            }
-
-            $combinations = $next;
+        $secondaryParts = \array_slice($form, 1);
+        if (\count($identifiers) !== ($secondaryParts === [] ? 1 : 2)) {
+            return null;
         }
 
-        return $combinations;
+        $groups = [$identifiers[0]];
+        $words = \explode('<', $identifiers[1] ?? '');
+        foreach ($secondaryParts as $variants) {
+            $groups[] = \implode('<', \array_splice($words, 0, \substr_count(self::key($variants[0]), '<') + 1));
+        }
+
+        return $secondaryParts === [] || $words === [] ? $groups : null;
+    }
+
+    /**
+     * @param non-empty-list<non-empty-string> $variants
+     *
+     * @return non-empty-string|null
+     */
+    private static function variantSpelled(string $group, array $variants): ?string
+    {
+        foreach ($variants as $variant) {
+            if (self::key($variant) === $group) {
+                return $variant;
+            }
+        }
+
+        return null;
+    }
+
+    private static function key(string $variant): string
+    {
+        return self::mrzEquivalent(\str_replace(' ', '<', \strtoupper($variant)));
+    }
+
+    private static function mrzEquivalent(string $canonical): string
+    {
+        return \str_replace('-', '<', $canonical);
     }
 }

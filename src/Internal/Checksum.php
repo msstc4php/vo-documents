@@ -11,7 +11,7 @@ use LogicException;
  *
  * Every method expects at least one ASCII digit and nothing else, and throws \LogicException otherwise.
  *
- * Sources: ISO/IEC 7812-1 (Luhn), ISO/IEC 7064:2003 (MOD 97-10, MOD 11-2)
+ * Sources: ISO/IEC 7812-1 (Luhn), ISO/IEC 7064:2003 (MOD 11-2)
  */
 final class Checksum
 {
@@ -56,22 +56,10 @@ final class Checksum
         return $sum % $modulus;
     }
 
-    public static function mod97(string $digits): int
-    {
-        self::assertDigits($digits);
-
-        $remainder = 0;
-        for ($i = 0, $length = \strlen($digits); $i < $length; $i++) {
-            $remainder = ($remainder * 10 + (int) $digits[$i]) % 97;
-        }
-
-        return $remainder;
-    }
-
     /**
      * @return non-empty-string the check character, 0-9 or X
      */
-    public static function iso7064Mod11_2(string $digits): string
+    public static function iso7064Mod11Dash2(string $digits): string
     {
         self::assertDigits($digits);
 

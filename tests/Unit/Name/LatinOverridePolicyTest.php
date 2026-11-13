@@ -37,6 +37,16 @@ final class LatinOverridePolicyTest extends TestCase
         self::assertNull(new AnyIcaoSpelling()->resolve(null, IcaoPersonName::from('IVANOV<<IVAN')));
     }
 
+    public function testTheDerivedFormIsRecognisedBeforeTheSpellingsAreComputed(): void
+    {
+        $policy = new TransliterationVariant(
+            static fn (): never => throw new LogicException('The spellings were computed.'),
+            self::REFUSAL,
+        );
+
+        self::assertNull($policy->resolve(IcaoPersonName::from('MUELLER<SMITH<<ZOE'), IcaoPersonName::from('MUELLER-SMITH<<ZOE')));
+    }
+
     public function testAnyIcaoSpellingKeepsAnyOtherName(): void
     {
         $kept = new AnyIcaoSpelling()->resolve(IcaoPersonName::from('IVANOVA<<YULIYA'), IcaoPersonName::from('IVANOVA<<IULIIA'));

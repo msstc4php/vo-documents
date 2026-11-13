@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace MSSTC4PHP\ValueObject\Documents\Internal;
 
+use LogicException;
+
 /**
  * @internal
  */
@@ -27,11 +29,8 @@ final class Mask
             $formatted,
         );
 
-        if ($masked === null || $masked === '') {
-            return \str_repeat('*', \strlen($formatted));
-        }
-
-        return $masked;
+        // Replacing digits one for one keeps a non-empty string non-empty; null would be a PCRE failure.
+        return Text::nonEmpty($masked ?? throw new LogicException('Masking failed.'));
     }
 
     /**

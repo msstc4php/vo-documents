@@ -27,7 +27,9 @@ final class SubdivisionTest extends TestCase
     public static function subdivisionEnums(): iterable
     {
         $source = \dirname(__DIR__, 3) . '/src/';
-        $files = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($source, RecursiveDirectoryIterator::SKIP_DOTS));
+        $files = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator($source, RecursiveDirectoryIterator::SKIP_DOTS),
+        );
         foreach ($files as $file) {
             \assert($file instanceof SplFileInfo);
             if ($file->getExtension() !== 'php') {

@@ -22,3 +22,11 @@
 - INN, TFN and Medicare checksums have no public official text; implemented from the algorithm used in practice.
 - `DriverLicenceNumberFactory::fromNumber()` is always ambiguous for AU with the published formats; use `fromNumberIn()`.
 - Name parts are limited to 100 characters, `Icao\PersonName` to 255.
+- A Latin letter outside ICAO table 6.A is spelled as its base letter (`Nguyễn` → `NGUYEN`, `Ș` → `S`); compatibility
+  characters (fullwidth letters, `ª`, `Ĳ`) are refused in name parts.
+- Requires `msstc4php/vo-base ^1.1.1`.
+
+### Compatibility policy
+
+- Transliteration tables and Latin override rules change only in a major version: a stored override is validated
+  again on hydration, so a narrower table or rule would make stored names unreadable.

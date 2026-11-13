@@ -7,6 +7,7 @@ namespace MSSTC4PHP\ValueObject\Documents\Name;
 use MSSTC4PHP\ValueObject\Documents\Exception\InvalidPersonNameException;
 use MSSTC4PHP\ValueObject\Documents\Internal\UnicodeText;
 use MSSTC4PHP\ValueObject\Support\AbstractStringValueObject;
+use Normalizer;
 use Override;
 
 /**
@@ -14,6 +15,9 @@ use Override;
  * collapsed, letter case kept. Every word matches {@see word()} (by default letters of {@see letters()}); words are
  * joined by one of {@see innerSeparators()}, never two in a row. Where the apostrophe is a separator, U+2019 (’) is
  * stored as U+0027 (').
+ *
+ * A compatibility character (NFKC differs from NFC: fullwidth `Ｓｍｉｔｈ`, `ª`, the ligature `Ĳ`) is refused: it
+ * looks like another spelling of the same name, so two stored values would denote one person.
  */
 abstract class AbstractNamePart extends AbstractStringValueObject
 {
@@ -60,10 +64,17 @@ abstract class AbstractNamePart extends AbstractStringValueObject
             ? '/^' . $word . '$/u'
             : '/^' . $word . '(?:[' . \preg_quote($separators, '/') . ']' . $word . ')*$/u';
 
-        if (\mb_strlen($normalized) > self::MAX_LENGTH || \preg_match($pattern, $normalized) !== 1) {
-            $message = \sprintf('Invalid %s (%d characters).', $this->label(), \mb_strlen($normalized));
+        $length = \mb_strlen($normalized, 'UTF-8');
+        if ($length === 0 || $length > self::MAX_LENGTH) {
+            throw new InvalidPersonNameException(\sprintf('Invalid %s (%d characters).', $this->label(), $length));
+        }
 
-            throw new InvalidPersonNameException($message);
+        if (Normalizer::normalize($normalized, Normalizer::FORM_KC) !== $normalized) {
+            throw new InvalidPersonNameException(\sprintf('Invalid %s (compatibility character).', $this->label()));
+        }
+
+        if (\preg_match($pattern, $normalized) !== 1) {
+            throw new InvalidPersonNameException(\sprintf('Invalid %s (invalid character).', $this->label()));
         }
 
         return $normalized;

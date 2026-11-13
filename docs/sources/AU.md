@@ -28,14 +28,18 @@ How the package applies this (designer's calls, no official character rule found
 | `GivenName` | `\p{Latin}` | hyphen, apostrophe, space | several given names (`Joan Catherine`), `Mary-Anne`, `D'Arcy` |
 
 - U+2019 (’) is stored as U+0027 ('), as for every part that allows the apostrophe (`AbstractNamePart`).
-- A Latin letter outside the ICAO table (e.g. `ƒ`) passes the part but is refused by `PersonName`, because it has no
-  ICAO spelling.
+- A Latin letter outside the ICAO table is spelled as its **base letter** (designer's call, `ICAO.md` "Letters outside
+  table 6.A"): `Nguyễn` → `NGUYEN`, Romanian `Ș`/`Ț` (comma below) → `S`/`T`. Without it such a name could never be
+  built, not even with an override. A letter with no base in the table (`ƒ`) passes the part but is refused by
+  `PersonName`, because it has no ICAO spelling.
+- A compatibility character (NFKC differs from NFC: fullwidth `Ｓｍｉｔｈ`, `ª`, the ligature `Ĳ`) is refused by the
+  part (`AbstractNamePart`, every country): it would be a second spelling of the same stored name.
 - **Derived Latin:** `FAMILY<<GIVEN` with the default spelling of each character (`Zoë` → `ZOE`,
   `Müller` → `MUELLER`); apostrophes are omitted (`O'Brien` → `OBRIEN`, ICAO Part 3 §4.6).
 - **Override** (policy `Name\TransliterationVariant`): a Latin form is accepted only when it is one of the ICAO
   spellings of the parts (`MULLER<<ZOE` for `Müller Zoë`); case, spaces next to `<`, MRZ padding and `<` for a hyphen
-  are normalised (`Name\LatinSpelling`, at most 4096 spellings, computed only when an override is given). An
-  override equal to the derived form is not kept. Unlike RU (any valid ICAO name, RU.md §4), a Latin-script name keeps
+  are normalised (`Name\LatinSpelling`, matched part by part, at most 4096 spellings per part, computed only when
+  the override is not the derived form). An override equal to the derived form is not kept. Unlike RU (any valid ICAO name, RU.md §4), a Latin-script name keeps
   this table rule: its Latin form is the name itself up to the table's spellings.
 - **Display order** (`full()`): given names then family name (`Joan Catherine Citizen`), the order of the passport
   application form and of the licences of every jurisdiction except the ACT, Northern Territory and Tasmania, which

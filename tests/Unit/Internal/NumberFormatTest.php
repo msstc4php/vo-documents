@@ -68,4 +68,14 @@ final class NumberFormatTest extends TestCase
     {
         self::assertSame('7', new NumberFormat('0-9', 1, 1)->parse('7', 'X'));
     }
+
+    public function testFitsLengthCountsCharactersAfterTheSeparatorsWithoutCheckingThem(): void
+    {
+        $format = new NumberFormat('0-9', 2, 3);
+
+        self::assertFalse($format->fitsLength('1'));
+        self::assertTrue($format->fitsLength('1-2'));
+        self::assertTrue($format->fitsLength("\u{00E9}b c"));
+        self::assertFalse($format->fitsLength('1234'));
+    }
 }

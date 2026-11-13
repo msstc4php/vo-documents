@@ -23,14 +23,14 @@ abstract readonly class LatinOverridePolicy
      */
     final public function resolve(?IcaoPersonName $override, IcaoPersonName $derived): ?IcaoPersonName
     {
-        if (!$override instanceof IcaoPersonName) {
+        // Same MRZ form (a hyphen written as a filler) means the same spelling; checked first, so the derived form is
+        // kept even for a name whose spellings are too many to list.
+        if (!$override instanceof IcaoPersonName
+            || \str_replace('-', '<', $override->value) === \str_replace('-', '<', $derived->value)) {
             return null;
         }
 
-        $spelling = $this->spelling($override);
-
-        // Same MRZ form (a hyphen written as a filler) means the same spelling.
-        return \str_replace('-', '<', $spelling->value) === \str_replace('-', '<', $derived->value) ? null : $spelling;
+        return $this->spelling($override);
     }
 
     /**

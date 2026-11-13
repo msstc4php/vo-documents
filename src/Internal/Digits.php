@@ -20,7 +20,7 @@ final class Digits
 
     public static function strip(string $input, string $separators = self::SEPARATORS): string
     {
-        $characters = \mb_str_split($separators);
+        $characters = \mb_str_split($separators, 1, 'UTF-8');
 
         return \str_replace($characters, '', $input);
     }

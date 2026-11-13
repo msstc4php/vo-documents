@@ -110,6 +110,31 @@ final class PersonNameTest extends TestCase
         self::assertSame(\str_repeat('AE', 13) . '<<ANN', $name->latin()->value);
     }
 
+    public function testTheDerivedFormOfANameWithTooManySpellingsIsAcceptedAsAnOverride(): void
+    {
+        $derived = \str_repeat('AE', 13) . '<<ANN';
+        $name = new PersonName(FamilyName::from(\str_repeat('Ä', 13)), GivenName::from('Ann'), IcaoPersonName::from($derived));
+
+        self::assertSame($derived, $name->latin()->value);
+        self::assertNull($name->latinOverride());
+    }
+
+    public function testPartsAreMatchedOneByOneSoTheirProductIsNotBounded(): void
+    {
+        // 3^7 spellings of the family name times 2 of the given name: above 4096 together, each part below it.
+        $name = new PersonName(FamilyName::from('Üüüüüüü'), GivenName::from('Ä'), IcaoPersonName::from('UXXUUEUUUU<<A'));
+
+        self::assertSame('UXXUUEUUUU<<A', $name->latinOverride()?->value);
+    }
+
+    public function testALatinLetterOutsideTheTableIsSpelledAsItsBaseLetter(): void
+    {
+        $name = new PersonName(FamilyName::from('Nguyễn'), GivenName::from('Ștefan Țurcanu'));
+
+        self::assertSame('NGUYEN<<STEFAN<TURCANU', $name->latin()->value);
+        self::assertNull(new PersonName(FamilyName::from('Nguyễn'), GivenName::from('Ana'), IcaoPersonName::from('NGUYEN<<ANA'))->latinOverride());
+    }
+
     public function testAnOverrideOfANameWithTooManySpellingsIsRefused(): void
     {
         $this->expectException(InvalidPersonNameException::class);

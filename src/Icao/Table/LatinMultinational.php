@@ -4,11 +4,17 @@ declare(strict_types=1);
 
 namespace MSSTC4PHP\ValueObject\Documents\Icao\Table;
 
+use Normalizer;
 use Override;
 
 /**
  * Doc 9303 Part 3 §6.A "Transliteration of Multinational Latin-based Characters", copied from docs/sources/ICAO.md.
  * Unaccented A-Z stand for themselves.
+ *
+ * A Latin letter missing from the table (`Ễ` in Nguyễn, Romanian `Ș` and `Ț` with comma below) is spelled as its base
+ * letter: canonical decomposition, combining marks dropped, then the table again. This fallback is the package's
+ * decision, not part of §6.A (docs/sources/ICAO.md "Letters outside table 6.A"); a letter with no base in the table
+ * (`Ƒ`) is still refused.
  *
  * @see https://www.icao.int/publications/Documents/9303_p3_cons_en.pdf ICAO Doc 9303 Part 3, 8th ed. (2021), §6.A
  *
@@ -126,10 +132,22 @@ final readonly class LatinMultinational implements TransliterationTable
     #[Override]
     public function spellings(string $character): ?array
     {
-        if (\str_contains(self::UNACCENTED, $character)) {
-            return [$character];
+        return self::TABLE[$character] ?? $this->baseLetterSpellings($character);
+    }
+
+    /**
+     * An unaccented A-Z is its own base letter.
+     *
+     * @return non-empty-list<non-empty-string>|null
+     */
+    private function baseLetterSpellings(string $character): ?array
+    {
+        $decomposed = Normalizer::normalize($character, Normalizer::FORM_D);
+        $base = \preg_replace('/\p{Mn}/u', '', \is_string($decomposed) ? $decomposed : '') ?? '';
+        if (\strlen($base) === 1 && \str_contains(self::UNACCENTED, $base)) {
+            return [$base];
         }
 
-        return self::TABLE[$character] ?? null;
+        return self::TABLE[$base] ?? null;
     }
 }

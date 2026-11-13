@@ -128,7 +128,7 @@ final readonly class PersonName implements NationalPersonName
         $words = [];
         foreach (\explode(' ', $part->value) as $word) {
             $words[] = \implode('-', \array_map(
-                static fn (string $piece): string => \mb_substr($piece, 0, 1) . '.',
+                static fn (string $piece): string => \mb_substr($piece, 0, 1, 'UTF-8') . '.',
                 \explode('-', $word),
             ));
         }

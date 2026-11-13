@@ -69,11 +69,11 @@ final class NamePartsTest extends TestCase
      */
     public static function invalidGivenNames(): iterable
     {
-        yield 'Cyrillic' => ['Иван', 'Invalid Australian given name (4 characters).'];
-        yield 'Latin with a Cyrillic look-alike' => ['Jоhn', 'Invalid Australian given name (4 characters).'];
-        yield 'digit' => ['John2', 'Invalid Australian given name (5 characters).'];
-        yield 'leading hyphen' => ['-John', 'Invalid Australian given name (5 characters).'];
-        yield 'two separators in a row' => ["Mary-'Anne", 'Invalid Australian given name (10 characters).'];
+        yield 'Cyrillic' => ['Иван', 'Invalid Australian given name (invalid character).'];
+        yield 'Latin with a Cyrillic look-alike' => ['Jоhn', 'Invalid Australian given name (invalid character).'];
+        yield 'digit' => ['John2', 'Invalid Australian given name (invalid character).'];
+        yield 'leading hyphen' => ['-John', 'Invalid Australian given name (invalid character).'];
+        yield 'two separators in a row' => ["Mary-'Anne", 'Invalid Australian given name (invalid character).'];
         yield 'empty' => ['', 'Invalid Australian given name (0 characters).'];
     }
 
@@ -89,7 +89,7 @@ final class NamePartsTest extends TestCase
     public function testFamilyNameRefusesCyrillic(): void
     {
         $this->expectException(InvalidPersonNameException::class);
-        $this->expectExceptionMessage('Invalid Australian family name (6 characters).');
+        $this->expectExceptionMessage('Invalid Australian family name (invalid character).');
 
         FamilyName::from('Иванов');
     }

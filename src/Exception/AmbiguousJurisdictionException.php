@@ -8,6 +8,8 @@ use MSSTC4PHP\ValueObject\Documents\Contract\Subdivision;
 use MSSTC4PHP\ValueObject\Exception\InvalidValueObjectException;
 
 /**
+ * An input error like any other: the bare number is not a valid input for a factory's `fromNumber()`.
+ *
  * @template TSubdivision of Subdivision
  */
 final class AmbiguousJurisdictionException extends InvalidValueObjectException

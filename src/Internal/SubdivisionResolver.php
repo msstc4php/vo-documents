@@ -25,11 +25,13 @@ final readonly class SubdivisionResolver
      * @param non-empty-string $document the document's name in exception messages, e.g. "Australian driver licence"
      * @param list<TSubdivision> $subdivisions in the order matches are reported
      * @param Closure(TSubdivision, string): ?TNumber $tryParse the subdivision's number, null if it does not fit
+     * @param Closure(TSubdivision, string): bool $fitsLength whether the number has a length the subdivision allows
      */
     public function __construct(
         private string $document,
         private array $subdivisions,
         private Closure $tryParse,
+        private Closure $fitsLength,
     ) {
     }
 
@@ -37,7 +39,8 @@ final readonly class SubdivisionResolver
      * @return TNumber
      *
      * @throws AmbiguousJurisdictionException<TSubdivision> when several subdivisions match, listed in the given order
-     * @throws InvalidDocumentNumberException when none matches
+     * @throws InvalidDocumentNumberException when none matches: "(invalid character)" when the length fits at least
+     *                                        one subdivision, otherwise the length
      */
     public function resolve(string $number): ValueObject
     {
@@ -48,7 +51,7 @@ final readonly class SubdivisionResolver
         }
 
         if ($matches === []) {
-            throw Digits::invalidLength(Digits::strip($number), $this->document . ' number');
+            throw $this->noMatch($number);
         }
 
         $subdivisions = \array_map(static fn (array $match): Subdivision => $match[0], $matches);
@@ -62,6 +65,18 @@ final readonly class SubdivisionResolver
     public function matching(string $number): array
     {
         return \array_map(static fn (array $match): Subdivision => $match[0], $this->parseAll($number));
+    }
+
+    private function noMatch(string $number): InvalidDocumentNumberException
+    {
+        $document = $this->document . ' number';
+        foreach ($this->subdivisions as $subdivision) {
+            if (($this->fitsLength)($subdivision, $number)) {
+                return new InvalidDocumentNumberException(\sprintf('Invalid %s (invalid character).', $document));
+            }
+        }
+
+        return Digits::invalidLength(Digits::strip($number), $document);
     }
 
     /**

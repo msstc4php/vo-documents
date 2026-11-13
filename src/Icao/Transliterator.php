@@ -96,7 +96,7 @@ final readonly class Transliterator
 
         $table = $this->tableFor($letters);
         $segments = [];
-        foreach (\mb_str_split(\mb_strtoupper($text)) as $character) {
+        foreach (\mb_str_split(\mb_strtoupper($text, 'UTF-8'), 1, 'UTF-8') as $character) {
             $spellings = $character === ' ' || $character === '-' ? [$character] : $table->spellings($character);
             if ($spellings === null) {
                 throw new InvalidPersonNameException(self::NO_SPELLING);

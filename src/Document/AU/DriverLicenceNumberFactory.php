@@ -28,7 +28,8 @@ final class DriverLicenceNumberFactory
 {
     /**
      * @throws AmbiguousJurisdictionException<Jurisdiction> when several jurisdictions match, listed in enum order
-     * @throws InvalidDocumentNumberException when none matches
+     * @throws InvalidDocumentNumberException when none matches: "(invalid character)" if the length fits a
+     *                                        jurisdiction, otherwise the length
      */
     public static function fromNumber(string $number): DriverLicenceNumber
     {
@@ -60,12 +61,18 @@ final class DriverLicenceNumberFactory
             'Australian driver licence',
             Jurisdiction::cases(),
             self::tryIn(...),
+            self::fitsLengthIn(...),
         );
     }
 
     private static function tryIn(Jurisdiction $jurisdiction, string $number): ?DriverLicenceNumber
     {
         return self::classFor($jurisdiction)::tryFrom($number);
+    }
+
+    private static function fitsLengthIn(Jurisdiction $jurisdiction, string $number): bool
+    {
+        return self::classFor($jurisdiction)::fitsLength($number);
     }
 
     /**

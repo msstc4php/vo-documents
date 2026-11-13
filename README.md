@@ -23,7 +23,8 @@ Not on Packagist yet; register the GitHub repositories:
 }
 ```
 
-Runtime requirements: `msstc4php/vo-base ^1.1`, `ext-mbstring`, `symfony/polyfill-intl-normalizer`. No framework.
+Runtime requirements: `msstc4php/vo-base ^1.1.1`, `ext-mbstring`, `symfony/polyfill-intl-normalizer`. No framework.
+vo-base 1.1.1 (the mapper no longer reports interfaces as supported) must be tagged before this package is released.
 
 ## Document numbers
 
@@ -60,6 +61,11 @@ last four digits, the AU classes keep three (their numbers are at most 10 charac
 | `Document\AU\DriverLicence\{Act,Nsw,Nt,Qld,Sa,Tas,Vic,Wa}DriverLicenceNumber` | Licence number per state or territory | shape only | Home Affairs DVS field rules |
 | `Document\AU\Jurisdiction` | The eight states and territories (enum, ISO 3166-2:AU) | n/a | ISO 3166-2:AU |
 
+Contracts: `Contract\Maskable` (every number above), `Contract\Subdivision` and `Contract\IssuedBySubdivision` (AU
+jurisdictions and licences). `Contract\HasBirthDate`, `Contract\HasSex` and the `Sex` enum are for documents that
+encode a birth date or sex in the number; no class of this release does, the first implementations come with the
+next countries (plan 2). They are public API, not leftovers.
+
 ### AU driving licences and the jurisdiction factory
 
 ```php
@@ -72,7 +78,10 @@ DriverLicenceNumberFactory::fromNumber('01234567');                             
 ```
 
 `fromNumber()` never picks one of several jurisdictions silently: it throws `AmbiguousJurisdictionException`, whose
-message lists the ISO codes in enum order, or `InvalidDocumentNumberException` when none fits. **With the formats
+message lists the ISO codes in enum order, or `InvalidDocumentNumberException` when none fits ("(invalid character)"
+when the length fits some jurisdiction, otherwise the length). `AmbiguousJurisdictionException` extends
+`InvalidValueObjectException` like every input error: the bare number is not a valid input for `fromNumber()`, so a
+caller that catches invalid input catches it too, and `jurisdictions()` tells which `fromNumberIn()` calls would work. **With the formats
 published today every valid number fits two or more jurisdictions, so `fromNumber()` always throws for AU**; use
 `fromNumberIn()` when the issuer is known (see `docs/sources/AU.md`).
 
@@ -81,7 +90,10 @@ published today every valid number fits two or more jurisdictions, so `fromNumbe
 A national name part (`Name\RU\FamilyName`, `GivenName`, `Patronymic`, `Name\AU\FamilyName`, `GivenName`) is
 NFC-normalised, trimmed, has inner whitespace runs collapsed to one space, and keeps its letter case. Limits: 100
 characters per part. Russian parts accept only the 33 Russian letters; a Cyrillic name typed with Latin look-alikes
-(Latin `a`, `o`, `e`, `c`) is refused.
+(Latin `a`, `o`, `e`, `c`) is refused. A compatibility character (its NFKC form differs: fullwidth `Ｓｍｉｔｈ`, `ª`,
+the ligatures `Ĳ` and `ﬁ`) is refused in every country, because it would be a second stored spelling of the same
+name. Messages say "(N characters)" for an empty or too long part, "(compatibility character)", or "(invalid
+character)" for a letter or separator that is not allowed where it stands.
 
 ```php
 use MSSTC4PHP\ValueObject\Documents\Icao\PersonName as IcaoPersonName;
@@ -116,6 +128,11 @@ spelling the table allows). Two rules that follow the sources, not the obvious g
   Latin in the passport.
 - The soft sign **Ь is omitted** (`Игорь` is `IGOR`): the ICAO table 6.B has no row for it, the MVD table has none
   either. The hard sign Ъ is `IE`.
+- A Latin letter **missing from table 6.A is spelled as its base letter** (`Nguyễn` is `NGUYEN`, Romanian `Ș`/`Ț` are
+  `S`/`T`): the package's fallback, not an ICAO rule (`docs/sources/ICAO.md`). A letter with no base in the table
+  (`ƒ`) is still refused.
+- Transliteration tables and override rules change **only in a major version**: a stored override is checked again
+  when it is read, so a narrower rule would make stored names unreadable.
 
 ### Canonical form and the override rule
 
@@ -243,8 +260,9 @@ Collected from the source notes; each is a deliberate omission with its reason i
   определенному ФНС"), the TFN weights (ATO gives them to registered developers only) and the Medicare check digit
   (ADHA appendix not reachable) are implemented from the algorithm used in practice. Each is flagged on its class and
   in the source note; blogs appear there only as "quoted from".
-- The 16-digit length of the OMS policy and the 2 + 7 split of the international passport number are not stated in
-  a text read (`RU.md`).
+- **Not verified against the official PDF:** the 16-digit length of the OMS policy and the FFOMS Order 79 text it is
+  checked against (www.ffoms.gov.ru is unreachable from here, the text is quoted from a copy), and the 2 + 7 split of
+  the international passport number (no text read states it; `RU.md`).
 - Name parts are limited to 100 characters, `Icao\PersonName` to 255 (a very long real name is refused).
 
 ## Development
