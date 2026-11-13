@@ -32,8 +32,10 @@ final class SocialSecurityNumberTest extends TestCase
     {
         yield 'Madrid-style province' => ['281234567840', '281234567840', '28'];
         yield 'first province' => ['010000000000', '010000000000', '01'];
-        yield 'last province' => ['569999999999', '569999999999', '56'];
-        yield 'slashes are not separators, spaces are' => ['28 12345678 40', '281234567840', '28'];
+        yield 'province above the AFI message range' => ['569999999999', '569999999999', '56'];
+        yield 'province 66' => ['661234567840', '661234567840', '66'];
+        yield 'province 00' => ['001234567840', '001234567840', '00'];
+        yield 'spaces between the fields' => ['28 12345678 40', '281234567840', '28'];
         yield 'NBSP and hyphen' => ["08\u{00A0}12345678-99", '081234567899', '08'];
     }
 
@@ -58,15 +60,10 @@ final class SocialSecurityNumberTest extends TestCase
      */
     public static function invalidNumbers(): iterable
     {
-        $province = 'Invalid Spanish social security number (invalid province code).';
-
         yield 'eleven digits' => ['28123456784', 'Invalid Spanish social security number (11 characters).'];
         yield 'thirteen digits' => ['2812345678401', 'Invalid Spanish social security number (13 characters).'];
         yield 'slashes' => ['28/12345678/40', 'Invalid Spanish social security number (14 characters).'];
         yield 'letter' => ['28123456784A', 'Invalid Spanish social security number (invalid character).'];
-        yield 'province 00' => ['001234567840', $province];
-        yield 'province 57' => ['571234567840', $province];
-        yield 'province 99' => ['991234567840', $province];
         yield 'empty' => ['', 'Invalid Spanish social security number (0 characters).'];
     }
 

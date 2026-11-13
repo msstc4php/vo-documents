@@ -53,12 +53,20 @@ final class DniTest extends TestCase
         self::assertSame($expected, $number->jsonSerialize());
     }
 
-    public function testEveryRemainderGivesItsLetter(): void
+    /**
+     * @return iterable<string, array{string}>
+     */
+    public static function everyRemainder(): iterable
     {
         foreach (\range(0, 22) as $remainder) {
-            $digits = \sprintf('%08d', 76_543_200 + $remainder);
-            self::assertSame(self::withLetter($digits), Dni::from(self::withLetter($digits))->value);
+            yield 'remainder ' . $remainder => [self::withLetter(\sprintf('%08d', 76_543_195 + $remainder))];
         }
+    }
+
+    #[DataProvider('everyRemainder')]
+    public function testEveryRemainderGivesItsLetter(string $number): void
+    {
+        self::assertSame($number, Dni::from($number)->value);
     }
 
     public function testMasks(): void

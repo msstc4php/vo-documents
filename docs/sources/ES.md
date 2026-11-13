@@ -130,12 +130,16 @@ la T, como código de verificación".)
 > Para el cálculo del dígito de control se sustituye: X → 0 Y → 1 Z → 2 y se aplica el mismo algoritmo que para el
 > NIF.
 
-**Check letter: verified.** Implemented: `X`, `Y` or `Z`, seven digits, the letter (`X1234567L`). Another initial letter
-"(invalid character)"; a wrong check letter "Invalid Spanish NIE checksum.". `masked()`: `*****567L`.
+**Check letter: verified** for the current layout. Implemented: `X`, `Y` or `Z`, seven digits, the letter
+(`X1234567L`). Another initial letter "(invalid character)"; a wrong check letter "Invalid Spanish NIE checksum.".
+`masked()`: `*****567L`. Initial letters after `Z` are not accepted: the Interior page lists only X, Y, Z.
 
-- **Not covered:** the pre-2008 layout `X` + eight digits + letter (ten characters). The Orden keeps those numbers
-  valid, but no official text gives their check algorithm (the Interior page speaks of seven digits), so a ten-character
-  NIE is refused as "(10 characters)". Initial letters after `Z` are not accepted: the Interior page lists only X, Y, Z.
+- **Pre-2008 layout, format only.** `X`, eight digits and a letter `A-Z` (ten characters, `X12345678Z`). The
+  transitoria única keeps these numbers valid, but no official text gives their check algorithm (the Interior page
+  speaks of seven digits, the 1997 figure only shows `T` as an illustration), so **the letter is not verified** and any
+  letter is accepted (controller ruling: refusing a valid old NIE is worse than accepting a wrong letter). Another
+  initial than `X`, a non-digit among the eight digits or a digit in last place is "(invalid character)".
+  `masked()`: `******678Z`.
 
 ## Número de la Seguridad Social (`Document\ES\SocialSecurityNumber`)
 
@@ -149,8 +153,9 @@ the Revista de la Seguridad Social: "El NUSS coincide con el Número de Afiliaci
 > 720 Provincia n..2 O 4 2 1..56
 > 730 Número n..10 O 6 10
 
-Implemented: twelve digits — the two-digit "Provincia" (positions 4-5 of the record, values `1..56`, written `01`-`56`)
-and the ten-digit "Número" (positions 6-15). A province outside `01`-`56` is "(invalid province code)".
+Implemented: twelve digits — the two-digit "Provincia" (positions 4-5 of the record) and the ten-digit "Número"
+(positions 6-15). **The province code is not range-checked** (controller ruling): the message's value list `1..56`
+describes what that message accepts, not every number ever issued, and real numbers with higher codes exist.
 `provinceCode()` returns the two digits as a string: the message gives no code table, so no `Subdivision` mapping.
 
 - **Format only; the check digits are not verified because no official algorithm is published.** The last two digits
@@ -185,7 +190,7 @@ The licence number is therefore a `Dni` or a `Nie`; no separate class.
 | Plan candidate | Source | Implemented |
 |---|---|---|
 | DNI | RD 255/2025, RD 1065/2007 art. 19, Ministerio del Interior page | `Dni`: 8 digits + letter, mod 23 letter verified |
-| NIE | Orden INT/2058/2008, Ministerio del Interior page | `Nie`: X/Y/Z + 7 digits + letter, verified; pre-2008 X + 8 digits not covered |
-| Número de afiliación a la Seguridad Social | TGSS Sistema RED AFI message | `SocialSecurityNumber`: 12 digits, province 01-56, **format only** |
+| NIE | Orden INT/2058/2008, Ministerio del Interior page | `Nie`: X/Y/Z + 7 digits + letter, verified; pre-2008 X + 8 digits + letter, **format only** |
+| Número de afiliación a la Seguridad Social | TGSS Sistema RED AFI message | `SocialSecurityNumber`: 12 digits, **format only** (no province range) |
 | Passport number | RD 896/2003 (no format), PRADO unreachable | **not covered** |
 | Driving licence number | RD 818/2009, convenio DGP–JCT 2024 | the DNI or NIE; no class |

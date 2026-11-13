@@ -8,8 +8,8 @@ namespace MSSTC4PHP\ValueObject\Documents\Document\ES;
  * The NIF/NIE check letter: the number divided by 23, the remainder replaced by the letter of the Interior ministry's
  * table.
  *
- * @see https://www.interior.gob.es/opencms/es/servicios-al-ciudadano/tramites-y-gestiones/dni/ Ministerio del
- *      Interior, "Cálculo del dígito de control del NIF/NIE" (full address in docs/sources/ES.md)
+ * @see https://www.interior.gob.es/opencms/es/servicios-al-ciudadano/tramites-y-gestiones/dni/calculo-del-digito-de-control-del-nif-nie/
+ *      Ministerio del Interior, "Cálculo del dígito de control del NIF/NIE"
  * @see docs/sources/ES.md "DNI"
  *
  * @internal

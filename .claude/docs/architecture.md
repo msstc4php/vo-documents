@@ -36,8 +36,8 @@ string), `LegacyIdentityCardNumber` (12-digit card issued until 2021; the 2021 c
 through lookup tables; year as two digits, `birthMonth()`/`birthDay()` ints, `birthPlaceCode()` string),
 `PassportNumber` (`AA9999999`). CIE and patente numbers are not covered. `Name\IT\*` mirrors `Name\DE\*`.
 
-`Document\ES\*`: `Dni` (8 digits + mod 23 letter, verified), `Nie` (X/Y/Z + 7 digits + letter, verified; both
-through the internal `ControlLetter`), `SocialSecurityNumber` (12 digits, province 01-56, format only;
+`Document\ES\*`: `Dni` (8 digits + mod 23 letter, verified), `Nie` (X/Y/Z + 7 digits + letter, verified through the
+internal `ControlLetter`; pre-2008 X + 8 digits + letter, format only), `SocialSecurityNumber` (12 digits, format only;
 `provinceCode()` string). The driving licence number is the DNI or NIE (no class); the passport number is not covered.
 `Name\ES\PersonName($first, ?$second, $given, ?$latin)`: both surnames feed `LatinPersonNameBuilder` as family
 parts (primary identifier joined by a space); codec keys `first`, `second`, `given`, `latin`.

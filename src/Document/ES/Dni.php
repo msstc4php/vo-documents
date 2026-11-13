@@ -19,8 +19,8 @@ use Override;
  * of a driving licence issued to a DNI holder. `masked()` keeps the last four characters (no official masking rule):
  * `*****678Z`.
  *
- * @see https://www.interior.gob.es/opencms/es/servicios-al-ciudadano/tramites-y-gestiones/dni/ Ministerio del
- *      Interior, "Cálculo del dígito de control del NIF/NIE" (full address in docs/sources/ES.md)
+ * @see https://www.interior.gob.es/opencms/es/servicios-al-ciudadano/tramites-y-gestiones/dni/calculo-del-digito-de-control-del-nif-nie/
+ *      Ministerio del Interior, "Cálculo del dígito de control del NIF/NIE"
  * @see https://www.boe.es/boe/dias/2025/04/02/pdfs/BOE-A-2025-6601.pdf Real Decreto 255/2025, arts. 2.2, 12 a)
  * @see https://www.boe.es/buscar/pdf/2007/BOE-A-2007-15984-consolidado.pdf Real Decreto 1065/2007, art. 19.1
  * @see docs/sources/ES.md "DNI"
