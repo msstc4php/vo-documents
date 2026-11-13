@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace MSSTC4PHP\ValueObject\Documents\Document\DE;
 
 use MSSTC4PHP\ValueObject\Documents\Contract\Maskable;
-use MSSTC4PHP\ValueObject\Documents\Internal\Mask;
-use MSSTC4PHP\ValueObject\Documents\Internal\NumberFormat;
 use MSSTC4PHP\ValueObject\Documents\Internal\Text;
 use MSSTC4PHP\ValueObject\Support\AbstractStringValueObject;
 use Override;
@@ -30,12 +28,12 @@ final class PassportNumber extends AbstractStringValueObject implements Maskable
     #[Override]
     public function masked(): string
     {
-        return Mask::keepLastCharacters(Text::nonEmpty($this->value), 4);
+        return SerialNumberFormat::masked(Text::nonEmpty($this->value));
     }
 
     #[Override]
     protected function parse(string $value): string
     {
-        return new NumberFormat('CFGHJKLMNPRTVWXYZ1-9', 9, 9)->parse($value, self::DOCUMENT);
+        return SerialNumberFormat::parse($value, self::DOCUMENT);
     }
 }

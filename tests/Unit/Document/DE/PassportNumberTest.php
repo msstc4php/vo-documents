@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace MSSTC4PHP\ValueObject\Documents\Tests\Unit\Document\DE;
 
 use MSSTC4PHP\ValueObject\Documents\Document\DE\PassportNumber;
+use MSSTC4PHP\ValueObject\Documents\Document\DE\SerialNumberFormat;
 use MSSTC4PHP\ValueObject\Documents\Internal\Digits;
 use MSSTC4PHP\ValueObject\Documents\Internal\Mask;
 use MSSTC4PHP\ValueObject\Documents\Internal\NumberFormat;
@@ -20,6 +21,7 @@ use PHPUnit\Framework\TestCase;
  * are built from the PassV alphabet).
  */
 #[CoversClass(PassportNumber::class)]
+#[UsesClass(SerialNumberFormat::class)]
 #[UsesClass(NumberFormat::class)]
 #[UsesClass(Digits::class)]
 #[UsesClass(Text::class)]

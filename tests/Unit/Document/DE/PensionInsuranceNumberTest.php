@@ -71,6 +71,68 @@ final class PensionInsuranceNumberTest extends TestCase
     }
 
     /**
+     * @return iterable<string, array{non-empty-string}>
+     */
+    public static function everyInitial(): iterable
+    {
+        yield 'A' => ['65230701A007'];
+        yield 'B' => ['65230701B008'];
+        yield 'C' => ['65230701C009'];
+        yield 'D' => ['65230701D000'];
+        yield 'E' => ['65230701E001'];
+        yield 'F' => ['65230701F002'];
+        yield 'G' => ['65230701G003'];
+        yield 'H' => ['65230701H004'];
+        yield 'I' => ['65230701I005'];
+        yield 'J' => ['65230701J008'];
+        yield 'K' => ['65230701K009'];
+        yield 'L' => ['65230701L000'];
+        yield 'M' => ['65230701M001'];
+        yield 'N' => ['65230701N002'];
+        yield 'O' => ['65230701O003'];
+        yield 'P' => ['65230701P004'];
+        yield 'Q' => ['65230701Q005'];
+        yield 'R' => ['65230701R006'];
+        yield 'S' => ['65230701S007'];
+        yield 'T' => ['65230701T000'];
+        yield 'U' => ['65230701U001'];
+        yield 'V' => ['65230701V002'];
+        yield 'W' => ['65230701W003'];
+        yield 'X' => ['65230701X004'];
+        yield 'Y' => ['65230701Y005'];
+        yield 'Z' => ['65230701Z006'];
+    }
+
+    /**
+     * @param non-empty-string $input
+     */
+    #[DataProvider('everyInitial')]
+    public function testAcceptsEveryLetterAToZAsTheInitial(string $input): void
+    {
+        self::assertSame($input[8], PensionInsuranceNumber::from($input)->birthNameInitial());
+    }
+
+    /**
+     * @return iterable<string, array{string}>
+     */
+    public static function digitInitials(): iterable
+    {
+        foreach (\range(0, 9) as $digit) {
+            yield (string) $digit => ['65230701' . $digit . '008'];
+        }
+    }
+
+    #[DataProvider('digitInitials')]
+    public function testRefusesADigitAsTheInitial(string $input): void
+    {
+        self::assertRefusedWithoutEcho(
+            static fn (string $value): PensionInsuranceNumber => PensionInsuranceNumber::from($value),
+            $input,
+            'Invalid German pension insurance number (invalid character).',
+        );
+    }
+
+    /**
      * @return iterable<string, array{string, string}>
      */
     public static function invalidNumbers(): iterable
