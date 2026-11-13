@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace MSSTC4PHP\ValueObject\Documents\Name;
 
 use MSSTC4PHP\ValueObject\Documents\Exception\InvalidPersonNameException;
+use MSSTC4PHP\ValueObject\Documents\Icao\Transliterator;
 use MSSTC4PHP\ValueObject\Documents\Internal\UnicodeText;
 use MSSTC4PHP\ValueObject\Support\AbstractStringValueObject;
 use Normalizer;
@@ -16,8 +17,9 @@ use Override;
  * joined by one of {@see innerSeparators()}, never two in a row. Where the apostrophe is a separator, U+2019 (’) is
  * stored as U+0027 (').
  *
- * A compatibility character (NFKC differs from NFC: fullwidth `Ｓｍｉｔｈ`, `ª`, the ligature `Ĳ`) is refused: it
- * looks like another spelling of the same name, so two stored values would denote one person.
+ * A compatibility character (NFKC differs from NFC: fullwidth `Ｓｍｉｔｈ`, `ª`, `ﬁ`) is refused: it looks like another
+ * spelling of the same name, so two stored values would denote one person. Characters an ICAO table lists itself
+ * (`Ĳ`, `Ŀ` of table 6.A) are kept, because the table gives them their own spelling.
  */
 abstract class AbstractNamePart extends AbstractStringValueObject
 {
@@ -69,7 +71,7 @@ abstract class AbstractNamePart extends AbstractStringValueObject
             throw new InvalidPersonNameException(\sprintf('Invalid %s (%d characters).', $this->label(), $length));
         }
 
-        if (Normalizer::normalize($normalized, Normalizer::FORM_KC) !== $normalized) {
+        if ($this->hasCompatibilityCharacter($normalized)) {
             throw new InvalidPersonNameException(\sprintf('Invalid %s (compatibility character).', $this->label()));
         }
 
@@ -78,5 +80,14 @@ abstract class AbstractNamePart extends AbstractStringValueObject
         }
 
         return $normalized;
+    }
+
+    private function hasCompatibilityCharacter(string $normalized): bool
+    {
+        return \array_any(
+            \mb_str_split($normalized, 1, 'UTF-8'),
+            static fn (string $character): bool => Normalizer::normalize($character, Normalizer::FORM_KC) !== $character
+                && !new Transliterator()->lists($character),
+        );
     }
 }

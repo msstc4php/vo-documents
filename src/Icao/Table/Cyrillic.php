@@ -76,6 +76,12 @@ final readonly class Cyrillic implements TransliterationTable
     }
 
     #[Override]
+    public function lists(string $character): bool
+    {
+        return isset(self::TABLE[$character]);
+    }
+
+    #[Override]
     public function spellings(string $character): ?array
     {
         return self::TABLE[$character] ?? null;

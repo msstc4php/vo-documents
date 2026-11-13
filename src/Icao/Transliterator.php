@@ -48,6 +48,16 @@ final readonly class Transliterator
     }
 
     /**
+     * Whether a table has a row of its own for `$character` in either letter case, such as the ligature Ĳ of table 6.A.
+     */
+    public function lists(string $character): bool
+    {
+        $upper = \mb_strtoupper($character, 'UTF-8');
+
+        return array_any($this->tables, fn (LatinMultinational|Cyrillic $table): bool => $table->lists($upper));
+    }
+
+    /**
      * @return non-empty-list<non-empty-string> every spelling the tables allow, the default first
      *
      * @throws InvalidPersonNameException when a character has no transliteration, the scripts are mixed or the

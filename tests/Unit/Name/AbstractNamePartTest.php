@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace MSSTC4PHP\ValueObject\Documents\Tests\Unit\Name;
 
 use MSSTC4PHP\ValueObject\Documents\Exception\InvalidPersonNameException;
+use MSSTC4PHP\ValueObject\Documents\Icao\Table\Cyrillic;
+use MSSTC4PHP\ValueObject\Documents\Icao\Table\LatinMultinational;
+use MSSTC4PHP\ValueObject\Documents\Icao\Transliterator;
 use MSSTC4PHP\ValueObject\Documents\Internal\UnicodeText;
 use MSSTC4PHP\ValueObject\Documents\Name\AbstractNamePart;
 use MSSTC4PHP\ValueObject\Documents\Name\AU\FamilyName as AustralianFamilyName;
@@ -20,6 +23,9 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(UnicodeText::class)]
 #[UsesClass(FamilyName::class)]
 #[UsesClass(AustralianFamilyName::class)]
+#[UsesClass(Transliterator::class)]
+#[UsesClass(LatinMultinational::class)]
+#[UsesClass(Cyrillic::class)]
 final class AbstractNamePartTest extends TestCase
 {
     public function testSeparatorsAreTakenLiterally(): void
@@ -88,7 +94,6 @@ final class AbstractNamePartTest extends TestCase
         yield 'fullwidth letters' => ["\u{FF33}\u{FF4D}\u{FF49}\u{FF54}\u{FF48}"];
         yield 'fullwidth letter inside a name' => ["Sm\u{FF49}th"];
         yield 'feminine ordinal indicator' => ["M\u{00AA}ria"];
-        yield 'ligature IJ' => ["\u{0132}sselmeer"];
         yield 'ligature fi' => ["\u{FB01}nch"];
         yield 'long s' => ["Ro\u{017F}e"];
     }
@@ -108,6 +113,25 @@ final class AbstractNamePartTest extends TestCase
         }
 
         self::fail('Expected an InvalidPersonNameException.');
+    }
+
+    /**
+     * @return iterable<string, array{non-empty-string}>
+     */
+    public static function tableListedCompatibilityCharacters(): iterable
+    {
+        yield 'ligature IJ' => ["\u{0132}sselmeer"];
+        yield 'lower-case ligature ij' => ["V\u{0133}ver"];
+        yield 'L with middle dot' => ["\u{013F}lobet"];
+    }
+
+    /**
+     * @param non-empty-string $input
+     */
+    #[DataProvider('tableListedCompatibilityCharacters')]
+    public function testACompatibilityCharacterListedByAnIcaoTableIsKept(string $input): void
+    {
+        self::assertSame($input, AustralianFamilyName::from($input)->value);
     }
 
     public function testTheCompatibilityCheckDoesNotTouchCanonicalLetters(): void

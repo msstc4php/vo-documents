@@ -124,6 +124,17 @@ final class TransliteratorTest extends TestCase
         yield 'apostrophe only' => ["'\u{2019}", self::EMPTY];
     }
 
+    public function testListsOnlyCharactersWithATableRowOfTheirOwn(): void
+    {
+        self::assertTrue($this->transliterator->lists("\u{0132}"));
+        self::assertTrue($this->transliterator->lists("\u{0133}"));
+        self::assertTrue($this->transliterator->lists('ж'));
+        self::assertFalse($this->transliterator->lists('A'));
+        self::assertFalse($this->transliterator->lists('ễ'));
+        self::assertFalse($this->transliterator->lists("\u{017F}"));
+        self::assertFalse($this->transliterator->lists("\u{FF33}"));
+    }
+
     /**
      * @param non-empty-string $message
      */

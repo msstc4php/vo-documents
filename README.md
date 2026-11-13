@@ -91,8 +91,8 @@ A national name part (`Name\RU\FamilyName`, `GivenName`, `Patronymic`, `Name\AU\
 NFC-normalised, trimmed, has inner whitespace runs collapsed to one space, and keeps its letter case. Limits: 100
 characters per part. Russian parts accept only the 33 Russian letters; a Cyrillic name typed with Latin look-alikes
 (Latin `a`, `o`, `e`, `c`) is refused. A compatibility character (its NFKC form differs: fullwidth `Ｓｍｉｔｈ`, `ª`,
-the ligatures `Ĳ` and `ﬁ`) is refused in every country, because it would be a second stored spelling of the same
-name. Messages say "(N characters)" for an empty or too long part, "(compatibility character)", or "(invalid
+the ligature `ﬁ`) is refused in every country, because it would be a second stored spelling of the same name; the
+ones an ICAO table lists itself (`Ĳ`, `Ŀ`) are kept. Messages say "(N characters)" for an empty or too long part, "(compatibility character)", or "(invalid
 character)" for a letter or separator that is not allowed where it stands.
 
 ```php

@@ -82,8 +82,10 @@
 - **Latin letters outside table 6.A** (`Ễ`, `Ș`, `Ț`) are spelled through their base letter
   (`LatinMultinational::baseLetterSpellings()`: NFD, drop `\p{Mn}`, table again). This is the package's decision
   (AU.md, ICAO.md); `Ƒ`/`Ʒ` (no base) are still refused. The Cyrillic table and `RussianTransliteration` have no fallback.
-- **Compatibility characters are refused in every name part** (`AbstractNamePart`: NFKC ≠ NFC), including the
-  ligature `Ĳ` that table 6.A lists: write `IJ`. The table row stays for `Icao\Transliterator` callers.
+- **Compatibility characters are refused in every name part** (`AbstractNamePart`: NFKC ≠ NFC per character), except
+  the ones an ICAO table lists itself (`Transliterator::lists()`: today `Ĳ`/`ĳ` and `Ŀ`/`ŀ` of 6.A), which keep their
+  table spelling (`Ĳsselmeer` → `IJSSELMEER`). The Transliterator is built only for a compatibility character, so
+  tests of ordinary parts need no `UsesClass` for it.
 - Name part messages: "(N characters)" for empty or > 100, "(compatibility character)", "(invalid character)" for
   any pattern failure (also a misplaced separator).
 - `LatinSpelling::find()` matches part by part: the override's secondary words are split by each part's word count

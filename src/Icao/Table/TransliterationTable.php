@@ -22,4 +22,11 @@ interface TransliterationTable
      * @return non-empty-list<non-empty-string>|null the spellings, default first; null when the table has no entry
      */
     public function spellings(string $character): ?array;
+
+    /**
+     * @param string $character one upper-case character
+     *
+     * @return bool whether the table has a row of its own for the character (no fallback, no A-Z)
+     */
+    public function lists(string $character): bool;
 }

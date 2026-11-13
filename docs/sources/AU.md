@@ -32,8 +32,9 @@ How the package applies this (designer's calls, no official character rule found
   table 6.A"): `Nguyễn` → `NGUYEN`, Romanian `Ș`/`Ț` (comma below) → `S`/`T`. Without it such a name could never be
   built, not even with an override. A letter with no base in the table (`ƒ`) passes the part but is refused by
   `PersonName`, because it has no ICAO spelling.
-- A compatibility character (NFKC differs from NFC: fullwidth `Ｓｍｉｔｈ`, `ª`, the ligature `Ĳ`) is refused by the
-  part (`AbstractNamePart`, every country): it would be a second spelling of the same stored name.
+- A compatibility character (NFKC differs from NFC: fullwidth `Ｓｍｉｔｈ`, `ª`, `ﬁ`) is refused by the part
+  (`AbstractNamePart`, every country): it would be a second spelling of the same stored name. Characters table 6.A
+  lists itself (`Ĳ`, `Ŀ`) are kept and take their table spelling (`Ĳsselmeer` → `IJSSELMEER`).
 - **Derived Latin:** `FAMILY<<GIVEN` with the default spelling of each character (`Zoë` → `ZOE`,
   `Müller` → `MUELLER`); apostrophes are omitted (`O'Brien` → `OBRIEN`, ICAO Part 3 §4.6).
 - **Override** (policy `Name\TransliterationVariant`): a Latin form is accepted only when it is one of the ICAO

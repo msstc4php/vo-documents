@@ -23,7 +23,7 @@
 - `DriverLicenceNumberFactory::fromNumber()` is always ambiguous for AU with the published formats; use `fromNumberIn()`.
 - Name parts are limited to 100 characters, `Icao\PersonName` to 255.
 - A Latin letter outside ICAO table 6.A is spelled as its base letter (`Nguyễn` → `NGUYEN`, `Ș` → `S`); compatibility
-  characters (fullwidth letters, `ª`, `Ĳ`) are refused in name parts.
+  characters (fullwidth letters, `ª`, `ﬁ`) are refused in name parts, except those an ICAO table lists (`Ĳ`, `Ŀ`).
 - Requires `msstc4php/vo-base ^1.1.1`.
 
 ### Compatibility policy

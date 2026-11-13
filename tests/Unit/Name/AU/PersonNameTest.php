@@ -127,6 +127,22 @@ final class PersonNameTest extends TestCase
         self::assertSame('UXXUUEUUUU<<A', $name->latinOverride()?->value);
     }
 
+    public function testALigatureListedByTable6AIsAcceptedAndTakesItsTableSpelling(): void
+    {
+        $name = new PersonName(FamilyName::from("\u{0132}sselmeer"), GivenName::from('Ann'));
+
+        self::assertSame("\u{0132}sselmeer", $name->family->value);
+        self::assertSame('IJSSELMEER<<ANN', $name->latin()->value);
+    }
+
+    public function testAFullwidthNameIsRefused(): void
+    {
+        $this->expectException(InvalidPersonNameException::class);
+        $this->expectExceptionMessage('Invalid Australian family name (compatibility character).');
+
+        new PersonName(FamilyName::from("\u{FF33}\u{FF4D}\u{FF49}\u{FF54}\u{FF48}"), GivenName::from('Ann'));
+    }
+
     public function testALatinLetterOutsideTheTableIsSpelledAsItsBaseLetter(): void
     {
         $name = new PersonName(FamilyName::from('Nguyễn'), GivenName::from('Ștefan Țurcanu'));
