@@ -11,7 +11,9 @@ use MSSTC4PHP\ValueObject\Documents\Icao\PersonName as IcaoPersonName;
 use MSSTC4PHP\ValueObject\Documents\Icao\Table\Cyrillic;
 use MSSTC4PHP\ValueObject\Documents\Icao\Table\LatinMultinational;
 use MSSTC4PHP\ValueObject\Documents\Icao\Transliterator;
+use MSSTC4PHP\ValueObject\Documents\Internal\Optional;
 use MSSTC4PHP\ValueObject\Documents\Internal\PayloadFields;
+use MSSTC4PHP\ValueObject\Documents\Internal\Text;
 use MSSTC4PHP\ValueObject\Documents\Internal\UnicodeText;
 use MSSTC4PHP\ValueObject\Documents\Name\AbstractNamePart;
 use MSSTC4PHP\ValueObject\Documents\Name\AU\PersonNameCodec as AuPersonNameCodec;
@@ -76,6 +78,8 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(LatinMultinational::class)]
 #[UsesClass(UnicodeText::class)]
 #[UsesClass(PayloadFields::class)]
+#[UsesClass(Optional::class)]
+#[UsesClass(Text::class)]
 final class PersonNameCodecTest extends TestCase
 {
     use RefusesNameWithoutEchoingInput;

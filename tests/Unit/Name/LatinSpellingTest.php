@@ -104,8 +104,8 @@ final class LatinSpellingTest extends TestCase
     {
         self::assertNameRefusedWithoutEcho(
             fn (): ?string => $this->find(
-                'BA<<BA',
-                new IdentifierSpellings([$this->variants(LatinSpelling::MAX_SPELLINGS + 1)], []),
+                'BA<BA<<BA',
+                new IdentifierSpellings([['BA'], $this->variants(LatinSpelling::MAX_SPELLINGS + 1)], [' ']),
                 new IdentifierSpellings([['BA']], []),
             ),
             '',

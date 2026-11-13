@@ -9,6 +9,7 @@ use MSSTC4PHP\ValueObject\Documents\Icao\Table\Cyrillic;
 use MSSTC4PHP\ValueObject\Documents\Icao\Table\LatinMultinational;
 use MSSTC4PHP\ValueObject\Documents\Icao\Transliterator;
 use MSSTC4PHP\ValueObject\Documents\Internal\Optional;
+use MSSTC4PHP\ValueObject\Documents\Internal\Text;
 use MSSTC4PHP\ValueObject\Documents\Internal\UnicodeText;
 use MSSTC4PHP\ValueObject\Documents\Name\AbstractNamePart;
 use MSSTC4PHP\ValueObject\Documents\Name\ES\FamilyName;
@@ -47,6 +48,7 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(Cyrillic::class)]
 #[UsesClass(UnicodeText::class)]
 #[UsesClass(Optional::class)]
+#[UsesClass(Text::class)]
 final class PersonNameTest extends TestCase
 {
     use RefusesNameWithoutEchoingInput;
