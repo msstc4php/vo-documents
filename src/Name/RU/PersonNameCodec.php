@@ -24,7 +24,7 @@ use Override;
 final readonly class PersonNameCodec implements PayloadCodec
 {
     private const string SHAPE = 'Expected a Russian person name payload with string "family" and "given", '
-        . 'string or null "patronymic" and "latin", and no other keys.';
+        . 'string, null or missing "patronymic" and "latin", and no other keys.';
 
     private const array KEYS = ['family', 'given', 'patronymic', 'latin'];
 

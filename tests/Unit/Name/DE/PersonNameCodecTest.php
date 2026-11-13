@@ -83,7 +83,7 @@ final class PersonNameCodecTest extends TestCase
     use RefusesNameWithoutEchoingInput;
 
     private const string SHAPE = 'Expected a German person name payload with string "family" and "given", '
-        . 'string or null "latin", and no other keys.';
+        . 'string, null or missing "latin", and no other keys.';
 
     public function testMapsItsClass(): void
     {

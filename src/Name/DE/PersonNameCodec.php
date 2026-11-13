@@ -18,7 +18,7 @@ use Override;
 final readonly class PersonNameCodec extends AbstractFamilyGivenPersonNameCodec
 {
     private const string SHAPE = 'Expected a German person name payload with string "family" and "given", '
-        . 'string or null "latin", and no other keys.';
+        . 'string, null or missing "latin", and no other keys.';
 
     #[Override]
     public function valueObjectClass(): string
