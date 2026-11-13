@@ -204,9 +204,11 @@ official masking rule).
 
 ## Führerschein number — not covered
 
-**FeV Anlage 8, I. Allgemeiner Führerschein, Nr. 2.1 c) field 5**: "Nummer des Führerscheins, die sich aus dem Behördenschlüssel der
+**FeV Anlage 8, I. Allgemeiner Führerschein, Nr. 2.1 c) field 5**: "Nummer des Führerscheins, die sich aus dem
+Behördenschlüssel der
 Fahrerlaubnisbehörde, einer von dieser fortlaufend zu vergebenden Fahrerlaubnisnummer sowie einer Prüfziffer und der
-Nummer der Ausfertigung des Dokuments zusammensetzt." FeV § 49 Abs. 1 Nr. 9 and 10 repeat the composition (Fahrerlaubnisnummer
+Nummer der Ausfertigung des Dokuments zusammensetzt." FeV § 49 Abs. 1 Nr. 9 and 10 repeat the composition
+(Fahrerlaubnisnummer
 = Behördenschlüssel + fortlaufende Nummer + Prüfnummer; Führerscheinnummer = Fahrerlaubnisnummer + fortlaufende Nummer
 des Führerscheins). The KBA list of authority keys (copy on `lima.diplo.de`) gives the key's 4 characters ("Der
 vorangestellte Buchstabe ist ein Landeskennzeichen … Die Stellen 2 und 3 sind fortlaufende Ziffern …").

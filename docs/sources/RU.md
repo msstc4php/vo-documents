@@ -171,7 +171,8 @@ characters, so a message never holds a run of three digits.
    Ministry of Justice 18.12.2025, No. 84664). Official publication:
    <http://publication.pravo.gov.ru/document/0001202512190014> (19.12.2025). Quoted from the SFR copy:
    <https://sfr.gov.ru/files/branches/tomsk/Prikaz_SFR_ot_17-11-2025_No_1463_prilojenie-doc.docx>.
-   - Type `ТипСтраховойНомер`: patterns `\d{3}-\d{3}-\d{3}\d{2}` and `\d{3}-\d{3}-\d{3}-\d{2}`, "в формате XXX-XXX-XXX CC
+   - Type `ТипСтраховойНомер`: patterns `\d{3}-\d{3}-\d{3}\d{2}` and `\d{3}-\d{3}-\d{3}-\d{2}`, "в формате XXX-XXX-XXX
+     CC
      или XXX-XXX-XXX-CC".
    - Check ВСЗЛ.ОП.1.1: "Последние 2 цифры Страхового номера должны быть числом, подсчитанным по Алгоритму формирования
      контрольного числа Страхового номера".
@@ -220,7 +221,8 @@ check digits are not verified because no official algorithm is published**: 12 d
 
 **Where the plan loses to the source:** the plan's `taxOfficeCode()` (first four digits) holds only for INNs assigned
 under Order ММВ-7-6/435@ (NNNN = code of the assigning tax office). Since 01.01.2026 digits 3–4 are an "индекс,
-определяемый ФНС", not part of a tax office code. The class therefore offers `taxAuthorityRegionCode()` (digits 1–2: the FNS code of
+определяемый ФНС", not part of a tax office code. The class therefore offers `taxAuthorityRegionCode()` (digits 1–2: the
+FNS code of
 the constituent entity) instead. `formatted()` is the 12 digits (`500100732259`); `masked()` `********2259`.
 
 ### Internal passport (`Document\RU\InternalPassportNumber`)

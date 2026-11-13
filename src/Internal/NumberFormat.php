@@ -35,8 +35,10 @@ final readonly class NumberFormat
      *
      * @return non-empty-string
      *
-     * @throws InvalidDocumentNumberException "(N characters)" or "(too long)" for a wrong length, "(invalid
-     *                                        character)" for a right length with a character outside the class
+     * @throws InvalidDocumentNumberException "(N characters)" for a wrong length of up to
+     *                                        Digits::MAX_REPORTED_LENGTH characters, "(too long)" above it,
+     *                                        "(invalid character)" for a right length with
+     *                                        a character outside the class
      */
     public function parse(string $input, string $document): string
     {

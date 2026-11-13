@@ -318,7 +318,8 @@ width 5 → `A<<B<`): no letter can then be removed without dropping a component
 stripped and the field is padded. ICAO gives no rule for that case.
 
 Steps 2–4 reproduce §4.2.3.2 a and b exactly. For the §4.2.3.3 name they give
-`BENNELONG<WOOLOOMOOLOO<WARRANDYTE<WA<<D`, which satisfies the rule (primary shortened until `<<` and the first secondary
+`BENNELONG<WOOLOOMOOLOO<WARRANDYTE<WA<<D`, which satisfies the rule (primary shortened until `<<` and the first
+secondary
 character fit, last character alphabetic) but is none of the three PDF results.
 
 Derived examples (computed with the procedure above, not printed by ICAO; used in `PersonNameTest`):

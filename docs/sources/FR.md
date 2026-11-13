@@ -73,7 +73,8 @@ Payload (`PersonNameCodec`): `{family, given, latin}` with `latin` the override 
 
 1. **INSEE definition c1409**: "Ce numéro d'identification unique de l'individu est formé de 13 chiffres : le sexe
    (1 chiffre), l'année de naissance (2 chiffres), le mois de naissance (2 chiffres) et le lieu de naissance
-   (5 chiffres). Les 3 chiffres suivants correspondent à un numéro d'ordre qui permet de distinguer les personnes nées au
+   (5 chiffres). Les 3 chiffres suivants correspondent à un numéro d'ordre qui permet de distinguer les personnes nées
+   au
    même lieu à la même période ; une clé de contrôle à 2 chiffres complète le NIR."
 2. **INSEE, Courrier des statistiques, encadré 1**:
 
@@ -201,7 +202,8 @@ portal), Section II:
 Section I: "The French name of the TIN is known as the numéro fiscal de référence or numéro SPI." No check digit or
 encoded data is described: **format only** (secondary sites name a "mod 511" key on the last three digits; no official
 text does). Implemented: 13 digits, first digit `0`-`3` ("(invalid first digit)"); `formatted()` follows the published
-format `99 99 999 999 999` (`30 23 217 600 053`; no official example number, the tests use synthetic ones); `masked()` keeps the last four digits: `** ** *** **0 053`. The New Caledonia and
+format `99 99 999 999 999` (`30 23 217 600 053`; no official example number, the tests use synthetic ones); `masked()`
+keeps the last four digits: `** ** *** **0 053`. The New Caledonia and
 Saint-Martin TINs are not covered.
 
 ## Driving licence number (`Document\FR\DriverLicenceNumber`)

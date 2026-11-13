@@ -9,5 +9,6 @@ Engineer notes for `msstc4php/vo-documents`. Team-readable, not user-facing docu
 | [integrations.md](integrations.md) | The core, the bridges, how composites reach the mapper |
 | [known-issues.md](known-issues.md) | Quirks that cost time |
 
-Related: `docs/` in this repository (requirements and plans), `docs/sources/` (RU, AU, DE, FR, IT, ES, NL, CH, GB, TR, ICAO
+Related: `docs/` in this repository (requirements and plans), `docs/sources/` (RU, AU, DE, FR, IT, ES, NL, CH, GB, TR,
+ICAO
 source notes: the authority for every format and table), `../vo-documents-doctrine/.claude/docs/` (Doctrine types).

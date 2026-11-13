@@ -14,7 +14,16 @@
   override, payload codecs, `Codecs::all()`.
 - Exceptions per family: `InvalidDocumentNumberException`, `InvalidPersonNameException`,
   `AmbiguousJurisdictionException`. No message contains the input.
-- Source notes in `docs/sources/` (RU, AU, ICAO).
+- Europe (plan 2): names (`Name\<CC>\FamilyName`, `GivenName`, `PersonName`, codecs in `Codecs::all()`) and documents
+  for Germany, France, Italy, Spain, the Netherlands, Switzerland, the United Kingdom and Türkiye: DE Personalausweis,
+  Reisepass, Steuer-ID, Rentenversicherungsnummer; FR NIR, CNI (issued until 2021), passport, numéro fiscal, permis; IT
+  codice fiscale, passport; ES DNI, NIE, social security number; NL BSN, identity document number; CH AHV number,
+  identity document number, driving licence; GB NINO, passport, DVLA and DVA licences, NHS, H&C and CHI numbers; TR
+  T.C. Kimlik No, passport. Source notes `docs/sources/{DE,FR,IT,ES,NL,CH,GB,TR}.md`.
+- `Name\Latin\AbstractLatinNamePart` and an internal `LatinPersonNameBuilder` shared by the Latin-script countries;
+  `Name\AU\*` moved onto them without a public API change.
+- `Contract\HasSex` is implemented by `Nir`, `FiscalCode`, the DVLA licence number and `ChiNumber`.
+- Source notes in `docs/sources/` (RU, AU, ICAO, DE, FR, IT, ES, NL, CH, GB, TR).
 
 ### Notes
 
@@ -26,6 +35,16 @@
 - Name parts are limited to 100 characters, `Icao\PersonName` to 255.
 - A Latin letter outside ICAO table 6.A is spelled as its base letter (`Nguyễn` → `NGUYEN`, `Ș` → `S`); compatibility
   characters (fullwidth letters, `ª`, `ﬁ`) are refused in name parts, except those an ICAO table lists (`Ĳ`, `Ŀ`).
+- Owner's rule: a checksum is verified only when its algorithm is quoted from an official source. Verified: DE
+  pension insurance number, IT codice fiscale, ES DNI and NIE, NL BSN, CH AHV number, GB NHS and H&C numbers. Format
+  only: DE Steuer-ID, FR NIR key, ES social security number and pre-2008 NIE letters, GB CHI check digit and DVLA
+  check characters, TR T.C. Kimlik No, and the other identity, passport and licence numbers.
+- Latin override policy per country: `TransliterationVariant` (AU, DE, FR, IT, ES, NL, CH, TR) or `AnyIcaoSpelling`
+  (RU, GB).
+- Not covered (no official format): DE Führerschein, FR 2021 identity card, IT CIE and patente, ES passport, NL
+  rijbewijs, TR sürücü belgesi; ES driving licence is the DNI or NIE.
+- Name limits: FR names use the 2014 civil-status circular's letters; NL refuses `ĳ`; TR refuses `Q`, `W`, `X`, hyphens
+  and apostrophes.
 - Requires `msstc4php/vo-base ^1.1.1`.
 
 ### Compatibility policy

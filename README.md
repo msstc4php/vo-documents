@@ -1,8 +1,8 @@
 # msstc4php/vo-documents
 
 Value objects for identity documents and personal names of the world's largest economies, with ICAO Doc 9303 Latin
-names. Built on [`msstc4php/vo-base`](https://github.com/msstc4php/vo-base); PHP >= 8.4. Today: the Russian Federation
-and Australia.
+names. Built on [`msstc4php/vo-base`](https://github.com/msstc4php/vo-base); PHP >= 8.4. Today: the Russian Federation,
+Australia, Germany, France, Italy, Spain, the Netherlands, Switzerland, the United Kingdom and Türkiye.
 
 Every format, checksum and table cites its official source on the class (`@see`); the full notes, with quotes and the
 places where the sources disagree with the obvious guess, are in [`docs/sources/`](docs/sources).
@@ -61,10 +61,53 @@ last four digits, the AU classes keep three (their numbers are at most 10 charac
 | `Document\AU\DriverLicence\{Act,Nsw,Nt,Qld,Sa,Tas,Vic,Wa}DriverLicenceNumber` | Licence number per state or territory | shape only | Home Affairs DVS field rules |
 | `Document\AU\Jurisdiction` | The eight states and territories (enum, ISO 3166-2:AU) | n/a | ISO 3166-2:AU |
 
+### European documents
+
+"Checksum verified" means the algorithm is quoted from an official source (given in the last column and on the class);
+"format only" means the shape is checked and the check digit, if the number has one, is **not** verified because no
+official algorithm is published. A number with the right shape is accepted, never refused for an unverifiable check.
+"Encoded data" lists what the official source defines inside the number and what the class exposes.
+
+| Class | Document | Check | Encoded data | Source |
+|---|---|---|---|---|
+| `Document\DE\IdentityCardNumber` | Personalausweis serial number, 9 characters | format only (no check digit of its own) | `authorityCode()` | PAuswG § 2 Abs. 8; PAuswV Anlage 3 |
+| `Document\DE\PassportNumber` | Reisepass serial number, 9 characters | format only | none | PassG § 4; PassV Anlage 11 |
+| `Document\DE\TaxIdentificationNumber` | Steuer-ID, 11 digits | format only | none | StIdV § 1; AO § 139b |
+| `Document\DE\PensionInsuranceNumber` | Rentenversicherungsnummer, `NN DDMMYY L SS C` | checksum verified (VKVV § 2) | fields as strings, no typed date or sex | VKVV § 2 |
+| `Document\FR\Nir` | NIR (numéro de sécurité sociale), 15 characters | key format only | `HasSex`, birth year digits, `birthMonth()`, `birthPlaceCode()` | INSEE; DSN cahier technique |
+| `Document\FR\LegacyIdentityCardNumber` | CNI issued until 2021, 12 digits | format only | none typed (issue month not validated) | NOR INTD0000001C |
+| `Document\FR\PassportNumber` | Passport, `99AA99999` | format only | none | France Titres-ANTS |
+| `Document\FR\TaxIdentificationNumber` | Numéro fiscal (SPI), 13 digits | format only | none | OECD TIN note (DGFiP) |
+| `Document\FR\DriverLicenceNumber` | Permis de conduire, 12 digits | format only | none | France Titres-ANTS |
+| `Document\IT\FiscalCode` | Codice fiscale, 16 characters | checksum verified (DM 23.12.1976 art. 7) | `HasSex`, birth year digits, month, day, `birthPlaceCode()`; omocodia read | DM 23 dicembre 1976 |
+| `Document\IT\PassportNumber` | Passport, 2 letters + 7 digits | format only | none | DM 23 marzo 2010 n. 303/13, 303/14 |
+| `Document\ES\Dni` | DNI, 8 digits + letter | checksum verified (mod 23) | none | Ministerio del Interior; RD 1065/2007 |
+| `Document\ES\Nie` | NIE, `X/Y/Z` + 7 digits + letter | checksum verified; pre-2008 `X` + 8 digits: format only | none | Ministerio del Interior; Orden INT/2058/2008 |
+| `Document\ES\SocialSecurityNumber` | Número de afiliación, 12 digits | format only | `provinceCode()` (not range-checked) | TGSS, Sistema RED |
+| `Document\NL\Bsn` | Burgerservicenummer, 9 digits | checksum verified (elfproef) | none | Logisch Ontwerp BSN 2025.Q4 |
+| `Document\NL\IdentityDocumentNumber` | Passport / ID card / emergency document, 9 characters | format only | none | RvIG Kenmerkenbrochure |
+| `Document\CH\AhvNumber` | AHV-Nummer, 13 digits | checksum verified (BSV WL VA/IK Anhang 7) | none | BSV WL VA/IK |
+| `Document\CH\IdentityDocumentNumber` | Passport / identity card, 8 characters | format only | none | SR 143.111 Art. 16; fedpol |
+| `Document\CH\DriverLicenceNumber` | Führerausweis, 12 or 15 digits | format only | `faberPin()`, `sequenceNumber()` (12 digits only) | ASTRA Weisungen 2023 |
+| `Document\GB\NationalInsuranceNumber` | NINO, `AB 12 34 56 C` | prefix rules (no check digit exists) | none | HMRC NIM39110 |
+| `Document\GB\PassportNumber` | Passport, 9 digits | format only | none | HMPO Basic Passport Checks |
+| `Document\GB\GreatBritainDriverLicenceNumber` | DVLA licence driver number, 16 characters | date validated; check characters not verified | `HasSex`, birth year digits, month, day | DVLA INS57P |
+| `Document\GB\NorthernIrelandDriverLicenceNumber` | DVA licence driver number, 8 digits | format only | none | nidirect (DVA) |
+| `Document\GB\NhsNumber` | NHS number (England, Wales), 10 digits | checksum verified (Modulus 11) | none | NHS Data Dictionary |
+| `Document\GB\HealthAndCareNumber` | H&C number (Northern Ireland), 10 digits | checksum verified; range 320000001-399999999 | none | NHS Data Dictionary |
+| `Document\GB\ChiNumber` | CHI number (Scotland), 10 digits | date validated; check digit format only | `HasSex`, birth year digits, month, day | NHS Data Dictionary; PHS |
+| `Document\TR\IdentityNumber` | T.C. Kimlik No, 11 digits | format only | none (NVİ: encodes nothing) | NVİ; Nüfus Hizmetleri Yönetmeliği Madde 4 |
+| `Document\TR\PassportNumber` | Passport, letter + 8 digits | format only | none | Council of the EU PRADO |
+
+Names: `Name\<CC>\FamilyName`, `GivenName` and `PersonName` for DE, FR, IT, ES, NL, CH, GB and TR, like the RU and AU
+ones. Spain's `PersonName` has two surnames (`first`, optional `second`); in the Dutch one the prefixes (`van der`) are
+part of the family name; the Swiss, Dutch and British ones accept a person without a given name.
+
 Contracts: `Contract\Maskable` (every number above), `Contract\Subdivision` and `Contract\IssuedBySubdivision` (AU
-jurisdictions and licences). `Contract\HasBirthDate`, `Contract\HasSex` and the `Sex` enum are for documents that
-encode a birth date or sex in the number; no class of this release does, the first implementations come with the
-next countries (plan 2). They are public API, not leftovers.
+jurisdictions and licences). `Contract\HasSex` and the `Sex` enum are implemented by the documents that encode a sex
+(`Nir`, `FiscalCode`, the DVLA licence number, `ChiNumber`). `Contract\HasBirthDate` is public API that no class
+implements yet: every encoded birth date of these countries lacks a century, so the classes expose the year digits,
+month and day instead, and impossible dates (30 February) are refused.
 
 ### AU driving licences and the jurisdiction factory
 
@@ -87,7 +130,8 @@ for AU**; use `fromNumberIn()` when the issuer is known (see `docs/sources/AU.md
 
 ## Personal names
 
-A national name part (`Name\RU\FamilyName`, `GivenName`, `Patronymic`, `Name\AU\FamilyName`, `GivenName`) is
+A national name part (`Name\RU\FamilyName`, `GivenName`, `Patronymic`, and `FamilyName`, `GivenName` of `Name\AU`,
+`Name\DE`, `Name\FR`, `Name\IT`, `Name\ES`, `Name\NL`, `Name\CH`, `Name\GB`, `Name\TR`) is
 NFC-normalised, trimmed, has inner whitespace runs collapsed to one space, and keeps its letter case. Limits: 100
 characters per part. Russian parts accept only the 33 Russian letters; a Cyrillic name typed with Latin look-alikes
 (Latin `a`, `o`, `e`, `c`) is refused. A compatibility character (its NFKC form differs: fullwidth `Ｓｍｉｔｈ`, `ª`, the
@@ -144,7 +188,8 @@ then depends on the country's sources:
 | Country | Accepted override | Why |
 |---|---|---|
 | RU | any valid ICAO name (`IVANOVA<<YULIYA` for Иванова Юлия, where the table gives `IVANOVA<<IULIIA`) | MVD Orders 996/186 (§32, §140) write the name "так, как это указано в подтверждающем документе" |
-| AU | only an ICAO spelling of the name (`MULLER<<ZOE` for Müller Zoë); `<` for a hyphen is stored as the hyphen | Latin-script names: the table spellings are the only ones |
+| AU, DE, FR, IT, ES, NL, CH, TR | only an ICAO spelling of the name (`MULLER<<ZOE` for Müller Zoë); `<` for a hyphen is stored as the hyphen (policy `TransliterationVariant`) | Latin-script names: no source lets a passport keep another spelling, so the table spellings are the only ones |
+| GB | any valid ICAO name (policy `AnyIcaoSpelling`) | HM Passport Office lets a passport carry an evidenced spelling (`docs/sources/GB.md`) |
 
 An override that is the derived form (also when it writes a hyphen as `<`) is not kept, so `latinOverride()` is null
 and the name equals the one built without it. Text that is no ICAO name (`IVANOV1<<IVAN`) is refused by
@@ -247,6 +292,21 @@ supported there** unless the application builds its own mapper; the string class
 
 Collected from the source notes; each is a deliberate omission with its reason in `docs/sources/`.
 
+- **DE:** Führerschein number (FeV composition without length or check digit); provisional passports and
+  identity cards (`docs/sources/DE.md`).
+- **FR:** the identity card issued since August 2021 (no official format); the pre-1975 driving licence form
+  (`docs/sources/FR.md`).
+- **IT:** carta d'identità elettronica number and patente number (no reachable official format); the eleven-digit
+  provisional codice fiscale (`docs/sources/IT.md`).
+- **ES:** passport number (the official register could not be read); the driving licence number is the DNI or NIE and
+  has no class of its own; the NIF of legal persons and minors (`K`, `L`, `M`) (`docs/sources/ES.md`).
+- **NL:** rijbewijsnummer (no published format) (`docs/sources/NL.md`).
+- **CH:** a per-canton licence format (the licence is federal); the Allianzname as a separate field
+  (`docs/sources/CH.md`).
+- **GB:** the HMRC Temporary Reference Number, the passport thin-film serial number, the licence issue number
+  (`docs/sources/GB.md`).
+- **TR:** sürücü belgesi number (a running sequence per province, no format), the identity card serial number
+  (`docs/sources/TR.md`).
 - **No region value object for RU**: no field encodes a region with a published mapping to ISO 3166-2:RU (`RU.md`).
 - **RU driving licences of the 1999 form** (Cyrillic series): expired by 2026 (`RU.md`).
 - **RU old-form OMS policies** (series and number) and AU **11-digit Medicare individual numbers**.
@@ -263,6 +323,22 @@ Collected from the source notes; each is a deliberate omission with its reason i
 - **Not verified against the official PDF:** the 16-digit length of the OMS policy and the FFOMS Order 79 text it is
   checked against (www.ffoms.gov.ru is unreachable from here, the text is quoted from a copy), and the 2 + 7 split of
   the international passport number (no text read states it; `RU.md`).
+- **Format only in Europe** (see the table above): DE Steuer-ID (no leading-zero or repeated-digit rule either, those
+  are in an unpublished BZSt paper), FR NIR key, FR and IT identity numbers, ES social security number, TR T.C. Kimlik
+  No (NVİ shares the algorithm only with public bodies; the popular formula fails the official PRADO specimens), the
+  Swiss and British licence numbers and the CHI check digit. ES pre-2008 NIE letters are accepted as any `A-Z`.
+- **Encoded data only where the source defines it:** the DE pension insurance number exposes strings (no century, no
+  published rule for unproven birth dates); Italian codice fiscale accepts any omocodia substitution over the seven
+  numeric positions and `29` February when the two-digit year is divisible by four (no century is encoded).
+- **Name limits by country:** FR names use the 2014 civil-status circular's letter list (`ñ`, `ł`, `ß` refused); NL
+  names use the BRP Teletex letters and refuse the `ĳ` ligature (written `ij`); TR names refuse `Q`, `W`, `X` (Law
+  1353 art. 3), hyphens and apostrophes; derived `Ö`/`Ü` stay `OE`/`UE` (table 6.A); ES refuses the Catalan middle dot
+  `l·l`; IT refuses the comma between given names; GB licence numbers of a holder with no first names would be refused
+  (no published rule for them).
+- **Source access:** FR passport and licence formats are France Titres-ANTS answers; CH passport length comes from
+  the Basel-Stadt passport office and fedpol; TR passport format from the PRADO register; the ES NIF/NIE algorithm and
+  several GB texts are cited through unmodified Internet Archive copies of the official page (original URL, archive URL
+  and capture date in the source notes).
 - Name parts are limited to 100 characters, `Icao\PersonName` to 255 (a very long real name is refused).
 
 ## Development

@@ -33,8 +33,10 @@ final class Digits
      *
      * @return non-empty-string
      *
-     * @throws InvalidDocumentNumberException "(N characters)" or "(too long)" for a wrong length, "(invalid
-     *                                        character)" for a right length with a character other than a digit
+     * @throws InvalidDocumentNumberException "(N characters)" for a wrong length of up to
+     *                                        Digits::MAX_REPORTED_LENGTH characters, "(too long)" above it,
+     *                                        "(invalid character)" for a right length with
+     *                                        a character other than a digit
      */
     public static function exactly(string $input, int $length, string $document): string
     {
