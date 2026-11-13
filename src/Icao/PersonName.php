@@ -22,6 +22,11 @@ use Override;
  */
 final class PersonName extends AbstractStringValueObject
 {
+    /**
+     * Longest accepted canonical form, in characters.
+     */
+    public const int MAX_LENGTH = 255;
+
     private const string IDENTIFIER = '[A-Z]+(?:[<-][A-Z]+)*';
 
     /**
@@ -107,7 +112,7 @@ final class PersonName extends AbstractStringValueObject
     protected function parse(string $value): string
     {
         $canonical = self::canonical($value);
-        if (\preg_match('/^' . self::IDENTIFIER . '(?:<<' . self::IDENTIFIER . ')?$/', $canonical) !== 1) {
+        if (\strlen($canonical) > self::MAX_LENGTH || \preg_match('/^' . self::IDENTIFIER . '(?:<<' . self::IDENTIFIER . ')?$/', $canonical) !== 1) {
             throw new InvalidPersonNameException('Invalid ICAO personal name.');
         }
 

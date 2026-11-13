@@ -18,6 +18,11 @@ use Override;
 abstract class AbstractNamePart extends AbstractStringValueObject
 {
     /**
+     * Longest accepted name part, in characters after normalisation.
+     */
+    public const int MAX_LENGTH = 100;
+
+    /**
      * @return non-empty-string a regex class body, e.g. \p{Cyrillic}
      */
     abstract protected function letters(): string;
@@ -55,7 +60,7 @@ abstract class AbstractNamePart extends AbstractStringValueObject
             ? '/^' . $word . '$/u'
             : '/^' . $word . '(?:[' . \preg_quote($separators, '/') . ']' . $word . ')*$/u';
 
-        if (\preg_match($pattern, $normalized) !== 1) {
+        if (\mb_strlen($normalized) > self::MAX_LENGTH || \preg_match($pattern, $normalized) !== 1) {
             throw new InvalidPersonNameException(\sprintf('Invalid %s (%d characters).', $this->label(), \mb_strlen($normalized)));
         }
 

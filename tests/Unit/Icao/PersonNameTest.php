@@ -255,6 +255,27 @@ final class PersonNameTest extends TestCase
         PersonName::from('IVANOV')->mrzField(1);
     }
 
+    public function testTheLongestAcceptedFormHasMaxLengthCharacters(): void
+    {
+        $primary = \str_repeat('A', 127);
+        $secondary = \str_repeat('B', PersonName::MAX_LENGTH - 129);
+        $longest = $primary . '<<' . $secondary;
+
+        self::assertSame(PersonName::MAX_LENGTH, \strlen($longest));
+        self::assertSame($longest, PersonName::from($longest)->value);
+        self::assertFalse(PersonName::isValid($longest . 'B'));
+    }
+
+    public function testTooLongANameIsRefusedWithoutEchoingIt(): void
+    {
+        try {
+            PersonName::fromParts(\str_repeat('Q', PersonName::MAX_LENGTH), ['X']);
+            self::fail('A name over the limit was accepted.');
+        } catch (InvalidPersonNameException $exception) {
+            self::assertStringNotContainsString('QQQ', $exception->getMessage());
+        }
+    }
+
     private static function bennelong(): PersonName
     {
         return PersonName::fromParts('Bennelong Wooloomooloo Warrandyte Warnambool', ['Dingo', 'Potoroo']);
