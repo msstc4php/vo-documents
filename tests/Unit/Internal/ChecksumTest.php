@@ -53,6 +53,10 @@ final class ChecksumTest extends TestCase
         yield 'mod97 space' => [static fn (): int => Checksum::mod97('12 3')];
         yield 'mod97 trailing newline' => [static fn (): int => Checksum::mod97("123\n")];
         yield 'mod11-2 X' => [static fn (): string => Checksum::iso7064Mod11_2('12X')];
+        yield 'luhn empty' => [static fn (): bool => Checksum::luhn('')];
+        yield 'weightedMod empty' => [static fn (): int => Checksum::weightedMod('', [], 11)];
+        yield 'mod97 empty' => [static fn (): int => Checksum::mod97('')];
+        yield 'mod11-2 empty' => [static fn (): string => Checksum::iso7064Mod11_2('')];
     }
 
     /**

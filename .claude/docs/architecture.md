@@ -14,6 +14,7 @@ core.
 | `Name\LatinSpelling` | `@internal`: finds a Latin override among the ICAO spellings of a name's forms (hyphen ≡ `<`, capped at 4096) |
 | `Name\PersonName` | Interface of a national full name: `latin(): Icao\PersonName`, `full()` |
 | `Name\RU\*` | `AbstractRussianNamePart` (letters, word pattern), `FamilyName`, `GivenName`, `Patronymic`, `PersonName` (+ `short()`, `initialsFirst()`), `PersonNameCodec`; `@internal RussianTransliteration` (drops Ь, then `Icao\Transliterator`) |
+| `Document\RU\*` | Number VOs (`Snils`, `Inn`, `InternalPassportNumber`, `PassportIssuingUnitCode`, `InternationalPassportNumber`, `DriverLicenceNumber`, `OmsPolicyNumber`): `final`, extend `AbstractStringValueObject`, implement `Maskable`, store digits only, `formatted()`; enum `DriverLicenceCategory`. No `Region` (no published ISO mapping, RU.md) |
 | `Codecs` | `Codecs::all()`: every payload codec, for `new ValueObjectMapper(Codecs::all())`; add each new composite's codec here |
 
 The transliterator picks the one table whose `script()` covers every letter of the input; letters from two tables

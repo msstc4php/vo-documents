@@ -9,7 +9,7 @@ use LogicException;
 /**
  * @internal
  *
- * Every method expects ASCII digits only and throws \LogicException otherwise.
+ * Every method expects at least one ASCII digit and nothing else, and throws \LogicException otherwise.
  *
  * Sources: ISO/IEC 7812-1 (Luhn), ISO/IEC 7064:2003 (MOD 97-10, MOD 11-2)
  */
@@ -87,8 +87,8 @@ final class Checksum
 
     private static function assertDigits(string $digits): void
     {
-        if (\preg_match('/^[0-9]*$/D', $digits) !== 1) {
-            throw new LogicException('Checksum input must consist of ASCII digits only.');
+        if (\preg_match('/^[0-9]+$/D', $digits) !== 1) {
+            throw new LogicException('Checksum input must be one or more ASCII digits.');
         }
     }
 }

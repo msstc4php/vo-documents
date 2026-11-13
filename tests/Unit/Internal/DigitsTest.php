@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace MSSTC4PHP\ValueObject\Documents\Tests\Unit\Internal;
 
+use LogicException;
+use MSSTC4PHP\ValueObject\Documents\Exception\InvalidDocumentNumberException;
 use MSSTC4PHP\ValueObject\Documents\Internal\Digits;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
@@ -24,5 +26,61 @@ final class DigitsTest extends TestCase
     public function testStripKeepsLettersAndHonoursCustomSeparators(): void
     {
         self::assertSame('1a-2', Digits::strip('1a-2.', '.'));
+    }
+
+    public function testStripRemovesLineBreaksAndNarrowSpaces(): void
+    {
+        self::assertSame('1234', Digits::strip("1\r\n2\u{2007}3\u{202F}4"));
+    }
+
+    public function testStripKeepsLettersSharingBytesWithMultibyteSeparators(): void
+    {
+        self::assertSame("1\u{0420}2", Digits::strip("1\u{0420}\u{00A0}2"));
+    }
+
+    public function testExactlyReturnsTheDigits(): void
+    {
+        self::assertSame('0123', Digits::exactly(' 01-23 ', 4, 'test number'));
+    }
+
+    public function testExactlyRefusesAnotherLengthWithTheCharacterCount(): void
+    {
+        $this->expectException(InvalidDocumentNumberException::class);
+        $this->expectExceptionMessage('Invalid test number (3 characters).');
+
+        Digits::exactly('123', 4, 'test number');
+    }
+
+    public function testExactlyCountsMultibyteCharactersOnce(): void
+    {
+        $this->expectExceptionMessage('Invalid test number (4 characters).');
+
+        Digits::exactly('12ЗО', 4, 'test number');
+    }
+
+    public function testExactlyRefusesEmptyInput(): void
+    {
+        $this->expectExceptionMessage('Invalid test number (0 characters).');
+
+        Digits::exactly(' - ', 1, 'test number');
+    }
+
+    public function testExactlyRefusesATrailingControlCharacter(): void
+    {
+        $this->expectException(InvalidDocumentNumberException::class);
+
+        Digits::exactly("1234\u{0000}", 4, 'test number');
+    }
+
+    public function testNonEmptyReturnsTheDigits(): void
+    {
+        self::assertSame('12', Digits::nonEmpty('12'));
+    }
+
+    public function testNonEmptyRefusesTheEmptyString(): void
+    {
+        $this->expectException(LogicException::class);
+
+        Digits::nonEmpty('');
     }
 }
