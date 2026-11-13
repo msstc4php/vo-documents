@@ -65,7 +65,7 @@ How the package applies this:
 
 | Part | Letters | Separators inside | Why |
 |---|---|---|---|
-| `FamilyName` | table 5.2 + 5.3 letters | hyphen, apostrophe, space; a word may start with `'` (at the start or after a space) and end with `'` before a space | prefixes are part of the geslachtsnaam (art. 23 lid 3): `van der Berg`, `'t Hart`, `van 't Hof`, `d' Ancona`, `d'Ancona`, `Jansen-de Vries` |
+| `FamilyName` | table 5.2 + 5.3 letters | hyphen, apostrophe, space; a word may start with `'` (at the start or after a space) and end with `'` before a space, never both around one space (`x' 'y`: no table 36 prefix has that shape) | prefixes are part of the geslachtsnaam (art. 23 lid 3): `van der Berg`, `'t Hart`, `van 't Hof`, `d' Ancona`, `d'Ancona`, `Jansen-de Vries` |
 | `GivenName` | the same | the same | several given names (`Willeke Liselotte`), `Hendrik-Jan` (LO BRP example); the apostrophe is a BRP character (table 5.2, code 27) and the shared word rule also accepts it leading a given name (`'Anna`) |
 
 - **Prefixes (plan decision, binding):** no separate class; the prefix is stored inside the family name as typed, so

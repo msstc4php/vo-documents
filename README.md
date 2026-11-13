@@ -44,7 +44,8 @@ checksum."); **it never contains the input or any part of it**.
 
 `__toString()` and `jsonSerialize()` return the full canonical value. Masking is an explicit, separate call,
 `masked()` (interface `Contract\Maskable`). No masking rule is official unless the class says so; the default keeps the
-last four digits, the AU classes keep three (their numbers are at most 10 characters long, `docs/sources/AU.md`).
+last four characters, and a number of 8 characters or fewer keeps three (CH identity document, GB Northern Ireland
+licence). The AU classes keep three (their numbers are at most 10 characters long, `docs/sources/AU.md`).
 
 | Class | Document | Check | Source |
 |---|---|---|---|
@@ -75,7 +76,7 @@ official algorithm is published. A number with the right shape is accepted, neve
 | `Document\DE\TaxIdentificationNumber` | Steuer-ID, 11 digits | format only | none | StIdV § 1; AO § 139b |
 | `Document\DE\PensionInsuranceNumber` | Rentenversicherungsnummer, `NN DDMMYY L SS C` | checksum verified (VKVV § 2) | fields as strings, no typed date or sex | VKVV § 2 |
 | `Document\FR\Nir` | NIR (numéro de sécurité sociale), 15 characters | key format only | `HasSex`, birth year digits, `birthMonth()`, `birthPlaceCode()` | INSEE; DSN cahier technique |
-| `Document\FR\LegacyIdentityCardNumber` | CNI issued until 2021, 12 digits | format only | none typed (issue month not validated) | NOR INTD0000001C |
+| `Document\FR\LegacyIdentityCardNumber` | CNI issued until 2021, 12 characters (digits; `2A`/`2B` in a Corsican place code) | format only | `issueYearDigits()`, `issueMonth()` (not validated), `issuePlaceCode()`, `serialNumber()` | NOR INTD0000001C |
 | `Document\FR\PassportNumber` | Passport, `99AA99999` | format only | none | France Titres-ANTS |
 | `Document\FR\TaxIdentificationNumber` | Numéro fiscal (SPI), 13 digits | format only | none | OECD TIN note (DGFiP) |
 | `Document\FR\DriverLicenceNumber` | Permis de conduire, 12 digits | format only | none | France Titres-ANTS |
@@ -227,9 +228,9 @@ it as unsupported (a configuration error, not a 500 on request input). The inter
 
 ### Composite names need the codecs
 
-Document numbers and name parts are strings and need nothing. The composite names (`Name\RU\PersonName`,
-`Name\AU\PersonName`) are read through a payload codec, so the mapper that the bridge uses must be built with
-`Codecs::all()`:
+Document numbers and name parts are strings and need nothing. The composite names (`Name\<CC>\PersonName` of every
+country: RU, AU, DE, FR, IT, ES, NL, CH, GB, TR) are read through a payload codec, so the mapper that the bridge uses
+must be built with `Codecs::all()`:
 
 ```php
 use MSSTC4PHP\ValueObject\Documents\Codecs;
@@ -273,11 +274,20 @@ Imports: `MSSTC4PHP\ValueObject\Documents\Codecs`, `MSSTC4PHP\ValueObject\Payloa
 `MSSTC4PHP\ValueObject\Laravel\Casts\AsValueObject`, `MSSTC4PHP\ValueObject\Laravel\Rules\ValidValueObject`.
 
 ```yaml
-# Symfony (vo-base-bundle): every PayloadCodec service is autoconfigured and added to the mapper
+# Symfony (vo-base-bundle): every PayloadCodec service is autoconfigured and added to the mapper; register the codec
+# of every country, the same list as Codecs::all()
 services:
     _defaults: { autoconfigure: true }
     MSSTC4PHP\ValueObject\Documents\Name\RU\PersonNameCodec: ~
     MSSTC4PHP\ValueObject\Documents\Name\AU\PersonNameCodec: ~
+    MSSTC4PHP\ValueObject\Documents\Name\DE\PersonNameCodec: ~
+    MSSTC4PHP\ValueObject\Documents\Name\FR\PersonNameCodec: ~
+    MSSTC4PHP\ValueObject\Documents\Name\IT\PersonNameCodec: ~
+    MSSTC4PHP\ValueObject\Documents\Name\ES\PersonNameCodec: ~
+    MSSTC4PHP\ValueObject\Documents\Name\NL\PersonNameCodec: ~
+    MSSTC4PHP\ValueObject\Documents\Name\CH\PersonNameCodec: ~
+    MSSTC4PHP\ValueObject\Documents\Name\GB\PersonNameCodec: ~
+    MSSTC4PHP\ValueObject\Documents\Name\TR\PersonNameCodec: ~
 ```
 
 ```php
@@ -319,14 +329,16 @@ Collected from the source notes; each is a deliberate omission with its reason i
 - **Format only, check digit not verified:** INN, TFN and Medicare card number. No official algorithm is published
   (FNS says only "по алгоритму, определенному ФНС"; the ATO gives the TFN algorithm to registered developers only;
   the ADHA appendix is not reachable), so a mistyped check digit is accepted. Only checksums quoted from an official
-  source are verified (SNILS, OMS policy).
+  source are verified: SNILS, OMS policy, DE pension insurance number, IT codice fiscale, ES DNI and NIE, NL BSN, CH
+  AHV number, GB NHS and H&C numbers.
 - **Not verified against the official PDF:** the 16-digit length of the OMS policy and the FFOMS Order 79 text it is
   checked against (www.ffoms.gov.ru is unreachable from here, the text is quoted from a copy), and the 2 + 7 split of
   the international passport number (no text read states it; `RU.md`).
 - **Format only in Europe** (see the table above): DE Steuer-ID (no leading-zero or repeated-digit rule either, those
-  are in an unpublished BZSt paper), FR NIR key, FR and IT identity numbers, ES social security number, TR T.C. Kimlik
-  No (NVİ shares the algorithm only with public bodies; the popular formula fails the official PRADO specimens), the
-  Swiss and British licence numbers and the CHI check digit. ES pre-2008 NIE letters are accepted as any `A-Z`.
+  are in an unpublished BZSt paper), FR NIR key and numéro fiscal, the identity card, passport and licence numbers of
+  every country, ES social security number, TR T.C. Kimlik No (NVİ shares the algorithm only with public bodies; the
+  popular formula fails the official PRADO specimens) and the CHI check digit. ES pre-2008 NIE letters are accepted as
+  any `A-Z`.
 - **Encoded data only where the source defines it:** the DE pension insurance number exposes strings (no century, no
   published rule for unproven birth dates); Italian codice fiscale accepts any omocodia substitution over the seven
   numeric positions and `29` February when the two-digit year is divisible by four (no century is encoded).
@@ -339,7 +351,15 @@ Collected from the source notes; each is a deliberate omission with its reason i
   the Basel-Stadt passport office and fedpol; TR passport format from the PRADO register; the ES NIF/NIE algorithm and
   several GB texts are cited through unmodified Internet Archive copies of the official page (original URL, archive URL
   and capture date in the source notes).
-- Name parts are limited to 100 characters, `Icao\PersonName` to 255 (a very long real name is refused).
+- Name parts are limited to 100 characters, `Icao\PersonName` to 255 (a very long real name is refused). Three long
+  parts can exceed 255 in Latin (an ES name of three 100-character parts): the name is refused with
+  "(Latin form too long)", unless the country accepts any ICAO spelling (RU, GB) and an override is given.
+- **RU and GB accept an override without a derived form**: when a letter has no ICAO spelling or the derived form is
+  too long, the override is kept as given (the passport authority writes a documented spelling); without an override
+  the name is refused. An `AnyIcaoSpelling` override is stored as typed: `SMYTH<JONES<<MARY` and `SMYTH-JONES<<MARY`
+  are two values. GB drops the `XXX` passport forename of a person with one name (`SMITH<<XXX` is `SMITH`).
+- **The transliteration variant cap (4096) is per ICAO word**, so a long list of given names with umlauts is accepted
+  with an override; a single word with more than twelve two-way letters is still refused with an override.
 
 ## Development
 

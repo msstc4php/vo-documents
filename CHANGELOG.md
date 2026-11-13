@@ -20,8 +20,9 @@
   codice fiscale, passport; ES DNI, NIE, social security number; NL BSN, identity document number; CH AHV number,
   identity document number, driving licence; GB NINO, passport, DVLA and DVA licences, NHS, H&C and CHI numbers; TR
   T.C. Kimlik No, passport. Source notes `docs/sources/{DE,FR,IT,ES,NL,CH,GB,TR}.md`.
-- `Name\Latin\AbstractLatinNamePart` and an internal `LatinPersonNameBuilder` shared by the Latin-script countries;
-  `Name\AU\*` moved onto them without a public API change.
+- `Name\Latin\AbstractLatinNamePart` and internal bases shared by the Latin-script countries
+  (`LatinPersonNameBuilder`, `AbstractLatinPersonName`, `AbstractFamilyGivenPersonName`,
+  `AbstractFamilyGivenPersonNameCodec`); `Name\AU\*` moved onto them without a public API change.
 - `Contract\HasSex` is implemented by `Nir`, `FiscalCode`, the DVLA licence number and `ChiNumber`.
 - Source notes in `docs/sources/` (RU, AU, ICAO, DE, FR, IT, ES, NL, CH, GB, TR).
 
@@ -29,7 +30,8 @@
 
 - The Russian derived Latin name omits the patronymic and the soft sign Ь (MVD Orders 996 and 186).
 - `Inn`, `TaxFileNumber` and `MedicareCardNumber` validate the format only; the check digit is not verified because no
-  official algorithm is published. Only checksums with an official source (`Snils`, `OmsPolicyNumber`) are verified.
+  official algorithm is published. Only checksums with an official source are verified: `Snils`, `OmsPolicyNumber` and
+  the European ones listed below.
 - `DriverLicenceNumberFactory::fromNumber()` is always ambiguous for AU with the published formats; use
   `fromNumberIn()`.
 - Name parts are limited to 100 characters, `Icao\PersonName` to 255.
@@ -41,8 +43,10 @@
   check characters, TR T.C. Kimlik No, and the other identity, passport and licence numbers.
 - Latin override policy per country: `TransliterationVariant` (AU, DE, FR, IT, ES, NL, CH, TR) or `AnyIcaoSpelling`
   (RU, GB).
-- Not covered (no official format): DE Führerschein, FR 2021 identity card, IT CIE and patente, ES passport, NL
-  rijbewijs, TR sürücü belgesi; ES driving licence is the DNI or NIE.
+- Not covered: see README "Not covered" for the full list with reasons (among them DE Führerschein, FR 2021 identity
+  card, IT CIE and patente, ES passport, NL rijbewijs, TR sürücü belgesi; the ES driving licence is the DNI or NIE).
+- RU and GB (`AnyIcaoSpelling`) accept an override when the name has no derived form; the transliteration variant cap
+  is per ICAO word; FR old identity cards accept the Corsican `2A`/`2B` place codes.
 - Name limits: FR names use the 2014 civil-status circular's letters; NL refuses `ĳ`; TR refuses `Q`, `W`, `X`, hyphens
   and apostrophes.
 - Requires `msstc4php/vo-base ^1.1.1`.

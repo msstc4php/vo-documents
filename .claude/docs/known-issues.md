@@ -90,10 +90,12 @@
   tests of ordinary parts need no `UsesClass` for it.
 - Name part messages: "(N characters)" for empty or > 100, "(compatibility character)", "(invalid character)" for
   any pattern failure (also a misplaced separator).
-- `LatinSpelling::find()` matches part by part: the override's secondary words are split by each part's word count
-  (all variants of a part have the same words), so the cost is the sum of variant counts and the cap
-  (`MAX_SPELLINGS` = 4096) is per part. `LatinOverridePolicy::resolve()` compares with the derived form **before**
-  computing spellings, so the derived override of a name with too many spellings (13 × `Ä`) is accepted.
+- `LatinSpelling::find()` matches word by word (`IdentifierSpellings`: the variants of each ICAO word, split at spaces
+  and hyphens, plus the national separators to rebuild the canonical form), so the cost is the sum of variant counts and
+  the cap (`MAX_SPELLINGS` = 4096, also `Transliterator::variants()` per call) is per word: 13 × `Jürgen` with an
+  override is accepted, one word with 13 × `Ä` is still refused when an override differs from the derived form.
+  `LatinOverridePolicy::resolve()` compares with the derived form **before** computing spellings, so the derived
+  override of a name with too many spellings (13 × `Ä`) is accepted.
 - `SubdivisionResolver` no-match message: "(fits no jurisdiction)" when the length fits at least one subdivision
   (`AbstractDriverLicenceNumber::fitsLength()`, `@internal`), else the length.
 - **Policy:** transliteration tables and override rules change only in a major version (stored overrides are
@@ -131,11 +133,12 @@
   the sandbox (use `www.service-public.gouv.fr`), `ants.gouv.fr` serves only a script shell.
 - **FR passport, licence and CNI formats come from ANTS answers on Services Publics+ and a 2000 Interior instruction**
   (no format in a decree that could be read). The 2021 CNI (9 characters) is not covered; the old CNI is
-  "douze chiffres" per the instruction, so a Corsican place code with a letter is refused (unverified case).
+  "douze chiffres" per the instruction, but a Corsican place code holds `2A`/`2B` at the department positions (5-6), so
+  `LegacyIdentityCardNumber` accepts those two letters there (controller ruling: never refuse a still-valid card).
 - **FR names use the circular's letter list, not `\p{Latin}`** (Circulaire 23 juillet 2014, § 1): `ñ`, `ł`, `ß`, `å`
   are refused even in foreign names ("sans reproduire les éventuels signes diacritiques de la langue étrangère").
 - `Document\FR\LegacyIdentityCardNumber` does not validate the issue-month field (the instruction defines the field,
-  not its values); `issueMonth()` is a plain `int` that may lie outside 1-12.
+  not its values); `issueMonth()` is `int<0, 99>` (digit lookup table, no clamp) and may lie outside 1-12.
 - **IT codice fiscale source:** the DM 23 dicembre 1976 is not in the online index of its own Gazzetta (n. 345 of
   1976); it is read from its official reprints as an annex of later decrees (GU 27-4-1999 S.O. 83, `099A3188`, and
   the 1995/1997/1998 ones). The 1997 reprint misprints `4 = O` (omocodia) and `r = 19`; the others read `4 = Q` and
@@ -221,3 +224,21 @@
   derivation).
 - TR passport pattern `[A-Z][0-9]{8}` is unanchored on purpose (length fixed by `NumberFormat`; anchors were
   equivalent mutants).
+- **Composite Latin form can exceed 255:** three name parts of 100 characters (ES first + second surname + given) give
+  a Latin form above `Icao\PersonName::MAX_LENGTH`; the name is refused with "(Latin form too long)" (every
+  `PersonName` documents it in `@throws`). RU and GB accept it when an override is given.
+- **`AnyIcaoSpelling` accepts an override without a derived form** (controller ruling, RU and GB): a letter without an
+  ICAO spelling (`Kĸ`) or a derived form above 255 is refused only when no override is given
+  (`LatinOverridePolicy::withoutDerivedForm()`). The override is stored as typed: `SMYTH<JONES<<MARY` and
+  `SMYTH-JONES<<MARY` are not equal (only an override equal to the derived form is normalised away).
+- **GB `XXX` forename** (GB.md (4)): with `given === null`, an override `SMITH<<XXX` is read as the mononym `SMITH`
+  (and dropped when it is the derived form); with a given name, `XXX` stays.
+- **NL apostrophes:** `x' 'y` (a trailing and a leading apostrophe around one space) is refused; no table 36 prefix has
+  that shape.
+- **DE VSNR:** VKVV § 2 Abs. 3 Satz 2 (unproven birth date) and Abs. 5 Satz 3 (exhausted serial numbers) leave the
+  formation of some numbers to unpublished rules; such a number could fail the format or the check digit although it
+  was issued. None is known.
+- Name codecs document `InvalidPersonNameException` next to `InvalidPayloadException` on `decode()` (a payload of the
+  right shape with an invalid part); the shape message says a nullable key may be missing (read as null).
+- The `Name\Latin` bases are `@internal`: public property types are the abstract part (`AbstractNamePart`) at runtime,
+  PHPStan sees the country's classes through `@extends AbstractFamilyGivenPersonName<FamilyName, GivenName>`.

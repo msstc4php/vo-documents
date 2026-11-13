@@ -9,7 +9,7 @@ Runtime requirements: `msstc4php/vo-base ^1.1.1`, `ext-mbstring`, `symfony/polyf
 |---|---|
 | Validation, request input, routes | The vo-base bridges work as is (bundle, Laravel, Yii 2, CodeIgniter 4, Spiral) |
 | Storage | As is in Laravel, Yii 2, CodeIgniter 4 (string classes) and Cycle; Doctrine through `vo-documents-doctrine` (`vod_<cc>_<snake_name>` types) |
-| Composite names (`Name\RU\PersonName`, `Name\AU\PersonName`) | The mapper must be `new ValueObjectMapper(Codecs::all())` |
+| Composite names (`Name\<CC>\PersonName` of every country) | The mapper must be `new ValueObjectMapper(Codecs::all())` |
 
 How each bridge gets its mapper (the README shows the code):
 
@@ -18,7 +18,8 @@ How each bridge gets its mapper (the README shows the code):
   the mapper from the same container, or an instance in `S::TYPECAST_HANDLER`.
 - vo-base-yii2: `Yii::$container->get(ValueObjectMapper::class)`; define it as a singleton. The ActiveRecord behavior
   falls back to a codec-less default mapper unless given `mapper`.
-- vo-base-bundle: `PayloadCodec` services are autoconfigured and tagged; register the two codec classes as services.
+- vo-base-bundle: `PayloadCodec` services are autoconfigured and tagged; register every codec class of `Codecs::all()`
+  (ten today) as a service.
 - vo-base-codeigniter4: built-in codecs only; composites of this package are not supported.
 
 `vo-documents-doctrine` has a completeness test that fails when a class here lacks a type: add the type there in the

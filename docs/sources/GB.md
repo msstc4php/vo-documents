@@ -62,13 +62,16 @@ How the package applies this:
   Apostrophes are accepted between letters (`O'Brien`, `D'Arcy`); a leading or trailing apostrophe is refused by the
   shared word rule (the DAP remark "anywhere in a name" describes the input system, not a name form).
 - **Forenames optional:** a person with one name (4) is `PersonName($family, null)`; the Latin form is the mononym
-  `FAMILY`, since `XXX` "does not form part of their name".
+  `FAMILY`, since `XXX` "does not form part of their name". An override copied from such a passport (`SMITH<<XXX`) is
+  read without the `XXX` (`SMITH`), so it is the derived form and not kept.
 - **Derived Latin:** `SURNAME<<FORENAMES` through ICAO table 6.A: `O'Brien, Siân` → `OBRIEN<<SIAN`, `Llŷr` → `LLYR`,
   `Smith-Jones, Mary Ann` → `SMITH-JONES<<MARY<ANN`.
 - **Override policy `Name\AnyIcaoSpelling`** (3): when the table has no spelling the customer wants, HMPO writes the
   spelling shown by an official document or a foreign authority's letter, or the name without the accent mark; the
   passport therefore keeps a documented spelling that need not be a table 6.A variant. Any valid ICAO name is kept as
-  the override; one equal to the derived form is not kept.
+  the override, as typed; one equal to the derived form is not kept. When a letter has no ICAO spelling ("Name not
+  found on the transliteration table", (3)), the name has no derived form: with an override (the evidenced spelling)
+  it is accepted, without one it is refused.
 
 Payload (`PersonNameCodec`): `{family, given, latin}` with `given` null for a person with one name and `latin` the
 override only; the JSON view is `{family, given, effectiveLatin}` and is refused by the codec.

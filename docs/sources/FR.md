@@ -74,8 +74,7 @@ Payload (`PersonNameCodec`): `{family, given, latin}` with `latin` the override 
 1. **INSEE definition c1409**: "Ce numéro d'identification unique de l'individu est formé de 13 chiffres : le sexe
    (1 chiffre), l'année de naissance (2 chiffres), le mois de naissance (2 chiffres) et le lieu de naissance
    (5 chiffres). Les 3 chiffres suivants correspondent à un numéro d'ordre qui permet de distinguer les personnes nées
-   au
-   même lieu à la même période ; une clé de contrôle à 2 chiffres complète le NIR."
+   au même lieu à la même période ; une clé de contrôle à 2 chiffres complète le NIR."
 2. **INSEE, Courrier des statistiques, encadré 1**:
 
    > Le NIR est composé de 13 chiffres et est unique pour chaque personne : Sexe (1 chiffre) : 1 pour les hommes, 2
@@ -163,15 +162,17 @@ Rubrique 55 b): "Sur la deuxième ligne, les douze premiers caractères sont ceu
 numéro est suivi d'un chiffre particulier qui permettra, lors de la lecture automatique, d'interpréter sans erreur le
 numéro de la carte." That check digit belongs to the MRZ, not to the number.
 
-Implemented: 12 digits. Positions 3-4 are the month of issue, but the instruction states no rule for the field's
-values, so they are **not validated** (owner's rule: no structural rule without an official text; `00` and `13` are
-accepted). Exposed: `issueYearDigits()` (2 digits, no century), `issueMonth()` (the two digits as an int, not
-validated), `issuePlaceCode()` (3 characters),
-`serialNumber()` (5 digits). No display form is published; `masked()` keeps the last four digits: `********2345`.
+Implemented: 12 characters (digits; `2A`/`2B` in a Corsican place code, below). Positions 3-4 are the month of issue,
+but the instruction states no rule for the field's values, so they are **not validated** (owner's rule: no structural
+rule without an official text; `00` and `13` are accepted). Exposed: `issueYearDigits()` (2 digits, no century),
+`issueMonth()` (the two digits as an `int<0, 99>`, not validated), `issuePlaceCode()` (3 characters), `serialNumber()`
+(5 digits). No display form is published; `masked()` keeps the last four characters: `********2345`.
 The provisional card (rubrique 57: 11 characters with the letter `P`) is not covered.
 
-**Concern:** the instruction says "douze chiffres", and a Corsican place code (`2A`/`2B`) would hold a letter; the
-source does not address it, so a letter is refused.
+**Corsica:** the instruction says "douze chiffres", but the INSEE geographic code of a Corsican place starts with the
+department `2A` or `2B` (as in the NIR's birth place, below). Cards issued before August 2021 stay valid, so the class
+accepts `2A`/`2B` at positions 5-6 (the department part of the place code) and digits everywhere else (controller
+ruling: never refuse a valid number).
 
 ### Card issued since August 2021 — not covered
 
@@ -231,7 +232,7 @@ no fixed format) and the older ones.
 | Plan candidate | Source | Implemented |
 |---|---|---|
 | NIR (sex, birth year/month, department) | INSEE, service-public, DSN norm | `Nir`: structure rules of the DSN norm, `HasSex`; birth year as two digits (no century), month nullable; place code as a string (no ISO mapping); **key format only** (no official algorithm) |
-| CNI number | Instruction INTD0000001C (old card); no official text for the 2021 card | `LegacyIdentityCardNumber` (12 digits, month field not validated); the 2021 card **not covered** |
+| CNI number | Instruction INTD0000001C (old card); no official text for the 2021 card | `LegacyIdentityCardNumber` (12 characters: digits, `2A`/`2B` in a Corsican place code; month field not validated); the 2021 card **not covered** |
 | Passport number | ANTS | `PassportNumber`, `2 digits + 2 letters + 5 digits` |
 | Numéro fiscal (SPI) | French TIN sheet (OECD) | `TaxIdentificationNumber`, format only, first digit 0-3 |
 | Permis de conduire number | ANTS | `DriverLicenceNumber`, 12 digits (licences since 1 June 1975), format only |

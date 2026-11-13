@@ -6,14 +6,15 @@ core.
 | Area | Purpose |
 |---|---|
 | `Contract\`, `Exception\`, `Sex` | Shared interfaces, the three exception families, the sex enum |
-| `Internal\` | `@internal` helpers: `Checksum`, `Mask`, `Digits`, `UnicodeText`/`Text`, `NumberFormat` (character class + length range of a licence), `SubdivisionResolver` (one match / none / ambiguous over an enum of subdivisions), `PayloadFields` (codec payload validation) |
+| `Internal\` | `@internal` helpers: `Checksum`, `Mask`, `Digits`, `UnicodeText`/`Text`, `NumberFormat` (character class + length range of a licence), `SubdivisionResolver` (one match / none / ambiguous over an enum of subdivisions), `PayloadFields` (codec payload validation), `Optional` (`equal()` of two optional value objects), `TwoDigitYearDate` (day/month valid in some century: DVLA, CHI, IT codice fiscale) |
 | `Icao\PersonName` | MRZ-style Latin name (`A-Z`, `-`, `<`; `<<` between primary and secondary), `mrzField()` truncation |
 | `Icao\Transliterator` | National name part → ICAO Latin (`toLatin()` default, `variants()` all spellings) |
 | `Icao\Table\*` | `@internal` `TransliterationTable` per script (LatinMultinational, Cyrillic); add a class + register it in the `Transliterator` constructor for a new script |
 | `Name\AbstractNamePart` | Base of every national name part: `letters()` (regex class), `label()` (message), `innerSeparators()` (default `-' `) |
-| `Name\LatinSpelling` | `@internal`: finds a Latin override among the ICAO spellings of a name's forms (hyphen ≡ `<`, capped at 4096) |
-| `Name\LatinOverridePolicy` | `@internal` abstract: `resolve(?override, derived)` (template method, drops the derived form); subclasses `AnyIcaoSpelling` (RU) and `TransliterationVariant` (AU, via `LatinSpelling`) |
+| `Name\LatinSpelling` | `@internal`: finds a Latin override among the ICAO spellings of a name, word by word (`Name\IdentifierSpellings`: variants per word + national separators; hyphen ≡ `<`; cap 4096 per word) |
+| `Name\LatinOverridePolicy` | `@internal` abstract: `resolve(?override, derived)` (template method, drops the derived form); `withoutDerivedForm()` (refuses, except `AnyIcaoSpelling` with an override); subclasses `AnyIcaoSpelling` (RU, GB) and `TransliterationVariant` (AU, DE, FR, IT, ES, NL, CH, TR; via `LatinSpelling`) |
 | `Name\PersonName` | Interface of a national full name: `latin(): Icao\PersonName`, `full()` |
+| `Name\Latin\*` | `AbstractLatinNamePart` (`\p{Latin}` part); `@internal`: `LatinPersonNameBuilder` (derived form, spellings per word for `TransliterationVariant`), `AbstractLatinPersonName` (effective Latin form + kept override, hook `overridePolicy()`), `AbstractFamilyGivenPersonName<TFamily, TGiven>` (public `family`/`given`, `full()`, `equals()`, JSON view; AU DE FR IT TR NL CH GB), `AbstractFamilyGivenPersonNameCodec<TName>` (keys `family`/`given`/`latin`; hooks `shape()`, `create()`) |
 | `Name\RU\*` | `AbstractRussianNamePart` (letters, word pattern), `FamilyName`, `GivenName`, `Patronymic`, `PersonName` (+ `short()`, `initialsFirst()`), `PersonNameCodec`; `@internal RussianTransliteration` (drops Ь, then `Icao\Transliterator`) |
 | `Document\RU\*` | Number VOs (`Snils`, `Inn`, `InternalPassportNumber`, `PassportIssuingUnitCode`, `InternationalPassportNumber`, `DriverLicenceNumber`, `OmsPolicyNumber`): `final`, extend `AbstractStringValueObject`, implement `Maskable`, store digits only, `formatted()`; enum `DriverLicenceCategory`. No `Region` (no published ISO mapping, RU.md) |
 | `Codecs` | `Codecs::all()`: every payload codec, for `new ValueObjectMapper(Codecs::all())`; add each new composite's codec here |
@@ -23,14 +24,15 @@ The transliterator picks the one table whose `script()` covers every letter of t
 
 `Document\AU\*`: `Jurisdiction` (enum, ISO 3166-2), `DriverLicenceNumber` interface, `AbstractDriverLicenceNumber` + one
 final class per jurisdiction in `DriverLicence\`, `DriverLicenceNumberFactory`, `TaxFileNumber`, `MedicareCardNumber`.
-`Name\AU\*` mirrors `Name\RU\*`.
+`Name\AU\*`: part classes on the Latin base, `PersonName`/`PersonNameCodec` on the `Name\Latin` family+given bases.
 
 `Document\DE\*`: `IdentityCardNumber` (+ `authorityCode()`), `PassportNumber`, `TaxIdentificationNumber` (format
 only), `PensionInsuranceNumber` (VKVV checksum; fields as strings, no `HasBirthDate`/`HasSex`). `Name\DE\*` mirrors
 `Name\AU\*` (Latin base, `TransliterationVariant`).
 
 `Document\FR\*`: `Nir` (`HasSex`; DSN field rules; key format only; `birthMonth()` nullable, `birthPlaceCode()`
-string), `LegacyIdentityCardNumber` (12-digit card issued until 2021; the 2021 card is not covered), `PassportNumber`
+string), `LegacyIdentityCardNumber` (12-character card issued until 2021, `2A`/`2B` accepted in the place code; the
+2021 card is not covered), `PassportNumber`
 (`99AA99999`), `TaxIdentificationNumber` (SPI, format only), `DriverLicenceNumber` (12 digits, format only).
 `Name\FR\*`: `AbstractFrenchNamePart` overrides `letters()` with the 2014 civil-status circular's list (no `\p{Latin}`).
 
@@ -41,7 +43,7 @@ through lookup tables; year as two digits, `birthMonth()`/`birthDay()` ints, `bi
 `Document\ES\*`: `Dni` (8 digits + mod 23 letter, verified), `Nie` (X/Y/Z + 7 digits + letter, verified through the
 internal `ControlLetter`; pre-2008 X + 8 digits + letter, format only), `SocialSecurityNumber` (12 digits, format only;
 `provinceCode()` string). The driving licence number is the DNI or NIE (no class); the passport number is not covered.
-`Name\ES\PersonName($first, ?$second, $given, ?$latin)`: both surnames feed `LatinPersonNameBuilder` as family
+`Name\ES\PersonName($first, ?$second, $given, ?$latin)` extends `AbstractLatinPersonName` only: both surnames are family
 parts (primary identifier joined by a space); codec keys `first`, `second`, `given`, `latin`.
 
 `Document\NL\*`: `Bsn` (9 digits, elfproef verified per LO BSN; 8 digits read with a leading zero and stored with 9),
@@ -65,7 +67,8 @@ digits; two plain classes, no `SubdivisionResolver`: the formats never overlap),
 (NHS Modulus 11 verified through the internal `NhsCheckDigit`; H&C range 320000001-399999999), `ChiNumber` (Scotland;
 `HasSex`, `DDMMYY` date validated, check digit format only). `Internal\TwoDigitYearDate` validates a day/month with a
 century-less year (shared by the DVLA and CHI classes). `Name\GB\PersonName($family, ?$given, ?$latin)`: `\p{Latin}`
-parts, override policy `AnyIcaoSpelling` (HMPO writes a documented spelling), `given` null for a person with one name;
+parts, override policy `AnyIcaoSpelling` (HMPO writes a documented spelling; kept also without a derived form), `given`
+null for a person with one name (an override's lone `XXX` forename is dropped);
 codec keys `family`, `given`, `latin`.
 
 `Document\TR\*`: `IdentityNumber` (T.C. Kimlik No, 11 digits, format only: NVİ does not publish the check-digit

@@ -135,8 +135,7 @@ Implemented (16 characters after separators are removed and ASCII letters upper-
 - **Birth day.** "(invalid birth day)" for `00`, `32`-`40`, `72`-`99` and a day the month cannot have. The year has no
   century, so February 29 is accepted when the two-digit year is divisible by four (`00` included: 2000 was a leap
   year, although 1900 was not; the century is unknown, so `00` is accepted) and refused otherwise (`01`, `10`, `98` are
-  not leap years in any century). This rejects impossible dates only;
-  an unlikely one is accepted.
+  not leap years in any century). This rejects impossible dates only; an unlikely one is accepted.
 - **Place code** is a string, not a `Subdivision`: it is a cadastral (Belfiore) code of a municipality or a foreign
   state (`Z…`), with no one-to-one ISO 3166-2 mapping; the code list itself is not checked.
 - `masked()` keeps the last four characters (16 > 8, package rule; no official masking rule): `************501U`. No

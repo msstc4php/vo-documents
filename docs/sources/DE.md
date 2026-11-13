@@ -6,13 +6,13 @@ amendment status given is the one the portal printed on that day.
 
 | Act | Citation (portal "Vollzitat") | Portal |
 |---|---|---|
-| PAuswG | Personalausweisgesetz vom 18. Juni 2009 (BGBl. I S. 1346), last amended by Art. 3 G v. 16.7.2026 (BGBl. 2026 I Nr. 213) | <https://www.gesetze-im-internet.de/pauswg/> |
-| PAuswV | Personalausweisverordnung vom 1. November 2010 (BGBl. I S. 1460), last amended by Art. 3 V v. 30.1.2026 (BGBl. 2026 I Nr. 31) | <https://www.gesetze-im-internet.de/pauswv/> |
-| PassG | Passgesetz i. d. F. d. Bek. vom 30. Oktober 2023 (BGBl. 2023 I Nr. 291), last amended by Art. 12 Abs. 13 G v. 22.10.2026 (BGBl. 2026 I Nr. 318) | <https://www.gesetze-im-internet.de/pa_g_1986/> |
-| PassV | Passverordnung vom 19. Oktober 2007 (BGBl. I S. 2386), last amended by Art. 1 V v. 30.1.2026 (BGBl. 2026 I Nr. 31) | <https://www.gesetze-im-internet.de/passv_2007/> |
+| PAuswG | Personalausweisgesetz vom 18. Juni 2009 (BGBl. I S. 1346), last amended by Art. 3 G v. 16.7.2026 (BGBl. 2026 I Nr. 213) | <https://www.gesetze-im-internet.de/pauswg/>; cited: <https://www.gesetze-im-internet.de/pauswg/__2.html> |
+| PAuswV | Personalausweisverordnung vom 1. November 2010 (BGBl. I S. 1460), last amended by Art. 3 V v. 30.1.2026 (BGBl. 2026 I Nr. 31) | <https://www.gesetze-im-internet.de/pauswv/>; cited: <https://www.gesetze-im-internet.de/pauswv/anlage_3.html> |
+| PassG | Passgesetz i. d. F. d. Bek. vom 30. Oktober 2023 (BGBl. 2023 I Nr. 291), last amended by Art. 12 Abs. 13 G v. 22.10.2026 (BGBl. 2026 I Nr. 318) | <https://www.gesetze-im-internet.de/pa_g_1986/>; cited: <https://www.gesetze-im-internet.de/pa_g_1986/__4.html> |
+| PassV | Passverordnung vom 19. Oktober 2007 (BGBl. I S. 2386), last amended by Art. 1 V v. 30.1.2026 (BGBl. 2026 I Nr. 31) | <https://www.gesetze-im-internet.de/passv_2007/>; cited: <https://www.gesetze-im-internet.de/passv_2007/anlage_11.html> |
 | AO | Abgabenordnung, § 139b | <https://www.gesetze-im-internet.de/ao_1977/__139b.html> |
-| StIdV | Steueridentifikationsnummerverordnung vom 28. November 2006 (BGBl. I S. 2726), last amended by Art. 10 V v. 19.12.2025 (BGBl. 2025 I Nr. 372) | <https://www.gesetze-im-internet.de/stidv/> |
-| VKVV | Versicherungsnummern-, Kontoführungs- und Versicherungsverlaufsverordnung vom 30. März 2001 (BGBl. I S. 475), last amended by Art. 22 G v. 12.6.2020 (BGBl. I S. 1248) | <https://www.gesetze-im-internet.de/vkvv/> |
+| StIdV | Steueridentifikationsnummerverordnung vom 28. November 2006 (BGBl. I S. 2726), last amended by Art. 10 V v. 19.12.2025 (BGBl. 2025 I Nr. 372) | <https://www.gesetze-im-internet.de/stidv/>; cited: <https://www.gesetze-im-internet.de/stidv/__1.html> |
+| VKVV | Versicherungsnummern-, Kontoführungs- und Versicherungsverlaufsverordnung vom 30. März 2001 (BGBl. I S. 475), last amended by Art. 22 G v. 12.6.2020 (BGBl. I S. 1248) | <https://www.gesetze-im-internet.de/vkvv/>; cited: <https://www.gesetze-im-internet.de/vkvv/__2.html> |
 | FeV | Fahrerlaubnis-Verordnung vom 13. Dezember 2010 (BGBl. I S. 1980), last amended by Art. 3 V v. 12.8.2026 (BGBl. 2026 I Nr. 236) | <https://www.gesetze-im-internet.de/fev_2010/> |
 
 **Reachability.** Also read: `www.bzst.de` (IdNr pages), `www.deutsche-rentenversicherung.de` (glossary),
@@ -205,13 +205,12 @@ official masking rule).
 ## Führerschein number — not covered
 
 **FeV Anlage 8, I. Allgemeiner Führerschein, Nr. 2.1 c) field 5**: "Nummer des Führerscheins, die sich aus dem
-Behördenschlüssel der
-Fahrerlaubnisbehörde, einer von dieser fortlaufend zu vergebenden Fahrerlaubnisnummer sowie einer Prüfziffer und der
-Nummer der Ausfertigung des Dokuments zusammensetzt." FeV § 49 Abs. 1 Nr. 9 and 10 repeat the composition
-(Fahrerlaubnisnummer
-= Behördenschlüssel + fortlaufende Nummer + Prüfnummer; Führerscheinnummer = Fahrerlaubnisnummer + fortlaufende Nummer
-des Führerscheins). The KBA list of authority keys (copy on `lima.diplo.de`) gives the key's 4 characters ("Der
-vorangestellte Buchstabe ist ein Landeskennzeichen … Die Stellen 2 und 3 sind fortlaufende Ziffern …").
+Behördenschlüssel der Fahrerlaubnisbehörde, einer von dieser fortlaufend zu vergebenden Fahrerlaubnisnummer sowie einer
+Prüfziffer und der Nummer der Ausfertigung des Dokuments zusammensetzt." FeV § 49 Abs. 1 Nr. 9 and 10 repeat the
+composition (Fahrerlaubnisnummer = Behördenschlüssel + fortlaufende Nummer + Prüfnummer; Führerscheinnummer =
+Fahrerlaubnisnummer + fortlaufende Nummer des Führerscheins). The KBA list of authority keys (copy on `lima.diplo.de`)
+gives the key's 4 characters ("Der vorangestellte Buchstabe ist ein Landeskennzeichen … Die Stellen 2 und 3 sind
+fortlaufende Ziffern …").
 
 **No official text gives the length or alphabet of the serial and of the Ausfertigung number, nor the check-digit
 algorithm.** The 11-character layout and the modulus-11 check found on dewiki.de and similar sites are secondary
