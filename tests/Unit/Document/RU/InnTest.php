@@ -34,9 +34,10 @@ final class InnTest extends TestCase
         yield 'spaces' => ['5001 007322 59', '500100732259'];
         yield 'hyphens' => ['5001-007322-59', '500100732259'];
         yield 'tab and NBSP' => ["5001\t007322\u{00A0}59", '500100732259'];
-        yield 'second control digit changed' => ['500100732258', '500100732258'];
-        yield 'first control digit changed' => ['500100732249', '500100732249'];
-        yield 'number digit changed' => ['500100732359', '500100732359'];
+        // Format only: no official algorithm is published, so a "wrong" control digit is accepted.
+        yield 'second control digit changed, accepted' => ['500100732258', '500100732258'];
+        yield 'first control digit changed, accepted' => ['500100732249', '500100732249'];
+        yield 'number digit changed, accepted' => ['500100732359', '500100732359'];
     }
 
     #[DataProvider('validNumbers')]

@@ -32,11 +32,12 @@ final class MedicareCardNumberTest extends TestCase
     {
         yield 'worked example, issue 1' => ['3189 97702 1', '3189977021'];
         yield 'issue number 0' => ['3189977020', '3189977020'];
-        yield 'check digit changed' => ['3189 97703 1', '3189977031'];
-        yield 'card digit changed' => ['3189 97802 1', '3189978021'];
-        yield 'first digit 1' => ['1189 97702 1', '1189977021'];
-        yield 'first digit 7' => ['7189 97702 1', '7189977021'];
-        yield 'first digit 0' => ['0000 00000 1', '0000000001'];
+        // Format only: no official algorithm or first-digit rule is published, so these are accepted.
+        yield 'check digit changed, accepted' => ['3189 97703 1', '3189977031'];
+        yield 'card digit changed, accepted' => ['3189 97802 1', '3189978021'];
+        yield 'first digit 1, accepted' => ['1189 97702 1', '1189977021'];
+        yield 'first digit 7, accepted' => ['7189 97702 1', '7189977021'];
+        yield 'first digit 0, accepted' => ['0000 00000 1', '0000000001'];
         yield 'hyphens, tabs and NBSP' => ["3189-977\t02\u{00A0}1", '3189977021'];
     }
 

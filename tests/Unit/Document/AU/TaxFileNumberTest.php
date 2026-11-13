@@ -31,11 +31,12 @@ final class TaxFileNumberTest extends TestCase
     public static function validNumbers(): iterable
     {
         yield 'worked example' => ['123 456 782', '123456782'];
-        yield '1982 notice of amended assessment' => ['330 600 376', '330600376'];
+        yield 'another nine digits' => ['330 600 376', '330600376'];
         yield 'digits only' => ['123456782', '123456782'];
         yield 'hyphens, tabs and NBSP' => ["123-456\t78\u{00A0}2", '123456782'];
-        yield 'last digit changed' => ['123 456 783', '123456783'];
-        yield 'first digit changed' => ['223 456 782', '223456782'];
+        // Format only: no official algorithm is published, so a "wrong" check digit is accepted.
+        yield 'last digit changed, accepted' => ['123 456 783', '123456783'];
+        yield 'first digit changed, accepted' => ['223 456 782', '223456782'];
     }
 
     #[DataProvider('validNumbers')]

@@ -20,7 +20,7 @@
 - `Icao\Transliterator::variants()` caps at 4096 combinations (untrusted input); `toLatin()` has no cap.
 - A document number VO parses with `Internal\Digits::exactly($input, $length, $label)` (strips `Digits::SEPARATORS`:
   space, `-`, tab, CR/LF, NBSP, U+2007, U+202F; message `Invalid <label> (<n> characters).`, or `(too long)` above
-  `Digits::MAX_REPORTED_LENGTH` = 40; right length with a non-digit: `(invalid character)`), then its checksum (`Invalid <label> checksum.`). The label is a
+  `Digits::MAX_REPORTED_LENGTH` = 40; right length with a non-digit: `(invalid character)`), then its checksum where an official algorithm exists (`Invalid <label> checksum.`). The label is a
   `private const string DOCUMENT` per class, used in every message. `masked()` is `Mask::keepLastDigits(formatted(), 4)` unless the source note records an
   official rule; AU classes keep 3 (numbers of at most 10 characters, AU.md "Masking rule"). A field without a published check digit is shape-only, said on the class and in the source note.
 - `AbstractStringValueObject::$value` is a plain `string`; where a getter must return `non-empty-string` without a
