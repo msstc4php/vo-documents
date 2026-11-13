@@ -167,3 +167,12 @@
 - Escaped equivalent mutants in `Document\ES\*`: the `(int)` cast in `ControlLetter::of()` (a numeric string divides
   the same), and the `substr()` length / unwrap in
   `Dni`/`Nie` (an `(int)` cast stops at the trailing check letter).
+- **NL names refuse `ĳ`/`Ĳ`**: LO BRP § 5.1.2.1 forbids the Hollandse IJ, so `Name\NL\*` uses the BRP letter tables,
+  not `\p{Latin}` (unlike DE/IT/ES). `İ`/`ı` are accepted, `Ð`, `Ș`, `Ț` refused; `ĸ` passes the part but has no ICAO
+  spelling, so `PersonName` refuses it. Apostrophe prefixes (`'t Hart`, `d' Ancona`) need the custom `word()` of
+  `AbstractDutchNamePart`: a leading `'` only at the start or after a space, a trailing `'` only before a space.
+- **NL BSN**: `000000000` passes the elfproef and is accepted (the LO BSN "ingestelde interval" is unpublished).
+- **NL sources:** `wetten.overheid.nl` fails from curl (HTTP/2 PROTOCOL_ERROR, TLS bad record mac on HTTP/1.1); read
+  it through WebFetch. LO BRP 2025.Q4 PDF is 404 at its expected URL; 2025.Q2 is cited. RDW publishes no
+  rijbewijsnummer format (not covered). The `@see` lines of `IdentityDocumentNumber` exceed 120 characters (URLs cannot
+  wrap), as for ES.

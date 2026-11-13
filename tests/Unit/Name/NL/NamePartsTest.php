@@ -1,0 +1,113 @@
+<?php
+
+declare(strict_types=1);
+
+namespace MSSTC4PHP\ValueObject\Documents\Tests\Unit\Name\NL;
+
+use MSSTC4PHP\ValueObject\Documents\Exception\InvalidPersonNameException;
+use MSSTC4PHP\ValueObject\Documents\Icao\Table\Cyrillic;
+use MSSTC4PHP\ValueObject\Documents\Icao\Table\LatinMultinational;
+use MSSTC4PHP\ValueObject\Documents\Icao\Transliterator;
+use MSSTC4PHP\ValueObject\Documents\Internal\UnicodeText;
+use MSSTC4PHP\ValueObject\Documents\Name\AbstractNamePart;
+use MSSTC4PHP\ValueObject\Documents\Name\Latin\AbstractLatinNamePart;
+use MSSTC4PHP\ValueObject\Documents\Name\NL\AbstractDutchNamePart;
+use MSSTC4PHP\ValueObject\Documents\Name\NL\FamilyName;
+use MSSTC4PHP\ValueObject\Documents\Name\NL\GivenName;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\UsesClass;
+use PHPUnit\Framework\TestCase;
+
+/**
+ * Expectations follow docs/sources/NL.md "Names" (LO BRP tables 5.2 and 5.3, prefixes of table 36).
+ */
+#[CoversClass(FamilyName::class)]
+#[CoversClass(GivenName::class)]
+#[CoversClass(AbstractDutchNamePart::class)]
+#[UsesClass(AbstractNamePart::class)]
+#[UsesClass(AbstractLatinNamePart::class)]
+#[UsesClass(UnicodeText::class)]
+#[UsesClass(Transliterator::class)]
+#[UsesClass(LatinMultinational::class)]
+#[UsesClass(Cyrillic::class)]
+final class NamePartsTest extends TestCase
+{
+    /**
+     * @return iterable<string, array{string, string}>
+     */
+    public static function validFamilyNames(): iterable
+    {
+        yield 'RvIG specimen, prefix in lower case' => ['de Bruijn', 'de Bruijn'];
+        yield 'two prefixes, spaces collapsed' => ['  van   der Berg ', 'van der Berg'];
+        yield 'capitalised prefix kept' => ['Van der Berg', 'Van der Berg'];
+        yield 'prefix starting with an apostrophe' => ["'t Hart", "'t Hart"];
+        yield 'apostrophe prefix after a space' => ["van 't Hof", "van 't Hof"];
+        yield 'apostrophe prefix and hyphen' => ["'s-Gravesande", "'s-Gravesande"];
+        yield 'right single quotation mark' => ["\u{2019}t Hart", "'t Hart"];
+        yield 'prefix ending with an apostrophe' => ["d' Ancona", "d' Ancona"];
+        yield 'apostrophe inside' => ["d'Ancona", "d'Ancona"];
+        yield 'two family names' => ['Jansen-de Vries', 'Jansen-de Vries'];
+        yield 'diaeresis' => ['Hoëvell', 'Hoëvell'];
+        yield 'decomposed diaeresis composed' => ["Hoe\u{0308}vell", 'Hoëvell'];
+        yield 'letter of table 5.2' => ['Øverby', 'Øverby'];
+        yield 'dotted capital I of table 5.3' => ['İnce', 'İnce'];
+        yield 'dotless i of table 5.2' => ['Kılıç', 'Kılıç'];
+    }
+
+    #[DataProvider('validFamilyNames')]
+    public function testFamilyNameIsNormalised(string $input, string $expected): void
+    {
+        self::assertSame($expected, FamilyName::from($input)->value);
+    }
+
+    public function testGivenNameMayHoldSeveralWords(): void
+    {
+        self::assertSame('Willeke Liselotte', GivenName::from('Willeke  Liselotte')->value);
+        self::assertSame('Hendrik-Jan', GivenName::from('Hendrik-Jan')->value);
+        self::assertSame('Noël', GivenName::from('Noël')->value);
+    }
+
+    /**
+     * @return iterable<string, array{string, string}>
+     */
+    public static function invalidFamilyNames(): iterable
+    {
+        $invalid = 'Invalid Dutch family name (invalid character).';
+
+        yield 'ij ligature, not in table 5.2' => ["\u{0133}sselstein", $invalid];
+        yield 'capital IJ ligature' => ["\u{0132}sselstein", $invalid];
+        yield 'capital eth, only the small one is listed' => ['Ðorđe', $invalid];
+        yield 's with comma below, not listed' => ['Ștefan', $invalid];
+        yield 'Cyrillic' => ['Ванде', $invalid];
+        yield 'digit' => ['Berg2', $invalid];
+        yield 'two apostrophes' => ["d''Ancona", $invalid];
+        yield 'apostrophe after a hyphen' => ["Berg-'t Hart", $invalid];
+        yield 'trailing apostrophe' => ["Hart'", $invalid];
+        yield 'apostrophe only' => ["'", $invalid];
+        yield 'apostrophe before a hyphen' => ["d'-Ancona", $invalid];
+        yield 'trailing hyphen' => ['Berg-', $invalid];
+        $compatibility = 'Invalid Dutch family name (compatibility character).';
+
+        yield 'fullwidth' => ["\u{FF22}erg", $compatibility];
+        yield 'n preceded by apostrophe of table 5.2' => ["\u{0149}t", $compatibility];
+        yield 'empty' => ['  ', 'Invalid Dutch family name (0 characters).'];
+    }
+
+    #[DataProvider('invalidFamilyNames')]
+    public function testFamilyNameRefusesCharactersOutsideTheBrpSet(string $input, string $message): void
+    {
+        $this->expectException(InvalidPersonNameException::class);
+        $this->expectExceptionMessage($message);
+
+        FamilyName::from($input);
+    }
+
+    public function testGivenNameRefusesOtherScripts(): void
+    {
+        $this->expectException(InvalidPersonNameException::class);
+        $this->expectExceptionMessage('Invalid Dutch given name (invalid character).');
+
+        GivenName::from('Δημήτρης');
+    }
+}

@@ -17,6 +17,8 @@ use MSSTC4PHP\ValueObject\Documents\Name\FR\PersonName as FrPersonName;
 use MSSTC4PHP\ValueObject\Documents\Name\FR\PersonNameCodec as FrPersonNameCodec;
 use MSSTC4PHP\ValueObject\Documents\Name\IT\PersonName as ItPersonName;
 use MSSTC4PHP\ValueObject\Documents\Name\IT\PersonNameCodec as ItPersonNameCodec;
+use MSSTC4PHP\ValueObject\Documents\Name\NL\PersonName as NlPersonName;
+use MSSTC4PHP\ValueObject\Documents\Name\NL\PersonNameCodec as NlPersonNameCodec;
 use MSSTC4PHP\ValueObject\Documents\Name\RU\PersonName;
 use MSSTC4PHP\ValueObject\Documents\Name\RU\PersonNameCodec;
 use MSSTC4PHP\ValueObject\Payload\PayloadCodec;
@@ -32,6 +34,7 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(FrPersonNameCodec::class)]
 #[UsesClass(ItPersonNameCodec::class)]
 #[UsesClass(EsPersonNameCodec::class)]
+#[UsesClass(NlPersonNameCodec::class)]
 final class CodecsTest extends TestCase
 {
     public function testListsEveryCodecOfThePackage(): void
@@ -44,6 +47,7 @@ final class CodecsTest extends TestCase
                 FrPersonName::class,
                 ItPersonName::class,
                 EsPersonName::class,
+                NlPersonName::class,
             ],
             \array_map(static fn (PayloadCodec $codec): string => $codec->valueObjectClass(), Codecs::all()),
         );
@@ -61,6 +65,7 @@ final class CodecsTest extends TestCase
         self::assertTrue($mapper->isComposite(FrPersonName::class));
         self::assertTrue($mapper->isComposite(ItPersonName::class));
         self::assertTrue($mapper->isComposite(EsPersonName::class));
+        self::assertTrue($mapper->isComposite(NlPersonName::class));
     }
 
     /**

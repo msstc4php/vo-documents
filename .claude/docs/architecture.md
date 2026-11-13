@@ -41,3 +41,9 @@ internal `ControlLetter`; pre-2008 X + 8 digits + letter, format only), `SocialS
 `provinceCode()` string). The driving licence number is the DNI or NIE (no class); the passport number is not covered.
 `Name\ES\PersonName($first, ?$second, $given, ?$latin)`: both surnames feed `LatinPersonNameBuilder` as family
 parts (primary identifier joined by a space); codec keys `first`, `second`, `given`, `latin`.
+
+`Document\NL\*`: `Bsn` (9 digits, elfproef verified per LO BSN; 8 digits read with a leading zero and stored with 9),
+`IdentityDocumentNumber` (passport, emergency documents and identity card: 2 letters, 6 letters/digits, 1 digit, no
+`O`, `0` allowed for model 2014). The rijbewijsnummer is not covered. `Name\NL\PersonName($family, ?$given, ?$latin)`:
+prefixes live inside `FamilyName` as typed; letters come from the BRP Teletex tables (`Name\NL\AbstractDutchNamePart`,
+which also overrides `word()` for apostrophe prefixes); codec keys `family`, `given` (null for one name), `latin`.
