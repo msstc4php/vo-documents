@@ -36,3 +36,18 @@
   `substr($v, 9, 3)` mutants escape on a fixed-length value.
 - **www.ffoms.gov.ru fails TLS verification** (curl error 60) from this environment: FFOMS sources are cited by URL and
   quoted from legalacts.ru copies.
+- **AU licence formats always overlap**: per the Home Affairs DVS field rules (AU.md) every valid licence number fits
+  2-6 jurisdictions, so `Document\AU\DriverLicenceNumberFactory::fromNumber()` is always ambiguous or invalid today.
+  Use `fromNumberIn()`. The resolution lives in `Internal\SubdivisionResolver` (fixture-tested single-match path).
+- **No AU issuing authority publishes its licence format**; the source is the Commonwealth DVS rules on
+  immi.homeaffairs.gov.au (the only AU gov site that reliably answers from this environment; most others reset HTTP/2
+  or return 403).
+- **TFN and Medicare checksums: no public official text; algorithm as used in practice.** The ATO gives the TFN
+  algorithm to registered developers only; the Medicare check digit is ADHA Appendix E, served by no reachable official
+  host. Weights are quoted from secondary sources in AU.md only; the classes cite the official pages.
+- Sub-national pattern (copy for US/CA/BR): `Document\<CC>\Jurisdiction` enum, `DriverLicenceNumber` interface with a
+  covariant `jurisdiction()`, an abstract base per country with `static format(): Internal\NumberFormat` (character
+  class + length range; messages "(N characters)" / "(invalid character)") and shared `masked()`/`parse()`, one final
+  class per jurisdiction, a factory with an exhaustive enum → class `match` delegating to `Internal\SubdivisionResolver`.
+- National name codecs validate payloads through `Internal\PayloadFields` (closed key set, string fields, one shape
+  message).

@@ -15,7 +15,7 @@ use MSSTC4PHP\ValueObject\Documents\Document\AU\DriverLicence\VicDriverLicenceNu
 use MSSTC4PHP\ValueObject\Documents\Document\AU\DriverLicence\WaDriverLicenceNumber;
 use MSSTC4PHP\ValueObject\Documents\Exception\AmbiguousJurisdictionException;
 use MSSTC4PHP\ValueObject\Documents\Exception\InvalidDocumentNumberException;
-use MSSTC4PHP\ValueObject\Documents\Internal\Digits;
+use MSSTC4PHP\ValueObject\Documents\Internal\SubdivisionResolver;
 
 /**
  * Builds the licence number of the jurisdiction a bare number belongs to, and never picks one of several: the
@@ -26,21 +26,13 @@ use MSSTC4PHP\ValueObject\Documents\Internal\Digits;
  */
 final class DriverLicenceNumberFactory
 {
-    private const string DOCUMENT = 'Australian driver licence';
-
     /**
-     * @throws AmbiguousJurisdictionException when several jurisdictions match, listed in enum order
+     * @throws AmbiguousJurisdictionException<Jurisdiction> when several jurisdictions match, listed in enum order
      * @throws InvalidDocumentNumberException when none matches
      */
     public static function fromNumber(string $number): DriverLicenceNumber
     {
-        $jurisdictions = self::jurisdictionsMatching($number);
-
-        return match (\count($jurisdictions)) {
-            0 => throw Digits::invalidLength(Digits::strip($number), self::DOCUMENT . ' number'),
-            1 => self::fromNumberIn($number, $jurisdictions[0]),
-            default => throw new AmbiguousJurisdictionException(self::DOCUMENT, $jurisdictions),
-        };
+        return self::resolver()->resolve($number);
     }
 
     /**
@@ -56,10 +48,19 @@ final class DriverLicenceNumberFactory
      */
     public static function jurisdictionsMatching(string $number): array
     {
-        return \array_values(\array_filter(
+        return self::resolver()->matching($number);
+    }
+
+    /**
+     * @return SubdivisionResolver<Jurisdiction, DriverLicenceNumber>
+     */
+    private static function resolver(): SubdivisionResolver
+    {
+        return new SubdivisionResolver(
+            'Australian driver licence',
             Jurisdiction::cases(),
-            static fn (Jurisdiction $jurisdiction): bool => self::classFor($jurisdiction)::isValid($number),
-        ));
+            static fn (Jurisdiction $jurisdiction, string $number): ?DriverLicenceNumber => self::classFor($jurisdiction)::tryFrom($number),
+        );
     }
 
     /**

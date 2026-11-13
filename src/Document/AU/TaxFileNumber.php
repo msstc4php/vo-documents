@@ -13,9 +13,9 @@ use MSSTC4PHP\ValueObject\Support\AbstractStringValueObject;
 use Override;
 
 /**
- * Tax file number: 9 digits whose sum weighted 1, 4, 3, 7, 5, 8, 6, 9, 10 is a multiple of 11. The ATO gives the
- * algorithm to registered software developers only; the weights are the published ones (AU.md). The 8-digit TFNs once
- * issued to non-individuals are not accepted. `masked()` keeps the last three digits (no official rule):
+ * Tax file number: 9 digits whose sum weighted 1, 4, 3, 7, 5, 8, 6, 9, 10 is a multiple of 11. No public official
+ * text; algorithm as used in practice: the ATO gives its TFN algorithm to registered software developers only (AU.md).
+ * The 8-digit TFNs once issued to non-individuals are not accepted. `masked()` keeps the last three digits (no official rule):
  * `*** *** 782`.
  *
  * @see https://softwaredevelopers.ato.gov.au/obtainTFNalgorithm ATO, "How to obtain the tax file number algorithm"

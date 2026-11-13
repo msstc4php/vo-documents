@@ -102,11 +102,19 @@ final class PersonNameTest extends TestCase
         new PersonName(FamilyName::from('Müller'), GivenName::from('Zoë'), IcaoPersonName::from($latin));
     }
 
-    public function testRefusesALatinLetterWithoutAnIcaoSpelling(): void
+    public function testRefusesALatinLetterWithoutAnIcaoSpellingWithoutEchoingIt(): void
     {
-        $this->expectException(InvalidPersonNameException::class);
+        try {
+            new PersonName(FamilyName::from('Citizen'), GivenName::from('ƒred'));
+        } catch (InvalidPersonNameException $exception) {
+            self::assertSame('Invalid personal name (no ICAO transliteration for a character).', $exception->getMessage());
+            self::assertStringNotContainsString('ƒ', $exception->getMessage());
+            self::assertStringNotContainsString('red', $exception->getMessage());
 
-        new PersonName(FamilyName::from('Citizen'), GivenName::from('ƒred'));
+            return;
+        }
+
+        self::fail('Expected an InvalidPersonNameException.');
     }
 
     public function testEqualityComparesPartsAndOverride(): void

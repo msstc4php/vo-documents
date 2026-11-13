@@ -7,11 +7,14 @@ namespace MSSTC4PHP\ValueObject\Documents\Exception;
 use MSSTC4PHP\ValueObject\Documents\Contract\Subdivision;
 use MSSTC4PHP\ValueObject\Exception\InvalidValueObjectException;
 
+/**
+ * @template TSubdivision of Subdivision
+ */
 final class AmbiguousJurisdictionException extends InvalidValueObjectException
 {
     /**
      * @param non-empty-string $document
-     * @param non-empty-list<Subdivision> $jurisdictions
+     * @param non-empty-list<TSubdivision> $jurisdictions
      */
     public function __construct(string $document, private readonly array $jurisdictions)
     {
@@ -23,7 +26,7 @@ final class AmbiguousJurisdictionException extends InvalidValueObjectException
     }
 
     /**
-     * @return non-empty-list<Subdivision>
+     * @return non-empty-list<TSubdivision>
      */
     public function jurisdictions(): array
     {

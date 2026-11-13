@@ -11,6 +11,7 @@ use MSSTC4PHP\ValueObject\Documents\Icao\PersonName as IcaoPersonName;
 use MSSTC4PHP\ValueObject\Documents\Icao\Table\Cyrillic;
 use MSSTC4PHP\ValueObject\Documents\Icao\Table\LatinMultinational;
 use MSSTC4PHP\ValueObject\Documents\Icao\Transliterator;
+use MSSTC4PHP\ValueObject\Documents\Internal\PayloadFields;
 use MSSTC4PHP\ValueObject\Documents\Internal\UnicodeText;
 use MSSTC4PHP\ValueObject\Documents\Name\AbstractNamePart;
 use MSSTC4PHP\ValueObject\Documents\Name\AU\FamilyName;
@@ -39,6 +40,7 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(Cyrillic::class)]
 #[UsesClass(LatinMultinational::class)]
 #[UsesClass(UnicodeText::class)]
+#[UsesClass(PayloadFields::class)]
 final class PersonNameCodecTest extends TestCase
 {
     private const string SHAPE = 'Expected an Australian person name payload with string "family" and "given", string or null "latin", and no other keys.';

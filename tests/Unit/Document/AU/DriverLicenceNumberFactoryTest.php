@@ -18,6 +18,9 @@ use MSSTC4PHP\ValueObject\Documents\Document\AU\Jurisdiction;
 use MSSTC4PHP\ValueObject\Documents\Exception\AmbiguousJurisdictionException;
 use MSSTC4PHP\ValueObject\Documents\Internal\Digits;
 use MSSTC4PHP\ValueObject\Documents\Internal\Mask;
+use MSSTC4PHP\ValueObject\Documents\Internal\NumberFormat;
+use MSSTC4PHP\ValueObject\Documents\Internal\SubdivisionResolver;
+use MSSTC4PHP\ValueObject\Documents\Internal\Text;
 use MSSTC4PHP\ValueObject\Documents\Tests\Fixture\RefusesWithoutEchoingInput;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -42,6 +45,9 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(AmbiguousJurisdictionException::class)]
 #[UsesClass(Digits::class)]
 #[UsesClass(Mask::class)]
+#[UsesClass(NumberFormat::class)]
+#[UsesClass(SubdivisionResolver::class)]
+#[UsesClass(Text::class)]
 final class DriverLicenceNumberFactoryTest extends TestCase
 {
     use RefusesWithoutEchoingInput;
@@ -92,7 +98,7 @@ final class DriverLicenceNumberFactoryTest extends TestCase
             DriverLicenceNumberFactory::fromNumber($number);
         } catch (AmbiguousJurisdictionException $exception) {
             self::assertSame(DriverLicenceNumberFactory::jurisdictionsMatching($number), $exception->jurisdictions());
-            self::assertDoesNotMatchRegularExpression('/[0-9]/', $exception->getMessage());
+            self::assertMessageHidesInput($number, $exception->getMessage());
 
             return;
         }

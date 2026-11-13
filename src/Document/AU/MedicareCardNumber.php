@@ -13,15 +13,16 @@ use MSSTC4PHP\ValueObject\Support\AbstractStringValueObject;
 use Override;
 
 /**
- * Medicare card number: 10 digits, printed `3189 97702 1` — an 8-digit card number starting with 2-6, a check digit
- * (the card number's digits weighted 1, 3, 7, 9, 1, 3, 7, 9, summed, mod 10) and the issue number. The 11-digit
+ * Medicare card number: 10 digits, printed `3189 97702 1` — an 8-digit card number, a check digit and the issue
+ * number (Australian Digital Health Agency). The first digit 2-6 and the check digit (the card number's digits
+ * weighted 1, 3, 7, 9, 1, 3, 7, 9, summed, mod 10) have no public official text; algorithm as used in practice
+ * (AU.md). The 11-digit
  * individual number (with the individual reference number) is not this value object. `masked()` keeps the last three
  * digits (no official rule): `**** ***02 1`.
  *
  * @see https://implementer.digitalhealth.gov.au/namespaces/id/medicare-number/index.html Australian Digital Health
  *      Agency, namespace http://ns.electronichealth.net.au/id/medicare-number
- * @see docs/sources/AU.md "Medicare card number" — the check algorithm is Appendix E of the Agency's "Use of
- *      Healthcare Identifiers in Health Software Systems" (not reachable; quoted from a secondary source)
+ * @see docs/sources/AU.md "Medicare card number"
  */
 final class MedicareCardNumber extends AbstractStringValueObject implements Maskable
 {

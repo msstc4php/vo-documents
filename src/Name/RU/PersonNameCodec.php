@@ -7,7 +7,7 @@ namespace MSSTC4PHP\ValueObject\Documents\Name\RU;
 use LogicException;
 use MSSTC4PHP\ValueObject\Contract\ValueObject;
 use MSSTC4PHP\ValueObject\Documents\Icao\PersonName as IcaoPersonName;
-use MSSTC4PHP\ValueObject\Exception\InvalidPayloadException;
+use MSSTC4PHP\ValueObject\Documents\Internal\PayloadFields;
 use MSSTC4PHP\ValueObject\Payload\PayloadCodec;
 use Override;
 
@@ -51,22 +51,13 @@ final readonly class PersonNameCodec implements PayloadCodec
     #[Override]
     public function decode(array $payload): PersonName
     {
-        if (\array_diff(\array_keys($payload), self::KEYS) !== []) {
-            throw new InvalidPayloadException(self::SHAPE);
-        }
-
-        $family = $payload['family'] ?? null;
-        $given = $payload['given'] ?? null;
-        $patronymic = $payload['patronymic'] ?? null;
-        $latin = $payload['latin'] ?? null;
-        if (!\is_string($family) || !\is_string($given)
-            || ($patronymic !== null && !\is_string($patronymic)) || ($latin !== null && !\is_string($latin))) {
-            throw new InvalidPayloadException(self::SHAPE);
-        }
+        PayloadFields::assertOnlyKeys($payload, self::KEYS, self::SHAPE);
+        $patronymic = PayloadFields::nullableString($payload, 'patronymic', self::SHAPE);
+        $latin = PayloadFields::nullableString($payload, 'latin', self::SHAPE);
 
         return new PersonName(
-            FamilyName::from($family),
-            GivenName::from($given),
+            FamilyName::from(PayloadFields::string($payload, 'family', self::SHAPE)),
+            GivenName::from(PayloadFields::string($payload, 'given', self::SHAPE)),
             $patronymic === null ? null : Patronymic::from($patronymic),
             $latin === null ? null : IcaoPersonName::from($latin),
         );

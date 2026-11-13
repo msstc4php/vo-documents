@@ -43,9 +43,8 @@ final class Mask
      */
     public static function keepLastCharacters(string $value, int $visible): string
     {
-        $hidden = \strlen($value) - \max(0, \min($visible, \strlen($value)));
-        $masked = \str_repeat('*', $hidden) . \substr($value, $hidden);
+        $shown = \min($visible, \strlen($value));
 
-        return $masked === '' ? $value : $masked;
+        return \str_pad(\substr($value, \strlen($value) - $shown), \strlen($value), '*', \STR_PAD_LEFT);
     }
 }
