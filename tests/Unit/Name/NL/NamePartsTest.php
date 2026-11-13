@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace MSSTC4PHP\ValueObject\Documents\Tests\Unit\Name\NL;
 
-use MSSTC4PHP\ValueObject\Documents\Exception\InvalidPersonNameException;
 use MSSTC4PHP\ValueObject\Documents\Icao\Table\Cyrillic;
 use MSSTC4PHP\ValueObject\Documents\Icao\Table\LatinMultinational;
 use MSSTC4PHP\ValueObject\Documents\Icao\Transliterator;
@@ -14,6 +13,7 @@ use MSSTC4PHP\ValueObject\Documents\Name\Latin\AbstractLatinNamePart;
 use MSSTC4PHP\ValueObject\Documents\Name\NL\AbstractDutchNamePart;
 use MSSTC4PHP\ValueObject\Documents\Name\NL\FamilyName;
 use MSSTC4PHP\ValueObject\Documents\Name\NL\GivenName;
+use MSSTC4PHP\ValueObject\Documents\Tests\Fixture\RefusesNameWithoutEchoingInput;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\UsesClass;
@@ -33,6 +33,8 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(Cyrillic::class)]
 final class NamePartsTest extends TestCase
 {
+    use RefusesNameWithoutEchoingInput;
+
     /**
      * @return iterable<string, array{string, string}>
      */
@@ -87,6 +89,8 @@ final class NamePartsTest extends TestCase
         yield 'apostrophe only' => ["'", $invalid];
         yield 'apostrophe before a hyphen' => ["d'-Ancona", $invalid];
         yield 'trailing hyphen' => ['Berg-', $invalid];
+        yield 'apostrophes on both sides of a space' => ["x' 'y", $invalid];
+        yield 'apostrophe prefixes on both sides of a space' => ["d' 't Hart", $invalid];
         $compatibility = 'Invalid Dutch family name (compatibility character).';
 
         yield 'fullwidth' => ["\u{FF22}erg", $compatibility];
@@ -97,10 +101,11 @@ final class NamePartsTest extends TestCase
     #[DataProvider('invalidFamilyNames')]
     public function testFamilyNameRefusesCharactersOutsideTheBrpSet(string $input, string $message): void
     {
-        $this->expectException(InvalidPersonNameException::class);
-        $this->expectExceptionMessage($message);
-
-        FamilyName::from($input);
+        self::assertNameRefusedWithoutEcho(
+            fn (): FamilyName => FamilyName::from($input),
+            $input,
+            $message,
+        );
     }
 
     /**
@@ -135,17 +140,19 @@ final class NamePartsTest extends TestCase
     #[DataProvider('invalidGivenNames')]
     public function testGivenNameRefusesCharactersOutsideTheBrpSet(string $input): void
     {
-        $this->expectException(InvalidPersonNameException::class);
-        $this->expectExceptionMessage('Invalid Dutch given name (invalid character).');
-
-        GivenName::from($input);
+        self::assertNameRefusedWithoutEcho(
+            fn (): GivenName => GivenName::from($input),
+            $input,
+            'Invalid Dutch given name (invalid character).',
+        );
     }
 
     public function testGivenNameRefusesOtherScripts(): void
     {
-        $this->expectException(InvalidPersonNameException::class);
-        $this->expectExceptionMessage('Invalid Dutch given name (invalid character).');
-
-        GivenName::from('Δημήτρης');
+        self::assertNameRefusedWithoutEcho(
+            fn (): GivenName => GivenName::from('Δημήτρης'),
+            'Δημήτρης',
+            'Invalid Dutch given name (invalid character).',
+        );
     }
 }

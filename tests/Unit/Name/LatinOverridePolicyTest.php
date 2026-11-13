@@ -9,9 +9,11 @@ use MSSTC4PHP\ValueObject\Documents\Exception\InvalidPersonNameException;
 use MSSTC4PHP\ValueObject\Documents\Icao\PersonName as IcaoPersonName;
 use MSSTC4PHP\ValueObject\Documents\Internal\UnicodeText;
 use MSSTC4PHP\ValueObject\Documents\Name\AnyIcaoSpelling;
+use MSSTC4PHP\ValueObject\Documents\Name\IdentifierSpellings;
 use MSSTC4PHP\ValueObject\Documents\Name\LatinOverridePolicy;
 use MSSTC4PHP\ValueObject\Documents\Name\LatinSpelling;
 use MSSTC4PHP\ValueObject\Documents\Name\TransliterationVariant;
+use MSSTC4PHP\ValueObject\Documents\Tests\Fixture\RefusesNameWithoutEchoingInput;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
@@ -20,10 +22,13 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(AnyIcaoSpelling::class)]
 #[CoversClass(TransliterationVariant::class)]
 #[UsesClass(LatinSpelling::class)]
+#[UsesClass(IdentifierSpellings::class)]
 #[UsesClass(IcaoPersonName::class)]
 #[UsesClass(UnicodeText::class)]
 final class LatinOverridePolicyTest extends TestCase
 {
+    use RefusesNameWithoutEchoingInput;
+
     private const string REFUSAL = 'Invalid test person name (not a spelling).';
 
     public function testNoOverrideIsNoOverrideAndTheSpellingsAreNotComputed(): void
@@ -73,7 +78,10 @@ final class LatinOverridePolicyTest extends TestCase
     public function testTransliterationVariantKeepsAnotherSpellingInTheNationalForm(): void
     {
         $policy = new TransliterationVariant(
-            static fn (): array => [[['MUELLER-SMITH', 'MULLER-SMITH'], ['ANN']]],
+            static fn (): array => [
+                new IdentifierSpellings([['MUELLER', 'MULLER'], ['SMITH']], ['-']),
+                new IdentifierSpellings([['ANN']], []),
+            ],
             self::REFUSAL,
         );
 
@@ -91,11 +99,43 @@ final class LatinOverridePolicyTest extends TestCase
 
     public function testTransliterationVariantRefusesAnotherName(): void
     {
-        $policy = new TransliterationVariant(static fn (): array => [[['MUELLER', 'MULLER'], ['ZOE']]], self::REFUSAL);
+        $policy = new TransliterationVariant(
+            static fn (): array => [
+                new IdentifierSpellings([['MUELLER', 'MULLER']], []),
+                new IdentifierSpellings([['ZOE']], []),
+            ],
+            self::REFUSAL,
+        );
 
-        $this->expectException(InvalidPersonNameException::class);
-        $this->expectExceptionMessage(self::REFUSAL);
+        self::assertNameRefusedWithoutEcho(
+            static fn (): ?IcaoPersonName => $policy->resolve(
+                IcaoPersonName::from('MILLER<<ZOE'),
+                IcaoPersonName::from('MUELLER<<ZOE'),
+            ),
+            'Miller Zoe',
+            self::REFUSAL,
+        );
+    }
 
-        $policy->resolve(IcaoPersonName::from('MILLER<<ZOE'), IcaoPersonName::from('MUELLER<<ZOE'));
+    public function testWithoutADerivedFormOnlyAnyIcaoSpellingAcceptsTheOverride(): void
+    {
+        $reason = new InvalidPersonNameException('Invalid personal name (no ICAO transliteration for a character).');
+        $override = IcaoPersonName::from('SMITH<<FRED');
+        $policy = new TransliterationVariant(
+            static fn (): never => throw new LogicException('The spellings were computed.'),
+            self::REFUSAL,
+        );
+
+        self::assertSame($override, new AnyIcaoSpelling()->withoutDerivedForm($override, $reason));
+        self::assertNameRefusedWithoutEcho(
+            static fn (): IcaoPersonName => new AnyIcaoSpelling()->withoutDerivedForm(null, $reason),
+            '',
+            $reason->getMessage(),
+        );
+        self::assertNameRefusedWithoutEcho(
+            static fn (): IcaoPersonName => $policy->withoutDerivedForm($override, $reason),
+            'Smith Fred',
+            $reason->getMessage(),
+        );
     }
 }

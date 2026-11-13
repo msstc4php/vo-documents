@@ -21,8 +21,12 @@ use MSSTC4PHP\ValueObject\Documents\Name\DE\PersonNameCodec as DePersonNameCodec
 use MSSTC4PHP\ValueObject\Documents\Name\ES\PersonNameCodec as EsPersonNameCodec;
 use MSSTC4PHP\ValueObject\Documents\Name\FR\PersonNameCodec as FrPersonNameCodec;
 use MSSTC4PHP\ValueObject\Documents\Name\GB\PersonNameCodec as GbPersonNameCodec;
+use MSSTC4PHP\ValueObject\Documents\Name\IdentifierSpellings;
 use MSSTC4PHP\ValueObject\Documents\Name\IT\PersonNameCodec as ItPersonNameCodec;
+use MSSTC4PHP\ValueObject\Documents\Name\Latin\AbstractFamilyGivenPersonName;
+use MSSTC4PHP\ValueObject\Documents\Name\Latin\AbstractFamilyGivenPersonNameCodec;
 use MSSTC4PHP\ValueObject\Documents\Name\Latin\AbstractLatinNamePart;
+use MSSTC4PHP\ValueObject\Documents\Name\Latin\AbstractLatinPersonName;
 use MSSTC4PHP\ValueObject\Documents\Name\Latin\LatinPersonNameBuilder;
 use MSSTC4PHP\ValueObject\Documents\Name\LatinOverridePolicy;
 use MSSTC4PHP\ValueObject\Documents\Name\LatinSpelling;
@@ -34,6 +38,7 @@ use MSSTC4PHP\ValueObject\Documents\Name\TR\GivenName;
 use MSSTC4PHP\ValueObject\Documents\Name\TR\PersonName;
 use MSSTC4PHP\ValueObject\Documents\Name\TR\PersonNameCodec;
 use MSSTC4PHP\ValueObject\Documents\Name\TransliterationVariant;
+use MSSTC4PHP\ValueObject\Documents\Tests\Fixture\RefusesNameWithoutEchoingInput;
 use MSSTC4PHP\ValueObject\Exception\InvalidPayloadException;
 use MSSTC4PHP\ValueObject\Payload\ValueObjectMapper;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -42,6 +47,9 @@ use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(PersonNameCodec::class)]
+#[CoversClass(AbstractFamilyGivenPersonNameCodec::class)]
+#[UsesClass(AbstractFamilyGivenPersonName::class)]
+#[UsesClass(AbstractLatinPersonName::class)]
 #[UsesClass(Codecs::class)]
 #[UsesClass(RuPersonNameCodec::class)]
 #[UsesClass(AuPersonNameCodec::class)]
@@ -57,6 +65,7 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(AbstractLatinNamePart::class)]
 #[UsesClass(LatinPersonNameBuilder::class)]
 #[UsesClass(LatinSpelling::class)]
+#[UsesClass(IdentifierSpellings::class)]
 #[UsesClass(LatinOverridePolicy::class)]
 #[UsesClass(TransliterationVariant::class)]
 #[UsesClass(FamilyName::class)]
@@ -71,6 +80,8 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(AbstractTurkishNamePart::class)]
 final class PersonNameCodecTest extends TestCase
 {
+    use RefusesNameWithoutEchoingInput;
+
     private const string SHAPE = 'Expected a Turkish person name payload with string "family" and "given", '
         . 'string or null "latin", and no other keys.';
 
@@ -144,19 +155,23 @@ final class PersonNameCodecTest extends TestCase
     #[DataProvider('malformedPayloads')]
     public function testDecodeRefusesAMalformedPayload(array $payload): void
     {
-        $this->expectException(InvalidPayloadException::class);
-        $this->expectExceptionMessage(self::SHAPE);
-
-        new PersonNameCodec()->decode($payload);
+        self::assertNameRefusedWithoutEcho(
+            fn (): PersonName => new PersonNameCodec()->decode($payload),
+            '',
+            self::SHAPE,
+            InvalidPayloadException::class,
+        );
     }
 
     public function testTheJsonViewIsNotACodecPayload(): void
     {
-        $this->expectException(InvalidPayloadException::class);
-        $this->expectExceptionMessage(self::SHAPE);
-
-        new PersonNameCodec()->decode(
-            new PersonName(FamilyName::from('Schmidt'), GivenName::from('Erika'))->jsonSerialize(),
+        self::assertNameRefusedWithoutEcho(
+            fn (): PersonName => new PersonNameCodec()->decode(
+                new PersonName(FamilyName::from('Schmidt'), GivenName::from('Erika'))->jsonSerialize(),
+            ),
+            '',
+            self::SHAPE,
+            InvalidPayloadException::class,
         );
     }
 
@@ -169,12 +184,12 @@ final class PersonNameCodecTest extends TestCase
 
     public function testEncodeRefusesAnotherValueObject(): void
     {
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage(
+        self::assertNameRefusedWithoutEcho(
+            fn (): array => new PersonNameCodec()->encode(GivenName::from('Erika')),
+            '',
             PersonNameCodec::class . ' encodes ' . PersonName::class . ', ' . GivenName::class . ' given.',
+            LogicException::class,
         );
-
-        new PersonNameCodec()->encode(GivenName::from('Erika'));
     }
 
     public function testWorksThroughTheMapperFromUntrustedInput(): void

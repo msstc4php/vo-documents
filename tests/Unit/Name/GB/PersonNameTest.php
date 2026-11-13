@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace MSSTC4PHP\ValueObject\Documents\Tests\Unit\Name\GB;
 
-use MSSTC4PHP\ValueObject\Documents\Exception\InvalidPersonNameException;
 use MSSTC4PHP\ValueObject\Documents\Icao\PersonName as IcaoPersonName;
 use MSSTC4PHP\ValueObject\Documents\Icao\Table\Cyrillic;
 use MSSTC4PHP\ValueObject\Documents\Icao\Table\LatinMultinational;
@@ -17,9 +16,12 @@ use MSSTC4PHP\ValueObject\Documents\Name\AnyIcaoSpelling;
 use MSSTC4PHP\ValueObject\Documents\Name\GB\FamilyName;
 use MSSTC4PHP\ValueObject\Documents\Name\GB\GivenName;
 use MSSTC4PHP\ValueObject\Documents\Name\GB\PersonName;
+use MSSTC4PHP\ValueObject\Documents\Name\Latin\AbstractFamilyGivenPersonName;
 use MSSTC4PHP\ValueObject\Documents\Name\Latin\AbstractLatinNamePart;
+use MSSTC4PHP\ValueObject\Documents\Name\Latin\AbstractLatinPersonName;
 use MSSTC4PHP\ValueObject\Documents\Name\Latin\LatinPersonNameBuilder;
 use MSSTC4PHP\ValueObject\Documents\Name\LatinOverridePolicy;
+use MSSTC4PHP\ValueObject\Documents\Tests\Fixture\RefusesNameWithoutEchoingInput;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\UsesClass;
@@ -29,6 +31,8 @@ use PHPUnit\Framework\TestCase;
  * Expectations follow docs/sources/GB.md "Names".
  */
 #[CoversClass(PersonName::class)]
+#[CoversClass(AbstractLatinPersonName::class)]
+#[CoversClass(AbstractFamilyGivenPersonName::class)]
 #[UsesClass(AbstractNamePart::class)]
 #[UsesClass(AbstractLatinNamePart::class)]
 #[UsesClass(LatinPersonNameBuilder::class)]
@@ -45,6 +49,8 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(Optional::class)]
 final class PersonNameTest extends TestCase
 {
+    use RefusesNameWithoutEchoingInput;
+
     /**
      * @return iterable<string, array{string, string, non-empty-string}>
      */
@@ -83,11 +89,53 @@ final class PersonNameTest extends TestCase
         self::assertSame('Mary Ann Llŷr', $name->full());
     }
 
-    public function testALetterWithoutAnIcaoSpellingIsRefused(): void
+    public function testALetterWithoutAnIcaoSpellingIsRefusedWithoutAnOverride(): void
     {
-        $this->expectException(InvalidPersonNameException::class);
+        self::assertNameRefusedWithoutEcho(
+            static fn (): PersonName => new PersonName(FamilyName::from('Kĸ'), GivenName::from('Mary')),
+            'Kĸ Mary',
+            'Invalid personal name (no ICAO transliteration for a character).',
+        );
+    }
 
-        new PersonName(FamilyName::from('Kĸ'), GivenName::from('Mary'));
+    public function testALetterWithoutAnIcaoSpellingIsAcceptedWithAnOverride(): void
+    {
+        $name = new PersonName(FamilyName::from('Kĸ'), GivenName::from('Mary'), IcaoPersonName::from('KK<<MARY'));
+
+        self::assertSame('KK<<MARY', $name->latin()->value);
+        self::assertSame('KK<<MARY', $name->latinOverride()?->value);
+        self::assertTrue(
+            $name->equals(
+                new PersonName(FamilyName::from('Kĸ'), GivenName::from('Mary'), IcaoPersonName::from('KK<<MARY')),
+            ),
+        );
+    }
+
+    public function testTheXxxForenameOfAPersonWithOneNameIsNotPartOfTheName(): void
+    {
+        $passport = new PersonName(FamilyName::from('Smith'), null, IcaoPersonName::from('SMITH<<XXX'));
+        $other = new PersonName(FamilyName::from('Smith'), null, IcaoPersonName::from('SMYTH<<XXX'));
+        $forename = new PersonName(
+            FamilyName::from('Smith'),
+            GivenName::from('Xxx'),
+            IcaoPersonName::from('SMYTH<<XXX'),
+        );
+
+        self::assertNull($passport->latinOverride());
+        self::assertSame('SMITH', $passport->latin()->value);
+        self::assertTrue($passport->equals(new PersonName(FamilyName::from('Smith'), null)));
+        self::assertSame('SMYTH', $other->latinOverride()?->value);
+        self::assertSame('SMYTH<<XXX', $forename->latinOverride()?->value);
+    }
+
+    public function testTheOverrideIsKeptAsTyped(): void
+    {
+        $family = FamilyName::from('Smith-Jones');
+        $filler = new PersonName($family, GivenName::from('Mary'), IcaoPersonName::from('SMYTH<JONES<<MARY'));
+        $hyphen = new PersonName($family, GivenName::from('Mary'), IcaoPersonName::from('SMYTH-JONES<<MARY'));
+
+        self::assertSame('SMYTH<JONES<<MARY', $filler->latinOverride()?->value);
+        self::assertFalse($filler->equals($hyphen));
     }
 
     /**

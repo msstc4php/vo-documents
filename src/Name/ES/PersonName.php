@@ -8,8 +8,8 @@ use MSSTC4PHP\ValueObject\Contract\ValueObject;
 use MSSTC4PHP\ValueObject\Documents\Exception\InvalidPersonNameException;
 use MSSTC4PHP\ValueObject\Documents\Icao\PersonName as IcaoPersonName;
 use MSSTC4PHP\ValueObject\Documents\Internal\Optional;
+use MSSTC4PHP\ValueObject\Documents\Name\Latin\AbstractLatinPersonName;
 use MSSTC4PHP\ValueObject\Documents\Name\Latin\LatinPersonNameBuilder;
-use MSSTC4PHP\ValueObject\Documents\Name\PersonName as NationalPersonName;
 use MSSTC4PHP\ValueObject\Documents\Name\TransliterationVariant;
 use Override;
 
@@ -18,21 +18,19 @@ use Override;
  * as the primary identifier, through the ICAO multinational Latin table (`García López, María José` →
  * `GARCIA<LOPEZ<<MARIA<JOSE`, `Muñoz` → `MUNOZ`). Override policy {@see TransliterationVariant}: no Spanish rule lets
  * a passport keep another Latin spelling, so an override must be another ICAO spelling of the parts (`ARGUELLES<<ANA`
- * for `Argüelles Ana`); an override equal to the derived form is not kept. See docs/sources/ES.md "Names".
+ * for `Argüelles Ana`); an MRZ-style `<` for a hyphen is stored as the hyphen, and an override equal to the derived
+ * form is not kept. See docs/sources/ES.md "Names".
  *
  * @see https://www.boe.es/buscar/pdf/2003/BOE-A-2003-13978-consolidado.pdf RD 896/2003 (pasaporte), art. 10.2 f)
  * @see https://www.icao.int/publications/Documents/9303_p3_cons_en.pdf ICAO Doc 9303 Part 3, 8th ed. (2021), §4.6,
  *      §6.A
  */
-final readonly class PersonName implements NationalPersonName
+final readonly class PersonName extends AbstractLatinPersonName
 {
-    private IcaoPersonName $derived;
-
-    private ?IcaoPersonName $latin;
-
     /**
-     * @throws InvalidPersonNameException when a letter has no ICAO spelling or $latin is not a transliteration of the
-     *                                    parts
+     * @throws InvalidPersonNameException when a letter has no ICAO spelling, the Latin form is too long (three parts
+     *                                    of 100 characters exceed {@see IcaoPersonName::MAX_LENGTH}) or $latin is not
+     *                                    a transliteration of the parts
      */
     public function __construct(
         public FamilyName $first,
@@ -40,27 +38,11 @@ final readonly class PersonName implements NationalPersonName
         public GivenName $given,
         ?IcaoPersonName $latin = null,
     ) {
-        $family = $second instanceof FamilyName ? [$first->value, $second->value] : [$first->value];
-        $builder = new LatinPersonNameBuilder($family, [$given->value]);
-        $this->derived = $builder->derive();
-        $this->latin = $builder->resolve($latin, $builder->transliterationVariant(
-            'Invalid Spanish person name (the Latin form is not a transliteration of the name).',
-        ));
-    }
-
-    #[Override]
-    public function latin(): IcaoPersonName
-    {
-        return $this->latin ?? $this->derived;
-    }
-
-    /**
-     * The Latin form given to the constructor, null when {@see latin()} is derived (also when the given form was the
-     * derived one).
-     */
-    public function latinOverride(): ?IcaoPersonName
-    {
-        return $this->latin;
+        parent::__construct(
+            $second instanceof FamilyName ? [$first->value, $second->value] : [$first->value],
+            [$given->value],
+            $latin,
+        );
     }
 
     /**
@@ -83,7 +65,7 @@ final readonly class PersonName implements NationalPersonName
             && $this->first->equals($other->first)
             && Optional::equal($this->second, $other->second)
             && $this->given->equals($other->given)
-            && Optional::equal($this->latin, $other->latin);
+            && Optional::equal($this->latinOverride(), $other->latinOverride());
     }
 
     /**
@@ -100,5 +82,13 @@ final readonly class PersonName implements NationalPersonName
             'given' => $this->given->value,
             'effectiveLatin' => $this->latin()->value,
         ];
+    }
+
+    #[Override]
+    protected function overridePolicy(LatinPersonNameBuilder $builder): TransliterationVariant
+    {
+        return $builder->transliterationVariant(
+            'Invalid Spanish person name (the Latin form is not a transliteration of the name).',
+        );
     }
 }

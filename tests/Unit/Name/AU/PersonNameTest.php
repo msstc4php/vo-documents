@@ -14,11 +14,15 @@ use MSSTC4PHP\ValueObject\Documents\Name\AbstractNamePart;
 use MSSTC4PHP\ValueObject\Documents\Name\AU\FamilyName;
 use MSSTC4PHP\ValueObject\Documents\Name\AU\GivenName;
 use MSSTC4PHP\ValueObject\Documents\Name\AU\PersonName;
+use MSSTC4PHP\ValueObject\Documents\Name\IdentifierSpellings;
+use MSSTC4PHP\ValueObject\Documents\Name\Latin\AbstractFamilyGivenPersonName;
 use MSSTC4PHP\ValueObject\Documents\Name\Latin\AbstractLatinNamePart;
+use MSSTC4PHP\ValueObject\Documents\Name\Latin\AbstractLatinPersonName;
 use MSSTC4PHP\ValueObject\Documents\Name\Latin\LatinPersonNameBuilder;
 use MSSTC4PHP\ValueObject\Documents\Name\LatinOverridePolicy;
 use MSSTC4PHP\ValueObject\Documents\Name\LatinSpelling;
 use MSSTC4PHP\ValueObject\Documents\Name\TransliterationVariant;
+use MSSTC4PHP\ValueObject\Documents\Tests\Fixture\RefusesNameWithoutEchoingInput;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\UsesClass;
@@ -28,12 +32,15 @@ use PHPUnit\Framework\TestCase;
  * Expectations follow docs/sources/AU.md "Names".
  */
 #[CoversClass(PersonName::class)]
+#[CoversClass(AbstractLatinPersonName::class)]
+#[CoversClass(AbstractFamilyGivenPersonName::class)]
 #[UsesClass(AbstractNamePart::class)]
 #[UsesClass(AbstractLatinNamePart::class)]
 #[UsesClass(LatinPersonNameBuilder::class)]
 #[UsesClass(FamilyName::class)]
 #[UsesClass(GivenName::class)]
 #[UsesClass(LatinSpelling::class)]
+#[UsesClass(IdentifierSpellings::class)]
 #[UsesClass(LatinOverridePolicy::class)]
 #[UsesClass(TransliterationVariant::class)]
 #[UsesClass(IcaoPersonName::class)]
@@ -43,6 +50,8 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(UnicodeText::class)]
 final class PersonNameTest extends TestCase
 {
+    use RefusesNameWithoutEchoingInput;
+
     /**
      * @return iterable<string, array{string, string, non-empty-string}>
      */
@@ -153,10 +162,14 @@ final class PersonNameTest extends TestCase
 
     public function testAFullwidthNameIsRefused(): void
     {
-        $this->expectException(InvalidPersonNameException::class);
-        $this->expectExceptionMessage('Invalid Australian family name (compatibility character).');
-
-        new PersonName(FamilyName::from("\u{FF33}\u{FF4D}\u{FF49}\u{FF54}\u{FF48}"), GivenName::from('Ann'));
+        self::assertNameRefusedWithoutEcho(
+            fn (): PersonName => new PersonName(
+                FamilyName::from("\u{FF33}\u{FF4D}\u{FF49}\u{FF54}\u{FF48}"),
+                GivenName::from('Ann'),
+            ),
+            \implode(' ', ['Ann', "\u{FF33}\u{FF4D}\u{FF49}\u{FF54}\u{FF48}"]),
+            'Invalid Australian family name (compatibility character).',
+        );
     }
 
     public function testALatinLetterOutsideTheTableIsSpelledAsItsBaseLetter(): void
@@ -175,10 +188,15 @@ final class PersonNameTest extends TestCase
 
     public function testAnOverrideOfANameWithTooManySpellingsIsRefused(): void
     {
-        $this->expectException(InvalidPersonNameException::class);
-        $this->expectExceptionMessage('Invalid personal name (too many transliteration variants).');
-
-        new PersonName(FamilyName::from(\str_repeat('Ä', 13)), GivenName::from('Ann'), IcaoPersonName::from('A<<ANN'));
+        self::assertNameRefusedWithoutEcho(
+            fn (): PersonName => new PersonName(
+                FamilyName::from(\str_repeat('Ä', 13)),
+                GivenName::from('Ann'),
+                IcaoPersonName::from('A<<ANN'),
+            ),
+            \implode(' ', ['Ä', 'Ann', 'A<<ANN']),
+            'Invalid personal name (too many transliteration variants).',
+        );
     }
 
     /**
@@ -198,12 +216,15 @@ final class PersonNameTest extends TestCase
     #[DataProvider('foreignOverrides')]
     public function testRefusesAnOverrideThatIsNotATransliteration(string $latin): void
     {
-        $this->expectException(InvalidPersonNameException::class);
-        $this->expectExceptionMessage(
+        self::assertNameRefusedWithoutEcho(
+            fn (): PersonName => new PersonName(
+                FamilyName::from('Müller'),
+                GivenName::from('Zoë'),
+                IcaoPersonName::from($latin),
+            ),
+            \implode(' ', ['Müller', 'Zoë', $latin]),
             'Invalid Australian person name (the Latin form is not a transliteration of the name).',
         );
-
-        new PersonName(FamilyName::from('Müller'), GivenName::from('Zoë'), IcaoPersonName::from($latin));
     }
 
     public function testRefusesALatinLetterWithoutAnIcaoSpellingWithoutEchoingIt(): void

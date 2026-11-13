@@ -34,6 +34,19 @@ abstract readonly class LatinOverridePolicy
     }
 
     /**
+     * The Latin form of a name whose derived form cannot be computed (a letter without an ICAO spelling, a Latin form
+     * too long): refused unless the policy accepts the override on its own.
+     *
+     * @param InvalidPersonNameException $reason why the derived form cannot be computed
+     *
+     * @throws InvalidPersonNameException $reason
+     */
+    public function withoutDerivedForm(?IcaoPersonName $override, InvalidPersonNameException $reason): IcaoPersonName
+    {
+        throw $reason;
+    }
+
+    /**
      * @return IcaoPersonName the override in the form to store
      *
      * @throws InvalidPersonNameException when the override is refused

@@ -17,11 +17,15 @@ use MSSTC4PHP\ValueObject\Documents\Name\CH\AbstractSwissNamePart;
 use MSSTC4PHP\ValueObject\Documents\Name\CH\FamilyName;
 use MSSTC4PHP\ValueObject\Documents\Name\CH\GivenName;
 use MSSTC4PHP\ValueObject\Documents\Name\CH\PersonName;
+use MSSTC4PHP\ValueObject\Documents\Name\IdentifierSpellings;
+use MSSTC4PHP\ValueObject\Documents\Name\Latin\AbstractFamilyGivenPersonName;
 use MSSTC4PHP\ValueObject\Documents\Name\Latin\AbstractLatinNamePart;
+use MSSTC4PHP\ValueObject\Documents\Name\Latin\AbstractLatinPersonName;
 use MSSTC4PHP\ValueObject\Documents\Name\Latin\LatinPersonNameBuilder;
 use MSSTC4PHP\ValueObject\Documents\Name\LatinOverridePolicy;
 use MSSTC4PHP\ValueObject\Documents\Name\LatinSpelling;
 use MSSTC4PHP\ValueObject\Documents\Name\TransliterationVariant;
+use MSSTC4PHP\ValueObject\Documents\Tests\Fixture\RefusesNameWithoutEchoingInput;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\UsesClass;
@@ -31,6 +35,8 @@ use PHPUnit\Framework\TestCase;
  * Expectations follow docs/sources/CH.md "Names"; `Schweizer Sample, Helvetia` is the fedpol identity card specimen.
  */
 #[CoversClass(PersonName::class)]
+#[CoversClass(AbstractLatinPersonName::class)]
+#[CoversClass(AbstractFamilyGivenPersonName::class)]
 #[UsesClass(AbstractNamePart::class)]
 #[UsesClass(AbstractLatinNamePart::class)]
 #[UsesClass(AbstractSwissNamePart::class)]
@@ -38,6 +44,7 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(FamilyName::class)]
 #[UsesClass(GivenName::class)]
 #[UsesClass(LatinSpelling::class)]
+#[UsesClass(IdentifierSpellings::class)]
 #[UsesClass(LatinOverridePolicy::class)]
 #[UsesClass(TransliterationVariant::class)]
 #[UsesClass(IcaoPersonName::class)]
@@ -49,6 +56,8 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(Optional::class)]
 final class PersonNameTest extends TestCase
 {
+    use RefusesNameWithoutEchoingInput;
+
     private const string NOT_A_TRANSLITERATION =
         'Invalid Swiss person name (the Latin form is not a transliteration of the name).';
 
@@ -153,10 +162,15 @@ final class PersonNameTest extends TestCase
     #[DataProvider('foreignOverrides')]
     public function testRefusesAnOverrideThatIsNotATransliteration(string $latin): void
     {
-        $this->expectException(InvalidPersonNameException::class);
-        $this->expectExceptionMessage(self::NOT_A_TRANSLITERATION);
-
-        new PersonName(FamilyName::from('Müller'), GivenName::from('Anna'), IcaoPersonName::from($latin));
+        self::assertNameRefusedWithoutEcho(
+            fn (): PersonName => new PersonName(
+                FamilyName::from('Müller'),
+                GivenName::from('Anna'),
+                IcaoPersonName::from($latin),
+            ),
+            \implode(' ', ['Müller', 'Anna', $latin]),
+            self::NOT_A_TRANSLITERATION,
+        );
     }
 
     public function testEqualityComparesPartsAndOverride(): void

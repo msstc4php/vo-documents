@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace MSSTC4PHP\ValueObject\Documents\Tests\Unit\Name\CH;
 
-use MSSTC4PHP\ValueObject\Documents\Exception\InvalidPersonNameException;
 use MSSTC4PHP\ValueObject\Documents\Icao\Table\Cyrillic;
 use MSSTC4PHP\ValueObject\Documents\Icao\Table\LatinMultinational;
 use MSSTC4PHP\ValueObject\Documents\Icao\Transliterator;
@@ -14,6 +13,7 @@ use MSSTC4PHP\ValueObject\Documents\Name\CH\AbstractSwissNamePart;
 use MSSTC4PHP\ValueObject\Documents\Name\CH\FamilyName;
 use MSSTC4PHP\ValueObject\Documents\Name\CH\GivenName;
 use MSSTC4PHP\ValueObject\Documents\Name\Latin\AbstractLatinNamePart;
+use MSSTC4PHP\ValueObject\Documents\Tests\Fixture\RefusesNameWithoutEchoingInput;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\UsesClass;
@@ -33,6 +33,8 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(Cyrillic::class)]
 final class NamePartsTest extends TestCase
 {
+    use RefusesNameWithoutEchoingInput;
+
     /**
      * @return iterable<string, array{string, string}>
      */
@@ -106,17 +108,19 @@ final class NamePartsTest extends TestCase
     #[DataProvider('invalidFamilyNames')]
     public function testFamilyNameRefusesCharactersOutsideTheRegisterSet(string $input, string $message): void
     {
-        $this->expectException(InvalidPersonNameException::class);
-        $this->expectExceptionMessage($message);
-
-        FamilyName::from($input);
+        self::assertNameRefusedWithoutEcho(
+            fn (): FamilyName => FamilyName::from($input),
+            $input,
+            $message,
+        );
     }
 
     public function testGivenNameRefusesOtherScripts(): void
     {
-        $this->expectException(InvalidPersonNameException::class);
-        $this->expectExceptionMessage('Invalid Swiss given name (invalid character).');
-
-        GivenName::from('Δημήτρης');
+        self::assertNameRefusedWithoutEcho(
+            fn (): GivenName => GivenName::from('Δημήτρης'),
+            'Δημήτρης',
+            'Invalid Swiss given name (invalid character).',
+        );
     }
 }

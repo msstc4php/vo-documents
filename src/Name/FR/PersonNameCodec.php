@@ -4,26 +4,21 @@ declare(strict_types=1);
 
 namespace MSSTC4PHP\ValueObject\Documents\Name\FR;
 
-use LogicException;
-use MSSTC4PHP\ValueObject\Contract\ValueObject;
 use MSSTC4PHP\ValueObject\Documents\Icao\PersonName as IcaoPersonName;
-use MSSTC4PHP\ValueObject\Documents\Internal\PayloadFields;
-use MSSTC4PHP\ValueObject\Payload\PayloadCodec;
+use MSSTC4PHP\ValueObject\Documents\Name\Latin\AbstractFamilyGivenPersonNameCodec;
 use Override;
 
 /**
- * {family: string, given: string, latin: string|null}; latin holds only an override, the derived form is never
- * stored. Other keys are refused, so the {@see PersonName::jsonSerialize()} view (which has `effectiveLatin`) is never
- * read as a payload that silently drops an override.
+ * {family: string, given: string, latin: string|null}; latin holds only an override, the derived form is never stored;
+ * a missing "latin" key reads as null. Other keys are refused, so the {@see PersonName::jsonSerialize()} view (which
+ * has `effectiveLatin`) is never read as a payload that silently drops an override.
  *
- * @implements PayloadCodec<PersonName>
+ * @extends AbstractFamilyGivenPersonNameCodec<PersonName>
  */
-final readonly class PersonNameCodec implements PayloadCodec
+final readonly class PersonNameCodec extends AbstractFamilyGivenPersonNameCodec
 {
     private const string SHAPE = 'Expected a French person name payload with string "family" and "given", '
         . 'string or null "latin", and no other keys.';
-
-    private const array KEYS = ['family', 'given', 'latin'];
 
     #[Override]
     public function valueObjectClass(): string
@@ -31,35 +26,15 @@ final readonly class PersonNameCodec implements PayloadCodec
         return PersonName::class;
     }
 
-    /**
-     * @return array{family: string, given: string, latin: string|null}
-     */
     #[Override]
-    public function encode(ValueObject $value): array
+    protected function shape(): string
     {
-        if (!$value instanceof PersonName) {
-            $message = \sprintf('%s encodes %s, %s given.', self::class, PersonName::class, $value::class);
-
-            throw new LogicException($message);
-        }
-
-        return [
-            'family' => $value->family->value,
-            'given' => $value->given->value,
-            'latin' => $value->latinOverride()?->value,
-        ];
+        return self::SHAPE;
     }
 
     #[Override]
-    public function decode(array $payload): PersonName
+    protected function create(string $family, ?string $given, ?IcaoPersonName $latin): PersonName
     {
-        PayloadFields::assertOnlyKeys($payload, self::KEYS, self::SHAPE);
-        $latin = PayloadFields::nullableString($payload, 'latin', self::SHAPE);
-
-        return new PersonName(
-            FamilyName::from(PayloadFields::string($payload, 'family', self::SHAPE)),
-            GivenName::from(PayloadFields::string($payload, 'given', self::SHAPE)),
-            $latin === null ? null : IcaoPersonName::from($latin),
-        );
+        return new PersonName(FamilyName::from($family), GivenName::from($given ?? throw $this->malformed()), $latin);
     }
 }

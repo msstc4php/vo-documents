@@ -22,6 +22,7 @@ use MSSTC4PHP\ValueObject\Documents\Name\DE\PersonNameCodec as DePersonNameCodec
 use MSSTC4PHP\ValueObject\Documents\Name\ES\PersonNameCodec as EsPersonNameCodec;
 use MSSTC4PHP\ValueObject\Documents\Name\FR\PersonNameCodec as FrPersonNameCodec;
 use MSSTC4PHP\ValueObject\Documents\Name\GB\PersonNameCodec as GbPersonNameCodec;
+use MSSTC4PHP\ValueObject\Documents\Name\IdentifierSpellings;
 use MSSTC4PHP\ValueObject\Documents\Name\IT\PersonNameCodec as ItPersonNameCodec;
 use MSSTC4PHP\ValueObject\Documents\Name\LatinOverridePolicy;
 use MSSTC4PHP\ValueObject\Documents\Name\LatinSpelling;
@@ -34,6 +35,7 @@ use MSSTC4PHP\ValueObject\Documents\Name\RU\PersonName;
 use MSSTC4PHP\ValueObject\Documents\Name\RU\PersonNameCodec;
 use MSSTC4PHP\ValueObject\Documents\Name\RU\RussianTransliteration;
 use MSSTC4PHP\ValueObject\Documents\Name\TR\PersonNameCodec as TrPersonNameCodec;
+use MSSTC4PHP\ValueObject\Documents\Tests\Fixture\RefusesNameWithoutEchoingInput;
 use MSSTC4PHP\ValueObject\Exception\InvalidPayloadException;
 use MSSTC4PHP\ValueObject\Payload\ValueObjectMapper;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -57,6 +59,7 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(AbstractNamePart::class)]
 #[UsesClass(AbstractRussianNamePart::class)]
 #[UsesClass(LatinSpelling::class)]
+#[UsesClass(IdentifierSpellings::class)]
 #[UsesClass(LatinOverridePolicy::class)]
 #[UsesClass(AnyIcaoSpelling::class)]
 #[UsesClass(FamilyName::class)]
@@ -71,6 +74,8 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(Optional::class)]
 final class PersonNameCodecTest extends TestCase
 {
+    use RefusesNameWithoutEchoingInput;
+
     private const string SHAPE = 'Expected a Russian person name payload with string "family" and "given", '
         . 'string or null "patronymic" and "latin", and no other keys.';
 
@@ -157,10 +162,12 @@ final class PersonNameCodecTest extends TestCase
     #[DataProvider('malformedPayloads')]
     public function testDecodeRefusesAMalformedPayload(array $payload): void
     {
-        $this->expectException(InvalidPayloadException::class);
-        $this->expectExceptionMessage(self::SHAPE);
-
-        new PersonNameCodec()->decode($payload);
+        self::assertNameRefusedWithoutEcho(
+            fn (): PersonName => new PersonNameCodec()->decode($payload),
+            '',
+            self::SHAPE,
+            InvalidPayloadException::class,
+        );
     }
 
     public function testTheJsonViewIsNotACodecPayload(): void
@@ -172,10 +179,12 @@ final class PersonNameCodecTest extends TestCase
             IcaoPersonName::from('IVANOV<<IVAN'),
         );
 
-        $this->expectException(InvalidPayloadException::class);
-        $this->expectExceptionMessage(self::SHAPE);
-
-        new PersonNameCodec()->decode($name->jsonSerialize());
+        self::assertNameRefusedWithoutEcho(
+            fn (): PersonName => new PersonNameCodec()->decode($name->jsonSerialize()),
+            '',
+            self::SHAPE,
+            InvalidPayloadException::class,
+        );
     }
 
     public function testDecodeRefusesAnInvalidPart(): void
@@ -187,12 +196,12 @@ final class PersonNameCodecTest extends TestCase
 
     public function testEncodeRefusesAnotherValueObject(): void
     {
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage(
+        self::assertNameRefusedWithoutEcho(
+            fn (): array => new PersonNameCodec()->encode(GivenName::from('Иван')),
+            '',
             PersonNameCodec::class . ' encodes ' . PersonName::class . ', ' . GivenName::class . ' given.',
+            LogicException::class,
         );
-
-        new PersonNameCodec()->encode(GivenName::from('Иван'));
     }
 
     public function testWorksThroughTheMapperFromUntrustedInput(): void

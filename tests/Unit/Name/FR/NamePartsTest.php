@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace MSSTC4PHP\ValueObject\Documents\Tests\Unit\Name\FR;
 
-use MSSTC4PHP\ValueObject\Documents\Exception\InvalidPersonNameException;
 use MSSTC4PHP\ValueObject\Documents\Icao\Table\Cyrillic;
 use MSSTC4PHP\ValueObject\Documents\Icao\Table\LatinMultinational;
 use MSSTC4PHP\ValueObject\Documents\Icao\Transliterator;
@@ -14,6 +13,7 @@ use MSSTC4PHP\ValueObject\Documents\Name\FR\AbstractFrenchNamePart;
 use MSSTC4PHP\ValueObject\Documents\Name\FR\FamilyName;
 use MSSTC4PHP\ValueObject\Documents\Name\FR\GivenName;
 use MSSTC4PHP\ValueObject\Documents\Name\Latin\AbstractLatinNamePart;
+use MSSTC4PHP\ValueObject\Documents\Tests\Fixture\RefusesNameWithoutEchoingInput;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\UsesClass;
@@ -33,6 +33,8 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(Cyrillic::class)]
 final class NamePartsTest extends TestCase
 {
+    use RefusesNameWithoutEchoingInput;
+
     /**
      * @return iterable<string, array{string, string}>
      */
@@ -88,17 +90,19 @@ final class NamePartsTest extends TestCase
     #[DataProvider('invalidGivenNames')]
     public function testGivenNameRefusesLettersOutsideTheCircular(string $input, string $message): void
     {
-        $this->expectException(InvalidPersonNameException::class);
-        $this->expectExceptionMessage($message);
-
-        GivenName::from($input);
+        self::assertNameRefusedWithoutEcho(
+            fn (): GivenName => GivenName::from($input),
+            $input,
+            $message,
+        );
     }
 
     public function testFamilyNameRefusesForeignDiacritics(): void
     {
-        $this->expectException(InvalidPersonNameException::class);
-        $this->expectExceptionMessage('Invalid French family name (invalid character).');
-
-        FamilyName::from('Muñoz');
+        self::assertNameRefusedWithoutEcho(
+            fn (): FamilyName => FamilyName::from('Muñoz'),
+            'Muñoz',
+            'Invalid French family name (invalid character).',
+        );
     }
 }

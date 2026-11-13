@@ -18,7 +18,8 @@ use Override;
  * omits the patronymic (docs/sources/RU.md §2). Override policy {@see AnyIcaoSpelling}: any valid ICAO name is kept as
  * the Latin form, because the MVD writes the name in Latin "так, как это указано в подтверждающем документе" (an
  * earlier passport may say IVANOVA<<YULIYA for Иванова Юлия; RU.md §4). An override with the derived form's MRZ
- * spelling (`RIMSKII<KORSAKOV<<NIKOLAI` for Римский-Корсаков Николай) is the derived form and is not kept.
+ * spelling (`RIMSKII<KORSAKOV<<NIKOLAI` for Римский-Корсаков Николай) is the derived form and is not kept; an
+ * override is kept as typed, also when the derived form would be too long.
  *
  * @see http://publication.pravo.gov.ru/document/0001202002280021 Order of the MVD of Russia No. 996 of 31.12.2019
  *      (Ministry of Justice reg. No. 57627), appendix 9, §1, §3, §16.1.1, §32
@@ -27,12 +28,13 @@ use Override;
  */
 final readonly class PersonName implements NationalPersonName
 {
-    private IcaoPersonName $derived;
+    private IcaoPersonName $effective;
 
     private ?IcaoPersonName $latin;
 
     /**
-     * @throws InvalidPersonNameException when a part has no ICAO spelling or its Latin form is too long
+     * @throws InvalidPersonNameException when a part has no ICAO spelling or its Latin form is too long, and
+     *                                    no override is given
      */
     public function __construct(
         public FamilyName $family,
@@ -41,17 +43,27 @@ final readonly class PersonName implements NationalPersonName
         ?IcaoPersonName $latin = null,
     ) {
         $transliteration = new RussianTransliteration();
-        $this->derived = IcaoPersonName::fromParts(
-            $transliteration->toLatin($family),
-            [$transliteration->toLatin($given)],
-        );
-        $this->latin = new AnyIcaoSpelling()->resolve($latin, $this->derived);
+        $policy = new AnyIcaoSpelling();
+        try {
+            $derived = IcaoPersonName::fromParts(
+                $transliteration->toLatin($family),
+                [$transliteration->toLatin($given)],
+            );
+        } catch (InvalidPersonNameException $reason) {
+            $this->latin = $policy->withoutDerivedForm($latin, $reason);
+            $this->effective = $this->latin;
+
+            return;
+        }
+
+        $this->latin = $policy->resolve($latin, $derived);
+        $this->effective = $this->latin ?? $derived;
     }
 
     #[Override]
     public function latin(): IcaoPersonName
     {
-        return $this->latin ?? $this->derived;
+        return $this->effective;
     }
 
     /**
@@ -108,7 +120,7 @@ final readonly class PersonName implements NationalPersonName
             'family' => $this->family->value,
             'given' => $this->given->value,
             'patronymic' => $this->patronymic?->value,
-            'effectiveLatin' => $this->latin()->value,
+            'effectiveLatin' => $this->effective->value,
         ];
     }
 

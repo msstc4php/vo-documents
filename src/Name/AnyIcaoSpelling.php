@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MSSTC4PHP\ValueObject\Documents\Name;
 
+use MSSTC4PHP\ValueObject\Documents\Exception\InvalidPersonNameException;
 use MSSTC4PHP\ValueObject\Documents\Icao\PersonName as IcaoPersonName;
 use Override;
 
@@ -16,6 +17,15 @@ use Override;
  */
 final readonly class AnyIcaoSpelling extends LatinOverridePolicy
 {
+    /**
+     * @throws InvalidPersonNameException $reason when no override is given
+     */
+    #[Override]
+    public function withoutDerivedForm(?IcaoPersonName $override, InvalidPersonNameException $reason): IcaoPersonName
+    {
+        return $override ?? throw $reason;
+    }
+
     #[Override]
     protected function spelling(IcaoPersonName $override): IcaoPersonName
     {

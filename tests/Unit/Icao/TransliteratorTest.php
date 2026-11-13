@@ -9,6 +9,7 @@ use MSSTC4PHP\ValueObject\Documents\Icao\Table\Cyrillic;
 use MSSTC4PHP\ValueObject\Documents\Icao\Table\LatinMultinational;
 use MSSTC4PHP\ValueObject\Documents\Icao\Transliterator;
 use MSSTC4PHP\ValueObject\Documents\Internal\UnicodeText;
+use MSSTC4PHP\ValueObject\Documents\Tests\Fixture\RefusesNameWithoutEchoingInput;
 use Override;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -24,6 +25,8 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(UnicodeText::class)]
 final class TransliteratorTest extends TestCase
 {
+    use RefusesNameWithoutEchoingInput;
+
     private const string EMPTY = 'Invalid personal name (empty).';
 
     private const string MIXED = 'Invalid personal name (mixed scripts).';
@@ -141,10 +144,11 @@ final class TransliteratorTest extends TestCase
     #[DataProvider('refusedInput')]
     public function testUncoveredInputIsRefusedWithoutEchoingIt(string $national, string $message): void
     {
-        $this->expectException(InvalidPersonNameException::class);
-        $this->expectExceptionMessage($message);
-
-        $this->transliterator->toLatin($national);
+        self::assertNameRefusedWithoutEcho(
+            fn (): string => $this->transliterator->toLatin($national),
+            $national,
+            $message,
+        );
     }
 
     public function testApostrophesAreOmitted(): void
@@ -163,18 +167,20 @@ final class TransliteratorTest extends TestCase
 
     public function testVariantsRefuseUncoveredInput(): void
     {
-        $this->expectException(InvalidPersonNameException::class);
-        $this->expectExceptionMessage('Invalid personal name (no ICAO transliteration for a character).');
-
-        $this->transliterator->variants('李');
+        self::assertNameRefusedWithoutEcho(
+            fn (): array => $this->transliterator->variants('李'),
+            '李',
+            'Invalid personal name (no ICAO transliteration for a character).',
+        );
     }
 
     public function testTooManyVariantsAreRefused(): void
     {
-        $this->expectException(InvalidPersonNameException::class);
-        $this->expectExceptionMessage('Invalid personal name (too many transliteration variants).');
-
-        $this->transliterator->variants(\str_repeat('Ü', 8));
+        self::assertNameRefusedWithoutEcho(
+            fn (): array => $this->transliterator->variants(\str_repeat('Ü', 8)),
+            'Ü',
+            'Invalid personal name (too many transliteration variants).',
+        );
     }
 
     public function testVariantsAtTheLimitAreReturned(): void

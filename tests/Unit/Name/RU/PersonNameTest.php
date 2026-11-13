@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace MSSTC4PHP\ValueObject\Documents\Tests\Unit\Name\RU;
 
-use MSSTC4PHP\ValueObject\Documents\Exception\InvalidPersonNameException;
 use MSSTC4PHP\ValueObject\Documents\Icao\PersonName as IcaoPersonName;
 use MSSTC4PHP\ValueObject\Documents\Icao\Table\Cyrillic;
 use MSSTC4PHP\ValueObject\Documents\Icao\Table\LatinMultinational;
@@ -13,6 +12,7 @@ use MSSTC4PHP\ValueObject\Documents\Internal\Optional;
 use MSSTC4PHP\ValueObject\Documents\Internal\UnicodeText;
 use MSSTC4PHP\ValueObject\Documents\Name\AbstractNamePart;
 use MSSTC4PHP\ValueObject\Documents\Name\AnyIcaoSpelling;
+use MSSTC4PHP\ValueObject\Documents\Name\IdentifierSpellings;
 use MSSTC4PHP\ValueObject\Documents\Name\LatinOverridePolicy;
 use MSSTC4PHP\ValueObject\Documents\Name\LatinSpelling;
 use MSSTC4PHP\ValueObject\Documents\Name\RU\AbstractRussianNamePart;
@@ -21,6 +21,7 @@ use MSSTC4PHP\ValueObject\Documents\Name\RU\GivenName;
 use MSSTC4PHP\ValueObject\Documents\Name\RU\Patronymic;
 use MSSTC4PHP\ValueObject\Documents\Name\RU\PersonName;
 use MSSTC4PHP\ValueObject\Documents\Name\RU\RussianTransliteration;
+use MSSTC4PHP\ValueObject\Documents\Tests\Fixture\RefusesNameWithoutEchoingInput;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\UsesClass;
@@ -34,6 +35,7 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(AbstractNamePart::class)]
 #[UsesClass(AbstractRussianNamePart::class)]
 #[UsesClass(LatinSpelling::class)]
+#[UsesClass(IdentifierSpellings::class)]
 #[UsesClass(LatinOverridePolicy::class)]
 #[UsesClass(AnyIcaoSpelling::class)]
 #[UsesClass(FamilyName::class)]
@@ -47,6 +49,8 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(Optional::class)]
 final class PersonNameTest extends TestCase
 {
+    use RefusesNameWithoutEchoingInput;
+
     public function testDerivedLatinOmitsThePatronymic(): void
     {
         $name = $this->ivanov();
@@ -145,18 +149,36 @@ final class PersonNameTest extends TestCase
 
     public function testAnOverrideThatIsNoIcaoNameIsRefusedBeforeTheName(): void
     {
-        $this->expectException(InvalidPersonNameException::class);
-        $this->expectExceptionMessage('Invalid ICAO personal name.');
-
-        $this->ivanov(latin: IcaoPersonName::from('IVANOV1<<IVAN'));
+        self::assertNameRefusedWithoutEcho(
+            fn (): PersonName => $this->ivanov(latin: IcaoPersonName::from('IVANOV1<<IVAN')),
+            'IVANOV1<<IVAN',
+            'Invalid ICAO personal name.',
+        );
     }
 
-    public function testAPartWhoseLatinFormIsTooLongIsRefused(): void
+    public function testAPartWhoseLatinFormIsTooLongIsRefusedWithoutAnOverride(): void
     {
-        $this->expectException(InvalidPersonNameException::class);
-        $this->expectExceptionMessage('Invalid ICAO personal name (Latin form too long).');
+        self::assertNameRefusedWithoutEcho(
+            static fn (): PersonName => new PersonName(
+                FamilyName::from(\str_repeat('Щ', 100)),
+                GivenName::from('Иван'),
+            ),
+            'Иван',
+            'Invalid ICAO personal name (Latin form too long).',
+        );
+    }
 
-        new PersonName(FamilyName::from(\str_repeat('Щ', 100)), GivenName::from('Иван'));
+    public function testAPartWhoseLatinFormIsTooLongIsAcceptedWithAnOverride(): void
+    {
+        $name = new PersonName(
+            FamilyName::from(\str_repeat('Щ', 100)),
+            GivenName::from('Иван'),
+            null,
+            IcaoPersonName::from('SHCH<<IVAN'),
+        );
+
+        self::assertSame('SHCH<<IVAN', $name->latin()->value);
+        self::assertSame('SHCH<<IVAN', $name->latinOverride()?->value);
     }
 
     public function testDisplayForms(): void

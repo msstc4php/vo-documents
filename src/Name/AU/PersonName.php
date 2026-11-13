@@ -4,11 +4,10 @@ declare(strict_types=1);
 
 namespace MSSTC4PHP\ValueObject\Documents\Name\AU;
 
-use MSSTC4PHP\ValueObject\Contract\ValueObject;
 use MSSTC4PHP\ValueObject\Documents\Exception\InvalidPersonNameException;
 use MSSTC4PHP\ValueObject\Documents\Icao\PersonName as IcaoPersonName;
+use MSSTC4PHP\ValueObject\Documents\Name\Latin\AbstractFamilyGivenPersonName;
 use MSSTC4PHP\ValueObject\Documents\Name\Latin\LatinPersonNameBuilder;
-use MSSTC4PHP\ValueObject\Documents\Name\PersonName as NationalPersonName;
 use MSSTC4PHP\ValueObject\Documents\Name\TransliterationVariant;
 use Override;
 
@@ -20,76 +19,25 @@ use Override;
  *
  * @see https://www.icao.int/publications/Documents/9303_p3_cons_en.pdf ICAO Doc 9303 Part 3, 8th ed. (2021), §4.6,
  *      §6.A
+ *
+ * @extends AbstractFamilyGivenPersonName<FamilyName, GivenName>
  */
-final readonly class PersonName implements NationalPersonName
+final readonly class PersonName extends AbstractFamilyGivenPersonName
 {
-    private IcaoPersonName $derived;
-
-    private ?IcaoPersonName $latin;
-
     /**
-     * @throws InvalidPersonNameException when a letter has no ICAO spelling or $latin is not a transliteration of the
-     *                                    parts
+     * @throws InvalidPersonNameException when a letter has no ICAO spelling, the Latin form is too long or $latin is
+     *                                    not a transliteration of the parts
      */
-    public function __construct(
-        public FamilyName $family,
-        public GivenName $given,
-        ?IcaoPersonName $latin = null,
-    ) {
-        $builder = new LatinPersonNameBuilder([$family->value], [$given->value]);
-        $this->derived = $builder->derive();
-        $this->latin = $builder->resolve($latin, $builder->transliterationVariant(
+    public function __construct(FamilyName $family, GivenName $given, ?IcaoPersonName $latin = null)
+    {
+        parent::__construct($family, $given, $latin);
+    }
+
+    #[Override]
+    protected function overridePolicy(LatinPersonNameBuilder $builder): TransliterationVariant
+    {
+        return $builder->transliterationVariant(
             'Invalid Australian person name (the Latin form is not a transliteration of the name).',
-        ));
-    }
-
-    #[Override]
-    public function latin(): IcaoPersonName
-    {
-        return $this->latin ?? $this->derived;
-    }
-
-    /**
-     * The Latin form given to the constructor, null when {@see latin()} is derived (also when the given form was the
-     * derived one).
-     */
-    public function latinOverride(): ?IcaoPersonName
-    {
-        return $this->latin;
-    }
-
-    /**
-     * @return non-empty-string e.g. "Joan Catherine Citizen"
-     */
-    #[Override]
-    public function full(): string
-    {
-        return $this->given->value . ' ' . $this->family->value;
-    }
-
-    #[Override]
-    public function equals(ValueObject $other): bool
-    {
-        return $other instanceof self
-            && $this->family->equals($other->family)
-            && $this->given->equals($other->given)
-            && ($this->latin instanceof IcaoPersonName
-                ? $other->latin instanceof IcaoPersonName && $this->latin->equals($other->latin)
-                : !$other->latin instanceof IcaoPersonName);
-    }
-
-    /**
-     * A view, not the storage payload ({@see PersonNameCodec}): `effectiveLatin` is {@see latin()}, derived or not.
-     *
-     * @return array{family: string, given: string, effectiveLatin: string}
-     */
-    #[Override]
-    public function jsonSerialize(): array
-    {
-        return [
-            'family' => $this->family->value,
-            'given' => $this->given->value,
-            'effectiveLatin' => $this->latin()->value,
-        ];
+        );
     }
 }

@@ -11,6 +11,7 @@ use MSSTC4PHP\ValueObject\Documents\Icao\Table\Cyrillic;
 use MSSTC4PHP\ValueObject\Documents\Icao\Table\LatinMultinational;
 use MSSTC4PHP\ValueObject\Documents\Icao\Transliterator;
 use MSSTC4PHP\ValueObject\Documents\Internal\UnicodeText;
+use MSSTC4PHP\ValueObject\Documents\Tests\Fixture\RefusesNameWithoutEchoingInput;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\UsesClass;
@@ -23,6 +24,8 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(Cyrillic::class)]
 final class PersonNameTest extends TestCase
 {
+    use RefusesNameWithoutEchoingInput;
+
     public function testFromPartsBuildsTheCanonicalForm(): void
     {
         $name = PersonName::fromParts('Rimsky-Korsakov', ['Nikolai', 'Andreevich']);
@@ -145,10 +148,11 @@ final class PersonNameTest extends TestCase
     #[DataProvider('partsWithFillers')]
     public function testFromPartsRefusesFillersInsideAPart(string $primary, array $secondary): void
     {
-        $this->expectException(InvalidPersonNameException::class);
-        $this->expectExceptionMessage('Invalid ICAO personal name.');
-
-        PersonName::fromParts($primary, $secondary);
+        self::assertNameRefusedWithoutEcho(
+            fn (): PersonName => PersonName::fromParts($primary, $secondary),
+            '',
+            'Invalid ICAO personal name.',
+        );
     }
 
     public function testMrzFieldOfTheTruncationExampleNameFollowsTheRule(): void
@@ -295,8 +299,11 @@ final class PersonNameTest extends TestCase
 
         self::assertSame(PersonName::MAX_LENGTH, \strlen($longest));
         self::assertSame($longest, PersonName::from($longest)->value);
-        $this->expectExceptionMessage('Invalid ICAO personal name (Latin form too long).');
-        PersonName::from($longest . 'B');
+        self::assertNameRefusedWithoutEcho(
+            static fn (): PersonName => PersonName::from($longest . 'B'),
+            '',
+            'Invalid ICAO personal name (Latin form too long).',
+        );
     }
 
     public function testTooLongANameIsRefusedWithoutEchoingIt(): void

@@ -6,15 +6,18 @@ namespace MSSTC4PHP\ValueObject\Documents\Name\RU;
 
 use LogicException;
 use MSSTC4PHP\ValueObject\Contract\ValueObject;
+use MSSTC4PHP\ValueObject\Documents\Exception\InvalidPersonNameException;
 use MSSTC4PHP\ValueObject\Documents\Icao\PersonName as IcaoPersonName;
 use MSSTC4PHP\ValueObject\Documents\Internal\PayloadFields;
+use MSSTC4PHP\ValueObject\Exception\InvalidPayloadException;
 use MSSTC4PHP\ValueObject\Payload\PayloadCodec;
 use Override;
 
 /**
  * {family: string, given: string, patronymic: string|null, latin: string|null}; latin holds only an override, the
- * derived form is never stored. Other keys are refused, so the {@see PersonName::jsonSerialize()} view (which has
- * `effectiveLatin`) is never read as a payload that silently drops an override.
+ * derived form is never stored; a missing "patronymic" or "latin" key reads as null. Other keys are refused, so the
+ * {@see PersonName::jsonSerialize()} view (which has `effectiveLatin`) is never read as a payload that silently drops
+ * an override.
  *
  * @implements PayloadCodec<PersonName>
  */
@@ -51,6 +54,10 @@ final readonly class PersonNameCodec implements PayloadCodec
         ];
     }
 
+    /**
+     * @throws InvalidPayloadException when the payload does not have the expected shape
+     * @throws InvalidPersonNameException when a field is not a valid name part or Latin form
+     */
     #[Override]
     public function decode(array $payload): PersonName
     {

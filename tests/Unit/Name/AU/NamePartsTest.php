@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace MSSTC4PHP\ValueObject\Documents\Tests\Unit\Name\AU;
 
-use MSSTC4PHP\ValueObject\Documents\Exception\InvalidPersonNameException;
 use MSSTC4PHP\ValueObject\Documents\Icao\Table\Cyrillic;
 use MSSTC4PHP\ValueObject\Documents\Icao\Table\LatinMultinational;
 use MSSTC4PHP\ValueObject\Documents\Icao\Transliterator;
@@ -12,6 +11,7 @@ use MSSTC4PHP\ValueObject\Documents\Internal\UnicodeText;
 use MSSTC4PHP\ValueObject\Documents\Name\AbstractNamePart;
 use MSSTC4PHP\ValueObject\Documents\Name\AU\FamilyName;
 use MSSTC4PHP\ValueObject\Documents\Name\AU\GivenName;
+use MSSTC4PHP\ValueObject\Documents\Tests\Fixture\RefusesNameWithoutEchoingInput;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\UsesClass;
@@ -29,6 +29,8 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(Cyrillic::class)]
 final class NamePartsTest extends TestCase
 {
+    use RefusesNameWithoutEchoingInput;
+
     public function testGivenNameWithDiaeresisTransliteratesByTheMultinationalTable(): void
     {
         $given = GivenName::from('Zoë');
@@ -80,17 +82,19 @@ final class NamePartsTest extends TestCase
     #[DataProvider('invalidGivenNames')]
     public function testGivenNameRefusesOtherScriptsAndSigns(string $input, string $message): void
     {
-        $this->expectException(InvalidPersonNameException::class);
-        $this->expectExceptionMessage($message);
-
-        GivenName::from($input);
+        self::assertNameRefusedWithoutEcho(
+            fn (): GivenName => GivenName::from($input),
+            $input,
+            $message,
+        );
     }
 
     public function testFamilyNameRefusesCyrillic(): void
     {
-        $this->expectException(InvalidPersonNameException::class);
-        $this->expectExceptionMessage('Invalid Australian family name (invalid character).');
-
-        FamilyName::from('Иванов');
+        self::assertNameRefusedWithoutEcho(
+            fn (): FamilyName => FamilyName::from('Иванов'),
+            'Иванов',
+            'Invalid Australian family name (invalid character).',
+        );
     }
 }

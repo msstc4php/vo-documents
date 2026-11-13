@@ -12,7 +12,8 @@ use Override;
  * combinations of table 5.3, case as listed (`İ` and `ı`, `ð` without a capital). The ligature `ĳ` is not one of them
  * ("Niet opgenomen tekens mogen niet gebruikt worden. Dat betreft onder andere de Hollandse IJ"): it is written `ij`.
  * Words are joined by a hyphen, an apostrophe or a space; a prefix of table 36 may start a word with an apostrophe
- * (`'t Hart`, `van 't Hof`) or end one before a space (`d' Ancona`). See docs/sources/NL.md "Names".
+ * (`'t Hart`, `van 't Hof`) or end one before a space (`d' Ancona`), never both around one space (no prefix of the
+ * table reads `d' 't`). See docs/sources/NL.md "Names".
  *
  * @see https://rvig.nl/sites/default/files/2025-05/Logisch%20Ontwerp%20BRP%202025.Q2.pdf Logisch Ontwerp BRP 2025.Q2,
  *      § 5.1.2 (tables 5.2, 5.3)
@@ -34,6 +35,6 @@ abstract class AbstractDutchNamePart extends AbstractLatinNamePart
     #[Override]
     final protected function word(): string
     {
-        return "(?:(?<![^ ])')?[" . self::LETTERS . "]+(?:'(?= ))?";
+        return "(?:(?<![^ ])(?<!' )')?[" . self::LETTERS . "]+(?:'(?= ))?";
     }
 }

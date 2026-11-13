@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace MSSTC4PHP\ValueObject\Documents\Tests\Unit\Name\TR;
 
-use MSSTC4PHP\ValueObject\Documents\Exception\InvalidPersonNameException;
 use MSSTC4PHP\ValueObject\Documents\Icao\Table\Cyrillic;
 use MSSTC4PHP\ValueObject\Documents\Icao\Table\LatinMultinational;
 use MSSTC4PHP\ValueObject\Documents\Icao\Transliterator;
@@ -14,6 +13,7 @@ use MSSTC4PHP\ValueObject\Documents\Name\Latin\AbstractLatinNamePart;
 use MSSTC4PHP\ValueObject\Documents\Name\TR\AbstractTurkishNamePart;
 use MSSTC4PHP\ValueObject\Documents\Name\TR\FamilyName;
 use MSSTC4PHP\ValueObject\Documents\Name\TR\GivenName;
+use MSSTC4PHP\ValueObject\Documents\Tests\Fixture\RefusesNameWithoutEchoingInput;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\UsesClass;
@@ -33,6 +33,8 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(Cyrillic::class)]
 final class NamePartsTest extends TestCase
 {
+    use RefusesNameWithoutEchoingInput;
+
     /**
      * @return iterable<string, array{string, string}>
      */
@@ -95,17 +97,19 @@ final class NamePartsTest extends TestCase
     #[DataProvider('invalidGivenNames')]
     public function testGivenNameRefusesOtherLettersAndSigns(string $input, string $message): void
     {
-        $this->expectException(InvalidPersonNameException::class);
-        $this->expectExceptionMessage($message);
-
-        GivenName::from($input);
+        self::assertNameRefusedWithoutEcho(
+            fn (): GivenName => GivenName::from($input),
+            $input,
+            $message,
+        );
     }
 
     public function testFamilyNameRefusesALetterOutsideTheAlphabet(): void
     {
-        $this->expectException(InvalidPersonNameException::class);
-        $this->expectExceptionMessage('Invalid Turkish family name (invalid character).');
-
-        FamilyName::from('Wagner');
+        self::assertNameRefusedWithoutEcho(
+            fn (): FamilyName => FamilyName::from('Wagner'),
+            'Wagner',
+            'Invalid Turkish family name (invalid character).',
+        );
     }
 }

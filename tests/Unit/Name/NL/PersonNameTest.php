@@ -13,7 +13,10 @@ use MSSTC4PHP\ValueObject\Documents\Internal\Optional;
 use MSSTC4PHP\ValueObject\Documents\Internal\Text;
 use MSSTC4PHP\ValueObject\Documents\Internal\UnicodeText;
 use MSSTC4PHP\ValueObject\Documents\Name\AbstractNamePart;
+use MSSTC4PHP\ValueObject\Documents\Name\IdentifierSpellings;
+use MSSTC4PHP\ValueObject\Documents\Name\Latin\AbstractFamilyGivenPersonName;
 use MSSTC4PHP\ValueObject\Documents\Name\Latin\AbstractLatinNamePart;
+use MSSTC4PHP\ValueObject\Documents\Name\Latin\AbstractLatinPersonName;
 use MSSTC4PHP\ValueObject\Documents\Name\Latin\LatinPersonNameBuilder;
 use MSSTC4PHP\ValueObject\Documents\Name\LatinOverridePolicy;
 use MSSTC4PHP\ValueObject\Documents\Name\LatinSpelling;
@@ -22,6 +25,7 @@ use MSSTC4PHP\ValueObject\Documents\Name\NL\FamilyName;
 use MSSTC4PHP\ValueObject\Documents\Name\NL\GivenName;
 use MSSTC4PHP\ValueObject\Documents\Name\NL\PersonName;
 use MSSTC4PHP\ValueObject\Documents\Name\TransliterationVariant;
+use MSSTC4PHP\ValueObject\Documents\Tests\Fixture\RefusesNameWithoutEchoingInput;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\UsesClass;
@@ -31,6 +35,8 @@ use PHPUnit\Framework\TestCase;
  * Expectations follow docs/sources/NL.md "Names"; `de Bruijn, Willeke Liselotte` is the RvIG passport specimen.
  */
 #[CoversClass(PersonName::class)]
+#[CoversClass(AbstractLatinPersonName::class)]
+#[CoversClass(AbstractFamilyGivenPersonName::class)]
 #[UsesClass(AbstractNamePart::class)]
 #[UsesClass(AbstractLatinNamePart::class)]
 #[UsesClass(AbstractDutchNamePart::class)]
@@ -38,6 +44,7 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(FamilyName::class)]
 #[UsesClass(GivenName::class)]
 #[UsesClass(LatinSpelling::class)]
+#[UsesClass(IdentifierSpellings::class)]
 #[UsesClass(LatinOverridePolicy::class)]
 #[UsesClass(TransliterationVariant::class)]
 #[UsesClass(IcaoPersonName::class)]
@@ -49,6 +56,8 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(Optional::class)]
 final class PersonNameTest extends TestCase
 {
+    use RefusesNameWithoutEchoingInput;
+
     private const string NOT_A_TRANSLITERATION =
         'Invalid Dutch person name (the Latin form is not a transliteration of the name).';
 
@@ -153,10 +162,15 @@ final class PersonNameTest extends TestCase
     #[DataProvider('foreignOverrides')]
     public function testRefusesAnOverrideThatIsNotATransliteration(string $latin): void
     {
-        $this->expectException(InvalidPersonNameException::class);
-        $this->expectExceptionMessage(self::NOT_A_TRANSLITERATION);
-
-        new PersonName(FamilyName::from('de Bruijn'), GivenName::from('Willeke'), IcaoPersonName::from($latin));
+        self::assertNameRefusedWithoutEcho(
+            fn (): PersonName => new PersonName(
+                FamilyName::from('de Bruijn'),
+                GivenName::from('Willeke'),
+                IcaoPersonName::from($latin),
+            ),
+            \implode(' ', ['de Bruijn', 'Willeke', $latin]),
+            self::NOT_A_TRANSLITERATION,
+        );
     }
 
     public function testEqualityComparesPartsAndOverride(): void

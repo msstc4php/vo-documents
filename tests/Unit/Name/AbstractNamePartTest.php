@@ -13,6 +13,7 @@ use MSSTC4PHP\ValueObject\Documents\Name\AbstractNamePart;
 use MSSTC4PHP\ValueObject\Documents\Name\AU\FamilyName as AustralianFamilyName;
 use MSSTC4PHP\ValueObject\Documents\Name\RU\FamilyName;
 use MSSTC4PHP\ValueObject\Documents\Tests\Fixture\LatinNamePart;
+use MSSTC4PHP\ValueObject\Documents\Tests\Fixture\RefusesNameWithoutEchoingInput;
 use MSSTC4PHP\ValueObject\Documents\Tests\Fixture\SingleWordNamePart;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -28,6 +29,8 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(Cyrillic::class)]
 final class AbstractNamePartTest extends TestCase
 {
+    use RefusesNameWithoutEchoingInput;
+
     public function testSeparatorsAreTakenLiterally(): void
     {
         self::assertSame('ab/cd.ef]gh', LatinNamePart::from('ab/cd.ef]gh')->value);
@@ -80,10 +83,11 @@ final class AbstractNamePartTest extends TestCase
     #[DataProvider('refusals')]
     public function testTheMessageTellsALengthFromACharacterProblem(string $input, string $message): void
     {
-        $this->expectException(InvalidPersonNameException::class);
-        $this->expectExceptionMessage($message);
-
-        LatinNamePart::from($input);
+        self::assertNameRefusedWithoutEcho(
+            fn (): LatinNamePart => LatinNamePart::from($input),
+            $input,
+            $message,
+        );
     }
 
     /**

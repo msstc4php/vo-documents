@@ -18,14 +18,14 @@ use Override;
 final readonly class TransliterationVariant extends LatinOverridePolicy
 {
     /**
-     * `$forms` gives the accepted forms of the name as {@see LatinSpelling::find()} takes them; `$refusal` is the
-     * exception message for an override that is not one of their spellings.
+     * `$spellings` gives the primary and the secondary identifiers' spellings as {@see LatinSpelling::find()} takes
+     * them; `$refusal` is the exception message for an override that is not one of them.
      *
-     * @param Closure(): non-empty-list<non-empty-list<non-empty-list<non-empty-string>>> $forms
+     * @param Closure(): array{IdentifierSpellings, IdentifierSpellings|null} $spellings
      * @param non-empty-string $refusal
      */
     public function __construct(
-        private Closure $forms,
+        private Closure $spellings,
         private string $refusal,
     ) {
     }
@@ -36,6 +36,9 @@ final readonly class TransliterationVariant extends LatinOverridePolicy
     #[Override]
     protected function spelling(IcaoPersonName $override): IcaoPersonName
     {
-        return LatinSpelling::find($override, ($this->forms)()) ?? throw new InvalidPersonNameException($this->refusal);
+        [$primary, $secondary] = ($this->spellings)();
+
+        return LatinSpelling::find($override, $primary, $secondary)
+            ?? throw new InvalidPersonNameException($this->refusal);
     }
 }

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace MSSTC4PHP\ValueObject\Documents\Tests\Unit\Name\TR;
 
-use MSSTC4PHP\ValueObject\Documents\Exception\InvalidPersonNameException;
 use MSSTC4PHP\ValueObject\Documents\Icao\PersonName as IcaoPersonName;
 use MSSTC4PHP\ValueObject\Documents\Icao\Table\Cyrillic;
 use MSSTC4PHP\ValueObject\Documents\Icao\Table\LatinMultinational;
@@ -12,7 +11,10 @@ use MSSTC4PHP\ValueObject\Documents\Icao\Transliterator;
 use MSSTC4PHP\ValueObject\Documents\Internal\Optional;
 use MSSTC4PHP\ValueObject\Documents\Internal\UnicodeText;
 use MSSTC4PHP\ValueObject\Documents\Name\AbstractNamePart;
+use MSSTC4PHP\ValueObject\Documents\Name\IdentifierSpellings;
+use MSSTC4PHP\ValueObject\Documents\Name\Latin\AbstractFamilyGivenPersonName;
 use MSSTC4PHP\ValueObject\Documents\Name\Latin\AbstractLatinNamePart;
+use MSSTC4PHP\ValueObject\Documents\Name\Latin\AbstractLatinPersonName;
 use MSSTC4PHP\ValueObject\Documents\Name\Latin\LatinPersonNameBuilder;
 use MSSTC4PHP\ValueObject\Documents\Name\LatinOverridePolicy;
 use MSSTC4PHP\ValueObject\Documents\Name\LatinSpelling;
@@ -21,6 +23,7 @@ use MSSTC4PHP\ValueObject\Documents\Name\TR\FamilyName;
 use MSSTC4PHP\ValueObject\Documents\Name\TR\GivenName;
 use MSSTC4PHP\ValueObject\Documents\Name\TR\PersonName;
 use MSSTC4PHP\ValueObject\Documents\Name\TransliterationVariant;
+use MSSTC4PHP\ValueObject\Documents\Tests\Fixture\RefusesNameWithoutEchoingInput;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\UsesClass;
@@ -30,6 +33,8 @@ use PHPUnit\Framework\TestCase;
  * Expectations follow docs/sources/TR.md "Names".
  */
 #[CoversClass(PersonName::class)]
+#[CoversClass(AbstractLatinPersonName::class)]
+#[CoversClass(AbstractFamilyGivenPersonName::class)]
 #[UsesClass(AbstractNamePart::class)]
 #[UsesClass(AbstractLatinNamePart::class)]
 #[UsesClass(AbstractTurkishNamePart::class)]
@@ -37,6 +42,7 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(FamilyName::class)]
 #[UsesClass(GivenName::class)]
 #[UsesClass(LatinSpelling::class)]
+#[UsesClass(IdentifierSpellings::class)]
 #[UsesClass(LatinOverridePolicy::class)]
 #[UsesClass(TransliterationVariant::class)]
 #[UsesClass(IcaoPersonName::class)]
@@ -47,6 +53,8 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(Optional::class)]
 final class PersonNameTest extends TestCase
 {
+    use RefusesNameWithoutEchoingInput;
+
     private const string NOT_A_TRANSLITERATION =
         'Invalid Turkish person name (the Latin form is not a transliteration of the name).';
 
@@ -149,10 +157,15 @@ final class PersonNameTest extends TestCase
     #[DataProvider('foreignOverrides')]
     public function testRefusesAnOverrideThatIsNotATransliteration(string $latin): void
     {
-        $this->expectException(InvalidPersonNameException::class);
-        $this->expectExceptionMessage(self::NOT_A_TRANSLITERATION);
-
-        new PersonName(FamilyName::from('Işık'), GivenName::from('İnci'), IcaoPersonName::from($latin));
+        self::assertNameRefusedWithoutEcho(
+            fn (): PersonName => new PersonName(
+                FamilyName::from('Işık'),
+                GivenName::from('İnci'),
+                IcaoPersonName::from($latin),
+            ),
+            \implode(' ', ['Işık', 'İnci', $latin]),
+            self::NOT_A_TRANSLITERATION,
+        );
     }
 
     public function testEqualityComparesPartsAndOverride(): void
@@ -181,5 +194,17 @@ final class PersonNameTest extends TestCase
             ['family' => 'Işık', 'given' => 'İnci', 'effectiveLatin' => 'ISIK<<INCI'],
             new PersonName(FamilyName::from('Işık'), GivenName::from('İnci'))->jsonSerialize(),
         );
+    }
+
+    public function testTheVariantCapIsPerWordSoManyUmlautsAcceptAnOverride(): void
+    {
+        $given = \implode(' ', \array_fill(0, 9, 'Ömür'));
+        $name = new PersonName(
+            FamilyName::from('Öztürk'),
+            GivenName::from($given),
+            IcaoPersonName::from('OZTURK<<' . \str_repeat('OMUR<', 8) . 'OMUR'),
+        );
+
+        self::assertSame('OZTURK<<' . \str_repeat('OMUR<', 8) . 'OMUR', $name->latinOverride()?->value);
     }
 }

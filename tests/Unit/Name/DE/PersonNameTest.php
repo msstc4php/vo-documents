@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace MSSTC4PHP\ValueObject\Documents\Tests\Unit\Name\DE;
 
-use MSSTC4PHP\ValueObject\Documents\Exception\InvalidPersonNameException;
 use MSSTC4PHP\ValueObject\Documents\Icao\PersonName as IcaoPersonName;
 use MSSTC4PHP\ValueObject\Documents\Icao\Table\Cyrillic;
 use MSSTC4PHP\ValueObject\Documents\Icao\Table\LatinMultinational;
@@ -14,11 +13,15 @@ use MSSTC4PHP\ValueObject\Documents\Name\AbstractNamePart;
 use MSSTC4PHP\ValueObject\Documents\Name\DE\FamilyName;
 use MSSTC4PHP\ValueObject\Documents\Name\DE\GivenName;
 use MSSTC4PHP\ValueObject\Documents\Name\DE\PersonName;
+use MSSTC4PHP\ValueObject\Documents\Name\IdentifierSpellings;
+use MSSTC4PHP\ValueObject\Documents\Name\Latin\AbstractFamilyGivenPersonName;
 use MSSTC4PHP\ValueObject\Documents\Name\Latin\AbstractLatinNamePart;
+use MSSTC4PHP\ValueObject\Documents\Name\Latin\AbstractLatinPersonName;
 use MSSTC4PHP\ValueObject\Documents\Name\Latin\LatinPersonNameBuilder;
 use MSSTC4PHP\ValueObject\Documents\Name\LatinOverridePolicy;
 use MSSTC4PHP\ValueObject\Documents\Name\LatinSpelling;
 use MSSTC4PHP\ValueObject\Documents\Name\TransliterationVariant;
+use MSSTC4PHP\ValueObject\Documents\Tests\Fixture\RefusesNameWithoutEchoingInput;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\UsesClass;
@@ -28,12 +31,15 @@ use PHPUnit\Framework\TestCase;
  * Expectations follow docs/sources/DE.md "Names".
  */
 #[CoversClass(PersonName::class)]
+#[CoversClass(AbstractLatinPersonName::class)]
+#[CoversClass(AbstractFamilyGivenPersonName::class)]
 #[UsesClass(AbstractNamePart::class)]
 #[UsesClass(AbstractLatinNamePart::class)]
 #[UsesClass(LatinPersonNameBuilder::class)]
 #[UsesClass(FamilyName::class)]
 #[UsesClass(GivenName::class)]
 #[UsesClass(LatinSpelling::class)]
+#[UsesClass(IdentifierSpellings::class)]
 #[UsesClass(LatinOverridePolicy::class)]
 #[UsesClass(TransliterationVariant::class)]
 #[UsesClass(IcaoPersonName::class)]
@@ -43,6 +49,8 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(UnicodeText::class)]
 final class PersonNameTest extends TestCase
 {
+    use RefusesNameWithoutEchoingInput;
+
     private const string NOT_A_TRANSLITERATION =
         'Invalid German person name (the Latin form is not a transliteration of the name).';
 
@@ -132,18 +140,28 @@ final class PersonNameTest extends TestCase
     #[DataProvider('foreignOverrides')]
     public function testRefusesAnOverrideThatIsNotATransliteration(string $latin): void
     {
-        $this->expectException(InvalidPersonNameException::class);
-        $this->expectExceptionMessage(self::NOT_A_TRANSLITERATION);
-
-        new PersonName(FamilyName::from('Müller'), GivenName::from('Jürgen'), IcaoPersonName::from($latin));
+        self::assertNameRefusedWithoutEcho(
+            fn (): PersonName => new PersonName(
+                FamilyName::from('Müller'),
+                GivenName::from('Jürgen'),
+                IcaoPersonName::from($latin),
+            ),
+            \implode(' ', ['Müller', 'Jürgen', $latin]),
+            self::NOT_A_TRANSLITERATION,
+        );
     }
 
     public function testSharpSHasOnlyOneSpelling(): void
     {
-        $this->expectException(InvalidPersonNameException::class);
-        $this->expectExceptionMessage(self::NOT_A_TRANSLITERATION);
-
-        new PersonName(FamilyName::from('Groß'), GivenName::from('Ann'), IcaoPersonName::from('GROS<<ANN'));
+        self::assertNameRefusedWithoutEcho(
+            fn (): PersonName => new PersonName(
+                FamilyName::from('Groß'),
+                GivenName::from('Ann'),
+                IcaoPersonName::from('GROS<<ANN'),
+            ),
+            \implode(' ', ['Groß', 'Ann', 'GROS<<ANN']),
+            self::NOT_A_TRANSLITERATION,
+        );
     }
 
     public function testEqualityComparesPartsAndOverride(): void
@@ -173,6 +191,21 @@ final class PersonNameTest extends TestCase
         self::assertSame(
             ['family' => 'Müller', 'given' => 'Jürgen', 'effectiveLatin' => 'MUELLER<<JUERGEN'],
             new PersonName(FamilyName::from('Müller'), GivenName::from('Jürgen'))->jsonSerialize(),
+        );
+    }
+
+    public function testTheVariantCapIsPerWordSoManyUmlautsAcceptAnOverride(): void
+    {
+        $given = \implode(' ', \array_fill(0, 13, 'Jürgen'));
+        $name = new PersonName(
+            FamilyName::from('Müller Lüdenscheid'),
+            GivenName::from($given),
+            IcaoPersonName::from('MULLER<LUDENSCHEID<<' . \str_repeat('JURGEN<', 12) . 'JURGEN'),
+        );
+
+        self::assertSame(
+            'MULLER<LUDENSCHEID<<' . \str_repeat('JURGEN<', 12) . 'JURGEN',
+            $name->latinOverride()?->value,
         );
     }
 }

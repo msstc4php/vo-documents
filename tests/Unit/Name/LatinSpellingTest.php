@@ -4,116 +4,131 @@ declare(strict_types=1);
 
 namespace MSSTC4PHP\ValueObject\Documents\Tests\Unit\Name;
 
-use MSSTC4PHP\ValueObject\Documents\Exception\InvalidPersonNameException;
 use MSSTC4PHP\ValueObject\Documents\Icao\PersonName as IcaoPersonName;
 use MSSTC4PHP\ValueObject\Documents\Internal\UnicodeText;
+use MSSTC4PHP\ValueObject\Documents\Name\IdentifierSpellings;
 use MSSTC4PHP\ValueObject\Documents\Name\LatinSpelling;
+use MSSTC4PHP\ValueObject\Documents\Tests\Fixture\RefusesNameWithoutEchoingInput;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(LatinSpelling::class)]
+#[CoversClass(IdentifierSpellings::class)]
 #[UsesClass(IcaoPersonName::class)]
 #[UsesClass(UnicodeText::class)]
 final class LatinSpellingTest extends TestCase
 {
-    public function testFindsTheSpellingInAnyFormAndVariant(): void
-    {
-        $forms = [
-            [['MULLER', 'MUELLER'], ['ANNA']],
-            [['MULLER', 'MUELLER'], ['ANNA'], ['MARIA', 'MARIE']],
-        ];
+    use RefusesNameWithoutEchoingInput;
 
-        self::assertSame('MUELLER<<ANNA', LatinSpelling::find(IcaoPersonName::from('MUELLER<<ANNA'), $forms)?->value);
-        self::assertSame(
-            'MUELLER<<ANNA<MARIE',
-            LatinSpelling::find(IcaoPersonName::from('MUELLER<<ANNA<MARIE'), $forms)?->value,
-        );
-        self::assertNull(LatinSpelling::find(IcaoPersonName::from('MULLER<<MARIE'), $forms));
-        self::assertNull(LatinSpelling::find(IcaoPersonName::from('MULLER<<ANNA<MARIA<MARIE'), $forms));
+    private const string TOO_MANY = 'Invalid personal name (too many transliteration variants).';
+
+    public function testFindsTheSpellingAmongTheVariantsOfEachWord(): void
+    {
+        $primary = new IdentifierSpellings([['MUELLER', 'MULLER']], []);
+        $secondary = new IdentifierSpellings([['ANNA'], ['MARIE', 'MARIA']], [' ']);
+
+        self::assertSame('MULLER<<ANNA<MARIA', $this->find('MULLER<<ANNA<MARIA', $primary, $secondary));
+        self::assertSame('MUELLER<<ANNA<MARIE', $this->find('MUELLER<<ANNA<MARIE', $primary, $secondary));
+        self::assertNull($this->find('MULLER<<MARIE<ANNA', $primary, $secondary));
+        self::assertNull($this->find('MILLER<<ANNA<MARIA', $primary, $secondary));
     }
 
-    public function testFillerAndHyphenAreEquivalentAndTheNationalFormIsReturned(): void
+    public function testFillerAndHyphenAreEquivalentAndTheNationalSeparatorIsReturned(): void
     {
-        $forms = [[['RIMSKII-KORSAKOV'], ['ANNA-MARIIA']]];
+        $hyphenated = new IdentifierSpellings([['RIMSKII'], ['KORSAKOV']], ['-']);
+        $spaced = new IdentifierSpellings([['FON'], ['VIZIN']], [' ']);
+        $given = new IdentifierSpellings([['ANNA'], ['MARIIA']], ['-']);
 
         self::assertSame(
             'RIMSKII-KORSAKOV<<ANNA-MARIIA',
-            LatinSpelling::find(IcaoPersonName::from('RIMSKII<KORSAKOV<<ANNA<MARIIA'), $forms)?->value,
+            $this->find('RIMSKII<KORSAKOV<<ANNA<MARIIA', $hyphenated, $given),
         );
-        self::assertSame(
-            'FON<VIZIN<<ANNA',
-            LatinSpelling::find(IcaoPersonName::from('FON-VIZIN<<ANNA'), [[['FON VIZIN'], ['ANNA']]])?->value,
-        );
-        self::assertNull(LatinSpelling::find(IcaoPersonName::from('RIMSKII<<KORSAKOV<ANNA<MARIIA'), $forms));
+        self::assertSame('FON<VIZIN<<ANNA-MARIIA', $this->find('FON-VIZIN<<ANNA-MARIIA', $spaced, $given));
+        self::assertNull($this->find('RIMSKII<<KORSAKOV<ANNA<MARIIA', $hyphenated, $given));
     }
 
-    public function testAPartWithExactlyTheCapIsSearched(): void
+    public function testTheWordCountsMustFit(): void
+    {
+        $primary = new IdentifierSpellings([['SMITH']], []);
+        $secondary = new IdentifierSpellings([['ANNA'], ['MARIA'], ['JO']], [' ', ' ']);
+
+        self::assertSame('SMITH<<ANNA<MARIA<JO', $this->find('SMITH<<ANNA<MARIA<JO', $primary, $secondary));
+        self::assertNull($this->find('SMITH<<ANNA<MARIA', $primary, $secondary));
+        self::assertNull($this->find('SMITH<<ANNA<MARIA<JO<JO', $primary, $secondary));
+        self::assertNull($this->find('SMITH<JO<<ANNA<MARIA', $primary, $secondary));
+        self::assertNull($this->find('SMITH', $primary, $secondary));
+        self::assertNull($this->find('SMITH<<JO', $primary, null));
+        self::assertSame('SMITH', $this->find('smith', $primary, null));
+        self::assertNull($this->find('SMITH<JONES', $primary, null));
+    }
+
+    public function testVariantsAreComparedInUpperCase(): void
+    {
+        $primary = new IdentifierSpellings([['van'], ['der'], ['Berg']], [' ', ' ']);
+
+        self::assertSame(
+            'VAN<DER<BERG<<ANN',
+            $this->find('VAN<DER<BERG<<ANN', $primary, new IdentifierSpellings([['Ann']], [])),
+        );
+    }
+
+    public function testAWordWithExactlyTheCapIsSearched(): void
     {
         $variants = $this->variants(LatinSpelling::MAX_SPELLINGS);
         $last = $variants[\count($variants) - 1];
 
         self::assertSame(
             $last . '<<BA',
-            LatinSpelling::find(IcaoPersonName::from($last . '<<BA'), [[$variants, ['BA']]])?->value,
+            $this->find(
+                $last . '<<BA',
+                new IdentifierSpellings([$variants], []),
+                new IdentifierSpellings([['BA']], []),
+            ),
         );
     }
 
-    public function testAPartAboveTheCapIsRefused(): void
-    {
-        $this->expectException(InvalidPersonNameException::class);
-        $this->expectExceptionMessage('Invalid personal name (too many transliteration variants).');
-
-        LatinSpelling::find(
-            IcaoPersonName::from('BA<<BA'),
-            [[['BA'], $this->variants(LatinSpelling::MAX_SPELLINGS + 1)]],
-        );
-    }
-
-    public function testAPartAboveTheCapInALaterFormIsRefused(): void
-    {
-        $this->expectException(InvalidPersonNameException::class);
-
-        LatinSpelling::find(
-            IcaoPersonName::from('BA<<BA'),
-            [[['BA'], ['BA']], [$this->variants(LatinSpelling::MAX_SPELLINGS + 1)]],
-        );
-    }
-
-    public function testPartsWhoseProductIsFarAboveTheCapAreMatchedPartByPart(): void
+    public function testWordsWhoseProductIsFarAboveTheCapAreMatchedWordByWord(): void
     {
         $variants = $this->variants(LatinSpelling::MAX_SPELLINGS);
         $last = $variants[\count($variants) - 1];
-        $forms = [[$variants, $variants, $variants]];
+        $primary = new IdentifierSpellings([$variants, $variants], [' ']);
+        $secondary = new IdentifierSpellings([$variants, $variants], [' ']);
+        $latin = $last . '<' . $last . '<<' . $last . '<' . $last;
 
-        self::assertSame(
-            $last . '<<' . $last . '<' . $last,
-            LatinSpelling::find(IcaoPersonName::from($last . '<<' . $last . '<' . $last), $forms)?->value,
-        );
-        self::assertNull(LatinSpelling::find(IcaoPersonName::from($last . '<<' . $last . '<A'), $forms));
+        self::assertSame($latin, $this->find($latin, $primary, $secondary));
+        self::assertNull($this->find($last . '<' . $last . '<<' . $last . '<A', $primary, $secondary));
     }
 
-    public function testTheWordsOfTheSecondaryIdentifiersMustFitTheParts(): void
+    public function testAPrimaryWordAboveTheCapIsRefused(): void
     {
-        $forms = [[['SMITH'], ['ANNA MARIA'], ['JO']]];
-
-        self::assertSame(
-            'SMITH<<ANNA<MARIA<JO',
-            LatinSpelling::find(IcaoPersonName::from('SMITH<<ANNA<MARIA<JO'), $forms)?->value,
+        self::assertNameRefusedWithoutEcho(
+            fn (): ?string => $this->find(
+                'BA<<BA',
+                new IdentifierSpellings([$this->variants(LatinSpelling::MAX_SPELLINGS + 1)], []),
+                new IdentifierSpellings([['BA']], []),
+            ),
+            '',
+            self::TOO_MANY,
         );
-        self::assertNull(LatinSpelling::find(IcaoPersonName::from('SMITH<<ANNA<MARIA'), $forms));
-        self::assertNull(LatinSpelling::find(IcaoPersonName::from('SMITH<<ANNA<MARIA<JO<JO'), $forms));
-        self::assertNull(LatinSpelling::find(IcaoPersonName::from('SMITH'), $forms));
-        self::assertNull(LatinSpelling::find(IcaoPersonName::from('SMITH<<JO'), [[['SMITH']]]));
-        self::assertSame('SMITH', LatinSpelling::find(IcaoPersonName::from('smith'), [[['SMITH']]])?->value);
     }
 
-    public function testVariantsAreComparedInUpperCase(): void
+    public function testASecondaryWordAboveTheCapIsRefused(): void
     {
-        self::assertSame(
-            'VAN<DER<BERG<<ANN',
-            LatinSpelling::find(IcaoPersonName::from('VAN<DER<BERG<<ANN'), [[['van der Berg'], ['Ann']]])?->value,
+        self::assertNameRefusedWithoutEcho(
+            fn (): ?string => $this->find(
+                'BA<<BA<BA',
+                new IdentifierSpellings([['BA']], []),
+                new IdentifierSpellings([['BA'], $this->variants(LatinSpelling::MAX_SPELLINGS + 1)], [' ']),
+            ),
+            '',
+            self::TOO_MANY,
         );
+    }
+
+    private function find(string $latin, IdentifierSpellings $primary, ?IdentifierSpellings $secondary): ?string
+    {
+        return LatinSpelling::find(IcaoPersonName::from($latin), $primary, $secondary)?->value;
     }
 
     /**
