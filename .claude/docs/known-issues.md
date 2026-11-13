@@ -104,3 +104,17 @@
   and `IJsselmeer` are different name parts, so they are not equal and do not collide in a unique index, while both
   derive `IJSSELMEER`. The table lists the ligature, so the national spelling is kept as
   typed.
+- **www.gesetze-im-internet.de answers from this environment** (sandbox: pass it in `allowed_domains`); per-paragraph
+  pages are `<act>/__<n>.html` and `anlage_<n>.html`; the full text is `BJNR….html`, ISO-8859-1. The PassVwV PDF
+  (BR-Drs. 301/19) extracts as scrambled glyphs and cannot be searched.
+- **DE Rentenversicherungsnummer: the DRV glossary example `65 170839 J 08 8` fails VKVV § 2 Abs. 6** (the algorithm
+  gives 1): it is illustrative and the tests refuse it; the AOK example `65 230701 J008` is valid. The birth date
+  field has no century and may hold non-dates (unpublished rules for unproven birth dates), and 50-99 is "female, no
+  entry or divers", so the class exposes strings only (`birthDateField()`, `serialNumber()`), no `HasBirthDate`/
+  `HasSex`, and does not validate the date.
+- **DE Steuer-ID: format only** (StIdV § 1: ten digits + check digit, no algorithm). The "no leading zero / one
+  repeated digit" rules come from a BZSt paper released under the IFG (FragDenStaat), not a publication: not applied.
+- **DE Führerschein number: not covered** (FeV Anlage 8 gives only the composition, no length or check algorithm).
+- Escaped equivalent mutant: `CastInt` in `Document\DE\PensionInsuranceNumber::checkDigit()` (numeric strings
+  multiply the same). The character-class check uses `strspn` instead of an anchored regex because anchors on a
+  fixed-length value left equivalent mutants.

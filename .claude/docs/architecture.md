@@ -22,3 +22,7 @@ The transliterator picks the one table whose `script()` covers every letter of t
 → "mixed scripts", none → "no ICAO transliteration".
 
 `Document\AU\*`: `Jurisdiction` (enum, ISO 3166-2), `DriverLicenceNumber` interface, `AbstractDriverLicenceNumber` + one final class per jurisdiction in `DriverLicence\`, `DriverLicenceNumberFactory`, `TaxFileNumber`, `MedicareCardNumber`. `Name\AU\*` mirrors `Name\RU\*`.
+
+`Document\DE\*`: `IdentityCardNumber` (+ `authorityCode()`), `PassportNumber`, `TaxIdentificationNumber` (format
+only), `PensionInsuranceNumber` (VKVV checksum; fields as strings, no `HasBirthDate`/`HasSex`). `Name\DE\*` mirrors
+`Name\AU\*` (Latin base, `TransliterationVariant`).
