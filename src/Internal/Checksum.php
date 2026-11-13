@@ -4,8 +4,12 @@ declare(strict_types=1);
 
 namespace MSSTC4PHP\ValueObject\Documents\Internal;
 
+use LogicException;
+
 /**
  * @internal
+ *
+ * Every method expects ASCII digits only and throws \LogicException otherwise.
  *
  * Sources: ISO/IEC 7812-1 (Luhn), ISO/IEC 7064:2003 (MOD 97-10, MOD 11-2)
  */
@@ -13,6 +17,8 @@ final class Checksum
 {
     public static function luhn(string $digits): bool
     {
+        self::assertDigits($digits);
+
         $sum = 0;
         $double = false;
         for ($i = \strlen($digits) - 1; $i >= 0; $i--) {
@@ -37,6 +43,11 @@ final class Checksum
      */
     public static function weightedMod(string $digits, array $weights, int $modulus): int
     {
+        self::assertDigits($digits);
+        if (\strlen($digits) !== \count($weights)) {
+            throw new LogicException('Digit count must equal the weight count.');
+        }
+
         $sum = 0;
         foreach ($weights as $index => $weight) {
             $sum += (int) $digits[$index] * $weight;
@@ -47,6 +58,8 @@ final class Checksum
 
     public static function mod97(string $digits): int
     {
+        self::assertDigits($digits);
+
         $remainder = 0;
         for ($i = 0, $length = \strlen($digits); $i < $length; $i++) {
             $remainder = ($remainder * 10 + (int) $digits[$i]) % 97;
@@ -60,6 +73,8 @@ final class Checksum
      */
     public static function iso7064Mod11_2(string $digits): string
     {
+        self::assertDigits($digits);
+
         $product = 0;
         for ($i = 0, $length = \strlen($digits); $i < $length; $i++) {
             $product = (($product + (int) $digits[$i]) * 2) % 11;
@@ -68,5 +83,12 @@ final class Checksum
         $check = (12 - $product) % 11;
 
         return $check === 10 ? 'X' : (string) $check;
+    }
+
+    private static function assertDigits(string $digits): void
+    {
+        if (\preg_match('/^[0-9]*$/D', $digits) !== 1) {
+            throw new LogicException('Checksum input must consist of ASCII digits only.');
+        }
     }
 }

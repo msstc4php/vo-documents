@@ -4,8 +4,11 @@ declare(strict_types=1);
 
 namespace MSSTC4PHP\ValueObject\Documents\Tests\Unit\Internal;
 
+use Closure;
+use LogicException;
 use MSSTC4PHP\ValueObject\Documents\Internal\Checksum;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(Checksum::class)]
@@ -36,5 +39,30 @@ final class ChecksumTest extends TestCase
     {
         self::assertSame('X', Checksum::iso7064Mod11_2('11010519491231002'));
         self::assertSame('0', Checksum::iso7064Mod11_2('0794'));
+    }
+
+    /**
+     * @return iterable<string, array{Closure(): mixed}>
+     */
+    public static function invalidCalls(): iterable
+    {
+        yield 'luhn letters' => [static fn (): bool => Checksum::luhn('12a4')];
+        yield 'weightedMod letters' => [static fn (): int => Checksum::weightedMod('1a', [1, 2], 11)];
+        yield 'weightedMod short' => [static fn (): int => Checksum::weightedMod('12', [1, 2, 3], 11)];
+        yield 'weightedMod long' => [static fn (): int => Checksum::weightedMod('123', [1, 2], 11)];
+        yield 'mod97 space' => [static fn (): int => Checksum::mod97('12 3')];
+        yield 'mod97 trailing newline' => [static fn (): int => Checksum::mod97("123\n")];
+        yield 'mod11-2 X' => [static fn (): string => Checksum::iso7064Mod11_2('12X')];
+    }
+
+    /**
+     * @param Closure(): mixed $call
+     */
+    #[DataProvider('invalidCalls')]
+    public function testNonDigitOrMismatchedInputThrowsLogicException(Closure $call): void
+    {
+        $this->expectException(LogicException::class);
+
+        $call();
     }
 }
