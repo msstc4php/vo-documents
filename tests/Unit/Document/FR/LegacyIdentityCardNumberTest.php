@@ -34,6 +34,9 @@ final class LegacyIdentityCardNumberTest extends TestCase
         yield 'with spaces, NBSP' => ["8806 923\u{00A0}02345", '880692302345'];
         yield 'January' => ['990175100001', '990175100001'];
         yield 'December' => ['011275100001', '011275100001'];
+        // The instruction states no rule for the month field's values, so it is not validated (owner's rule).
+        yield 'month field 00, accepted' => ['880092302345', '880092302345'];
+        yield 'month field 13, accepted' => ['881392302345', '881392302345'];
     }
 
     #[DataProvider('validNumbers')]
@@ -55,6 +58,7 @@ final class LegacyIdentityCardNumberTest extends TestCase
         self::assertSame('923', $number->issuePlaceCode());
         self::assertSame('02345', $number->serialNumber());
         self::assertSame(12, LegacyIdentityCardNumber::from('011275100001')->issueMonth());
+        self::assertSame(13, LegacyIdentityCardNumber::from('881392302345')->issueMonth());
     }
 
     public function testMasks(): void
@@ -67,10 +71,6 @@ final class LegacyIdentityCardNumberTest extends TestCase
      */
     public static function invalidNumbers(): iterable
     {
-        $month = 'Invalid French identity card number (invalid issue month).';
-
-        yield 'month 00' => ['880092302345', $month];
-        yield 'month 13' => ['881392302345', $month];
         yield 'thirteen digits (with the MRZ check digit)' => [
             '8806923023451',
             'Invalid French identity card number (13 characters).',

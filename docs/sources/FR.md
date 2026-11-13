@@ -10,15 +10,13 @@ All dates UTC. Sources read 2026-11-13.
 | "Les règles d'identification et d'immatriculation des assurés par les organismes sociaux" (2015 leaflet, linked from F33078) | Ministère des affaires sociales et de la santé / Ministère de l'économie et des finances | <https://caf.fr/sites/default/files/medias/cnaf/DCOM/mentions_legales/informatique_libertes/Regles-authentification-immatriculation.pdf> (scanned; read as images) |
 | DSN cahier technique CT2026.1, rubrique S21.G00.30.001 (pages 169-170) | GIP-MDS (net-entreprises.fr), the normative DSN specification | <https://www.net-entreprises.fr/media/documentation/dsn-cahier-technique-2026.1.pdf> |
 | "Dès l'embauche, je m'identifie" (Cnav leaflet, 09/2017) | Cnav / net-entreprises.fr | <https://www.net-entreprises.fr/media/2018/11/n4ds-identification-embauche.pdf> |
-| Instruction générale relative à la carte nationale d'identité, NOR INTD0000001C (2000), rubriques 46 and 55 | Ministère de l'intérieur | quoted from the copy on <https://www.gisti.org/IMG/pdf/norintd0000001c.pdf> (Légifrance answers 403) |
+| Instruction générale relative à la carte nationale d'identité, NOR INTD0000001C (2000), rubriques 46 and 55 | Ministère de l'intérieur | quoted from the mirror <https://www.gisti.org/IMG/pdf/norintd0000001c.pdf> (not an official host) |
 | Answers of "France Titres-ANTS" on Services Publics+ (passport and driving licence numbers) | ANTS (France Titres), on the government platform plus.transformation.gouv.fr | links in the sections below |
 | France — Information on Tax Identification Numbers | French tax administration, published by the OECD (AEOI portal) | <https://www.oecd.org/content/dam/oecd/en/topics/policy-issue-focus/aeoi/france-tin.pdf> |
 | Circulaire du 23 juillet 2014 relative à l'état civil, NOR JUSC1412888C, BOMJ n° 2014-07 du 31 juillet 2014, § 1 | Ministère de la justice | <https://www.legifrance.gouv.fr/circulaire/id/38565> (PDF `cir_38565`) |
 
-**Reachability.** `www.legifrance.gouv.fr` answers 403 to scripted requests (the circular PDF was read through the
-fetch tool), `www.interieur.gouv.fr` and `www.consilium.europa.eu` (PRADO) answer 403, the `ec.europa.eu` TIN pages
-answer 429/500, `affairesjuridiques.aphp.fr` times out. `www.service-public.fr` is refused by the sandbox; its pages are
-served from `www.service-public.gouv.fr`. `ants.gouv.fr` serves no readable page (a 222-byte script shell).
+Reachability notes (sites that block scripted requests) are in `.claude/docs/known-issues.md`; Légifrance texts
+are cited by URL and NOR, copies on other hosts are marked as mirrors.
 
 ## Names (`Name\FR\*`)
 
@@ -164,8 +162,10 @@ Rubrique 55 b): "Sur la deuxième ligne, les douze premiers caractères sont ceu
 numéro est suivi d'un chiffre particulier qui permettra, lors de la lecture automatique, d'interpréter sans erreur le
 numéro de la carte." That check digit belongs to the MRZ, not to the number.
 
-Implemented: 12 digits; positions 3-4 are a month of issue, so `01`-`12` is required ("(invalid issue month)").
-Exposed: `issueYearDigits()` (2 digits, no century), `issueMonth()` (1-12), `issuePlaceCode()` (3 characters),
+Implemented: 12 digits. Positions 3-4 are the month of issue, but the instruction states no rule for the field's
+values, so they are **not validated** (owner's rule: no structural rule without an official text; `00` and `13` are
+accepted). Exposed: `issueYearDigits()` (2 digits, no century), `issueMonth()` (the two digits as an int, not
+validated), `issuePlaceCode()` (3 characters),
 `serialNumber()` (5 digits). No display form is published; `masked()` keeps the last four digits: `********2345`.
 The provisional card (rubrique 57: 11 characters with the letter `P`) is not covered.
 
@@ -176,7 +176,7 @@ source does not address it, so a letter is refused.
 
 Décret n° 2021-279 du 13 mars 2021 (JORF 14 mars 2021, read from the copy on `medias.amf.asso.fr`) lists "le numéro du
 titre" among the card's data but gives no format. The nine-character alphanumeric number is described only on
-secondary sites; PRADO (Council of the EU) answers 403 and ICAO Doc 9303 Part 5 gives the width of the MRZ field
+secondary sites; PRADO (Council of the EU) could not be read and ICAO Doc 9303 Part 5 gives the width of the MRZ field
 (9 characters, longer numbers overflow), not the French number. No official format: not covered.
 
 ## Passport number (`Document\FR\PassportNumber`)
@@ -229,7 +229,7 @@ no fixed format) and the older ones.
 | Plan candidate | Source | Implemented |
 |---|---|---|
 | NIR (sex, birth year/month, department) | INSEE, service-public, DSN norm | `Nir`: structure rules of the DSN norm, `HasSex`; birth year as two digits (no century), month nullable; place code as a string (no ISO mapping); **key format only** (no official algorithm) |
-| CNI number | Instruction INTD0000001C (old card); no official text for the 2021 card | `LegacyIdentityCardNumber` (12 digits); the 2021 card **not covered** |
+| CNI number | Instruction INTD0000001C (old card); no official text for the 2021 card | `LegacyIdentityCardNumber` (12 digits, month field not validated); the 2021 card **not covered** |
 | Passport number | ANTS | `PassportNumber`, `2 digits + 2 letters + 5 digits` |
 | Numéro fiscal (SPI) | French TIN sheet (OECD) | `TaxIdentificationNumber`, format only, first digit 0-3 |
 | Permis de conduire number | ANTS | `DriverLicenceNumber`, 12 digits (licences since 1 June 1975), format only |

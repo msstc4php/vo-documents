@@ -13,7 +13,9 @@ use MSSTC4PHP\ValueObject\Support\AbstractStringValueObject;
 use Override;
 
 /**
- * Passport number: nine characters, two digits, two letters and five digits (`12AB12345`). The number has no check
+ * Passport number: nine characters, two digits, two letters and five digits (`12AB12345`). The format is ANTS's
+ * answer about the number of the previous passport to enter in a renewal pre-application (no decree states it,
+ * docs/sources/FR.md). The number has no check
  * digit of its own; the check digit is an MRZ field. `masked()` keeps the last four characters (no official masking
  * rule): `*****2345`.
  *

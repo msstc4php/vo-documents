@@ -32,3 +32,7 @@
   `tests/Unit/Contract/SubdivisionTest.php` scans `src/` and checks new enums automatically.
 - Source lines stay within 120 characters. php-cs-fixer re-joins a call with a single wrapped argument and an arrow
   function body moved to its own line; extract a `$message` variable, a constant or a first-class callable instead.
+- Masking layout: when the source publishes a spaced display form, `formatted()` gives it and `masked()` keeps that
+  layout (`Nir`: `* ** ** ** *** *32 - 50`, FR TIN `** ** *** **0 053`, DE VSNR); otherwise `masked()` masks the
+  compact stored value (`*****2345`). Letters are masked with `Mask::keepLastCharacters()` before the layout is
+  applied; digit-only layouts use `Mask::keepLastDigits(formatted(), n)`.

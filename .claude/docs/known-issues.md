@@ -126,11 +126,13 @@
 - **FR sources reachable from this environment:** `www.insee.fr`, `www.service-public.gouv.fr` (not `.fr`),
   `www.net-entreprises.fr`, `www.plus.transformation.gouv.fr` (ANTS answers), `caf.fr`, `www.oecd.org`. Légifrance,
   interieur.gouv.fr and PRADO answer 403 to curl; the Légifrance circular PDF (`/download/file/pdf/cir_38565/CIRC`)
-  came through the WebFetch tool. The CAF-hosted ministries' leaflet is a scan (render with `pdftoppm`).
+  came through the WebFetch tool. The CAF-hosted ministries' leaflet is a scan (render with `pdftoppm`). Also: the
+  `ec.europa.eu` TIN pages answer 429/500, `affairesjuridiques.aphp.fr` times out, `www.service-public.fr` is refused by
+  the sandbox (use `www.service-public.gouv.fr`), `ants.gouv.fr` serves only a script shell.
 - **FR passport, licence and CNI formats come from ANTS answers on Services Publics+ and a 2000 Interior instruction**
   (no format in a decree that could be read). The 2021 CNI (9 characters) is not covered; the old CNI is
   "douze chiffres" per the instruction, so a Corsican place code with a letter is refused (unverified case).
 - **FR names use the circular's letter list, not `\p{Latin}`** (Circulaire 23 juillet 2014, § 1): `ñ`, `ł`, `ß`, `å`
   are refused even in foreign names ("sans reproduire les éventuels signes diacritiques de la langue étrangère").
-- Escaped equivalent mutant: `CastInt` on the issue month in `Document\FR\LegacyIdentityCardNumber::parse()`
-  (a two-digit numeric string compares the same).
+- `Document\FR\LegacyIdentityCardNumber` does not validate the issue-month field (the instruction defines the field,
+  not its values); `issueMonth()` is a plain `int` that may lie outside 1-12.

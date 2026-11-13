@@ -55,7 +55,7 @@ final class Nir extends AbstractStringValueObject implements HasSex, Maskable
     {
         $month = (int) \substr($this->value, 3, 2);
 
-        return $month >= 1 && $month <= 12 ? $month : null;
+        return $this->isCalendarMonth($month) ? $month : null;
     }
 
     /**
@@ -133,7 +133,15 @@ final class Nir extends AbstractStringValueObject implements HasSex, Maskable
 
     private function isMonthField(int $month): bool
     {
-        return ($month >= 1 && $month <= 12) || $month === 20 || ($month >= 30 && $month <= 42) || $month >= 50;
+        return $this->isCalendarMonth($month) || $month === 20 || ($month >= 30 && $month <= 42) || $month >= 50;
+    }
+
+    /**
+     * @phpstan-assert-if-true int<1, 12> $month
+     */
+    private function isCalendarMonth(int $month): bool
+    {
+        return $month >= 1 && $month <= 12;
     }
 
     /**

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace MSSTC4PHP\ValueObject\Documents\Document\FR;
 
 use MSSTC4PHP\ValueObject\Documents\Contract\Maskable;
-use MSSTC4PHP\ValueObject\Documents\Exception\InvalidDocumentNumberException;
 use MSSTC4PHP\ValueObject\Documents\Internal\Digits;
 use MSSTC4PHP\ValueObject\Documents\Internal\Mask;
 use MSSTC4PHP\ValueObject\Documents\Internal\Text;
@@ -14,13 +13,14 @@ use Override;
 
 /**
  * Number of the carte nationale d'identité issued until August 2021: twelve digits, the year and month of issue
- * (`YYMM`, month `01`-`12`), the INSEE geographic code of the place of issue (3 digits) and an order number
- * (5 digits). The number has no check digit of its own; the one that follows it in the MRZ belongs to the MRZ. The card
- * issued since August 2021 is not covered (no official format). `masked()` keeps the last four digits (no official
- * masking rule): `********2345`.
+ * (`YYMM`, not validated: the source states no rule for the field's values), the INSEE geographic code of the place
+ * of issue (3 digits) and an order number (5 digits). The number has no check digit of its own; the one that follows
+ * it in the MRZ belongs to the MRZ. The card issued since August 2021 is not covered (no official format). `masked()`
+ * keeps the last four digits (no official masking rule): `********2345`.
  *
- * @see https://www.gisti.org/IMG/pdf/norintd0000001c.pdf Ministère de l'intérieur, instruction générale relative à la
- *      carte nationale d'identité, NOR INTD0000001C, rubriques 46 and 55 (copy; Légifrance answers 403)
+ * @see NOR INTD0000001C Ministère de l'intérieur, instruction générale relative à la carte nationale d'identité
+ *      (2000), rubriques 46 and 55
+ * @see https://www.gisti.org/IMG/pdf/norintd0000001c.pdf mirror of NOR INTD0000001C (not an official host)
  * @see docs/sources/FR.md "Carte nationale d'identité"
  */
 final class LegacyIdentityCardNumber extends AbstractStringValueObject implements Maskable
@@ -36,7 +36,7 @@ final class LegacyIdentityCardNumber extends AbstractStringValueObject implement
     }
 
     /**
-     * @return int the month of issue, 1-12 (checked on parsing)
+     * @return int positions 3-4 read as a number, the month of issue; not validated, so it may lie outside 1-12
      */
     public function issueMonth(): int
     {
@@ -68,12 +68,6 @@ final class LegacyIdentityCardNumber extends AbstractStringValueObject implement
     #[Override]
     protected function parse(string $value): string
     {
-        $number = Digits::exactly($value, 12, self::DOCUMENT);
-        $month = (int) \substr($number, 2, 2);
-        if ($month < 1 || $month > 12) {
-            throw new InvalidDocumentNumberException(\sprintf('Invalid %s (invalid issue month).', self::DOCUMENT));
-        }
-
-        return $number;
+        return Digits::exactly($value, 12, self::DOCUMENT);
     }
 }
