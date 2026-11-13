@@ -49,7 +49,8 @@ archived page gives no number layout (only "document number" as a laser-engraved
 6. No Swiss act read (SR 143.11, SR 143.111) has a rule on the Latin spelling in the machine-readable zone or lets a
    passport keep another spelling.
 
-How the package applies this:
+How the package applies this: of the register set it keeps only the letters and the separators `-' ` (hyphen,
+apostrophe, space); its digits, punctuation and other signs are refused in names.
 
 | Part | Letters | Separators inside | Why |
 |---|---|---|---|

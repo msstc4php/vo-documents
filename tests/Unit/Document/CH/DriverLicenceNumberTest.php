@@ -35,6 +35,8 @@ final class DriverLicenceNumberTest extends TestCase
         yield 'ASTRA specimen 2003' => ['000123456789003', '000123456789003'];
         yield 'spaces and NBSP' => ["123 456\u{00A0}789 004", '123456789004'];
         yield 'hyphens' => ['123456789-004', '123456789004'];
+        yield 'grouped 2003 layout' => ['0001-2345-6789-003', '000123456789003'];
+        yield 'grouped 2023 layout with spaces' => ['123 456 789 004 ', '123456789004'];
     }
 
     #[DataProvider('validNumbers')]

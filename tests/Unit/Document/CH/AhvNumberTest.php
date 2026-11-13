@@ -39,6 +39,7 @@ final class AhvNumberTest extends TestCase
         yield 'compact' => ['7563047500962', '7563047500962'];
         yield 'spaces and NBSP' => ["756 3047\u{00A0}5009 62", '7563047500962'];
         yield 'hyphens' => ['756-3047-5009-62', '7563047500962'];
+        yield 'display form with spaces' => [' 756. 3047. 5009. 62 ', '7563047500962'];
     }
 
     #[DataProvider('validNumbers')]
