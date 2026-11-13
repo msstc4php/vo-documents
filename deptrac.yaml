@@ -1,0 +1,42 @@
+deptrac:
+  paths:
+    - ./src
+  layers:
+    - name: Core
+      collectors:
+        - type: directory
+          value: src/.*
+    # These layers exist only to be forbidden: the package is framework-agnostic and its bridges live in
+    # separate packages.
+    - name: Doctrine
+      collectors:
+        - type: classNameRegex
+          value: '#^Doctrine\\#'
+    - name: Symfony
+      collectors:
+        - type: classNameRegex
+          value: '#^Symfony\\#'
+    - name: Laravel
+      collectors:
+        - type: classNameRegex
+          value: '#^Illuminate\\#'
+    - name: Yii
+      collectors:
+        - type: classNameRegex
+          value: '#^yii\\#'
+    - name: CodeIgniter
+      collectors:
+        - type: classNameRegex
+          value: '#^CodeIgniter\\#'
+    - name: Cycle
+      collectors:
+        - type: classNameRegex
+          value: '#^(Cycle|Spiral)\\#'
+  ruleset:
+    Core: ~
+    Doctrine: ~
+    Symfony: ~
+    Laravel: ~
+    Yii: ~
+    CodeIgniter: ~
+    Cycle: ~

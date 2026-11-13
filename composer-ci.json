@@ -1,0 +1,74 @@
+{
+    "name": "msstc4php/vo-documents",
+    "description": "Value objects for identity documents and personal names of the world's largest economies, with ICAO 9303 Latin names. (CI profile: CI-only tools)",
+    "type": "library",
+    "license": "MIT",
+    "keywords": [
+        "value-object",
+        "identity-document",
+        "tax-id",
+        "passport",
+        "driver-licence",
+        "personal-name",
+        "icao-9303",
+        "mrz",
+        "transliteration",
+        "ddd"
+    ],
+    "minimum-stability": "stable",
+    "prefer-stable": true,
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/msstc4php/vo-base"
+        }
+    ],
+    "require": {
+        "ext-mbstring": "*",
+        "msstc4php/vo-base": "^1.1",
+        "php": ">=8.4",
+        "symfony/polyfill-intl-normalizer": "^1.31"
+    },
+    "require-dev": {
+        "deptrac/deptrac": "^4.6",
+        "friendsofphp/php-cs-fixer": "^3.76",
+        "infection/infection": "^0.32",
+        "phpstan/extension-installer": "^1.4",
+        "phpstan/phpstan": "^2.1",
+        "phpstan/phpstan-phpunit": "^2.0",
+        "phpstan/phpstan-strict-rules": "^2.0",
+        "phpunit/phpunit": ">=11.0",
+        "rector/rector": "^2.1",
+        "roave/backward-compatibility-check": "^8.20",
+        "roave/security-advisories": "dev-latest"
+    },
+    "autoload": {
+        "psr-4": {
+            "MSSTC4PHP\\ValueObject\\Documents\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "MSSTC4PHP\\ValueObject\\Documents\\Tests\\": "tests/"
+        }
+    },
+    "config": {
+        "allow-plugins": {
+            "phpstan/extension-installer": true,
+            "infection/extension-installer": true
+        },
+        "sort-packages": true
+    },
+    "authors": [
+        {
+            "name": "Maxim Shamaev",
+            "email": "maxim.shamaev@gmail.com"
+        }
+    ],
+    "extra": {
+        "bundle-standard": {
+            "kind": "library",
+            "runtime": "php84"
+        }
+    }
+}
