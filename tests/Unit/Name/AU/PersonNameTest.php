@@ -78,7 +78,11 @@ final class PersonNameTest extends TestCase
 
     public function testOverrideMayWriteAHyphenAsAFiller(): void
     {
-        $name = new PersonName(FamilyName::from('Müller-Smith'), GivenName::from('Ann'), IcaoPersonName::from('MULLER<SMITH<<ANN'));
+        $name = new PersonName(
+            FamilyName::from('Müller-Smith'),
+            GivenName::from('Ann'),
+            IcaoPersonName::from('MULLER<SMITH<<ANN'),
+        );
 
         self::assertSame('MULLER-SMITH<<ANN', $name->latin()->value);
         self::assertSame('MULLER-SMITH<<ANN', $name->latinOverride()?->value);
@@ -113,7 +117,11 @@ final class PersonNameTest extends TestCase
     public function testTheDerivedFormOfANameWithTooManySpellingsIsAcceptedAsAnOverride(): void
     {
         $derived = \str_repeat('AE', 13) . '<<ANN';
-        $name = new PersonName(FamilyName::from(\str_repeat('Ä', 13)), GivenName::from('Ann'), IcaoPersonName::from($derived));
+        $name = new PersonName(
+            FamilyName::from(\str_repeat('Ä', 13)),
+            GivenName::from('Ann'),
+            IcaoPersonName::from($derived),
+        );
 
         self::assertSame($derived, $name->latin()->value);
         self::assertNull($name->latinOverride());
@@ -122,7 +130,11 @@ final class PersonNameTest extends TestCase
     public function testPartsAreMatchedOneByOneSoTheirProductIsNotBounded(): void
     {
         // 3^7 spellings of the family name times 2 of the given name: above 4096 together, each part below it.
-        $name = new PersonName(FamilyName::from('Üüüüüüü'), GivenName::from('Ä'), IcaoPersonName::from('UXXUUEUUUU<<A'));
+        $name = new PersonName(
+            FamilyName::from('Üüüüüüü'),
+            GivenName::from('Ä'),
+            IcaoPersonName::from('UXXUUEUUUU<<A'),
+        );
 
         self::assertSame('UXXUUEUUUU<<A', $name->latinOverride()?->value);
     }
@@ -148,7 +160,13 @@ final class PersonNameTest extends TestCase
         $name = new PersonName(FamilyName::from('Nguyễn'), GivenName::from('Ștefan Țurcanu'));
 
         self::assertSame('NGUYEN<<STEFAN<TURCANU', $name->latin()->value);
-        self::assertNull(new PersonName(FamilyName::from('Nguyễn'), GivenName::from('Ana'), IcaoPersonName::from('NGUYEN<<ANA'))->latinOverride());
+        $overridden = new PersonName(
+            FamilyName::from('Nguyễn'),
+            GivenName::from('Ana'),
+            IcaoPersonName::from('NGUYEN<<ANA'),
+        );
+
+        self::assertNull($overridden->latinOverride());
     }
 
     public function testAnOverrideOfANameWithTooManySpellingsIsRefused(): void
@@ -177,7 +195,9 @@ final class PersonNameTest extends TestCase
     public function testRefusesAnOverrideThatIsNotATransliteration(string $latin): void
     {
         $this->expectException(InvalidPersonNameException::class);
-        $this->expectExceptionMessage('Invalid Australian person name (the Latin form is not a transliteration of the name).');
+        $this->expectExceptionMessage(
+            'Invalid Australian person name (the Latin form is not a transliteration of the name).',
+        );
 
         new PersonName(FamilyName::from('Müller'), GivenName::from('Zoë'), IcaoPersonName::from($latin));
     }
@@ -187,7 +207,10 @@ final class PersonNameTest extends TestCase
         try {
             new PersonName(FamilyName::from('Citizen'), GivenName::from('ƒred'));
         } catch (InvalidPersonNameException $exception) {
-            self::assertSame('Invalid personal name (no ICAO transliteration for a character).', $exception->getMessage());
+            self::assertSame(
+                'Invalid personal name (no ICAO transliteration for a character).',
+                $exception->getMessage(),
+            );
             self::assertStringNotContainsString('ƒ', $exception->getMessage());
             self::assertStringNotContainsString('red', $exception->getMessage());
 
@@ -200,12 +223,20 @@ final class PersonNameTest extends TestCase
     public function testEqualityComparesPartsAndOverride(): void
     {
         $derived = new PersonName(FamilyName::from('Müller'), GivenName::from('Zoë'));
-        $override = new PersonName(FamilyName::from('Müller'), GivenName::from('Zoë'), IcaoPersonName::from('MULLER<<ZOE'));
+        $override = new PersonName(
+            FamilyName::from('Müller'),
+            GivenName::from('Zoë'),
+            IcaoPersonName::from('MULLER<<ZOE'),
+        );
 
         self::assertTrue($derived->equals(new PersonName(FamilyName::from('Müller'), GivenName::from('Zoë'))));
         self::assertFalse($derived->equals($override));
         self::assertFalse($override->equals($derived));
-        self::assertTrue($override->equals(new PersonName(FamilyName::from('Müller'), GivenName::from('Zoë'), IcaoPersonName::from('muller<<zoe'))));
+        self::assertTrue(
+            $override->equals(
+                new PersonName(FamilyName::from('Müller'), GivenName::from('Zoë'), IcaoPersonName::from('muller<<zoe')),
+            ),
+        );
         self::assertFalse($derived->equals(new PersonName(FamilyName::from('Muller'), GivenName::from('Zoë'))));
         self::assertFalse($derived->equals(new PersonName(FamilyName::from('Müller'), GivenName::from('Zoe'))));
         self::assertFalse($derived->equals(GivenName::from('Zoë')));

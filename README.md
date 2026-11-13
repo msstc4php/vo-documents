@@ -78,22 +78,22 @@ DriverLicenceNumberFactory::fromNumber('01234567');                             
 ```
 
 `fromNumber()` never picks one of several jurisdictions silently: it throws `AmbiguousJurisdictionException`, whose
-message lists the ISO codes in enum order, or `InvalidDocumentNumberException` when none fits ("(invalid character)"
+message lists the ISO codes in enum order, or `InvalidDocumentNumberException` when none fits ("(fits no jurisdiction)"
 when the length fits some jurisdiction, otherwise the length). `AmbiguousJurisdictionException` extends
 `InvalidValueObjectException` like every input error: the bare number is not a valid input for `fromNumber()`, so a
-caller that catches invalid input catches it too, and `jurisdictions()` tells which `fromNumberIn()` calls would work. **With the formats
-published today every valid number fits two or more jurisdictions, so `fromNumber()` always throws for AU**; use
-`fromNumberIn()` when the issuer is known (see `docs/sources/AU.md`).
+caller that catches invalid input catches it too, and `jurisdictions()` tells which `fromNumberIn()` calls would work.
+**With the formats published today every valid number fits two or more jurisdictions, so `fromNumber()` always throws
+for AU**; use `fromNumberIn()` when the issuer is known (see `docs/sources/AU.md`).
 
 ## Personal names
 
 A national name part (`Name\RU\FamilyName`, `GivenName`, `Patronymic`, `Name\AU\FamilyName`, `GivenName`) is
 NFC-normalised, trimmed, has inner whitespace runs collapsed to one space, and keeps its letter case. Limits: 100
 characters per part. Russian parts accept only the 33 Russian letters; a Cyrillic name typed with Latin look-alikes
-(Latin `a`, `o`, `e`, `c`) is refused. A compatibility character (its NFKC form differs: fullwidth `Ｓｍｉｔｈ`, `ª`,
-the ligature `ﬁ`) is refused in every country, because it would be a second stored spelling of the same name; the
-ones an ICAO table lists itself (`Ĳ`, `Ŀ`) are kept. Messages say "(N characters)" for an empty or too long part, "(compatibility character)", or "(invalid
-character)" for a letter or separator that is not allowed where it stands.
+(Latin `a`, `o`, `e`, `c`) is refused. A compatibility character (its NFKC form differs: fullwidth `Ｓｍｉｔｈ`, `ª`, the
+ligature `ﬁ`) is refused in every country, because it would be a second stored spelling of the same name; the ones an
+ICAO table lists itself (`Ĳ`, `Ŀ`) are kept. Messages say "(N characters)" for an empty or too long part,
+"(compatibility character)", or "(invalid character)" for a letter or separator that is not allowed where it stands.
 
 ```php
 use MSSTC4PHP\ValueObject\Documents\Icao\PersonName as IcaoPersonName;

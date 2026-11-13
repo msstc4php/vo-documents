@@ -53,7 +53,8 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(PayloadFields::class)]
 final class PersonNameCodecTest extends TestCase
 {
-    private const string SHAPE = 'Expected a Russian person name payload with string "family" and "given", string or null "patronymic" and "latin", and no other keys.';
+    private const string SHAPE = 'Expected a Russian person name payload with string "family" and "given", '
+        . 'string or null "patronymic" and "latin", and no other keys.';
 
     public function testMapsItsClass(): void
     {
@@ -67,18 +68,29 @@ final class PersonNameCodecTest extends TestCase
 
         $payload = $codec->encode($name);
 
-        self::assertSame(['family' => 'Иванов', 'given' => 'Иван', 'patronymic' => 'Иванович', 'latin' => null], $payload);
+        self::assertSame(
+            ['family' => 'Иванов', 'given' => 'Иван', 'patronymic' => 'Иванович', 'latin' => null],
+            $payload,
+        );
         self::assertTrue($codec->decode($payload)->equals($name));
     }
 
     public function testRoundTripWithOverrideAndNoPatronymic(): void
     {
         $codec = new PersonNameCodec();
-        $name = new PersonName(FamilyName::from('Иванова'), GivenName::from('Юлия'), null, IcaoPersonName::from('IVANOVA<<YULIYA'));
+        $name = new PersonName(
+            FamilyName::from('Иванова'),
+            GivenName::from('Юлия'),
+            null,
+            IcaoPersonName::from('IVANOVA<<YULIYA'),
+        );
 
         $payload = $codec->encode($name);
 
-        self::assertSame(['family' => 'Иванова', 'given' => 'Юлия', 'patronymic' => null, 'latin' => 'IVANOVA<<YULIYA'], $payload);
+        self::assertSame(
+            ['family' => 'Иванова', 'given' => 'Юлия', 'patronymic' => null, 'latin' => 'IVANOVA<<YULIYA'],
+            $payload,
+        );
         $decoded = $codec->decode($payload);
         self::assertTrue($decoded->equals($name));
         self::assertSame('IVANOVA<<YULIYA', $decoded->latinOverride()?->value);
@@ -86,7 +98,12 @@ final class PersonNameCodecTest extends TestCase
 
     public function testAnOverrideThatIsTheDerivedFormIsStoredAsNull(): void
     {
-        $name = new PersonName(FamilyName::from('Иванов'), GivenName::from('Иван'), null, IcaoPersonName::from('IVANOV<<IVAN'));
+        $name = new PersonName(
+            FamilyName::from('Иванов'),
+            GivenName::from('Иван'),
+            null,
+            IcaoPersonName::from('IVANOV<<IVAN'),
+        );
 
         self::assertNull(new PersonNameCodec()->encode($name)['latin']);
     }
@@ -110,7 +127,9 @@ final class PersonNameCodecTest extends TestCase
         yield 'given is an int' => [['family' => 'Иванов', 'given' => 1]];
         yield 'patronymic is an int' => [['family' => 'Иванов', 'given' => 'Иван', 'patronymic' => 1]];
         yield 'latin is an int' => [['family' => 'Иванов', 'given' => 'Иван', 'latin' => 1]];
-        yield 'unknown key' => [['family' => 'Иванов', 'given' => 'Иван', 'patronymic' => null, 'latin' => null, 'extra' => 'x']];
+        yield 'unknown key' => [
+            ['family' => 'Иванов', 'given' => 'Иван', 'patronymic' => null, 'latin' => null, 'extra' => 'x'],
+        ];
         yield 'int key' => [['family' => 'Иванов', 'given' => 'Иван', 0 => 'x']];
     }
 
@@ -128,7 +147,12 @@ final class PersonNameCodecTest extends TestCase
 
     public function testTheJsonViewIsNotACodecPayload(): void
     {
-        $name = new PersonName(FamilyName::from('Иванов'), GivenName::from('Иван'), null, IcaoPersonName::from('IVANOV<<IVAN'));
+        $name = new PersonName(
+            FamilyName::from('Иванов'),
+            GivenName::from('Иван'),
+            null,
+            IcaoPersonName::from('IVANOV<<IVAN'),
+        );
 
         $this->expectException(InvalidPayloadException::class);
         $this->expectExceptionMessage(self::SHAPE);
@@ -146,7 +170,9 @@ final class PersonNameCodecTest extends TestCase
     public function testEncodeRefusesAnotherValueObject(): void
     {
         $this->expectException(LogicException::class);
-        $this->expectExceptionMessage(PersonNameCodec::class . ' encodes ' . PersonName::class . ', ' . GivenName::class . ' given.');
+        $this->expectExceptionMessage(
+            PersonNameCodec::class . ' encodes ' . PersonName::class . ', ' . GivenName::class . ' given.',
+        );
 
         new PersonNameCodec()->encode(GivenName::from('Иван'));
     }

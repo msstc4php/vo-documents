@@ -15,7 +15,10 @@ final class JurisdictionTest extends TestCase
     {
         self::assertSame(
             ['AU-ACT', 'AU-NSW', 'AU-NT', 'AU-QLD', 'AU-SA', 'AU-TAS', 'AU-VIC', 'AU-WA'],
-            \array_map(static fn (Jurisdiction $jurisdiction): string => $jurisdiction->isoCode(), Jurisdiction::cases()),
+            \array_map(
+                static fn (Jurisdiction $jurisdiction): string => $jurisdiction->isoCode(),
+                Jurisdiction::cases(),
+            ),
         );
     }
 

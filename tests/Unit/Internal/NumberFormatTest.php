@@ -45,7 +45,10 @@ final class NumberFormatTest extends TestCase
         yield 'letter first' => ['A12', 'Invalid X (invalid character).'];
         yield 'multibyte letter counted once' => ['12É', 'Invalid X (invalid character).'];
         yield 'multibyte letter beyond the length' => ['123É', 'Invalid X (4 characters).'];
-        yield 'trailing line feed is a separator, control character is not' => ["12\x01", 'Invalid X (invalid character).'];
+        yield 'trailing line feed is a separator, control character is not' => [
+            "12\x01",
+            'Invalid X (invalid character).',
+        ];
     }
 
     #[DataProvider('invalidInputs')]

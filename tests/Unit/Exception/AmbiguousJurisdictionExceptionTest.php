@@ -14,14 +14,23 @@ final class AmbiguousJurisdictionExceptionTest extends TestCase
 {
     public function testMessageListsIsoCodesOnly(): void
     {
-        $exception = new AmbiguousJurisdictionException('AU driver licence', [TestSubdivision::Nsw, TestSubdivision::Vic]);
+        $exception = new AmbiguousJurisdictionException(
+            'AU driver licence',
+            [TestSubdivision::Nsw, TestSubdivision::Vic],
+        );
 
-        self::assertSame('AU driver licence number fits several jurisdictions: AU-NSW, AU-VIC.', $exception->getMessage());
+        self::assertSame(
+            'AU driver licence number fits several jurisdictions: AU-NSW, AU-VIC.',
+            $exception->getMessage(),
+        );
     }
 
     public function testJurisdictionsKeepGivenOrder(): void
     {
-        $exception = new AmbiguousJurisdictionException('AU driver licence', [TestSubdivision::Vic, TestSubdivision::Nsw]);
+        $exception = new AmbiguousJurisdictionException(
+            'AU driver licence',
+            [TestSubdivision::Vic, TestSubdivision::Nsw],
+        );
 
         self::assertSame([TestSubdivision::Vic, TestSubdivision::Nsw], $exception->jurisdictions());
     }

@@ -235,8 +235,16 @@ final class PersonNameTest extends TestCase
         yield 'hyphenated secondary' => [
             PersonName::fromParts('Ivanov', ['Jean-Pierre']), 39, 'IVANOV<<JEAN<PIERRE<<<<<<<<<<<<<<<<<<<<',
         ];
-        yield 'cut landing on a secondary hyphen' => [PersonName::fromParts('Ivanov', ['Jean-Pierre']), 13, 'IVANOV<<JEA<P'];
-        yield 'cut landing on a filler' => [PersonName::fromParts('Eriksson', ['Anna', 'Maria']), 15, 'ERIKSSON<<ANN<M'];
+        yield 'cut landing on a secondary hyphen' => [
+            PersonName::fromParts('Ivanov', ['Jean-Pierre']),
+            13,
+            'IVANOV<<JEA<P',
+        ];
+        yield 'cut landing on a filler' => [
+            PersonName::fromParts('Eriksson', ['Anna', 'Maria']),
+            15,
+            'ERIKSSON<<ANN<M',
+        ];
         yield 'mononym cut' => [PersonName::from('ARKFREITH'), 5, 'ARKFR'];
         yield 'mononym cut landing on a filler' => [PersonName::from('ANNA<MARIA'), 5, 'ANN<M'];
         yield 'primary cut landing on a filler' => [PersonName::fromParts('Anna Maria', ['Eva']), 8, 'ANN<M<<E'];
@@ -264,7 +272,10 @@ final class PersonNameTest extends TestCase
 
     public function testMrzFieldDefaultsToTd3Width(): void
     {
-        self::assertSame('ERIKSSON<<ANNA<MARIA<<<<<<<<<<<<<<<<<<<', PersonName::from('ERIKSSON<<ANNA<MARIA')->mrzField());
+        self::assertSame(
+            'ERIKSSON<<ANNA<MARIA<<<<<<<<<<<<<<<<<<<',
+            PersonName::from('ERIKSSON<<ANNA<MARIA')->mrzField(),
+        );
     }
 
     public function testMrzFieldRefusesAWidthBelowTwo(): void

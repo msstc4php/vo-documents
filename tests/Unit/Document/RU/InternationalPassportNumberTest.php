@@ -15,8 +15,8 @@ use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
 
 /**
- * Expectations follow docs/sources/RU.md "International passport". The source has no check digit and no example number, so the
- * value is checked by its shape only.
+ * Expectations follow docs/sources/RU.md "International passport". The source has no check digit and no example
+ * number, so the value is checked by its shape only.
  */
 #[CoversClass(InternationalPassportNumber::class)]
 #[UsesClass(Digits::class)]
@@ -61,7 +61,10 @@ final class InternationalPassportNumberTest extends TestCase
     public static function invalidNumbers(): iterable
     {
         yield 'too short' => ['75 123456', 'Invalid Russian international passport number (8 characters).'];
-        yield 'internal passport length' => ['45 08 123456', 'Invalid Russian international passport number (10 characters).'];
+        yield 'internal passport length' => [
+            '45 08 123456',
+            'Invalid Russian international passport number (10 characters).',
+        ];
         yield 'letters' => ['75 123456A', 'Invalid Russian international passport number (invalid character).'];
     }
 

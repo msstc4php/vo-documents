@@ -54,7 +54,7 @@ final readonly class Transliterator
     {
         $upper = \mb_strtoupper($character, 'UTF-8');
 
-        return array_any($this->tables, fn (LatinMultinational|Cyrillic $table): bool => $table->lists($upper));
+        return \array_any($this->tables, static fn (TransliterationTable $table): bool => $table->lists($upper));
     }
 
     /**

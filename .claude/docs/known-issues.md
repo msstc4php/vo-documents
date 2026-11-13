@@ -8,16 +8,17 @@
   the code was restructured so `cut()` is called unconditionally (a shorter text is returned unchanged). Keep it that
   way rather than adding fast paths.
 - **ICAO table 6.B has no Ь (soft sign)**: `Icao\Transliterator` still throws for `Игорь`. Russian names go through
-  `Name\RU\RussianTransliteration`, which omits Ь (MVD Order 996 table has no row for it, `docs/sources/RU.md` §3);
-  the Cyrillic table stays the verbatim ICAO table. Ъ → `IE`, so `Объедков` → `OBIEEDKOV` (the plan's `OBIEDKOV` was wrong).
+  `Name\RU\RussianTransliteration`, which omits Ь (MVD Order 996 table has no row for it, `docs/sources/RU.md` §3); the
+  Cyrillic table stays the verbatim ICAO table. Ъ → `IE`, so `Объедков` → `OBIEEDKOV` (the plan's `OBIEDKOV` was wrong).
 - **PDF glyphs vs code points in Doc 9303 Part 3 §6**: rows 0402, 040E, 0110 print a different glyph than their
   code; the code column is used (see `docs/sources/ICAO.md`).
 - **Russian passports omit the patronymic in Latin** (MVD Orders 996/186): `Name\RU\PersonName::latin()` derives
   `IVANOV<<IVAN`, not the plan's `IVANOV<<IVAN<IVANOVICH`; a RU override may be any valid ICAO name (MVD §32/§140,
   RU.md §4). An override equal to the derived form (also with `<` for a hyphen) is normalised to null, so it equals
   no override and the codec stores `latin: null`.
-- `Name\RU\*` letters are the 33 Russian letters (`А-ЯЁа-яё`), not `\p{Cyrillic}`: Ukrainian/Belarusian letters are refused;
-  no word starts with Ъ/Ь (`AbstractRussianNamePart::word()`), otherwise `PersonName` failed later with a transliteration message.
+- `Name\RU\*` letters are the 33 Russian letters (`А-ЯЁа-яё`), not `\p{Cyrillic}`: Ukrainian/Belarusian letters are
+  refused; no word starts with Ъ/Ь (`AbstractRussianNamePart::word()`), otherwise `PersonName` failed later with a
+  transliteration message.
 - `PersonName::jsonSerialize()` uses `effectiveLatin`, the codec payload `latin` (override only); the codec refuses
   unknown keys so the JSON view can never be decoded as "no override".
 - Infection only runs tests that cover a mutated line: a base-class hook overridden in every real subclass needs a
@@ -28,8 +29,8 @@
   canonical `<`/`<<` form. `mrzField()` maps hyphens to `<` in both identifiers before cutting.
 - **INN control-digit weights have no official text**: FNS Order ЕД-7-14/559@ only says the control number is computed
   "по алгоритму, определенному ФНС". `Document\RU\Inn` uses the universally described weights (RU.md "INN").
-- **INN digits 3-4 changed meaning on 2026-01-01** (Order ЕД-7-14/559@): NN = FNS directorate, YY = FNS index, so there is
-  no `taxOfficeCode()`; `Inn::taxAuthorityRegionCode()` returns digits 1-2.
+- **INN digits 3-4 changed meaning on 2026-01-01** (Order ЕД-7-14/559@): NN = FNS directorate, YY = FNS index, so there
+  is no `taxOfficeCode()`; `Inn::taxAuthorityRegionCode()` returns digits 1-2.
 - **HL7 Mod10 (OMS policy, FFOMS Order 79) is Luhn**: doubling the odd-position number has the same digit sum as
   doubling each digit; `OmsPolicyNumber` uses `Checksum::luhn()` over all 16 digits.
 - `Checksum` refuses `''` (was accepted before task 5: `luhn('')` returned true).
@@ -49,7 +50,8 @@
 - Sub-national pattern (copy for US/CA/BR): `Document\<CC>\Jurisdiction` enum, `DriverLicenceNumber` interface with a
   covariant `jurisdiction()`, an abstract base per country with `static format(): Internal\NumberFormat` (character
   class + length range; messages "(N characters)" / "(invalid character)") and shared `masked()`/`parse()`, one final
-  class per jurisdiction, a factory with an exhaustive enum → class `match` delegating to `Internal\SubdivisionResolver`.
+  class per jurisdiction, a factory with an exhaustive enum → class `match` delegating to
+  `Internal\SubdivisionResolver`.
 - National name codecs validate payloads through `Internal\PayloadFields` (closed key set, string fields, one shape
   message).
 - **CI cannot pass until the `msstc4php/vo-documents` GitHub repository exists**: `composer-ci.json` and the
@@ -66,22 +68,24 @@
   the "no number" ambiguity test is trivial. `Subdivision` string backing is enforced by
   `tests/Unit/Contract/SubdivisionTest.php` (scans `src/`).
 - Escaped Infection mutants (9) are all equivalent: `luhn()` `>= 9` and `-=` (same result mod 10), `CastInt` in
-  `Checksum`/`Mask`/`Snils` (strict digit strings), the `?? throw` in `Mask::keepLastDigits()` (PCRE failure only) and `strlen($base) === 1 &&` in
-  `LatinMultinational::baseLetterSpellings()` (a one-byte base of an upper-case Latin letter is always A-Z).
-- **vo-base 1.1.0 reported interfaces as supported**: `ValueObjectMapper::supports(Document\AU\DriverLicenceNumber::class)`
-  was true and reading it threw `\Error` ("Cannot call abstract method"). Fixed in vo-base 1.1.1 (CHANGELOG
-  `## 1.1.1 - 2026-11-13`, local commits only). `composer.json`/`composer-ci.json` require `^1.1.1`, the local
-  profile aliases `dev-main as 1.1.1`. **Release order (owner):** tag vo-base `v1.1.1` first, then vo-documents;
-  until then the CI profile cannot resolve. Typed properties must use the concrete jurisdiction class.
-- `Icao\PersonName::from()` drops spaces next to `<` and trailing `<` padding before the shape check, so
-  `IVANOV<<` is the mononym `IVANOV`; `fromParts()` still refuses an empty part itself (the padding strip would hide it).
+  `Checksum`/`Mask`/`Snils` (strict digit strings), the `?? throw` in `Mask::keepLastDigits()` (PCRE failure only) and
+  `strlen($base) === 1 &&` in `LatinMultinational::baseLetterSpellings()` (a one-byte base of an upper-case Latin letter
+  is always A-Z).
+- **vo-base 1.1.0 reported interfaces as supported**:
+  `ValueObjectMapper::supports(Document\AU\DriverLicenceNumber::class)` was true and reading it threw `\Error` ("Cannot
+  call abstract method"). Fixed in vo-base 1.1.1 (CHANGELOG `## 1.1.1 - 2026-11-13`, local commits only).
+  `composer.json`/`composer-ci.json` require `^1.1.1`, the local profile aliases `dev-main as 1.1.1`. **Release order
+  (owner):** tag vo-base `v1.1.1` first, then vo-documents; until then the CI profile cannot resolve. Typed properties
+  must use the concrete jurisdiction class.
+- `Icao\PersonName::from()` drops spaces next to `<` and trailing `<` padding before the shape check, so `IVANOV<<` is
+  the mononym `IVANOV`; `fromParts()` still refuses an empty part itself (the padding strip would hide it).
 - `Digits::exactly()` checks the length first (`mb_strlen`), then the characters (`strspn`): a regex with `/D` left
   equivalent mutants because every line break is a separator and is stripped.
 - `composer-ci.lock` is regenerated by `make install-ci` and not ignored (`.gitignore` is a byte-identical template):
   delete it after a CI-profile install, never commit it.
 - **Latin letters outside table 6.A** (`Ễ`, `Ș`, `Ț`) are spelled through their base letter
-  (`LatinMultinational::baseLetterSpellings()`: NFD, drop `\p{Mn}`, table again). This is the package's decision
-  (AU.md, ICAO.md); `Ƒ`/`Ʒ` (no base) are still refused. The Cyrillic table and `RussianTransliteration` have no fallback.
+  (`LatinMultinational::baseLetterSpellings()`: NFD, drop `\p{Mn}`, table again). This is the package's decision (AU.md,
+  ICAO.md); `Ƒ`/`Ʒ` (no base) are still refused. The Cyrillic table and `RussianTransliteration` have no fallback.
 - **Compatibility characters are refused in every name part** (`AbstractNamePart`: NFKC ≠ NFC per character), except
   the ones an ICAO table lists itself (`Transliterator::lists()`: today `Ĳ`/`ĳ` and `Ŀ`/`ŀ` of 6.A), which keep their
   table spelling (`Ĳsselmeer` → `IJSSELMEER`). The Transliterator is built only for a compatibility character, so
@@ -92,9 +96,13 @@
   (all variants of a part have the same words), so the cost is the sum of variant counts and the cap
   (`MAX_SPELLINGS` = 4096) is per part. `LatinOverridePolicy::resolve()` compares with the derived form **before**
   computing spellings, so the derived override of a name with too many spellings (13 × `Ä`) is accepted.
-- `SubdivisionResolver` no-match message: "(invalid character)" when the length fits at least one subdivision
+- `SubdivisionResolver` no-match message: "(fits no jurisdiction)" when the length fits at least one subdivision
   (`AbstractDriverLicenceNumber::fitsLength()`, `@internal`), else the length.
 - **Policy:** transliteration tables and override rules change only in a major version (stored overrides are
   re-validated on hydration).
 - `rector.php` (template file) skips a deprecated rule (`PostIncDecToPreIncDecRector`, a Rector warning on every run);
   it comes from the bundle-standard template and is reported to the owner, not edited here.
+- **Ĳ/Ŀ and their two-letter spellings are distinct stored values with the same ICAO form** (intended): `Ĳsselmeer`
+  and `IJsselmeer` are different name parts, so they are not equal and do not collide in a unique index, while both
+  derive `IJSSELMEER`. The table lists the ligature, so the national spelling is kept as
+  typed.

@@ -73,6 +73,10 @@ final class TaxFileNumberTest extends TestCase
     #[DataProvider('invalidNumbers')]
     public function testRefusesWithoutEchoingTheInput(string $input, string $message): void
     {
-        self::assertRefusedWithoutEcho(static fn (string $value): TaxFileNumber => TaxFileNumber::from($value), $input, $message);
+        self::assertRefusedWithoutEcho(
+            static fn (string $value): TaxFileNumber => TaxFileNumber::from($value),
+            $input,
+            $message,
+        );
     }
 }

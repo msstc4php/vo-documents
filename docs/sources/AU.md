@@ -39,9 +39,9 @@ How the package applies this (designer's calls, no official character rule found
   `Müller` → `MUELLER`); apostrophes are omitted (`O'Brien` → `OBRIEN`, ICAO Part 3 §4.6).
 - **Override** (policy `Name\TransliterationVariant`): a Latin form is accepted only when it is one of the ICAO
   spellings of the parts (`MULLER<<ZOE` for `Müller Zoë`); case, spaces next to `<`, MRZ padding and `<` for a hyphen
-  are normalised (`Name\LatinSpelling`, matched part by part, at most 4096 spellings per part, computed only when
-  the override is not the derived form). An override equal to the derived form is not kept. Unlike RU (any valid ICAO name, RU.md §4), a Latin-script name keeps
-  this table rule: its Latin form is the name itself up to the table's spellings.
+  are normalised (`Name\LatinSpelling`, matched part by part, at most 4096 spellings per part, computed only when the
+  override is not the derived form). An override equal to the derived form is not kept. Unlike RU (any valid ICAO name,
+  RU.md §4), a Latin-script name keeps this table rule: its Latin form is the name itself up to the table's spellings.
 - **Display order** (`full()`): given names then family name (`Joan Catherine Citizen`), the order of the passport
   application form and of the licences of every jurisdiction except the ACT, Northern Territory and Tasmania, which
   print the family name first.

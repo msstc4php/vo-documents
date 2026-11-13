@@ -47,7 +47,8 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(PayloadFields::class)]
 final class PersonNameCodecTest extends TestCase
 {
-    private const string SHAPE = 'Expected an Australian person name payload with string "family" and "given", string or null "latin", and no other keys.';
+    private const string SHAPE = 'Expected an Australian person name payload with string "family" and "given", '
+        . 'string or null "latin", and no other keys.';
 
     public function testMapsItsClass(): void
     {
@@ -114,7 +115,9 @@ final class PersonNameCodecTest extends TestCase
         $this->expectException(InvalidPayloadException::class);
         $this->expectExceptionMessage(self::SHAPE);
 
-        new PersonNameCodec()->decode(new PersonName(FamilyName::from('Citizen'), GivenName::from('Joan'))->jsonSerialize());
+        new PersonNameCodec()->decode(
+            new PersonName(FamilyName::from('Citizen'), GivenName::from('Joan'))->jsonSerialize(),
+        );
     }
 
     public function testDecodeRefusesAnInvalidPart(): void
@@ -127,7 +130,9 @@ final class PersonNameCodecTest extends TestCase
     public function testEncodeRefusesAnotherValueObject(): void
     {
         $this->expectException(LogicException::class);
-        $this->expectExceptionMessage(PersonNameCodec::class . ' encodes ' . PersonName::class . ', ' . GivenName::class . ' given.');
+        $this->expectExceptionMessage(
+            PersonNameCodec::class . ' encodes ' . PersonName::class . ', ' . GivenName::class . ' given.',
+        );
 
         new PersonNameCodec()->encode(GivenName::from('Joan'));
     }

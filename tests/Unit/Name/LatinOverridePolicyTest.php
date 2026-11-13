@@ -44,12 +44,17 @@ final class LatinOverridePolicyTest extends TestCase
             self::REFUSAL,
         );
 
-        self::assertNull($policy->resolve(IcaoPersonName::from('MUELLER<SMITH<<ZOE'), IcaoPersonName::from('MUELLER-SMITH<<ZOE')));
+        self::assertNull(
+            $policy->resolve(IcaoPersonName::from('MUELLER<SMITH<<ZOE'), IcaoPersonName::from('MUELLER-SMITH<<ZOE')),
+        );
     }
 
     public function testAnyIcaoSpellingKeepsAnyOtherName(): void
     {
-        $kept = new AnyIcaoSpelling()->resolve(IcaoPersonName::from('IVANOVA<<YULIYA'), IcaoPersonName::from('IVANOVA<<IULIIA'));
+        $kept = new AnyIcaoSpelling()->resolve(
+            IcaoPersonName::from('IVANOVA<<YULIYA'),
+            IcaoPersonName::from('IVANOVA<<IULIIA'),
+        );
 
         self::assertSame('IVANOVA<<YULIYA', $kept?->value);
     }
@@ -60,15 +65,28 @@ final class LatinOverridePolicyTest extends TestCase
 
         self::assertNull(new AnyIcaoSpelling()->resolve(IcaoPersonName::from('RIMSKII<KORSAKOV<<NIKOLAI'), $derived));
         self::assertNull(new AnyIcaoSpelling()->resolve(IcaoPersonName::from('rimskii-korsakov<<nikolai'), $derived));
-        self::assertNotNull(new AnyIcaoSpelling()->resolve(IcaoPersonName::from('RIMSKII<<KORSAKOV<NIKOLAI'), $derived));
+        self::assertNotNull(
+            new AnyIcaoSpelling()->resolve(IcaoPersonName::from('RIMSKII<<KORSAKOV<NIKOLAI'), $derived),
+        );
     }
 
     public function testTransliterationVariantKeepsAnotherSpellingInTheNationalForm(): void
     {
-        $policy = new TransliterationVariant(static fn (): array => [[['MUELLER-SMITH', 'MULLER-SMITH'], ['ANN']]], self::REFUSAL);
+        $policy = new TransliterationVariant(
+            static fn (): array => [[['MUELLER-SMITH', 'MULLER-SMITH'], ['ANN']]],
+            self::REFUSAL,
+        );
 
-        self::assertSame('MULLER-SMITH<<ANN', $policy->resolve(IcaoPersonName::from('MULLER<SMITH<<ANN'), IcaoPersonName::from('MUELLER-SMITH<<ANN'))?->value);
-        self::assertNull($policy->resolve(IcaoPersonName::from('MUELLER<SMITH<<ANN'), IcaoPersonName::from('MUELLER-SMITH<<ANN')));
+        self::assertSame(
+            'MULLER-SMITH<<ANN',
+            $policy->resolve(
+                IcaoPersonName::from('MULLER<SMITH<<ANN'),
+                IcaoPersonName::from('MUELLER-SMITH<<ANN'),
+            )?->value,
+        );
+        self::assertNull(
+            $policy->resolve(IcaoPersonName::from('MUELLER<SMITH<<ANN'), IcaoPersonName::from('MUELLER-SMITH<<ANN')),
+        );
     }
 
     public function testTransliterationVariantRefusesAnotherName(): void

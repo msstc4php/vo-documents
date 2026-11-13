@@ -15,8 +15,8 @@ use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
 
 /**
- * Expectations follow docs/sources/RU.md "Passport issuing unit code". The source has no check digit and no example number, so the
- * value is checked by its shape only.
+ * Expectations follow docs/sources/RU.md "Passport issuing unit code". The source has no check digit and no example
+ * number, so the value is checked by its shape only.
  */
 #[CoversClass(PassportIssuingUnitCode::class)]
 #[UsesClass(Digits::class)]

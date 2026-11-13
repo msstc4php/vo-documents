@@ -59,7 +59,10 @@ final class SubdivisionResolverTest extends TestCase
             $resolver->resolve('123456');
         } catch (AmbiguousJurisdictionException $exception) {
             self::assertSame([TestSubdivision::Vic, TestSubdivision::Nsw], $exception->jurisdictions());
-            self::assertSame('Test licence number fits several jurisdictions: AU-VIC, AU-NSW.', $exception->getMessage());
+            self::assertSame(
+                'Test licence number fits several jurisdictions: AU-VIC, AU-NSW.',
+                $exception->getMessage(),
+            );
 
             return;
         }
@@ -75,17 +78,17 @@ final class SubdivisionResolverTest extends TestCase
         $this->resolver()->resolve(' X-12 ');
     }
 
-    public function testRefusesANumberValidNowhereAsAnInvalidCharacterWhenALengthFits(): void
+    public function testRefusesANumberValidNowhereAsFittingNoJurisdictionWhenALengthFits(): void
     {
         $this->expectException(InvalidDocumentNumberException::class);
-        $this->expectExceptionMessage('Invalid Test licence number (invalid character).');
+        $this->expectExceptionMessage('Invalid Test licence number (fits no jurisdiction).');
 
         $this->resolver()->resolve('X-1234');
     }
 
     public function testTheLengthIsCheckedForEverySubdivision(): void
     {
-        $this->expectExceptionMessage('Invalid Test licence number (invalid character).');
+        $this->expectExceptionMessage('Invalid Test licence number (fits no jurisdiction).');
 
         $this->resolver()->resolve('X-12345');
     }

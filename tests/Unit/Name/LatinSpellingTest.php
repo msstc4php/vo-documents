@@ -25,7 +25,10 @@ final class LatinSpellingTest extends TestCase
         ];
 
         self::assertSame('MUELLER<<ANNA', LatinSpelling::find(IcaoPersonName::from('MUELLER<<ANNA'), $forms)?->value);
-        self::assertSame('MUELLER<<ANNA<MARIE', LatinSpelling::find(IcaoPersonName::from('MUELLER<<ANNA<MARIE'), $forms)?->value);
+        self::assertSame(
+            'MUELLER<<ANNA<MARIE',
+            LatinSpelling::find(IcaoPersonName::from('MUELLER<<ANNA<MARIE'), $forms)?->value,
+        );
         self::assertNull(LatinSpelling::find(IcaoPersonName::from('MULLER<<MARIE'), $forms));
         self::assertNull(LatinSpelling::find(IcaoPersonName::from('MULLER<<ANNA<MARIA<MARIE'), $forms));
     }
@@ -34,8 +37,14 @@ final class LatinSpellingTest extends TestCase
     {
         $forms = [[['RIMSKII-KORSAKOV'], ['ANNA-MARIIA']]];
 
-        self::assertSame('RIMSKII-KORSAKOV<<ANNA-MARIIA', LatinSpelling::find(IcaoPersonName::from('RIMSKII<KORSAKOV<<ANNA<MARIIA'), $forms)?->value);
-        self::assertSame('FON<VIZIN<<ANNA', LatinSpelling::find(IcaoPersonName::from('FON-VIZIN<<ANNA'), [[['FON VIZIN'], ['ANNA']]])?->value);
+        self::assertSame(
+            'RIMSKII-KORSAKOV<<ANNA-MARIIA',
+            LatinSpelling::find(IcaoPersonName::from('RIMSKII<KORSAKOV<<ANNA<MARIIA'), $forms)?->value,
+        );
+        self::assertSame(
+            'FON<VIZIN<<ANNA',
+            LatinSpelling::find(IcaoPersonName::from('FON-VIZIN<<ANNA'), [[['FON VIZIN'], ['ANNA']]])?->value,
+        );
         self::assertNull(LatinSpelling::find(IcaoPersonName::from('RIMSKII<<KORSAKOV<ANNA<MARIIA'), $forms));
     }
 
@@ -44,7 +53,10 @@ final class LatinSpellingTest extends TestCase
         $variants = $this->variants(LatinSpelling::MAX_SPELLINGS);
         $last = $variants[\count($variants) - 1];
 
-        self::assertSame($last . '<<BA', LatinSpelling::find(IcaoPersonName::from($last . '<<BA'), [[$variants, ['BA']]])?->value);
+        self::assertSame(
+            $last . '<<BA',
+            LatinSpelling::find(IcaoPersonName::from($last . '<<BA'), [[$variants, ['BA']]])?->value,
+        );
     }
 
     public function testAPartAboveTheCapIsRefused(): void
@@ -52,14 +64,20 @@ final class LatinSpellingTest extends TestCase
         $this->expectException(InvalidPersonNameException::class);
         $this->expectExceptionMessage('Invalid personal name (too many transliteration variants).');
 
-        LatinSpelling::find(IcaoPersonName::from('BA<<BA'), [[['BA'], $this->variants(LatinSpelling::MAX_SPELLINGS + 1)]]);
+        LatinSpelling::find(
+            IcaoPersonName::from('BA<<BA'),
+            [[['BA'], $this->variants(LatinSpelling::MAX_SPELLINGS + 1)]],
+        );
     }
 
     public function testAPartAboveTheCapInALaterFormIsRefused(): void
     {
         $this->expectException(InvalidPersonNameException::class);
 
-        LatinSpelling::find(IcaoPersonName::from('BA<<BA'), [[['BA'], ['BA']], [$this->variants(LatinSpelling::MAX_SPELLINGS + 1)]]);
+        LatinSpelling::find(
+            IcaoPersonName::from('BA<<BA'),
+            [[['BA'], ['BA']], [$this->variants(LatinSpelling::MAX_SPELLINGS + 1)]],
+        );
     }
 
     public function testPartsWhoseProductIsFarAboveTheCapAreMatchedPartByPart(): void
@@ -68,7 +86,10 @@ final class LatinSpellingTest extends TestCase
         $last = $variants[\count($variants) - 1];
         $forms = [[$variants, $variants, $variants]];
 
-        self::assertSame($last . '<<' . $last . '<' . $last, LatinSpelling::find(IcaoPersonName::from($last . '<<' . $last . '<' . $last), $forms)?->value);
+        self::assertSame(
+            $last . '<<' . $last . '<' . $last,
+            LatinSpelling::find(IcaoPersonName::from($last . '<<' . $last . '<' . $last), $forms)?->value,
+        );
         self::assertNull(LatinSpelling::find(IcaoPersonName::from($last . '<<' . $last . '<A'), $forms));
     }
 
@@ -76,7 +97,10 @@ final class LatinSpellingTest extends TestCase
     {
         $forms = [[['SMITH'], ['ANNA MARIA'], ['JO']]];
 
-        self::assertSame('SMITH<<ANNA<MARIA<JO', LatinSpelling::find(IcaoPersonName::from('SMITH<<ANNA<MARIA<JO'), $forms)?->value);
+        self::assertSame(
+            'SMITH<<ANNA<MARIA<JO',
+            LatinSpelling::find(IcaoPersonName::from('SMITH<<ANNA<MARIA<JO'), $forms)?->value,
+        );
         self::assertNull(LatinSpelling::find(IcaoPersonName::from('SMITH<<ANNA<MARIA'), $forms));
         self::assertNull(LatinSpelling::find(IcaoPersonName::from('SMITH<<ANNA<MARIA<JO<JO'), $forms));
         self::assertNull(LatinSpelling::find(IcaoPersonName::from('SMITH'), $forms));
@@ -86,7 +110,10 @@ final class LatinSpellingTest extends TestCase
 
     public function testVariantsAreComparedInUpperCase(): void
     {
-        self::assertSame('VAN<DER<BERG<<ANN', LatinSpelling::find(IcaoPersonName::from('VAN<DER<BERG<<ANN'), [[['van der Berg'], ['Ann']]])?->value);
+        self::assertSame(
+            'VAN<DER<BERG<<ANN',
+            LatinSpelling::find(IcaoPersonName::from('VAN<DER<BERG<<ANN'), [[['van der Berg'], ['Ann']]])?->value,
+        );
     }
 
     /**

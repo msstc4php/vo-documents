@@ -58,10 +58,43 @@ final class DriverLicenceNumberFactoryTest extends TestCase
     public static function matchingJurisdictions(): iterable
     {
         yield 'one digit' => ['7', [Jurisdiction::Act, Jurisdiction::Nt, Jurisdiction::Vic]];
-        yield 'six digits' => ['000000', [Jurisdiction::Act, Jurisdiction::Nsw, Jurisdiction::Nt, Jurisdiction::Sa, Jurisdiction::Tas, Jurisdiction::Vic]];
-        yield 'seven digits (WA sample)' => ['6437772', [Jurisdiction::Act, Jurisdiction::Nsw, Jurisdiction::Nt, Jurisdiction::Tas, Jurisdiction::Vic, Jurisdiction::Wa]];
-        yield 'eight digits (NSW sample)' => ['01234567', [Jurisdiction::Act, Jurisdiction::Nsw, Jurisdiction::Nt, Jurisdiction::Qld, Jurisdiction::Tas, Jurisdiction::Vic]];
-        yield 'nine digits (Qld sample)' => ['123 456 789', [Jurisdiction::Act, Jurisdiction::Nt, Jurisdiction::Qld, Jurisdiction::Vic]];
+        yield 'six digits' => [
+            '000000',
+            [
+                Jurisdiction::Act,
+                Jurisdiction::Nsw,
+                Jurisdiction::Nt,
+                Jurisdiction::Sa,
+                Jurisdiction::Tas,
+                Jurisdiction::Vic,
+            ],
+        ];
+        yield 'seven digits (WA sample)' => [
+            '6437772',
+            [
+                Jurisdiction::Act,
+                Jurisdiction::Nsw,
+                Jurisdiction::Nt,
+                Jurisdiction::Tas,
+                Jurisdiction::Vic,
+                Jurisdiction::Wa,
+            ],
+        ];
+        yield 'eight digits (NSW sample)' => [
+            '01234567',
+            [
+                Jurisdiction::Act,
+                Jurisdiction::Nsw,
+                Jurisdiction::Nt,
+                Jurisdiction::Qld,
+                Jurisdiction::Tas,
+                Jurisdiction::Vic,
+            ],
+        ];
+        yield 'nine digits (Qld sample)' => [
+            '123 456 789',
+            [Jurisdiction::Act, Jurisdiction::Nt, Jurisdiction::Qld, Jurisdiction::Vic],
+        ];
         yield 'ten digits (ACT sample)' => ['1234567890', [Jurisdiction::Act, Jurisdiction::Nt, Jurisdiction::Vic]];
         yield 'six characters with a letter' => ['s12345', [Jurisdiction::Nsw, Jurisdiction::Sa, Jurisdiction::Tas]];
         yield 'eight characters with a letter' => ['AB123456', [Jurisdiction::Nsw, Jurisdiction::Tas]];
@@ -120,16 +153,29 @@ final class DriverLicenceNumberFactoryTest extends TestCase
     public static function numbersValidNowhere(): iterable
     {
         yield 'eleven digits' => ['12345678901', 'Invalid Australian driver licence number (11 characters).'];
-        yield 'nine characters with a letter, a length some jurisdiction has' => ['A12-345-678', 'Invalid Australian driver licence number (invalid character).'];
-        yield 'punctuation at a length every format allows' => ['12345.78', 'Invalid Australian driver licence number (invalid character).'];
+        yield 'nine characters with a letter, a length some jurisdiction has' => [
+            'A12-345-678',
+            'Invalid Australian driver licence number (fits no jurisdiction).',
+        ];
+        yield 'punctuation at a length every format allows' => [
+            '12345.78',
+            'Invalid Australian driver licence number (fits no jurisdiction).',
+        ];
         yield 'empty' => ['', 'Invalid Australian driver licence number (0 characters).'];
-        yield 'pasted several times' => [\str_repeat('1234567890 ', 5), 'Invalid Australian driver licence number (too long).'];
+        yield 'pasted several times' => [
+            \str_repeat('1234567890 ', 5),
+            'Invalid Australian driver licence number (too long).',
+        ];
     }
 
     #[DataProvider('numbersValidNowhere')]
     public function testRefusesANumberValidNowhereWithoutEchoingIt(string $number, string $message): void
     {
-        self::assertRefusedWithoutEcho(static fn (string $value): mixed => DriverLicenceNumberFactory::fromNumber($value), $number, $message);
+        self::assertRefusedWithoutEcho(
+            static fn (string $value): mixed => DriverLicenceNumberFactory::fromNumber($value),
+            $number,
+            $message,
+        );
     }
 
     /**

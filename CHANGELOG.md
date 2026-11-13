@@ -4,8 +4,8 @@
 
 ### Added
 
-- Document numbers, each with `formatted()`, `masked()` and a checksum where an algorithm exists: Russia (`Snils`, `Inn`,
-  `InternalPassportNumber`, `PassportIssuingUnitCode`, `InternationalPassportNumber`, `DriverLicenceNumber`,
+- Document numbers, each with `formatted()`, `masked()` and a checksum where an algorithm exists: Russia (`Snils`,
+  `Inn`, `InternalPassportNumber`, `PassportIssuingUnitCode`, `InternationalPassportNumber`, `DriverLicenceNumber`,
   `DriverLicenceCategory`, `OmsPolicyNumber`) and Australia (`TaxFileNumber`, `MedicareCardNumber`, a licence number per
   state or territory, `Jurisdiction`, `DriverLicenceNumberFactory`).
 - `Icao\PersonName` (ICAO Doc 9303 Latin name, `mrzField()` truncation) and `Icao\Transliterator` with the multinational
@@ -20,7 +20,8 @@
 
 - The Russian derived Latin name omits the patronymic and the soft sign Ь (MVD Orders 996 and 186).
 - INN, TFN and Medicare checksums have no public official text; implemented from the algorithm used in practice.
-- `DriverLicenceNumberFactory::fromNumber()` is always ambiguous for AU with the published formats; use `fromNumberIn()`.
+- `DriverLicenceNumberFactory::fromNumber()` is always ambiguous for AU with the published formats; use
+  `fromNumberIn()`.
 - Name parts are limited to 100 characters, `Icao\PersonName` to 255.
 - A Latin letter outside ICAO table 6.A is spelled as its base letter (`Nguyễn` → `NGUYEN`, `Ș` → `S`); compatibility
   characters (fullwidth letters, `ª`, `ﬁ`) are refused in name parts, except those an ICAO table lists (`Ĳ`, `Ŀ`).

@@ -39,7 +39,7 @@ final readonly class SubdivisionResolver
      * @return TNumber
      *
      * @throws AmbiguousJurisdictionException<TSubdivision> when several subdivisions match, listed in the given order
-     * @throws InvalidDocumentNumberException when none matches: "(invalid character)" when the length fits at least
+     * @throws InvalidDocumentNumberException when none matches: "(fits no jurisdiction)" when the length fits at least
      *                                        one subdivision, otherwise the length
      */
     public function resolve(string $number): ValueObject
@@ -72,7 +72,7 @@ final readonly class SubdivisionResolver
         $document = $this->document . ' number';
         foreach ($this->subdivisions as $subdivision) {
             if (($this->fitsLength)($subdivision, $number)) {
-                return new InvalidDocumentNumberException(\sprintf('Invalid %s (invalid character).', $document));
+                return new InvalidDocumentNumberException(\sprintf('Invalid %s (fits no jurisdiction).', $document));
             }
         }
 

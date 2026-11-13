@@ -119,13 +119,22 @@ final class PersonNameTest extends TestCase
         // Order 996 §32 / Order 186 §140: the spelling of a supporting document, not of the table.
         yield 'earlier passport spelling' => ['Иванова', 'Юлия', 'IVANOVA<<YULIYA', 'IVANOVA<<YULIYA'];
         yield 'German civil-status spelling' => ['Шмидт', 'Юрий', 'schmidt<<jurij', 'SCHMIDT<<JURIJ'];
-        yield 'MRZ-form spelling kept as given' => ['Римский-Корсаков', 'Николай', 'RIMSKY<KORSAKOV<<NIKOLAY', 'RIMSKY<KORSAKOV<<NIKOLAY'];
+        yield 'MRZ-form spelling kept as given' => [
+            'Римский-Корсаков',
+            'Николай',
+            'RIMSKY<KORSAKOV<<NIKOLAY',
+            'RIMSKY<KORSAKOV<<NIKOLAY',
+        ];
         yield 'mononym' => ['Иванов', 'Иван', 'IVANOV', 'IVANOV'];
     }
 
     #[DataProvider('documentedSpellings')]
-    public function testAnyValidIcaoNameIsKeptAsTheOverride(string $family, string $given, string $latin, string $stored): void
-    {
+    public function testAnyValidIcaoNameIsKeptAsTheOverride(
+        string $family,
+        string $given,
+        string $latin,
+        string $stored,
+    ): void {
         $name = new PersonName(FamilyName::from($family), GivenName::from($given), null, IcaoPersonName::from($latin));
 
         self::assertSame($stored, $name->latin()->value);
@@ -168,7 +177,11 @@ final class PersonNameTest extends TestCase
 
     public function testInitialsOfCompoundParts(): void
     {
-        $name = new PersonName(FamilyName::from('Алиев'), GivenName::from('Анна-Мария Ёлка'), Patronymic::from('Гусейн оглы'));
+        $name = new PersonName(
+            FamilyName::from('Алиев'),
+            GivenName::from('Анна-Мария Ёлка'),
+            Patronymic::from('Гусейн оглы'),
+        );
 
         self::assertSame('Алиев А.-М. Ё. Г. о.', $name->short());
         self::assertSame('А.-М. Ё. Г. о. Алиев', $name->initialsFirst());
@@ -193,13 +206,33 @@ final class PersonNameTest extends TestCase
         self::assertTrue($name->equals($this->ivanov()));
         self::assertFalse($name->equals($this->ivanov(withPatronymic: false)));
         self::assertFalse($this->ivanov(withPatronymic: false)->equals($name));
-        self::assertFalse($name->equals(new PersonName(FamilyName::from('Петров'), GivenName::from('Иван'), Patronymic::from('Иванович'))));
-        self::assertFalse($name->equals(new PersonName(FamilyName::from('Иванов'), GivenName::from('Пётр'), Patronymic::from('Иванович'))));
-        self::assertFalse($name->equals(new PersonName(FamilyName::from('Иванов'), GivenName::from('Иван'), Patronymic::from('Петрович'))));
+        self::assertFalse(
+            $name->equals(
+                new PersonName(FamilyName::from('Петров'), GivenName::from('Иван'), Patronymic::from('Иванович')),
+            ),
+        );
+        self::assertFalse(
+            $name->equals(
+                new PersonName(FamilyName::from('Иванов'), GivenName::from('Пётр'), Patronymic::from('Иванович')),
+            ),
+        );
+        self::assertFalse(
+            $name->equals(
+                new PersonName(FamilyName::from('Иванов'), GivenName::from('Иван'), Patronymic::from('Петрович')),
+            ),
+        );
         self::assertFalse($name->equals($this->ivanov(latin: IcaoPersonName::from('IWANOW<<IWAN'))));
         self::assertFalse($this->ivanov(latin: IcaoPersonName::from('IWANOW<<IWAN'))->equals($name));
-        self::assertTrue($this->ivanov(latin: IcaoPersonName::from('IWANOW<<IWAN'))->equals($this->ivanov(latin: IcaoPersonName::from('iwanow<<iwan'))));
-        self::assertFalse($this->ivanov(latin: IcaoPersonName::from('IWANOW<<IWAN'))->equals($this->ivanov(latin: IcaoPersonName::from('IVANOV<<IVAN<IVANOVICH'))));
+        self::assertTrue(
+            $this->ivanov(latin: IcaoPersonName::from('IWANOW<<IWAN'))->equals(
+                $this->ivanov(latin: IcaoPersonName::from('iwanow<<iwan')),
+            ),
+        );
+        self::assertFalse(
+            $this->ivanov(latin: IcaoPersonName::from('IWANOW<<IWAN'))->equals(
+                $this->ivanov(latin: IcaoPersonName::from('IVANOV<<IVAN<IVANOVICH')),
+            ),
+        );
         self::assertTrue($name->equals($this->ivanov(latin: IcaoPersonName::from('IVANOV<<IVAN'))));
         self::assertFalse($name->equals(GivenName::from('Иван')));
     }

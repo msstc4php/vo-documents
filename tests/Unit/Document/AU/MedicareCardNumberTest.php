@@ -67,7 +67,10 @@ final class MedicareCardNumberTest extends TestCase
         yield 'first digit 1' => ['1189 97702 1', 'Invalid Medicare card number (first digit out of range).'];
         yield 'first digit 7' => ['7189 97702 1', 'Invalid Medicare card number (first digit out of range).'];
         yield 'first digit 0' => ['0000 00000 1', 'Invalid Medicare card number (first digit out of range).'];
-        yield 'with the individual reference number' => ['3189 97702 1 1', 'Invalid Medicare card number (11 characters).'];
+        yield 'with the individual reference number' => [
+            '3189 97702 1 1',
+            'Invalid Medicare card number (11 characters).',
+        ];
         yield 'nine digits' => ['3189 97702', 'Invalid Medicare card number (9 characters).'];
         yield 'letter' => ['3189 97702 I', 'Invalid Medicare card number (invalid character).'];
     }
@@ -75,6 +78,10 @@ final class MedicareCardNumberTest extends TestCase
     #[DataProvider('invalidNumbers')]
     public function testRefusesWithoutEchoingTheInput(string $input, string $message): void
     {
-        self::assertRefusedWithoutEcho(static fn (string $value): MedicareCardNumber => MedicareCardNumber::from($value), $input, $message);
+        self::assertRefusedWithoutEcho(
+            static fn (string $value): MedicareCardNumber => MedicareCardNumber::from($value),
+            $input,
+            $message,
+        );
     }
 }

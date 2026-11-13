@@ -113,7 +113,12 @@ final class DriverLicenceNumbersTest extends TestCase
     }
 
     /**
-     * @return iterable<string, array{class-string<AbstractDriverLicenceNumber>, int<1, max>, int<1, max>, non-empty-string}>
+     * @return iterable<string, array{
+     *     class-string<AbstractDriverLicenceNumber>,
+     *     int<1, max>,
+     *     int<1, max>,
+     *     non-empty-string,
+     * }>
      */
     public static function lengthRanges(): iterable
     {
@@ -178,24 +183,96 @@ final class DriverLicenceNumbersTest extends TestCase
      */
     public static function invalidNumbers(): iterable
     {
-        yield 'ACT eleven digits' => [ActDriverLicenceNumber::class, '12345678901', 'Invalid AU-ACT driver licence number (11 characters).'];
-        yield 'ACT letter' => [ActDriverLicenceNumber::class, '123456789A', 'Invalid AU-ACT driver licence number (invalid character).'];
-        yield 'ACT empty' => [ActDriverLicenceNumber::class, '', 'Invalid AU-ACT driver licence number (0 characters).'];
-        yield 'NSW five characters' => [NswDriverLicenceNumber::class, '12345', 'Invalid AU-NSW driver licence number (5 characters).'];
-        yield 'NSW nine characters' => [NswDriverLicenceNumber::class, '123456789', 'Invalid AU-NSW driver licence number (9 characters).'];
-        yield 'NSW non-ASCII letter' => [NswDriverLicenceNumber::class, '1234567É', 'Invalid AU-NSW driver licence number (invalid character).'];
-        yield 'NT letter' => [NtDriverLicenceNumber::class, '156410Z', 'Invalid AU-NT driver licence number (invalid character).'];
-        yield 'Qld seven digits' => [QldDriverLicenceNumber::class, '1234567', 'Invalid AU-QLD driver licence number (7 characters).'];
-        yield 'Qld ten digits' => [QldDriverLicenceNumber::class, '1234567890', 'Invalid AU-QLD driver licence number (10 characters).'];
-        yield 'SA five characters' => [SaDriverLicenceNumber::class, 'S1234', 'Invalid AU-SA driver licence number (5 characters).'];
-        yield 'SA seven characters' => [SaDriverLicenceNumber::class, 'S123456', 'Invalid AU-SA driver licence number (7 characters).'];
-        yield 'Tas nine characters' => [TasDriverLicenceNumber::class, 'A12345678', 'Invalid AU-TAS driver licence number (9 characters).'];
-        yield 'Tas other separator' => [TasDriverLicenceNumber::class, 'A12.345', 'Invalid AU-TAS driver licence number (invalid character).'];
-        yield 'Vic letter' => [VicDriverLicenceNumber::class, '12345678O', 'Invalid AU-VIC driver licence number (invalid character).'];
-        yield 'WA six digits' => [WaDriverLicenceNumber::class, '643777', 'Invalid AU-WA driver licence number (6 characters).'];
-        yield 'WA eight digits' => [WaDriverLicenceNumber::class, '64377721', 'Invalid AU-WA driver licence number (8 characters).'];
-        yield 'WA trailing control character' => [WaDriverLicenceNumber::class, "643777\x00", 'Invalid AU-WA driver licence number (invalid character).'];
-        yield 'pasted several times' => [WaDriverLicenceNumber::class, \str_repeat('6437772 ', 6), 'Invalid AU-WA driver licence number (too long).'];
+        yield 'ACT eleven digits' => [
+            ActDriverLicenceNumber::class,
+            '12345678901',
+            'Invalid AU-ACT driver licence number (11 characters).',
+        ];
+        yield 'ACT letter' => [
+            ActDriverLicenceNumber::class,
+            '123456789A',
+            'Invalid AU-ACT driver licence number (invalid character).',
+        ];
+        yield 'ACT empty' => [
+            ActDriverLicenceNumber::class,
+            '',
+            'Invalid AU-ACT driver licence number (0 characters).',
+        ];
+        yield 'NSW five characters' => [
+            NswDriverLicenceNumber::class,
+            '12345',
+            'Invalid AU-NSW driver licence number (5 characters).',
+        ];
+        yield 'NSW nine characters' => [
+            NswDriverLicenceNumber::class,
+            '123456789',
+            'Invalid AU-NSW driver licence number (9 characters).',
+        ];
+        yield 'NSW non-ASCII letter' => [
+            NswDriverLicenceNumber::class,
+            '1234567É',
+            'Invalid AU-NSW driver licence number (invalid character).',
+        ];
+        yield 'NT letter' => [
+            NtDriverLicenceNumber::class,
+            '156410Z',
+            'Invalid AU-NT driver licence number (invalid character).',
+        ];
+        yield 'Qld seven digits' => [
+            QldDriverLicenceNumber::class,
+            '1234567',
+            'Invalid AU-QLD driver licence number (7 characters).',
+        ];
+        yield 'Qld ten digits' => [
+            QldDriverLicenceNumber::class,
+            '1234567890',
+            'Invalid AU-QLD driver licence number (10 characters).',
+        ];
+        yield 'SA five characters' => [
+            SaDriverLicenceNumber::class,
+            'S1234',
+            'Invalid AU-SA driver licence number (5 characters).',
+        ];
+        yield 'SA seven characters' => [
+            SaDriverLicenceNumber::class,
+            'S123456',
+            'Invalid AU-SA driver licence number (7 characters).',
+        ];
+        yield 'Tas nine characters' => [
+            TasDriverLicenceNumber::class,
+            'A12345678',
+            'Invalid AU-TAS driver licence number (9 characters).',
+        ];
+        yield 'Tas other separator' => [
+            TasDriverLicenceNumber::class,
+            'A12.345',
+            'Invalid AU-TAS driver licence number (invalid character).',
+        ];
+        yield 'Vic letter' => [
+            VicDriverLicenceNumber::class,
+            '12345678O',
+            'Invalid AU-VIC driver licence number (invalid character).',
+        ];
+        yield 'WA six digits' => [
+            WaDriverLicenceNumber::class,
+            '643777',
+            'Invalid AU-WA driver licence number (6 characters).',
+        ];
+        yield 'WA eight digits' => [
+            WaDriverLicenceNumber::class,
+            '64377721',
+            'Invalid AU-WA driver licence number (8 characters).',
+        ];
+        yield 'WA trailing control character' => [
+            WaDriverLicenceNumber::class,
+            "643777\x00",
+            'Invalid AU-WA driver licence number (invalid character).',
+        ];
+        yield 'pasted several times' => [
+            WaDriverLicenceNumber::class,
+            \str_repeat('6437772 ', 6),
+            'Invalid AU-WA driver licence number (too long).',
+        ];
     }
 
     /**
@@ -204,6 +281,10 @@ final class DriverLicenceNumbersTest extends TestCase
     #[DataProvider('invalidNumbers')]
     public function testRefusesWithoutEchoingTheInput(string $class, string $input, string $message): void
     {
-        self::assertRefusedWithoutEcho(static fn (string $value): AbstractDriverLicenceNumber => $class::from($value), $input, $message);
+        self::assertRefusedWithoutEcho(
+            static fn (string $value): AbstractDriverLicenceNumber => $class::from($value),
+            $input,
+            $message,
+        );
     }
 }

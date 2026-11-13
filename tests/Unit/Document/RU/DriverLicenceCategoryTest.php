@@ -18,7 +18,10 @@ final class DriverLicenceCategoryTest extends TestCase
     {
         self::assertSame(
             ['A', 'A1', 'B', 'B1', 'C', 'C1', 'D', 'D1', 'BE', 'CE', 'C1E', 'DE', 'D1E', 'M', 'Tm', 'Tb'],
-            \array_map(static fn (DriverLicenceCategory $category): string => $category->value, DriverLicenceCategory::cases()),
+            \array_map(
+                static fn (DriverLicenceCategory $category): string => $category->value,
+                DriverLicenceCategory::cases(),
+            ),
         );
     }
 

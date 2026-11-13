@@ -65,25 +65,65 @@ final class NamePartsTest extends TestCase
     public static function invalidParts(): iterable
     {
         yield 'Latin' => [GivenName::class, 'Ivan', 'Invalid Russian given name (invalid character).'];
-        yield 'Latin a inside Cyrillic' => [GivenName::class, 'Ивaн', 'Invalid Russian given name (invalid character).'];
-        yield 'Latin o inside a surname' => [FamilyName::class, 'Иванoв', 'Invalid Russian family name (invalid character).'];
+        yield 'Latin a inside Cyrillic' => [
+            GivenName::class,
+            'Ивaн',
+            'Invalid Russian given name (invalid character).',
+        ];
+        yield 'Latin o inside a surname' => [
+            FamilyName::class,
+            'Иванoв',
+            'Invalid Russian family name (invalid character).',
+        ];
         yield 'digit' => [GivenName::class, 'Иван2', 'Invalid Russian given name (invalid character).'];
         yield 'leading hyphen' => [GivenName::class, '-Иван', 'Invalid Russian given name (invalid character).'];
         yield 'trailing hyphen' => [FamilyName::class, 'Иванов-', 'Invalid Russian family name (invalid character).'];
-        yield 'two separators' => [FamilyName::class, 'Иван--Петров', 'Invalid Russian family name (invalid character).'];
-        yield 'hyphen then space' => [FamilyName::class, 'Иван- Петров', 'Invalid Russian family name (invalid character).'];
+        yield 'two separators' => [
+            FamilyName::class,
+            'Иван--Петров',
+            'Invalid Russian family name (invalid character).',
+        ];
+        yield 'hyphen then space' => [
+            FamilyName::class,
+            'Иван- Петров',
+            'Invalid Russian family name (invalid character).',
+        ];
         yield 'empty' => [FamilyName::class, '  ', 'Invalid Russian family name (0 characters).'];
         yield 'Ukrainian Ї' => [GivenName::class, 'Їржи', 'Invalid Russian given name (invalid character).'];
         yield 'Cyrillic І' => [GivenName::class, 'Іван', 'Invalid Russian given name (invalid character).'];
-        yield 'apostrophe in a given name' => [GivenName::class, "Д'Анна", 'Invalid Russian given name (invalid character).'];
-        yield 'apostrophe in a patronymic' => [Patronymic::class, "Д'Иванович", 'Invalid Russian patronymic (invalid character).'];
+        yield 'apostrophe in a given name' => [
+            GivenName::class,
+            "Д'Анна",
+            'Invalid Russian given name (invalid character).',
+        ];
+        yield 'apostrophe in a patronymic' => [
+            Patronymic::class,
+            "Д'Иванович",
+            'Invalid Russian patronymic (invalid character).',
+        ];
         yield 'other punctuation' => [FamilyName::class, 'Иванов.', 'Invalid Russian family name (invalid character).'];
         yield 'soft sign alone' => [FamilyName::class, 'Ь', 'Invalid Russian family name (invalid character).'];
-        yield 'word starting with Ь' => [FamilyName::class, 'Ь-Иванов', 'Invalid Russian family name (invalid character).'];
-        yield 'second word starting with Ь' => [GivenName::class, 'Иван Ь', 'Invalid Russian given name (invalid character).'];
-        yield 'word starting with Ъ' => [Patronymic::class, 'Ъеремеевич', 'Invalid Russian patronymic (invalid character).'];
+        yield 'word starting with Ь' => [
+            FamilyName::class,
+            'Ь-Иванов',
+            'Invalid Russian family name (invalid character).',
+        ];
+        yield 'second word starting with Ь' => [
+            GivenName::class,
+            'Иван Ь',
+            'Invalid Russian given name (invalid character).',
+        ];
+        yield 'word starting with Ъ' => [
+            Patronymic::class,
+            'Ъеремеевич',
+            'Invalid Russian patronymic (invalid character).',
+        ];
         yield 'lower-case ь first' => [GivenName::class, 'ьван', 'Invalid Russian given name (invalid character).'];
-        yield 'U+2019 in a given name' => [GivenName::class, "Д\u{2019}Анна", 'Invalid Russian given name (invalid character).'];
+        yield 'U+2019 in a given name' => [
+            GivenName::class,
+            "Д\u{2019}Анна",
+            'Invalid Russian given name (invalid character).',
+        ];
         yield 'separator alone' => [FamilyName::class, "'", 'Invalid Russian family name (invalid character).'];
     }
 
