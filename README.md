@@ -109,6 +109,9 @@ official algorithm is published. A number with the right shape is accepted, neve
 | `Document\US\Jurisdiction` | The 50 states and DC (enum, ISO 3166-2:US) | n/a | n/a | ISO 3166-2:US |
 | `Document\CA\SocialInsuranceNumber` | SIN, `123 456 789` | format only (no check digit verified: no algorithm published) | `isTemporaryResident()` (first digit 9, ESDC) | ESDC; CRA |
 | `Document\CA\PassportNumber` | Passport, letter + 6 digits + 2 letters (since 2023-05-10) or 2 letters + 6 digits | format only | none | IRCC |
+| `Document\CA\DriverLicence\{Ab,Bc,Ns,On,Qc,Sk}DriverLicenceNumber` | Driver's licence number of 6 jurisdictions (NS and SK also cover the photo ID card): AB `123456-789`, BC and SK 1-8 digits stored zero-padded to 8, NS Master Number `FINCH220867001`, ON 15 alphanumerics, QC `L1531-171274-08` | shape only (no check digit published); NS day and month checked as calendar fields | none (the NS surname and birth fields are not decoded: two-digit year) | Service Alberta RDN; ICBC; Service Nova Scotia; MTO glossary; SAAQ; Government of Saskatchewan, SGI |
+| `Document\CA\HealthCard\{Ab,Bc,Mb,Nb,Nl,Ns,Nt,Nu,On,Pe,Qc,Sk,Yt}HealthCardNumber` | Health card number of all 13 jurisdictions (8-12 characters; NT letter `D`/`N`/`H`/`M`/`T` + 7 digits; QC NAM `YUXJ75021213`) | BC leading 9 and MOD-11, ON leading digit 1-9 and MOD 10 verified; QC month (01-12, 51-62) and day checked; the rest format only | ON `versionCode()` (kept apart from the value); QC `HasSex`, birth year digits, month, day (GIU REQ-19-53: a reading aid, not a value to fill a record with) | Ontario Ministry of Health "Province and Territory Codes" and HCV/IHCS specifications; BC Teleplan; Québec MSSS GIU; provincial ministries |
+| `Document\CA\Jurisdiction` | The 10 provinces and 3 territories (enum, ISO 3166-2:CA) | n/a | n/a | ISO 3166-2:CA |
 
 Names: `Name\<CC>\FamilyName`, `GivenName` and `PersonName` for DE, FR, IT, ES, NL, CH, GB and TR, like the RU and AU
 ones. Spain's `PersonName` has two surnames (`first`, optional `second`); in the Dutch one the prefixes (`van der`) are
@@ -118,9 +121,9 @@ US one is `Name\US\PersonName($family, ?$given, ?$middle, ?$suffix)` (`given` nu
 identifiers of the ICAO form, ordinals as Roman numerals (`SMITH<<JOHN<MICHAEL<III`). The Canadian one is
 `Name\CA\PersonName($family, ?$given)`, letters of the Latin script (English and French names).
 
-Contracts: `Contract\Maskable` (every number above), `Contract\Subdivision` and `Contract\IssuedBySubdivision` (AU
-and US jurisdictions, AU licences, US DL/ID numbers). `Contract\HasSex` and the `Sex` enum are implemented by the documents that encode a sex
-(`Nir`, `FiscalCode`, the DVLA licence number, `ChiNumber`). `Contract\HasBirthDate` is public API that no class
+Contracts: `Contract\Maskable` (every number above), `Contract\Subdivision` and `Contract\IssuedBySubdivision` (AU,
+US and CA jurisdictions, AU licences, US DL/ID numbers, CA licence and health card numbers). `Contract\HasSex` and the `Sex` enum are implemented by the documents that encode a sex
+(`Nir`, `FiscalCode`, the DVLA licence number, `ChiNumber`, the Québec NAM). `Contract\HasBirthDate` is public API that no class
 implements yet: every encoded birth date of these countries lacks a century, so the classes expose the year digits,
 month and day instead, and impossible dates (30 February) are refused.
 
@@ -159,6 +162,29 @@ DlIdNumberFactory::fromNumberIn('123456789', Jurisdiction::Ca);   // "Invalid US
 some numbers fit exactly one state (10 digits: IN; a letter and 13 digits: WI; WA's `WDL` numbers). A plain 7-9 digit
 number fits several, so pass the issuer when it is known. The 21 jurisdictions without a published format have no
 class, and `fromNumberIn()` refuses them (`docs/sources/US.md` "DL/ID numbers").
+
+### Canadian provincial documents
+
+```php
+use MSSTC4PHP\ValueObject\Documents\Document\CA\DriverLicenceNumberFactory;
+use MSSTC4PHP\ValueObject\Documents\Document\CA\HealthCardNumberFactory;
+use MSSTC4PHP\ValueObject\Documents\Document\CA\Jurisdiction;
+
+DriverLicenceNumberFactory::fromNumberIn('890562', Jurisdiction::Sk);   // SkDriverLicenceNumber, value 00890562
+DriverLicenceNumberFactory::fromNumber('L1531-171274-08');            // QcDriverLicenceNumber, the only match
+DriverLicenceNumberFactory::fromNumber('347631');                     // AmbiguousJurisdictionException: CA-BC, CA-SK
+DriverLicenceNumberFactory::fromNumberIn('123', Jurisdiction::Mb);     // "Invalid CA-MB driver's licence number (format not covered)."
+
+$card = HealthCardNumberFactory::fromNumber('9876543217 YM');          // OnHealthCardNumber, value 9876543217
+$card->versionCode();                                                  // "YM"
+HealthCardNumberFactory::fromNumber('123456789');                      // AmbiguousJurisdictionException, 6 jurisdictions
+```
+
+Both factories work like the AU and US ones. BC and SK licence numbers share every shape (1-8 digits, stored padded to
+8), so a bare BC or SK number is always ambiguous: pass the issuer. All 13 health card formats are published (Ontario's
+reciprocal-billing table, checked against each province's own text where one exists). The ON version code is part of
+the card, not of the health number: two cards of one person have the same value and are equal, and the string, JSON
+and storage forms carry the ten digits only.
 
 ## Personal names
 
@@ -360,7 +386,13 @@ Collected from the source notes; each is a deliberate omission with its reason i
 - **CA:** the SIN check digit (the CRA names a "Mod 10" formula but no official text gives the algorithm), the
   province meaning of a SIN's first digit, the CRA individual and temporary tax numbers, the passport print form of a
   one-word name, special, diplomatic, temporary and emergency passport numbers (only the general format is
-  published); provincial documents follow in a later task (`docs/sources/CA.md`).
+  published). Provincial documents: the driver's licence numbers of MB, NB, NL, NT, NU, PE and YT (their authorities
+  name the number without a format; `fromNumberIn()` throws "(format not covered)"); the photo ID card numbers of AB,
+  BC (BCID), ON (Photo Card) and QC; the encoded data of the ON and QC licence numbers (not defined in text) and the
+  NS birth date (two-digit year); SK validation numbers, ICBC client numbers and the ON Driver Identification Number;
+  the Manitoba six-character family registration number; prior health number formats (AB 11, MB 6, NS 11 numerics);
+  the QC temporary NAM; the QC "chiffre valideur" and every health check digit other than BC and ON (no algorithm
+  published); whether an ON version code is the current card's (`docs/sources/CA.md`).
 - **No region value object for RU**: no field encodes a region with a published mapping to ISO 3166-2:RU (`RU.md`).
 - **RU driving licences of the 1999 form** (Cyrillic series): expired by 2026 (`RU.md`).
 - **RU old-form OMS policies** (series and number) and AU **11-digit Medicare individual numbers**.
@@ -370,11 +402,13 @@ Collected from the source notes; each is a deliberate omission with its reason i
 
 ## Limits to know about
 
-- **Format only, check digit not verified:** INN, TFN, Medicare card number and CA SIN. No official algorithm is
+- **Format only, check digit not verified:** INN, TFN, Medicare card number, CA SIN and the CA health card numbers
+  other than BC and ON. No official algorithm is
   published (FNS says only "по алгоритму, определенному ФНС"; the ATO gives the TFN algorithm to registered developers
   only; the ADHA appendix is not reachable; the CRA names a "Mod 10" formula for the SIN without giving it), so a
   mistyped check digit is accepted. Only checksums quoted from an official source are verified: SNILS, OMS policy, DE
-  pension insurance number, IT codice fiscale, ES DNI and NIE, NL BSN, CH AHV number, GB NHS and H&C numbers.
+  pension insurance number, IT codice fiscale, ES DNI and NIE, NL BSN, CH AHV number, GB NHS and H&C numbers, BC and
+  ON health card numbers.
 - **Not verified against the official PDF:** the 16-digit length of the OMS policy and the FFOMS Order 79 text it is
   checked against (www.ffoms.gov.ru is unreachable from here, the text is quoted from a copy), and the 2 + 7 split of
   the international passport number (no text read states it; `RU.md`).

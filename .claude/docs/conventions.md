@@ -58,3 +58,9 @@
   card have different shapes (AL, IL): the class accepts the union and its doc says which is which. `fromNumberIn()` for
   a jurisdiction with no published format throws `Invalid US-XX DL/ID number (format not covered).`; the factory's
   document label is `American DL/ID` (as Task 1's `American passport book number`).
+- CA provincial documents (plan 3 Task 5b) copy the US DL/ID pattern with a `stored()` hook for rules beyond the shape.
+  Labels: `CA-XX driver's licence number` / `CA-XX health card number` per class, `Canadian driver's licence` /
+  `Canadian health card` in the factories; an uncovered licence jurisdiction throws `Invalid CA-XX driver's licence
+  number (format not covered).` (no health-card equivalent is reachable: all 13 are covered). A derived range check
+  (QC month/day, NS day/month) is a regex constant matched with `preg_match()`, not int casts and comparisons: casts of
+  digit substrings are equivalent mutants for Infection.

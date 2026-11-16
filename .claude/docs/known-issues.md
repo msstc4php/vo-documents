@@ -305,3 +305,19 @@ script classes use `\p{sc=Latin}` / `\p{sc=Cyrillic}` (Script property only); `c
   examples for "kept as typed" must differ in a letter, `BERUBE<LEVESQUE<<ANNIE`).
 - **Adding a country codec** touches every `tests/Unit/Name/*/PersonNameCodecTest.php` (`#[UsesClass]` for the new
   codec, since each test builds the mapper from `Codecs::all()`) and `CodecsTest`.
+
+## CA provincial documents (plan 3 Task 5b, 2026-11-16 UTC)
+
+- **BC and SK licences are always ambiguous** for `fromNumber()` (both 1-8 digits, both stored padded to 8): test them
+  through `fromNumberIn()`. `347631`, `0347631` and `00347631` are one BC number (`value()` `00347631`).
+- **ON health version code is not in `value()`**: `OnHealthCardNumber::from('9876543217YM')` has value `9876543217` and
+  `versionCode()` `YM`; `equals()`, `__toString()` and `jsonSerialize()` ignore the code, so a round trip through the
+  string (or a Doctrine column holding `value`) loses it. Task 8 must decide whether the type stores it.
+- **ON MOD 10 is plain Luhn** over the ten digits (`Checksum::luhn()`); the AB-PRG illustration `5584486674` fails it
+  and is refused as ON (fits NS only). "Subtract from ten" leaving 10 is read as check digit 0.
+- **BC MOD-11:** a remainder of 0 or 1 gives 11 or 10, equal to no digit, so every number with such a prefix is
+  refused (`912345678x`, `913579246x`).
+- **QC NAM:** no 30-February check (the year has no century); the temporary NAM (`M` at position 11) fails the shape.
+  The `birthDay()`/`birthMonth()` clamps leave equivalent Increment/Decrement mutants, as in `ChiNumber`.
+- **NS licence:** the padding spaces of a short surname are separators (`FOY  220867001` → `FOY220867001`); a 10-14
+  digit input fits the NS length, so the factory reports it as "(fits no jurisdiction)", not by length.

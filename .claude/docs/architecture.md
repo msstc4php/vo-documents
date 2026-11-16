@@ -101,3 +101,14 @@ new enum case breaks the `match`. FL, WI, WY add `formatted()` (published hyphen
 2023-05-10 or `AB123456` before; mask 4, 3 for 8 characters). `Name\CA\PersonName($family, ?$given, ?$latin)` on
 `AbstractFamilyGivenPersonName` like GB (one-word name = `given` null), policy `AnyIcaoSpelling`, no `XXX` handling;
 codec keys `family`, `given`, `latin`.
+
+`Document\CA\*` provincial (plan 3 Task 5b): `Jurisdiction` (13 cases, ISO 3166-2:CA), interfaces `DriverLicenceNumber`
+and `HealthCardNumber`, bases `DriverLicence\AbstractDriverLicenceNumber` (hooks `shapes()`, `layout()`, `stored()`)
+and `HealthCard\AbstractHealthCardNumber` (hooks `shapes()`, `stored()`; no layout: no health display form is
+published). `stored(normalized, document)` is an instance hook run after the shape match: extra checks (BC MOD-11, ON
+MOD 10, QC and NS month/day regexes), BC/SK licence zero padding to 8, and the ON version code split (it sets a private
+non-readonly property). Licences: AB, BC, NS, ON, QC, SK (AB and QC add `formatted()` and mask in that layout);
+`DriverLicenceNumberFactory::classFor()` maps the other 7 to `null`. Health cards: all 13;
+`HealthCardNumberFactory::classFor()` is non-nullable and the resolver runs over `Jurisdiction::cases()`.
+`QcHealthCardNumber` implements `HasSex` (7th character `5`/`6` = female) with `birthDay()`, `birthMonth()`,
+`birthYearDigits()`; `OnHealthCardNumber::versionCode(): ?string`.
