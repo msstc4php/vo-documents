@@ -133,7 +133,12 @@ given names are the primary identifier (`JUAN`); policy `TransliterationVariant`
 accepted), `VoterRegistrationNumber` (TSE art. 36: 5-12 digits left-padded to 12, state code `01`-`28` by regex,
 `stateCode()`/`isAbroad()`, check digits format only), `Nis` (11 digits, ANS PIS/PASEP check: weights `[3,2,9,8,7,6,5,4,3,2]`, `11 - r`, ≥10 → 0; `formatted()`), `Cns` (15 digits, ANS check reduced to `Σ d·(15..1) ≡ 0 mod 11` plus all-zero refusal), `DriverLicenceNumber` (CNH
 registro nacional, `NumberShapes('[0-9A-Z]{9}[0-9]{2}')`), `PassportNumber` (`[A-Z]{2}[0-9]{6}`, `series()`, masks 3).
-No `Jurisdiction` enum yet (the TSE codes are not one-to-one with ISO 3166-2:BR: `28` is abroad); Task 7b (RG) may add
-it. No `Sex` change. `Name\BR\PersonName($family, $given, ?$latin)` on `AbstractFamilyGivenPersonName` (both required),
+BR RG (plan 3 Task 7b): `Document\BR\Jurisdiction` (27 cases, ISO 3166-2:BR code order, `Df` for the Distrito
+Federal; not used by `VoterRegistrationNumber`, whose TSE codes are not one-to-one: `28` is abroad),
+`Document\BR\IdentityCardNumber`, `Document\BR\IdentityCard\{AbstractIdentityCardNumber, SpIdentityCardNumber}` and
+`Document\BR\IdentityCardNumberFactory` (CA HealthCard pattern: abstract `stored()` hook for the check, masks
+`<= 8 ? 3 : 4`; dots stripped in the base and, for the resolver's length messages, in the factory; resolver document
+"Brazilian identity card"). Named `IdentityCard…`, not `Rg…`, like the other English role names
+(`DriverLicenceNumber`, `VoterRegistrationNumber`). Only BR-SP is covered. No `Sex` change. `Name\BR\PersonName($family, $given, ?$latin)` on `AbstractFamilyGivenPersonName` (both required),
 parts on the plain `AbstractLatinNamePart` (no extra punctuation), policy `AnyIcaoSpelling` (PF SINPA abbreviation);
 codec as IT (`given` required).

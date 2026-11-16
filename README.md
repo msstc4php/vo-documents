@@ -124,6 +124,8 @@ official algorithm is published. A number with the right shape is accepted, neve
 | `Document\BR\Cns` | Cartão Nacional de Saúde, 15 digits | check verified (ANS `isDvCnsValido`: digits weighted 15 to 1 sum to a multiple of 11, all zeros refused) | none | DATASUS CADSUS integration specification; ANS "Algoritmos do Aplicativo de Carga" |
 | `Document\BR\DriverLicenceNumber` | CNH número do registro nacional, 9 characters + 2 check digits | format only (CONTRAN names "módulo 11" without weights); letters accepted in the first nine ("caracteres") | none | CONTRAN Resoluções nº 1.020/2025 art. 10 and nº 886/2021 art. 4 |
 | `Document\BR\PassportNumber` | Passport, 2 letters ("série") + 6 digits (`CS265436`) | format only | `series()` | Polícia Federal |
+| `Document\BR\IdentityCard\SpIdentityCardNumber` | RG of the São Paulo Carteira de Identidade (IIRGD), 1-8 digits + check character (`12.345.678-2`) | check character verified (SSP-SP form's `checaRG`: weights 2-9 from the right, sum % 11, 10 → `X`); all zeros refused | none | SSP-SP Atestado de Antecedentes Criminais form and `aac.js` |
+| `Document\BR\Jurisdiction` | The 27 federative units (enum, ISO 3166-2:BR) | n/a | n/a | ISO 3166-2:BR |
 
 Names: `Name\<CC>\FamilyName`, `GivenName` and `PersonName` for DE, FR, IT, ES, NL, CH, GB and TR, like the RU and AU
 ones. Spain's `PersonName` has two surnames (`first`, optional `second`); in the Dutch one the prefixes (`van der`) are
@@ -138,7 +140,8 @@ surnames; then the given names are the only ICAO identifier, `JUAN`). The Brazil
 several words with particles in the case given (`da Silva`, `Maria da Conceição`).
 
 Contracts: `Contract\Maskable` (every number above), `Contract\Subdivision` and `Contract\IssuedBySubdivision` (AU,
-US, CA and MX jurisdictions, AU licences, US DL/ID numbers, CA licence and health card numbers, MX licence numbers). `Contract\HasSex` and the `Sex` enum are implemented by the documents that encode a sex
+US, CA, MX and BR jurisdictions, AU licences, US DL/ID numbers, CA licence and health card numbers, MX licence numbers,
+BR RG numbers). `Contract\HasSex` and the `Sex` enum are implemented by the documents that encode a sex
 (`Nir`, `FiscalCode`, the DVLA licence number, `ChiNumber`, the Québec NAM, the Mexican CURP); `Sex::Unspecified` is
 the CURP's `X` (RENAPO, non-binary persons). `Contract\HasBirthDate` is implemented by the Mexican CURP only (its
 17th character gives the century); the other encoded birth dates lack a century, so those classes expose the year
@@ -218,6 +221,24 @@ Only the Estado de México publishes a number format (its validator's field rule
 entities have no class and `fromNumberIn()` refuses them; because `fromNumber()` can only match published formats, a
 twelve-digit licence of another state is reported as MX-MEX, so pass the issuer when it is known
 (`docs/sources/MX.md` "State driving licences").
+
+### Brazilian state identity cards (RG)
+
+```php
+use MSSTC4PHP\ValueObject\Documents\Document\BR\IdentityCardNumberFactory;
+use MSSTC4PHP\ValueObject\Documents\Document\BR\Jurisdiction;
+
+IdentityCardNumberFactory::fromNumberIn('12.345.678-2', Jurisdiction::Sp);   // SpIdentityCardNumber, value 123456782
+IdentityCardNumberFactory::fromNumber('24.681.357-X');                       // SpIdentityCardNumber, the only covered unit
+IdentityCardNumberFactory::fromNumber('12.345.678-3');                       // "Invalid Brazilian identity card number (fits no jurisdiction)."
+IdentityCardNumberFactory::fromNumberIn('1234567', Jurisdiction::Rj);        // "Invalid BR-RJ identity card number (format not covered)."
+```
+
+Only São Paulo publishes an RG format (the SSP's antecedentes form: up to eight digits and a required check character
+with its algorithm). The other 26 units have no class and `fromNumberIn()` refuses them; `fromNumber()` can only match
+SP, so an RG of another state whose last character happens to be SP's check character is reported as BR-SP: pass the
+issuer when it is known. The RG of a CIN is its CPF: use `Document\BR\Cpf`. Old-model cards stay valid until
+2032-03-01 (Decreto nº 10.977/2022, art. 25) (`docs/sources/BR.md` "RG per state").
 
 ## Personal names
 
@@ -439,8 +460,9 @@ Collected from the source notes; each is a deliberate omission with its reason i
 - **BR:** the check digits of the título de eleitor and the CNH registration number (the TSE and CONTRAN name
   "módulo 11" without the weights, and no government text found gives them), the CNH número do espelho and formulário
   Renach, passport formats other than the Polícia Federal's two letters and six digits, the masking rule of the CPF
-  (plan default used), a person with no surname (the CNJ code requires one), the RG of each state (Task 7b)
-  (`docs/sources/BR.md`).
+  (plan default used), a person with no surname (the CNJ code requires one). The RG of 26 units (all but BR-SP): their
+  online forms limit the field at most (BA: eight digits with an optional control digit and no algorithm); the forms of
+  BA, CE, MG, PE, RJ and RN could not be read live on 2026-11-16 UTC and are to be re-checked (`docs/sources/BR.md`).
 - **No region value object for RU**: no field encodes a region with a published mapping to ISO 3166-2:RU (`RU.md`).
 - **RU driving licences of the 1999 form** (Cyrillic series): expired by 2026 (`RU.md`).
 - **RU old-form OMS policies** (series and number) and AU **11-digit Medicare individual numbers**.

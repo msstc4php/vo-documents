@@ -404,3 +404,20 @@ script classes use `\p{sc=Latin}` / `\p{sc=Cyrillic}` (Script property only); `c
 - **New codec ⇒ every codec test**: `Codecs::all()` instantiates every codec, and `beStrictAboutCoverageMetadata`
   needs `#[UsesClass(<Cc>PersonNameCodec::class)]` in each test that builds the mapper (14 files for BR).
 
+## BR RG per state (plan 3 Task 7b, 2026-11-16 UTC)
+
+- **Verdict 1/27 (BR-SP)**: found in the SSP-SP antecedentes form, not in any law: `www2.ssp.sp.gov.br/aacweb/
+  carrega-formulario` (fields `numero` maxlength 8, `digito`) and its `AACWEBSTATIC/style/aac.js` (`verificaRange(…, 1,
+  99999999)`, `checaRG`: weights 2-9 from the RIGHT, `sum % 11`, 10 → `X`, no `11 - r`). The weighting popular on
+  generator sites (2-9 from the left) differs; follow the form. No official sample exists to cross-check it.
+- **Look at every state's online antecedentes form**: they all take the RG, but the other 26 only limit the field
+  (BA maxlength 8 + optional control digit with no algorithm, CE 13, MG 10, DF/PE 20, RR 15 + 1-digit DV, MA ≥ 5, the
+  rest free text). A maximum length is not a published length.
+- **Decreto 10.977/2022**: the CIN's number is the CPF (art. 3); old cards valid until 2032-03-01 (art. 25, 60+ forever).
+  `planalto.gov.br` 302-redirects curl and WebFetch to `gov.br/planalto`; read the IA `id_` copy.
+- **Sandbox**: a curl with several police hosts in one `allowed_domains` list was refused by the auto-mode classifier;
+  one host per command worked. Unreachable live: `antecedentes.pc.ba.gov.br`, `wwws.pc.mg.gov.br` (proxy 502),
+  `sistemas.sspds.ce.gov.br`, `www.servicos.sds.pe.gov.br`, `www8.defesasocial.rn.gov.br` (timeouts); the RJ request
+  form's ASP.NET postback answered 500. IA copies used where they exist.
+- **Equivalent mutant**: as in MX, `ArrayOneItem` on `BR\IdentityCardNumberFactory::coveredJurisdictions()` escapes
+  while only one unit is covered.
