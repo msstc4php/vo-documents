@@ -134,6 +134,100 @@ final class IdentityCardNumbersTest extends TestCase
         self::assertSame('*****672', SpIdentityCardNumber::from('12345672')->masked());
     }
 
+    /**
+     * @return iterable<string, array{string, string}>
+     */
+    public static function shortValues(): iterable
+    {
+        yield 'two characters' => ['1-2', '*2'];
+        yield 'three characters' => ['10-3', '*03'];
+        yield 'four characters' => ['123-5', '*235'];
+    }
+
+    #[DataProvider('shortValues')]
+    public function testNeverMasksAShortValueToItsWholeSelf(string $input, string $masked): void
+    {
+        self::assertSame($masked, SpIdentityCardNumber::from($input)->masked());
+    }
+
+    /**
+     * Decreto nº 10.977/2022 art. 25 keeps old-model cards valid, and the SSP page admits cards without the check
+     * character ("Se na sua Carteira de Identidade não constar o dígito de controle…").
+     *
+     * @return iterable<string, array{string, ?string, string}>
+     */
+    public static function formFields(): iterable
+    {
+        yield 'no check character printed (null)' => ['1234567', null, '12345672'];
+        yield 'no check character printed (empty)' => ['1.234.567', '', '12345672'];
+        yield 'blank check field' => ['24681357', ' ', '24681357X'];
+        yield 'computed X' => ['24.681.357', null, '24681357X'];
+        yield 'supplied check character' => ['12.345.678', '2', '123456782'];
+        yield 'supplied x upper-cased' => ['24681357', 'x', '24681357X'];
+        yield 'leading zeros kept' => ['00000001', null, '000000012'];
+    }
+
+    #[DataProvider('formFields')]
+    public function testBuildsFromTheFormsTwoFields(string $number, ?string $checkCharacter, string $expected): void
+    {
+        $card = SpIdentityCardNumber::fromNumberAndCheckCharacter($number, $checkCharacter);
+
+        self::assertSame($expected, $card->value);
+        self::assertTrue(SpIdentityCardNumber::from($expected)->equals($card));
+    }
+
+    public function testACardWithoutTheCheckCharacterEqualsTheOneWithIt(): void
+    {
+        self::assertTrue(
+            SpIdentityCardNumber::fromNumberAndCheckCharacter('1234567', null)
+                ->equals(SpIdentityCardNumber::from('1.234.567-2')),
+        );
+    }
+
+    public function testAnEightDigitBareNumberRoundTripsThroughFrom(): void
+    {
+        $card = SpIdentityCardNumber::fromNumberAndCheckCharacter('12345678', null);
+
+        self::assertTrue(SpIdentityCardNumber::from((string) $card)->equals($card));
+        self::assertSame('123456782', (string) $card);
+    }
+
+    /**
+     * @return iterable<string, array{string, ?string, string}>
+     */
+    public static function refusedFormFields(): iterable
+    {
+        $document = 'Invalid BR-SP identity card number';
+
+        yield 'wrong supplied check' => ['12.345.678', '3', $document . ' checksum.'];
+        yield 'zeros only' => ['00000000', null, $document . ' (zeros only).'];
+        yield 'zeros only with a check' => ['0', '0', $document . ' (zeros only).'];
+        yield 'nine digits' => ['123456782', null, $document . ' (9 characters).'];
+        yield 'empty number' => ['', null, $document . ' (0 characters).'];
+        yield 'pasted several times' => [\str_repeat('12.345.678 ', 6), null, $document . ' (too long).'];
+        yield 'letter in the number' => ['1234567A', null, $document . ' (invalid character).'];
+        yield 'X in the number' => ['1234567X', '2', $document . ' (invalid character).'];
+        yield 'two check characters' => ['1234567', '22', $document . ' (invalid character).'];
+        yield 'letter other than X as check' => ['1234567', 'A', $document . ' (invalid character).'];
+        yield 'dot as check' => ['123456', '.', $document . ' (invalid character).'];
+    }
+
+    #[DataProvider('refusedFormFields')]
+    public function testRefusesBadFormFieldsWithoutEchoingThem(
+        string $number,
+        ?string $checkCharacter,
+        string $message,
+    ): void {
+        self::assertRefusedWithoutEcho(
+            static fn (string $value): SpIdentityCardNumber => SpIdentityCardNumber::fromNumberAndCheckCharacter(
+                $value,
+                $checkCharacter,
+            ),
+            $number,
+            $message,
+        );
+    }
+
     public function testEqualsTheSameNumberWithSeparators(): void
     {
         self::assertTrue(SpIdentityCardNumber::from('12.345.678-2')->equals(SpIdentityCardNumber::from('123456782')));

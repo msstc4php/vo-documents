@@ -408,8 +408,12 @@ script classes use `\p{sc=Latin}` / `\p{sc=Cyrillic}` (Script property only); `c
 
 - **Verdict 1/27 (BR-SP)**: found in the SSP-SP antecedentes form, not in any law: `www2.ssp.sp.gov.br/aacweb/
   carrega-formulario` (fields `numero` maxlength 8, `digito`) and its `AACWEBSTATIC/style/aac.js` (`verificaRange(…, 1,
-  99999999)`, `checaRG`: weights 2-9 from the RIGHT, `sum % 11`, 10 → `X`, no `11 - r`). The weighting popular on
-  generator sites (2-9 from the left) differs; follow the form. No official sample exists to cross-check it.
+  99999999)`, `checaRG`: weights 2-9 from the right, `sum % 11`, 10 → `X`). The formulation on generator sites (2-9
+  from the left with `11 - r`) gives the same character for the number padded to 8 digits (review: 200k samples):
+  not a bug, do not "fix" either into the other. No official sample number exists.
+- **SP card without a printed check character** is valid (Decreto 10.977 art. 25; the SSP page admits such cards):
+  `SpIdentityCardNumber::fromNumberAndCheckCharacter($number, null)` stores the computed character; `from()` and the
+  factory stay strict on purpose (a bare form would match any 1-8 digits).
 - **Look at every state's online antecedentes form**: they all take the RG, but the other 26 only limit the field
   (BA maxlength 8 + optional control digit with no algorithm, CE 13, MG 10, DF/PE 20, RR 15 + 1-digit DV, MA ≥ 5, the
   rest free text). A maximum length is not a published length.
@@ -418,6 +422,7 @@ script classes use `\p{sc=Latin}` / `\p{sc=Cyrillic}` (Script property only); `c
 - **Sandbox**: a curl with several police hosts in one `allowed_domains` list was refused by the auto-mode classifier;
   one host per command worked. Unreachable live: `antecedentes.pc.ba.gov.br`, `wwws.pc.mg.gov.br` (proxy 502),
   `sistemas.sspds.ce.gov.br`, `www.servicos.sds.pe.gov.br`, `www8.defesasocial.rn.gov.br` (timeouts); the RJ request
-  form's ASP.NET postback answered 500. IA copies used where they exist.
+  form's ASP.NET postback answered 500; `www.pc.rs.gov.br` answers a WAF "Request Rejected" page to plain curl (a
+  browser User-Agent with Referer got through once). IA copies used where they exist.
 - **Equivalent mutant**: as in MX, `ArrayOneItem` on `BR\IdentityCardNumberFactory::coveredJurisdictions()` escapes
   while only one unit is covered.

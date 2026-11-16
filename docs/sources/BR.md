@@ -475,13 +475,24 @@ Rules applied to BR-SP, each from the quotes above:
 - The check character: one character, `0`-`9` or `X` (`"0123456789xX"`, upper-cased), equal to the sum of the digits
   weighted 2, 3, …, 9 (then 2 again) from the rightmost digit, modulo 11, with 10 written `X`. `checaRG` compares only
   `dc.charAt(0)`, so the field's second position is never part of the check character; the class takes exactly one.
-- The check character is required, as the form requires it. A card printed without it carries a number whose check
-  character the published algorithm still defines; the IIRGD's answer to such a card is a second copy. This is a
-  ruling, recorded as a concern in the Task 7b report.
+- A card that does not print the check character stays valid (reversed in the Task 7b fix round 1). The SSP page
+  itself admits such cards: "Se na sua Carteira de Identidade não constar o dígito de controle após o Número do RG,
+  dirigir-se a um Posto Poupatempo ou Posto de Identificação da Polícia Civil para requerer a 2a. via da Carteira."
+  (live page, re-read 2026-11-16 12:52 UTC; the current wording below it: "Se não constar o dígito de controle após o
+  Número do RG, dirija-se a um Posto Poupatempo …"), and DEC art. 25 keeps old-model cards valid until 2032-03-01
+  (indefinitely for a holder aged sixty or more on 2022-03-01). The form's answer (a second copy) is a condition of
+  its own online service, not of the card's validity. So `SpIdentityCardNumber::fromNumberAndCheckCharacter($number,
+  $checkCharacter)` mirrors the form's two fields: with no check character (`null` or empty) the number must be one to
+  eight digits, not all zeros, and the stored value is the number plus the character `checaRG` computes (canonical:
+  it round-trips through `from()`); a given check character is verified. The card does not print that character;
+  the stored one is computed. `from()` and the factory stay strict (number and check character in one string), since
+  a bare form there would match every string of one to eight digits.
 - Separators: those of `Internal\Digits::SEPARATORS` and the dot (the printed form `12.345.678-9` is common; dots are
   removed as for `Cpf`). ASCII letters are upper-cased (`x` becomes `X`).
 - No display form is quoted, so there is no `formatted()`. `masked()` keeps four characters for a number of nine
-  characters and three for one of eight or fewer (plan default; the shape has several lengths).
+  characters and three for one of eight or fewer (plan default; the shape has several lengths), and never the whole
+  value: a value of two or three characters keeps one fewer than its length (`*2`, `*03`; controller ruling, fix
+  round 1).
 - No official sample number is published; the tests use numbers computed with the quoted algorithm.
 
 **Why the other forms do not give a format.** Each limits only the field (verbatim attributes): BA-AAC
@@ -524,7 +535,7 @@ but BA publishes no check algorithm and makes the control digit optional, so its
 | BR-RN | `www8.defesasocial.rn.gov.br/antecedentes/` (timeout; IA offline at the attempt) | none read | — | — | — | not covered: issuer's form unreachable on 2026-11-16 UTC, re-check |
 | BR-RO | `ro.gov.br` (searched; Portal do Cidadão service, no field rule) | none | — | — | — | not covered: no published format |
 | BR-RR | RR-AAC | "maxlength=15", DV "maxlength=1" | — | none published | — | not covered: input limit only, no check algorithm |
-| BR-RS | RS-AAC | free text (RG or CPF) | — | — | — | not covered: no published format |
+| BR-RS | RS-AAC | free text (RG or CPF) | — | — | — | not covered: no published format; host answered a WAF "Request Rejected" page on a re-read (2026-11-16 12:52 UTC), re-check |
 | BR-SC | SC-AAC | required, no rule | — | — | — | not covered: no published format |
 | BR-SE | `se.gov.br` (searched; in-person antecedentes) | none | — | — | — | not covered: no published format |
 | BR-SP | SP-AAC | number `maxlength="8"`, digits, `verificaRange(…, 1, 99999999)`; check character `"0123456789xX"`, required; `checaRG` | `[0-9]{1,8}[0-9X]` (2 to 9 characters) | `checaRG`: weights 2-9 from the right, sum mod 11, 10 = `X` | none | covered |
@@ -572,5 +583,4 @@ verbatim quote above against the downloaded source, and the worked examples with
 - A CPF masking rule (the plan default is used; no official rule was researched).
 - A Brazilian with no surname (the CNJ code requires one; indigenous registration rules were not researched).
 - RG of 26 units (all but BR-SP, above "RG per state — per unit"): no published format, or only an input
-  limit; BA, CE, MG, PE, RJ and RN to re-check when their hosts answer. An SP RG card printed without its check
-  character must be given with the character the IIRGD algorithm defines.
+  limit; BA, CE, MG, PE, RJ, RN and RS to re-check when their hosts answer.

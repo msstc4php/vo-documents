@@ -137,7 +137,8 @@ BR RG (plan 3 Task 7b): `Document\BR\Jurisdiction` (27 cases, ISO 3166-2:BR code
 Federal; not used by `VoterRegistrationNumber`, whose TSE codes are not one-to-one: `28` is abroad),
 `Document\BR\IdentityCardNumber`, `Document\BR\IdentityCard\{AbstractIdentityCardNumber, SpIdentityCardNumber}` and
 `Document\BR\IdentityCardNumberFactory` (CA HealthCard pattern: abstract `stored()` hook for the check, masks
-`<= 8 ? 3 : 4`; dots stripped in the base and, for the resolver's length messages, in the factory; resolver document
+`<= 8 ? min(3, length - 1) : 4`, never the whole value; `SpIdentityCardNumber::fromNumberAndCheckCharacter()` for a card
+without a printed check character; dots stripped in the base and, for the resolver's length messages, in the factory; resolver document
 "Brazilian identity card"). Named `IdentityCard…`, not `Rg…`, like the other English role names
 (`DriverLicenceNumber`, `VoterRegistrationNumber`). Only BR-SP is covered. No `Sex` change. `Name\BR\PersonName($family, $given, ?$latin)` on `AbstractFamilyGivenPersonName` (both required),
 parts on the plain `AbstractLatinNamePart` (no extra punctuation), policy `AnyIcaoSpelling` (PF SINPA abbreviation);

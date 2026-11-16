@@ -225,6 +225,7 @@ twelve-digit licence of another state is reported as MX-MEX, so pass the issuer 
 ### Brazilian state identity cards (RG)
 
 ```php
+use MSSTC4PHP\ValueObject\Documents\Document\BR\IdentityCard\SpIdentityCardNumber;
 use MSSTC4PHP\ValueObject\Documents\Document\BR\IdentityCardNumberFactory;
 use MSSTC4PHP\ValueObject\Documents\Document\BR\Jurisdiction;
 
@@ -232,12 +233,15 @@ IdentityCardNumberFactory::fromNumberIn('12.345.678-2', Jurisdiction::Sp);   // 
 IdentityCardNumberFactory::fromNumber('24.681.357-X');                       // SpIdentityCardNumber, the only covered unit
 IdentityCardNumberFactory::fromNumber('12.345.678-3');                       // "Invalid Brazilian identity card number (fits no jurisdiction)."
 IdentityCardNumberFactory::fromNumberIn('1234567', Jurisdiction::Rj);        // "Invalid BR-RJ identity card number (format not covered)."
+SpIdentityCardNumber::fromNumberAndCheckCharacter('1.234.567', null);         // card without a printed check character: value 12345672
 ```
 
 Only São Paulo publishes an RG format (the SSP's antecedentes form: up to eight digits and a required check character
 with its algorithm). The other 26 units have no class and `fromNumberIn()` refuses them; `fromNumber()` can only match
 SP, so an RG of another state whose last character happens to be SP's check character is reported as BR-SP: pass the
-issuer when it is known. The RG of a CIN is its CPF: use `Document\BR\Cpf`. Old-model cards stay valid until
+issuer when it is known. An old SP card that does not print its check character is still valid:
+`fromNumberAndCheckCharacter()` takes the form's two fields and stores the computed character (`from()` and the factory
+want both in one string). The RG of a CIN is its CPF: use `Document\BR\Cpf`. Old-model cards stay valid until
 2032-03-01 (Decreto nº 10.977/2022, art. 25) (`docs/sources/BR.md` "RG per state").
 
 ## Personal names
@@ -462,7 +466,7 @@ Collected from the source notes; each is a deliberate omission with its reason i
   Renach, passport formats other than the Polícia Federal's two letters and six digits, the masking rule of the CPF
   (plan default used), a person with no surname (the CNJ code requires one). The RG of 26 units (all but BR-SP): their
   online forms limit the field at most (BA: eight digits with an optional control digit and no algorithm); the forms of
-  BA, CE, MG, PE, RJ and RN could not be read live on 2026-11-16 UTC and are to be re-checked (`docs/sources/BR.md`).
+  BA, CE, MG, PE, RJ, RN and RS could not be read live on 2026-11-16 UTC and are to be re-checked (`docs/sources/BR.md`).
 - **No region value object for RU**: no field encodes a region with a published mapping to ISO 3166-2:RU (`RU.md`).
 - **RU driving licences of the 1999 form** (Cyrillic series): expired by 2026 (`RU.md`).
 - **RU old-form OMS policies** (series and number) and AU **11-digit Medicare individual numbers**.

@@ -7,6 +7,7 @@ namespace MSSTC4PHP\ValueObject\Documents\Document\BR\IdentityCard;
 use MSSTC4PHP\ValueObject\Documents\Document\BR\Jurisdiction;
 use MSSTC4PHP\ValueObject\Documents\Exception\InvalidDocumentNumberException;
 use MSSTC4PHP\ValueObject\Documents\Internal\Checksum;
+use MSSTC4PHP\ValueObject\Documents\Internal\Digits;
 use MSSTC4PHP\ValueObject\Documents\Internal\NumberShapes;
 use Override;
 
@@ -17,9 +18,16 @@ use Override;
  * and checks it with its `checaRG`: the digits weighted 2 to 9 (then 2 again) from the rightmost, summed modulo 11,
  * 10 written `X`. No display form is quoted, so there is no `formatted()`.
  *
+ * An old-model card that does not print the check character stays valid (Decreto nº 10.977/2022, art. 25: until
+ * 2032-03-01, indefinitely for a holder aged sixty or more on 2022-03-01; the SSP page: "Se na sua Carteira de
+ * Identidade não constar o dígito de controle…"): {@see fromNumberAndCheckCharacter()} takes the form's two fields
+ * and, without a check character, stores the one `checaRG` computes, so the value is canonical. {@see from()} and the
+ * factory stay strict, because a bare form there would match every string of one to eight digits.
+ *
  * @see https://www2.ssp.sp.gov.br/aacweb/carrega-formulario SSP-SP, Atestado de Antecedentes Criminais, "Pesquisa de
  *      RG"
  * @see https://www2.ssp.sp.gov.br/AACWEBSTATIC/style/aac.js SSP-SP, `validaFormulario` and `checaRG`
+ * @see https://www.planalto.gov.br/ccivil_03/_ato2019-2022/2022/decreto/d10977.htm Decreto nº 10.977/2022, art. 25
  * @see docs/sources/BR.md "RG per state (Task 7b)"
  */
 final class SpIdentityCardNumber extends AbstractIdentityCardNumber
@@ -33,6 +41,32 @@ final class SpIdentityCardNumber extends AbstractIdentityCardNumber
      * to 2 never applies to eight digits, and a leading zero adds nothing.
      */
     private const array WEIGHTS = [9, 8, 7, 6, 5, 4, 3, 2];
+
+    private const string FORM_FIELDS = 'BR-SP identity card number';
+
+    /**
+     * The SSP form's two fields: the number and, when the card prints one, the check character.
+     *
+     * @param string|null $checkCharacter null or empty for a card that does not print it: the computed one is stored
+     *
+     * @throws InvalidDocumentNumberException for a number other than one to eight digits (dots and separators
+     *                                        removed), a check character other than one `0`-`9` or `X`, zeros only or
+     *                                        a wrong check character
+     */
+    public static function fromNumberAndCheckCharacter(string $number, ?string $checkCharacter): self
+    {
+        $digits = self::numberField()->parse(\str_replace('.', '', $number), self::FORM_FIELDS);
+        $check = \strtoupper(Digits::strip($checkCharacter ?? ''));
+        if ($check === '') {
+            return self::from($digits . self::checkCharacter($digits));
+        }
+
+        if (\strlen($check) !== 1 || \strspn($check, '0123456789X') !== 1) {
+            throw new InvalidDocumentNumberException(\sprintf('Invalid %s (invalid character).', self::FORM_FIELDS));
+        }
+
+        return self::from($digits . $check);
+    }
 
     #[Override]
     public function jurisdiction(): Jurisdiction
@@ -63,14 +97,28 @@ final class SpIdentityCardNumber extends AbstractIdentityCardNumber
             throw new InvalidDocumentNumberException(\sprintf('Invalid %s (zeros only).', $document));
         }
 
-        if ($this->checkCharacter($digits) !== \substr($normalized, -1)) {
+        if (self::checkCharacter($digits) !== \substr($normalized, -1)) {
             throw new InvalidDocumentNumberException(\sprintf('Invalid %s checksum.', $document));
         }
 
         return $normalized;
     }
 
-    private function checkCharacter(string $digits): string
+    private static function numberField(): NumberShapes
+    {
+        return new NumberShapes(
+            '[0-9]',
+            '[0-9]{2}',
+            '[0-9]{3}',
+            '[0-9]{4}',
+            '[0-9]{5}',
+            '[0-9]{6}',
+            '[0-9]{7}',
+            '[0-9]{8}',
+        );
+    }
+
+    private static function checkCharacter(string $digits): string
     {
         $padded = \str_pad($digits, \count(self::WEIGHTS), '0', \STR_PAD_LEFT);
         $remainder = Checksum::weightedMod($padded, self::WEIGHTS, self::MODULUS);
