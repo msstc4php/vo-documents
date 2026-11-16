@@ -105,6 +105,10 @@ final class HealthCardNumberFactoryTest extends TestCase
         yield 'example YUXJ75021213' => ['YUXJ75021213', [Jurisdiction::Qc]];
         yield 'example BOUF94311419 (month 31)' => ['BOUF94311419', []];
         yield 'example BERC920401M2 (temporary NAM)' => ['BERC920401M2', []];
+        yield 'overlap: 10 digits passing BC MOD-11 and ON MOD 10' => [
+            '9282887125',
+            [Jurisdiction::Bc, Jurisdiction::Ns, Jurisdiction::On],
+        ];
         yield 'overlap: 10 digits passing BC MOD-11 and failing ON MOD 10' => [
             '9555555552',
             [Jurisdiction::Bc, Jurisdiction::Ns],

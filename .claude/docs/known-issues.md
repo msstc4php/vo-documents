@@ -321,3 +321,7 @@ script classes use `\p{sc=Latin}` / `\p{sc=Cyrillic}` (Script property only); `c
   The `birthDay()`/`birthMonth()` clamps leave equivalent Increment/Decrement mutants, as in `ChiNumber`.
 - **NS licence:** the padding spaces of a short surname are separators (`FOY  220867001` → `FOY220867001`); a 10-14
   digit input fits the NS length, so the factory reports it as "(fits no jurisdiction)", not by length.
+- **Extra state set in `parse()` is write-once, not readonly:** `readonly` there fails PHPStan
+  (`property.readOnlyAssignNotInConstructor` and `property.uninitializedReadonly`). `OnHealthCardNumber::$versionCode`
+  is an uninitialized `string` ('' = none) and `stored()` throws `LogicException` when `isset()` shows it already set,
+  so `$card->__construct(...)` called again cannot change it (the readonly `$value` would throw only after `parse()`).

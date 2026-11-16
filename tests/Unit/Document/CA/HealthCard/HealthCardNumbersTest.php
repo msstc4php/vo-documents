@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MSSTC4PHP\ValueObject\Documents\Tests\Unit\Document\CA\HealthCard;
 
+use LogicException;
 use MSSTC4PHP\ValueObject\Documents\Document\CA\HealthCard\AbHealthCardNumber;
 use MSSTC4PHP\ValueObject\Documents\Document\CA\HealthCard\AbstractHealthCardNumber;
 use MSSTC4PHP\ValueObject\Documents\Document\CA\HealthCard\BcHealthCardNumber;
@@ -30,6 +31,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
+use ReflectionMethod;
 
 /**
  * Expectations follow docs/sources/CA.md "Health card numbers — per jurisdiction": every quoted shape, the BC-TP and
@@ -92,6 +94,11 @@ final class HealthCardNumbersTest extends TestCase
         yield 'ON check digit 3' => [OnHealthCardNumber::class, '9123456783', '9123456783'];
         yield 'ON check digit 5' => [OnHealthCardNumber::class, '5555555555', '5555555555'];
         yield 'ON check digit 9' => [OnHealthCardNumber::class, '2468135799', '2468135799'];
+        yield 'ON check digit 0 (unit position 0 read as Luhn 0)' => [
+            OnHealthCardNumber::class,
+            '1000000040',
+            '1000000040',
+        ];
         yield 'PE eight digits' => [PeHealthCardNumber::class, '12345678', '12345678'];
         yield 'QC GIU example' => [QcHealthCardNumber::class, 'YUXJ75021213', 'YUXJ75021213'];
         yield 'QC X leaflet, spaced' => [QcHealthCardNumber::class, 'BOUF 9401 1419', 'BOUF94011419'];
@@ -301,6 +308,21 @@ final class HealthCardNumbersTest extends TestCase
     public function testTwoOntarioCardsOfOnePersonShareTheHealthNumber(): void
     {
         self::assertTrue(OnHealthCardNumber::from('9876543217AB')->equals(OnHealthCardNumber::from('9876543217YM')));
+    }
+
+    public function testCallingTheConstructorAgainCannotChangeTheVersionCode(): void
+    {
+        $number = OnHealthCardNumber::from('9876543217YM');
+
+        try {
+            new ReflectionMethod($number, '__construct')->invoke($number, '9876543217');
+            self::fail('Expected a LogicException.');
+        } catch (LogicException $exception) {
+            self::assertSame('A health card number is immutable.', $exception->getMessage());
+        }
+
+        self::assertSame('YM', $number->versionCode());
+        self::assertSame('9876543217', $number->value);
     }
 
     /**

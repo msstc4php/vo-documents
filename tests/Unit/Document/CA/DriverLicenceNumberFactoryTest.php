@@ -78,6 +78,7 @@ final class DriverLicenceNumberFactoryTest extends TestCase
         yield 'example L1531-171274-08' => ['L1531-171274-08', [Jurisdiction::Qc]];
         yield 'example l153117127408' => ['l153117127408', [Jurisdiction::Qc]];
         yield 'example LL53117127408' => ['LL53117127408', []];
+        yield 'example LL531171274080 (2 letters + 12 digits)' => ['LL531171274080', []];
         yield 'example X0915-26435-95718' => ['X0915-26435-95718', [Jurisdiction::On]];
         yield 'example X09152643595718' => ['X09152643595718', [Jurisdiction::On]];
         yield 'example ABCDEFGHIJKLMNO' => ['ABCDEFGHIJKLMNO', [Jurisdiction::On]];

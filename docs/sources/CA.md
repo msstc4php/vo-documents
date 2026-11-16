@@ -258,7 +258,7 @@ Decisions in this table:
 | 1–5 letters + valid `DDMM` + 5 digits (10–14 characters) | CA-NS |
 | letter + 12 digits | CA-QC |
 | 15 alphanumerics | CA-ON |
-| anything else (empty, 10+ digits, the NS layout with a bad day or month, 2+ letters + 12 digits) | none |
+| anything else (empty, 10-14 or 16+ digits, the NS layout with a bad day or month, 2+ letters + 12 digits) | none |
 
 Worked examples (verified by the script below). "1" means `fromNumber()` returns that class; "≥ 2" throws
 `AmbiguousJurisdictionException` with exactly these codes in this order; "0" throws `InvalidDocumentNumberException`.
@@ -287,6 +287,7 @@ Worked examples (verified by the script below). "1" means `fromNumber()` returns
 | `L1531-171274-08` | `L153117127408` | 1 | CA-QC |
 | `l153117127408` | `L153117127408` | 1 | CA-QC |
 | `LL53117127408` | `LL53117127408` | 0 | none |
+| `LL531171274080` | `LL531171274080` | 0 | none (2 letters + 12 digits) |
 | `X0915-26435-95718` | `X09152643595718` | 1 | CA-ON |
 | `X09152643595718` | `X09152643595718` | 1 | CA-ON |
 | `ABCDEFGHIJKLMNO` | `ABCDEFGHIJKLMNO` | 1 | CA-ON |

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MSSTC4PHP\ValueObject\Documents\Document\CA\HealthCard;
 
+use LogicException;
 use MSSTC4PHP\ValueObject\Documents\Document\CA\Jurisdiction;
 use MSSTC4PHP\ValueObject\Documents\Exception\InvalidDocumentNumberException;
 use MSSTC4PHP\ValueObject\Documents\Internal\Checksum;
@@ -32,15 +33,18 @@ final class OnHealthCardNumber extends AbstractHealthCardNumber
 {
     private const int DIGITS = 10;
 
-    /** @var non-empty-string|null */
-    private ?string $versionCode = null;
+    /**
+     * Empty when the card has none. Not readonly: `parse()` assigns it, which PHPStan allows only in a constructor, so
+     * {@see stored()} enforces the single assignment instead.
+     */
+    private string $versionCode;
 
     /**
      * @return non-empty-string|null one or two upper-case letters, null when the input had none
      */
     public function versionCode(): ?string
     {
-        return $this->versionCode;
+        return $this->versionCode === '' ? null : $this->versionCode;
     }
 
     #[Override]
@@ -58,13 +62,16 @@ final class OnHealthCardNumber extends AbstractHealthCardNumber
     #[Override]
     protected function stored(string $normalized, string $document): string
     {
+        if (isset($this->versionCode)) {
+            throw new LogicException('A health card number is immutable.');
+        }
+
         $healthNumber = Text::nonEmpty(\substr($normalized, 0, self::DIGITS));
         if (!Checksum::luhn($healthNumber)) {
             throw new InvalidDocumentNumberException(\sprintf('Invalid %s checksum.', $document));
         }
 
-        $versionCode = \substr($normalized, self::DIGITS);
-        $this->versionCode = $versionCode === '' ? null : $versionCode;
+        $this->versionCode = \substr($normalized, self::DIGITS);
 
         return $healthNumber;
     }

@@ -107,7 +107,7 @@ and `HealthCardNumber`, bases `DriverLicence\AbstractDriverLicenceNumber` (hooks
 and `HealthCard\AbstractHealthCardNumber` (hooks `shapes()`, `stored()`; no layout: no health display form is
 published). `stored(normalized, document)` is an instance hook run after the shape match: extra checks (BC MOD-11, ON
 MOD 10, QC and NS month/day regexes), BC/SK licence zero padding to 8, and the ON version code split (it sets a private
-non-readonly property). Licences: AB, BC, NS, ON, QC, SK (AB and QC add `formatted()` and mask in that layout);
+write-once property guarded by `isset()`). Licences: AB, BC, NS, ON, QC, SK (AB and QC add `formatted()` and mask in that layout);
 `DriverLicenceNumberFactory::classFor()` maps the other 7 to `null`. Health cards: all 13;
 `HealthCardNumberFactory::classFor()` is non-nullable and the resolver runs over `Jurisdiction::cases()`.
 `QcHealthCardNumber` implements `HasSex` (7th character `5`/`6` = female) with `birthDay()`, `birthMonth()`,
