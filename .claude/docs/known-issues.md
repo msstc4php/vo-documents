@@ -413,7 +413,10 @@ script classes use `\p{sc=Latin}` / `\p{sc=Cyrillic}` (Script property only); `c
   not a bug, do not "fix" either into the other. No official sample number exists.
 - **SP card without a printed check character** is valid (Decreto 10.977 art. 25; the SSP page admits such cards):
   `SpIdentityCardNumber::fromNumberAndCheckCharacter($number, null)` stores the computed character; `from()` and the
-  factory stay strict on purpose (a bare form would match any 1-8 digits).
+  factory stay strict on purpose (a bare form would match any 1-8 digits). Its number field takes digits and dots
+  only: stripping a hyphen there turned `1234567-2` into the different RG `12345672` + computed character (re-review).
+- **SSP page HTML comments**: the "Se na sua Carteira de Identidade não constar…" sentence is in a commented-out
+  block; quote the rendered "Se não constar o dígito de controle…" as the live text.
 - **Look at every state's online antecedentes form**: they all take the RG, but the other 26 only limit the field
   (BA maxlength 8 + optional control digit with no algorithm, CE 13, MG 10, DF/PE 20, RR 15 + 1-digit DV, MA ≥ 5, the
   rest free text). A maximum length is not a published length.

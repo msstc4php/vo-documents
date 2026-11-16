@@ -476,14 +476,17 @@ Rules applied to BR-SP, each from the quotes above:
   weighted 2, 3, …, 9 (then 2 again) from the rightmost digit, modulo 11, with 10 written `X`. `checaRG` compares only
   `dc.charAt(0)`, so the field's second position is never part of the check character; the class takes exactly one.
 - A card that does not print the check character stays valid (reversed in the Task 7b fix round 1). The SSP page
-  itself admits such cards: "Se na sua Carteira de Identidade não constar o dígito de controle após o Número do RG,
-  dirigir-se a um Posto Poupatempo ou Posto de Identificação da Polícia Civil para requerer a 2a. via da Carteira."
-  (live page, re-read 2026-11-16 12:52 UTC; the current wording below it: "Se não constar o dígito de controle após o
-  Número do RG, dirija-se a um Posto Poupatempo …"), and DEC art. 25 keeps old-model cards valid until 2032-03-01
+  itself admits such cards. Its rendered text (re-read 2026-11-16 12:52 UTC) says: "Se não constar o dígito de
+  controle após o Número do RG, dirija-se a um Posto Poupatempo ou Posto de Identificação da Polícia Civil para
+  requerer a 2a. via da Carteira."; an earlier wording, kept inside an HTML comment of the same page and not rendered,
+  read "Se na sua Carteira de Identidade não constar o dígito de controle após o Número do RG, dirigir-se a um Posto
+  Poupatempo …". DEC art. 25 keeps old-model cards valid until 2032-03-01
   (indefinitely for a holder aged sixty or more on 2022-03-01). The form's answer (a second copy) is a condition of
   its own online service, not of the card's validity. So `SpIdentityCardNumber::fromNumberAndCheckCharacter($number,
-  $checkCharacter)` mirrors the form's two fields: with no check character (`null` or empty) the number must be one to
-  eight digits, not all zeros, and the stored value is the number plus the character `checaRG` computes (canonical:
+  $checkCharacter)` mirrors the form's two fields: the number field takes digits and dots only (a hyphen, an `X` or a
+  check character there is refused with "(number field: digits and dots only)", since `1234567-2` would otherwise be
+  read as the eight-digit number `12345672`, another RG); with no check character (`null` or empty) the number must be
+  one to eight digits, not all zeros, and the stored value is the number plus the character `checaRG` computes (canonical:
   it round-trips through `from()`); a given check character is verified. The card does not print that character;
   the stored one is computed. `from()` and the factory stay strict (number and check character in one string), since
   a bare form there would match every string of one to eight digits.

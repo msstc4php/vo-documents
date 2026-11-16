@@ -44,17 +44,26 @@ final class SpIdentityCardNumber extends AbstractIdentityCardNumber
 
     private const string FORM_FIELDS = 'BR-SP identity card number';
 
+    private const string NUMBER_FIELD_CHARACTERS = '0123456789.';
+
     /**
      * The SSP form's two fields: the number and, when the card prints one, the check character.
      *
      * @param string|null $checkCharacter null or empty for a card that does not print it: the computed one is stored
+     * @param string $number digits and dots only: a hyphen or a check character here would be read as a digit of the
+     *                       number and change the RG
      *
-     * @throws InvalidDocumentNumberException for a number other than one to eight digits (dots and separators
-     *                                        removed), a check character other than one `0`-`9` or `X`, zeros only or
-     *                                        a wrong check character
+     * @throws InvalidDocumentNumberException "(number field: digits and dots only)" for any other character in
+     *                                        `$number`, its length for other than one to eight digits, "(invalid
+     *                                        character)" for a check character other than one `0`-`9` or `X`, zeros
+     *                                        only or a wrong check character
      */
     public static function fromNumberAndCheckCharacter(string $number, ?string $checkCharacter): self
     {
+        if (\strspn($number, self::NUMBER_FIELD_CHARACTERS) !== \strlen($number)) {
+            throw new InvalidDocumentNumberException(\sprintf('Invalid %s (number field: digits and dots only).', self::FORM_FIELDS));
+        }
+
         $digits = self::numberField()->parse(\str_replace('.', '', $number), self::FORM_FIELDS);
         $check = \strtoupper(Digits::strip($checkCharacter ?? ''));
         if ($check === '') {
