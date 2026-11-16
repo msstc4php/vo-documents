@@ -34,16 +34,16 @@ final class UnicodeTextTest extends TestCase
 
     public function testIsInScriptAcceptsPureCyrillic(): void
     {
-        self::assertTrue(UnicodeText::isInScript('Иван', '\p{Cyrillic}'));
+        self::assertTrue(UnicodeText::isInScript('Иван', '\p{sc=Cyrillic}'));
     }
 
     public function testIsInScriptRejectsLatinLookAlike(): void
     {
-        self::assertFalse(UnicodeText::isInScript("Ив\u{0061}н", '\p{Cyrillic}'));
+        self::assertFalse(UnicodeText::isInScript("Ив\u{0061}н", '\p{sc=Cyrillic}'));
     }
 
     public function testIsInScriptRejectsEmptyText(): void
     {
-        self::assertFalse(UnicodeText::isInScript('', '\p{Cyrillic}'));
+        self::assertFalse(UnicodeText::isInScript('', '\p{sc=Cyrillic}'));
     }
 }

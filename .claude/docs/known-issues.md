@@ -248,3 +248,11 @@
 - `LatinOverridePolicy::effective(Closure $derive, ?override): LatinForm` is the one place that derives, falls back to
   `withoutDerivedForm()` and resolves (RU and the Latin base). `overridePolicy()` runs inside the constructor: build the
   policy from the builder and constants only. `IdentifierSpellings` refuses separators ≠ words − 1 (`LogicException`).
+
+## Script classes must be `\p{sc=...}`, not bare `\p{Latin}` (2026-11-16 UTC)
+
+PCRE2 matches a bare script name (`\p{Latin}`) against Script_Extensions. Unicode 16 added Latn to the
+Script_Extensions of U+00B7 MIDDLE DOT (Catalan `l·l`), so on PHP builds with a Unicode-16 PCRE2 (e.g. PHP 8.4.27 on
+GitHub runners) `\p{Latin}` accepted `Marcel·lí`, while PHP 8.4.17 locally (PCRE2 10.44, Unicode 15) refused it. All
+script classes use `\p{sc=Latin}` / `\p{sc=Cyrillic}` (Script property only); `composer.json` requires
+`lib-pcre >=10.40` for the `sc=` syntax. A CI-only name test failure is the first thing to check against this.

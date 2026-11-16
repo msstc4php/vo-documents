@@ -23,7 +23,7 @@ final class UnicodeText
     }
 
     /**
-     * @param non-empty-string $letterClass a regex class body such as \p{Cyrillic}
+     * @param non-empty-string $letterClass a regex class body such as \p{sc=Cyrillic}
      */
     public static function isInScript(string $text, string $letterClass): bool
     {

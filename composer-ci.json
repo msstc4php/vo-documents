@@ -25,6 +25,7 @@
     ],
     "require": {
         "ext-mbstring": "*",
+        "lib-pcre": ">=10.40",
         "msstc4php/vo-base": "^1.1.1",
         "php": ">=8.4",
         "symfony/polyfill-intl-normalizer": "^1.31"

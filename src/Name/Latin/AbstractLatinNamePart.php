@@ -19,6 +19,6 @@ abstract class AbstractLatinNamePart extends AbstractNamePart
     #[Override]
     protected function letters(): string
     {
-        return '\p{Latin}';
+        return '\p{sc=Latin}';
     }
 }

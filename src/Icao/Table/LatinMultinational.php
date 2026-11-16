@@ -126,7 +126,7 @@ final readonly class LatinMultinational implements TransliterationTable
     #[Override]
     public function script(): string
     {
-        return '\p{Latin}';
+        return '\p{sc=Latin}';
     }
 
     #[Override]

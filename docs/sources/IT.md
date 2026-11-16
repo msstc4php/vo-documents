@@ -34,8 +34,8 @@ civil status could not be read), so the package keeps its Latin default:
 
 | Part | Letters | Separators inside |
 |---|---|---|
-| `FamilyName` | `\p{Latin}` (`à è é ì ò ù` and foreign diacritics) | hyphen, apostrophe (`D'Angelo`), space (`De Luca`) |
-| `GivenName` | `\p{Latin}` | hyphen, apostrophe, space (`Maria Grazia`) |
+| `FamilyName` | `\p{sc=Latin}` (`à è é ì ò ù` and foreign diacritics) | hyphen, apostrophe (`D'Angelo`), space (`De Luca`) |
+| `GivenName` | `\p{sc=Latin}` | hyphen, apostrophe, space (`Maria Grazia`) |
 
 - The comma of art. 35 c. 2 (names "separati da virgola") is refused: it marks which name the certificates print and
   is not part of a name. The "non superiori a tre" limit applies to naming a child; older and foreign-born persons

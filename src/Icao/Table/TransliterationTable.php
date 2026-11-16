@@ -12,7 +12,7 @@ namespace MSSTC4PHP\ValueObject\Documents\Icao\Table;
 interface TransliterationTable
 {
     /**
-     * @return non-empty-string a regex class body such as \p{Cyrillic}, matching every letter of the script
+     * @return non-empty-string a regex class body such as \p{sc=Cyrillic}, matching every letter of the script
      */
     public function script(): string;
 

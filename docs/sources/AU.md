@@ -24,8 +24,8 @@ How the package applies this (designer's calls, no official character rule found
 
 | Part | Letters | Separators inside | Why |
 |---|---|---|---|
-| `FamilyName` | `\p{Latin}` | hyphen, apostrophe, space | double-barrelled (`Smith-Jones`), `O'Brien`, `van der Berg` |
-| `GivenName` | `\p{Latin}` | hyphen, apostrophe, space | several given names (`Joan Catherine`), `Mary-Anne`, `D'Arcy` |
+| `FamilyName` | `\p{sc=Latin}` | hyphen, apostrophe, space | double-barrelled (`Smith-Jones`), `O'Brien`, `van der Berg` |
+| `GivenName` | `\p{sc=Latin}` | hyphen, apostrophe, space | several given names (`Joan Catherine`), `Mary-Anne`, `D'Arcy` |
 
 - U+2019 (’) is stored as U+0027 ('), as for every part that allows the apostrophe (`AbstractNamePart`).
 - A Latin letter outside the ICAO table is spelled as its **base letter** (designer's call, `ICAO.md` "Letters outside

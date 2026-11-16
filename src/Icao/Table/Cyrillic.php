@@ -72,7 +72,7 @@ final readonly class Cyrillic implements TransliterationTable
     #[Override]
     public function script(): string
     {
-        return '\p{Cyrillic}';
+        return '\p{sc=Cyrillic}';
     }
 
     #[Override]

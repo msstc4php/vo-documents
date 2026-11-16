@@ -48,8 +48,8 @@ apellidos a cualquiera de las lenguas oficiales correspondiente al origen o domi
 
 | Part | Letters | Separators inside |
 |---|---|---|
-| `FamilyName` (`first`, `second`) | `\p{Latin}` (`ñ`, `á é í ó ú`, `ü`, `ç` and foreign diacritics) | hyphen, apostrophe (`d'Ors`), space (`de la Fuente`) |
-| `GivenName` | `\p{Latin}` | hyphen, apostrophe, space (`María José`) |
+| `FamilyName` (`first`, `second`) | `\p{sc=Latin}` (`ñ`, `á é í ó ú`, `ü`, `ç` and foreign diacritics) | hyphen, apostrophe (`d'Ors`), space (`de la Fuente`) |
+| `GivenName` | `\p{sc=Latin}` | hyphen, apostrophe, space (`María José`) |
 
 - No Spanish text lists the letters of a civil-status name; the co-official languages (art. 50.4, 53.4.º) and the
   foreign surnames of art. 56 rule out a Castilian-only list, so the package's Latin default applies.

@@ -225,7 +225,7 @@ of languages." The tables list upper-case characters only.
 
 Table 6.A lists the common precomposed letters only; Vietnamese (`Ễ` in Nguyễn) and Romanian comma-below letters
 (`Ș` U+0218, `Ț` U+021A) are missing, and Doc 9303 says nothing about them. `LatinMultinational` therefore spells a
-`\p{Latin}` letter that is not in the table as its base letter: canonical decomposition (NFD), combining marks
+`\p{sc=Latin}` letter that is not in the table as its base letter: canonical decomposition (NFD), combining marks
 (`\p{Mn}`) dropped, then the table again (or the letter itself if it is A-Z). `Nguyễn` → `NGUYEN`, `Ș` → `S`,
 `Ț` → `T`, `Ǿ` → `Ø` → `OE`. A letter without a canonical base (`Ƒ`, `Ʒ`) is still refused. The fallback applies to
 the Latin table only; table 6.B and the Russian MVD table have none. Like the tables themselves it changes only in a
