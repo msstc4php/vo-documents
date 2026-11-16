@@ -6,6 +6,7 @@ namespace MSSTC4PHP\ValueObject\Documents;
 
 use MSSTC4PHP\ValueObject\Contract\ValueObject;
 use MSSTC4PHP\ValueObject\Documents\Name\AU\PersonNameCodec as AuPersonNameCodec;
+use MSSTC4PHP\ValueObject\Documents\Name\BR\PersonNameCodec as BrPersonNameCodec;
 use MSSTC4PHP\ValueObject\Documents\Name\CA\PersonNameCodec as CaPersonNameCodec;
 use MSSTC4PHP\ValueObject\Documents\Name\CH\PersonNameCodec as ChPersonNameCodec;
 use MSSTC4PHP\ValueObject\Documents\Name\DE\PersonNameCodec as DePersonNameCodec;
@@ -44,6 +45,7 @@ final class Codecs
             new UsPersonNameCodec(),
             new CaPersonNameCodec(),
             new MxPersonNameCodec(),
+            new BrPersonNameCodec(),
         ];
     }
 }

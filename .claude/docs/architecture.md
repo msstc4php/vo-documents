@@ -12,9 +12,9 @@ core.
 | `Icao\Table\*` | `@internal` `TransliterationTable` per script (LatinMultinational, Cyrillic); add a class + register it in the `Transliterator` constructor for a new script |
 | `Name\AbstractNamePart` | Base of every national name part: `letters()` (regex class), `label()` (message), `innerSeparators()` (default `-' `) |
 | `Name\LatinSpelling` | `@internal`: finds a Latin override among the ICAO spellings of a name, word by word (`Name\IdentifierSpellings`: variants per word + national separators; hyphen ≡ `<`; cap 4096 per word) |
-| `Name\LatinOverridePolicy` | `@internal` abstract: `resolve(?override, derived)` (template method, drops the derived form); `withoutDerivedForm()` (refuses, except `AnyIcaoSpelling` with an override); subclasses `AnyIcaoSpelling` (RU, GB, CA) and `TransliterationVariant` (AU, DE, FR, IT, ES, NL, CH, TR, US, MX; via `LatinSpelling`) |
+| `Name\LatinOverridePolicy` | `@internal` abstract: `resolve(?override, derived)` (template method, drops the derived form); `withoutDerivedForm()` (refuses, except `AnyIcaoSpelling` with an override); subclasses `AnyIcaoSpelling` (RU, GB, CA, BR) and `TransliterationVariant` (AU, DE, FR, IT, ES, NL, CH, TR, US, MX; via `LatinSpelling`) |
 | `Name\PersonName` | Interface of a national full name: `latin(): Icao\PersonName`, `full()` |
-| `Name\Latin\*` | `AbstractLatinNamePart` (`\p{Latin}` part); `@internal`: `LatinPersonNameBuilder` (derived form, spellings per word for `TransliterationVariant`; strips the `$omitted` punctuation first), `AbstractLatinPersonName` (effective Latin form + kept override, hook `overridePolicy()`; constructor argument `$omittedPunctuation` (MRZ-omitted punctuation, default none, MX `.` `/`)), `AbstractFamilyGivenPersonName<TFamily, TGiven>` (public `family`/`given`, `full()`, `equals()`, JSON view; AU DE FR IT TR NL CH GB), `AbstractFamilyGivenPersonNameCodec<TName>` (keys `family`/`given`/`latin`; hooks `shape()`, `create()`) |
+| `Name\Latin\*` | `AbstractLatinNamePart` (`\p{Latin}` part); `@internal`: `LatinPersonNameBuilder` (derived form, spellings per word for `TransliterationVariant`; strips the `$omitted` punctuation first), `AbstractLatinPersonName` (effective Latin form + kept override, hook `overridePolicy()`; constructor argument `$omittedPunctuation` (MRZ-omitted punctuation, default none, MX `.` `/`)), `AbstractFamilyGivenPersonName<TFamily, TGiven>` (public `family`/`given`, `full()`, `equals()`, JSON view; AU DE FR IT TR NL CH GB CA BR), `AbstractFamilyGivenPersonNameCodec<TName>` (keys `family`/`given`/`latin`; hooks `shape()`, `create()`) |
 | `Name\RU\*` | `AbstractRussianNamePart` (letters, word pattern), `FamilyName`, `GivenName`, `Patronymic`, `PersonName` (+ `short()`, `initialsFirst()`), `PersonNameCodec`; `@internal RussianTransliteration` (drops Ь, then `Icao\Transliterator`) |
 | `Document\RU\*` | Number VOs (`Snils`, `Inn`, `InternalPassportNumber`, `PassportIssuingUnitCode`, `InternationalPassportNumber`, `DriverLicenceNumber`, `OmsPolicyNumber`): `final`, extend `AbstractStringValueObject`, implement `Maskable`, store digits only, `formatted()`; enum `DriverLicenceCategory`. No `Region` (no published ISO mapping, RU.md) |
 | `Codecs` | `Codecs::all()`: every payload codec, for `new ValueObjectMapper(Codecs::all())`; add each new composite's codec here |
@@ -127,3 +127,13 @@ test, when one is added).
 `Name\MX\PersonName(?$first, ?$second, $given, ?$latin)` extends `AbstractLatinPersonName` like ES (parts on `AbstractMexicanNamePart`: `/` separator, `.` after or between letters, both omitted in the ICAO form); no surnames → the
 given names are the primary identifier (`JUAN`); policy `TransliterationVariant`; codec keys `first`, `second`, `given`,
 `latin` (`first` and `second` nullable).
+
+`Document\BR\*` (national, plan 3 Task 7a): `Cpf` (Receita "DV módulo 11": weights 1-9 then 0-9 from the left,
+`sum % 11 % 10`; dots stripped; `fiscalRegion()` = 9th digit string; `formatted()` `XXX.XXX.XXX-XX`; repeated digits
+accepted), `VoterRegistrationNumber` (TSE art. 36: 5-12 digits left-padded to 12, state code `01`-`28` by regex,
+`stateCode()`/`isAbroad()`, check digits format only), `Nis` (11 digits), `Cns` (15 digits), `DriverLicenceNumber` (CNH
+registro nacional, `NumberShapes('[0-9A-Z]{9}[0-9]{2}')`), `PassportNumber` (`[A-Z]{2}[0-9]{6}`, `series()`, masks 3).
+No `Jurisdiction` enum yet (the TSE codes are not one-to-one with ISO 3166-2:BR: `28` is abroad); Task 7b (RG) may add
+it. No `Sex` change. `Name\BR\PersonName($family, $given, ?$latin)` on `AbstractFamilyGivenPersonName` (both required),
+parts on the plain `AbstractLatinNamePart` (no extra punctuation), policy `AnyIcaoSpelling` (PF SINPA abbreviation);
+codec as IT (`given` required).

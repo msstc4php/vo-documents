@@ -371,3 +371,32 @@ script classes use `\p{sc=Latin}` / `\p{sc=Cyrillic}` (Script property only); `c
   capture of those licence pages. Working copies: NL law on `galeana.gob.mx`,
   CDMX reglamento on `paot.org.mx`, Guanajuato reglamento on `leon.gob.mx`. Retry the dead hosts before concluding a
   state is still unpublished.
+
+## BR sources and decisions (plan 3 Task 7a, 2026-11-16 UTC)
+
+- **CPF algorithm source**: the Receita's own text is the REGRA_VALIDA_CPF of its SPED manuals (ADE COFIS nº 41/2017
+  Anexo II on `sped.rfb.gov.br`; same text in the e-Financeira Anexo II 2.1.1 of 2026). It writes the weights "9, 8, …, 1
+  e 0, a partir da unidade" with "O resto 10 é considerado 0" — equivalent to the usual `11 - r` formulation (weights
+  10..2), but implemented as written. `normas.receita.fazenda.gov.br` is an Angular SPA: curl/WebFetch get an empty
+  shell (API under `/api`, not explored).
+- **Repeated-digit CPFs are accepted** (Review Focus 4): DATASUS (CADSUS spec RN001.3) and Previdência SIPREV
+  (RV_01 "Recusar todos os dígitos iguais") refuse them for their own intake; SIRC lists "Dígitos repetidos" as an
+  invalidity reason. None is the Receita Federal, so per the owner's rule they pass. If the owner wants the stricter
+  intake rule, it is a one-line refusal plus the test provider flip.
+- **TSE**: `www.tse.jus.br` returns 403 to curl and WebFetch; the Internet Archive `id_` copy of 2026-11-10 22:48:11
+  UTC of Res. 23.659/2021 was read. Art. 36 gives the table 01-28 and "Módulo 11" without weights (the widely copied
+  SP/MG special case is unquoted), so check digits are format only.
+- **CNH**: CONTRAN Res. 1.020/2025 art. 10 says "nove caracteres e dois dígitos verificadores" (not "algarismos"), so
+  letters are accepted in the first nine. Res. 886/2021 (not revoked by 1.020's art. 140 list) gives "módulo 11" and
+  "resto … 0 ou 1 → 0", no weights.
+- **CNS**: DATASUS only states "15 dígitos e conter somente números"; the weighted-sum routine (`Σ d·(15..1) ≡ 0 mod
+  11`) is published by the ANS (SIB-XML algorithms), not by the Ministério da Saúde/DATASUS; `rni-docs.anvisa.gov.br`
+  (says "algoritmo do Ministério da Saúde (em anexo)") answers 403. Not applied; re-check if a DATASUS text surfaces.
+- **NIS**: eSocial MOS 2.4 "11 dígitos numéricos, incluído o dv"; no issuer text for the DV algorithm found (the
+  DATASUS spec says "algoritmo de verificação (modulo 11) do PIS/NIS/PASEP" without weights).
+- **BR names use `AnyIcaoSpelling`**: the PF FAQ ("Nome abreviado no passaporte") describes SINPA abbreviation at 30
+  characters per field (particles first, then the penultimate word to one letter). A Brazilian `PersonName` cannot
+  exceed `Icao\PersonName::MAX_LENGTH` (two parts of ≤100 characters), so "too long" never triggers here.
+- **New codec ⇒ every codec test**: `Codecs::all()` instantiates every codec, and `beStrictAboutCoverageMetadata`
+  needs `#[UsesClass(<Cc>PersonNameCodec::class)]` in each test that builds the mapper (14 files for BR).
+
