@@ -495,10 +495,10 @@ Rules applied to BR-SP, each from the quotes above:
   a bare form there would match every string of one to eight digits.
 - Separators: those of `Internal\Digits::SEPARATORS` and the dot (the printed form `12.345.678-9` is common; dots are
   removed as for `Cpf`). ASCII letters are upper-cased (`x` becomes `X`).
-- No display form is quoted, so there is no `formatted()`. Every stored value has nine characters, so `masked()`
-  keeps the last four (plan default): `*****0012` for `1-2`. (The earlier "three for eight or fewer, never the whole
-  value" rule of fix round 1 became unreachable with the padding and was removed; restore it when a unit with shorter
-  values is covered.)
+- No display form is quoted, so there is no `formatted()`. `masked()` keeps the last four characters (plan default)
+  and never the whole value (controller ruling, fix round 1, kept after the padding): the leading zeros are padding, so
+  a value whose significant part (without leading zeros) has n ≤ 4 characters keeps n − 1: `1-2` (`000000012`) →
+  `********2`, `10-3` → `*******03`, `123-5` → `******235`, `12.345.678-2` → `*****6782`.
 - No official sample number is published; the tests use numbers computed with the quoted algorithm.
 
 **Why the other forms do not give a format.** Each limits only the field (verbatim attributes): BA-AAC

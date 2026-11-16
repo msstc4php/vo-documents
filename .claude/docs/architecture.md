@@ -143,8 +143,8 @@ accepted), `VoterRegistrationNumber` (TSE art. 36: 5-12 digits left-padded to 12
 cases, ISO 3166-2:BR code order, `Df` for the Distrito Federal; not used by `VoterRegistrationNumber`, whose TSE codes
 are not one-to-one: `28` is abroad), `Document\BR\IdentityCardNumber`,
 `Document\BR\IdentityCard\{AbstractIdentityCardNumber, SpIdentityCardNumber}` and
-`Document\BR\IdentityCardNumberFactory` (CA HealthCard pattern: abstract `stored()` hook for the check and the canonical form, masks the last 4 (every
-covered value has 9 characters: SP pads the number part to 8 digits); `SpIdentityCardNumber::fromNumberAndCheckCharacter()` for a card
+`Document\BR\IdentityCardNumberFactory` (CA HealthCard pattern: abstract `stored()` hook for the check and the canonical form, masks the last 4 but at most
+the significant length (without the leading padding zeros) − 1, so a padded short RG never shows every real digit; `SpIdentityCardNumber::fromNumberAndCheckCharacter()` for a card
 without a printed check character; dots stripped in the base and, for the resolver's length messages, in the factory;
 resolver document "Brazilian identity card"). Named `IdentityCard…`, not `Rg…`, like the other English role names
 (`DriverLicenceNumber`, `VoterRegistrationNumber`). Only BR-SP is covered. No `Sex` change.

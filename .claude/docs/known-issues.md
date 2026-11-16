@@ -438,3 +438,9 @@ script classes use `\p{sc=Latin}` / `\p{sc=Cyrillic}` (Script property only); `c
   browser User-Agent with Referer got through once). IA copies used where they exist.
 - **Equivalent mutant**: as in MX, `ArrayOneItem` on `BR\IdentityCardNumberFactory::coveredJurisdictions()` escapes
   while only one unit is covered.
+
+## Final review of plan 3 (2026-11-16 UTC)
+
+- **SP RG mask counts only significant characters:** the stored RG is padded to 9 with leading zeros, so masking the
+  last 4 of `000000012` would show every real digit (`*****0012`). `AbstractIdentityCardNumber::masked()` keeps
+  `min(4, strlen(ltrim(value, '0')) - 1)`; zeros-only is refused, so the significant part is never empty.

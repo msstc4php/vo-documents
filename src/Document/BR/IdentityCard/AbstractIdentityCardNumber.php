@@ -16,9 +16,9 @@ use Override;
  * separators and dots are removed and ASCII letters upper-cased; a check character is verified only where the
  * algorithm is published (SP).
  *
- * `masked()` (no official rule) keeps the last four characters (`*****6782`): every covered unit stores nine. When a
- * unit with shorter values is covered, restore the rule "three for eight characters or fewer, never the whole value",
- * with a test.
+ * `masked()` (no official rule) keeps the last four characters (`*****6782`), and never the whole significant value:
+ * leading zeros are padding (SP stores nine characters), so a value of n characters without them keeps n − 1
+ * (`000000012` → `********2`, `000000103` → `*******03`).
  *
  * @see docs/sources/BR.md "RG per state (Task 7b)"
  */
@@ -29,7 +29,10 @@ abstract class AbstractIdentityCardNumber extends AbstractStringValueObject impl
     #[Override]
     final public function masked(): string
     {
-        return Mask::keepLastCharacters(Text::nonEmpty($this->value), self::VISIBLE);
+        $value = Text::nonEmpty($this->value);
+        $significant = \strlen(\ltrim($value, '0'));
+
+        return Mask::keepLastCharacters($value, \min(self::VISIBLE, $significant - 1));
     }
 
     /**

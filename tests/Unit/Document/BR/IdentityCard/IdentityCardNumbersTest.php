@@ -132,11 +132,15 @@ final class IdentityCardNumbersTest extends TestCase
     {
         yield 'eight digits' => ['123456782', '*****6782'];
         yield 'seven digits' => ['1.234.567-2', '*****5672'];
-        yield 'one digit' => ['1-2', '*****0012'];
+        yield 'four digits' => ['1234-8', '*****2348'];
+        yield 'three digits: never every real digit' => ['123-5', '******235'];
+        yield 'two digits' => ['10-3', '*******03'];
+        yield 'one digit' => ['1-2', '********2'];
+        yield 'two digits, check 0' => ['14-0', '*******40'];
     }
 
     #[DataProvider('maskedValues')]
-    public function testMasksAllButTheLastFourOfTheNineStoredCharacters(string $input, string $masked): void
+    public function testMasksAllButTheLastFourAndNeverTheWholeSignificantValue(string $input, string $masked): void
     {
         self::assertSame($masked, SpIdentityCardNumber::from($input)->masked());
     }
