@@ -107,13 +107,16 @@ official algorithm is published. A number with the right shape is accepted, neve
 | `Document\US\MedicareBeneficiaryIdentifier` | MBI, `1EG4-TE5-MK73` | CMS position layout (no check digit exists) | none | CMS |
 | `Document\US\DlId\{Al,Az,Co,Ct,Fl,Hi,Ia,Id,Il,In,Ks,Ky,Ma,Md,Me,Mi,Ms,Nd,Ne,Nj,Nm,Ny,Ok,Pa,Ri,Tx,Vt,Wa,Wi,Wy}DlIdNumber` | DL/ID number of 30 states (one class covers a state's licence and ID card where the source says so) | shape only (no check digit verified; HI, KS, MA, NE, VT, WA letters enforced as quoted) | none (the IL, WA, FL and MI name and birth data is not decoded) | state DMV and police publications; USCIS E-Verify RIDE fact sheets |
 | `Document\US\Jurisdiction` | The 50 states and DC (enum, ISO 3166-2:US) | n/a | n/a | ISO 3166-2:US |
+| `Document\CA\SocialInsuranceNumber` | SIN, `123 456 789` | format only (no check digit verified: no algorithm published) | `isTemporaryResident()` (first digit 9, ESDC) | ESDC; CRA |
+| `Document\CA\PassportNumber` | Passport, letter + 6 digits + 2 letters (since 2023-05-10) or 2 letters + 6 digits | format only | none | IRCC |
 
 Names: `Name\<CC>\FamilyName`, `GivenName` and `PersonName` for DE, FR, IT, ES, NL, CH, GB and TR, like the RU and AU
 ones. Spain's `PersonName` has two surnames (`first`, optional `second`); in the Dutch one the prefixes (`van der`) are
-part of the family name; the Swiss, Dutch, British and US ones accept a person without a given name. The US one is
-`Name\US\PersonName($family, ?$given, ?$middle, ?$suffix)` (`given` null for a one-word name), the suffix a
+part of the family name; the Swiss, Dutch, British, US and Canadian ones accept a person without a given name. The
+US one is `Name\US\PersonName($family, ?$given, ?$middle, ?$suffix)` (`given` null for a one-word name), the suffix a
 `Name\US\NameSuffix` (the AAMVA list `JR`, `SR`, `1ST`/`I` … `9TH`/`IX`), written last among the secondary
-identifiers of the ICAO form, ordinals as Roman numerals (`SMITH<<JOHN<MICHAEL<III`).
+identifiers of the ICAO form, ordinals as Roman numerals (`SMITH<<JOHN<MICHAEL<III`). The Canadian one is
+`Name\CA\PersonName($family, ?$given)`, letters of the Latin script (English and French names).
 
 Contracts: `Contract\Maskable` (every number above), `Contract\Subdivision` and `Contract\IssuedBySubdivision` (AU
 and US jurisdictions, AU licences, US DL/ID numbers). `Contract\HasSex` and the `Sex` enum are implemented by the documents that encode a sex
@@ -160,7 +163,7 @@ class, and `fromNumberIn()` refuses them (`docs/sources/US.md` "DL/ID numbers").
 ## Personal names
 
 A national name part (`Name\RU\FamilyName`, `GivenName`, `Patronymic`, and `FamilyName`, `GivenName` of `Name\AU`,
-`Name\DE`, `Name\FR`, `Name\IT`, `Name\ES`, `Name\NL`, `Name\CH`, `Name\GB`, `Name\TR`, `Name\US`, plus
+`Name\DE`, `Name\FR`, `Name\IT`, `Name\ES`, `Name\NL`, `Name\CH`, `Name\GB`, `Name\TR`, `Name\US`, `Name\CA`, plus
 `Name\US\MiddleName`) is NFC-normalised, trimmed, has inner whitespace runs collapsed to one space, and keeps its letter
 case. Limits: 100 characters per part. Russian parts accept only the 33 Russian letters; a Cyrillic name typed with
 Latin look-alikes (Latin `a`, `o`, `e`, `c`) is refused. A compatibility character (its NFKC form differs: fullwidth
@@ -220,6 +223,7 @@ then depends on the country's sources:
 | RU | any valid ICAO name (`IVANOVA<<YULIYA` for Иванова Юлия, where the table gives `IVANOVA<<IULIIA`) | MVD Orders 996/186 (§32, §140) write the name "так, как это указано в подтверждающем документе" |
 | AU, DE, FR, IT, ES, NL, CH, TR, US | only an ICAO spelling of the name (`MULLER<<ZOE` for Müller Zoë); `<` for a hyphen is stored as the hyphen (policy `TransliterationVariant`) | Latin-script names: no source lets a passport keep another spelling, so the table spellings are the only ones |
 | GB | any valid ICAO name (policy `AnyIcaoSpelling`) | HM Passport Office lets a passport carry an evidenced spelling (`docs/sources/GB.md`) |
+| CA | any valid ICAO name (policy `AnyIcaoSpelling`) | the Passport Program points to "alternative spellings" and lets an adult drop or invert given names (`docs/sources/CA.md`) |
 
 An override that is the derived form (also when it writes a hyphen as `<`) is not kept, so `latinOverride()` is null
 and the name equals the one built without it. Text that is no ICAO name (`IVANOV1<<IVAN`) is refused by
@@ -258,7 +262,7 @@ it as unsupported (a configuration error, not a 500 on request input). The inter
 ### Composite names need the codecs
 
 Document numbers and name parts are strings and need nothing. The composite names (`Name\<CC>\PersonName` of every
-country: RU, AU, DE, FR, IT, ES, NL, CH, GB, TR, US) are read through a payload codec, so the mapper that the bridge
+country: RU, AU, DE, FR, IT, ES, NL, CH, GB, TR, US, CA) are read through a payload codec, so the mapper that the bridge
 uses must be built with `Codecs::all()`:
 
 ```php
@@ -318,6 +322,7 @@ services:
     MSSTC4PHP\ValueObject\Documents\Name\GB\PersonNameCodec: ~
     MSSTC4PHP\ValueObject\Documents\Name\TR\PersonNameCodec: ~
     MSSTC4PHP\ValueObject\Documents\Name\US\PersonNameCodec: ~
+    MSSTC4PHP\ValueObject\Documents\Name\CA\PersonNameCodec: ~
 ```
 
 ```php
@@ -352,6 +357,9 @@ Collected from the source notes; each is a deliberate omission with its reason i
   OH, OR, SC, SD, TN, UT, VA and WV (no official format published), the ID cards of CT, HI, IN, KY, ME, NJ, NM, OK and
   RI (numbering not stated), the Maryland customer ID, and the decoding of name or birth data in IL, WA, FL and MI
   numbers (`docs/sources/US.md`).
+- **CA:** the SIN check digit (the CRA names a "Mod 10" formula but no official text gives the algorithm), the
+  province meaning of a SIN's first digit, the CRA individual and temporary tax numbers, the passport print form of a
+  one-word name; provincial documents follow in a later task (`docs/sources/CA.md`).
 - **No region value object for RU**: no field encodes a region with a published mapping to ISO 3166-2:RU (`RU.md`).
 - **RU driving licences of the 1999 form** (Cyrillic series): expired by 2026 (`RU.md`).
 - **RU old-form OMS policies** (series and number) and AU **11-digit Medicare individual numbers**.
@@ -361,11 +369,11 @@ Collected from the source notes; each is a deliberate omission with its reason i
 
 ## Limits to know about
 
-- **Format only, check digit not verified:** INN, TFN and Medicare card number. No official algorithm is published
-  (FNS says only "по алгоритму, определенному ФНС"; the ATO gives the TFN algorithm to registered developers only;
-  the ADHA appendix is not reachable), so a mistyped check digit is accepted. Only checksums quoted from an official
-  source are verified: SNILS, OMS policy, DE pension insurance number, IT codice fiscale, ES DNI and NIE, NL BSN, CH
-  AHV number, GB NHS and H&C numbers.
+- **Format only, check digit not verified:** INN, TFN, Medicare card number and CA SIN. No official algorithm is
+  published (FNS says only "по алгоритму, определенному ФНС"; the ATO gives the TFN algorithm to registered developers
+  only; the ADHA appendix is not reachable; the CRA names a "Mod 10" formula for the SIN without giving it), so a
+  mistyped check digit is accepted. Only checksums quoted from an official source are verified: SNILS, OMS policy, DE
+  pension insurance number, IT codice fiscale, ES DNI and NIE, NL BSN, CH AHV number, GB NHS and H&C numbers.
 - **Not verified against the official PDF:** the 16-digit length of the OMS policy and the FFOMS Order 79 text it is
   checked against (www.ffoms.gov.ru is unreachable from here, the text is quoted from a copy), and the 2 + 7 split of
   the international passport number (no text read states it; `RU.md`).
@@ -388,11 +396,12 @@ Collected from the source notes; each is a deliberate omission with its reason i
   and capture date in the source notes).
 - Name parts are limited to 100 characters, `Icao\PersonName` to 255 (a very long real name is refused). Three long
   parts can exceed 255 in Latin (an ES name of three 100-character parts): the name is refused with
-  "(Latin form too long)", unless the country accepts any ICAO spelling (RU, GB) and an override is given.
-- **RU and GB accept an override without a derived form**: when a letter has no ICAO spelling or the derived form is
-  too long, the override is kept as given (the passport authority writes a documented spelling); without an override
-  the name is refused. An `AnyIcaoSpelling` override is stored as typed: `SMYTH<JONES<<MARY` and `SMYTH-JONES<<MARY`
-  are two values. GB drops the `XXX` passport forename of a person with one name (`SMITH<<XXX` is `SMITH`).
+  "(Latin form too long)", unless the country accepts any ICAO spelling (RU, GB, CA) and an override is given.
+- **RU, GB and CA accept an override without a derived form**: when a letter has no ICAO spelling or the derived form
+  is too long, the override is kept as given (the passport authority writes a documented spelling); without an
+  override the name is refused. An `AnyIcaoSpelling` override is stored as typed: `SMYTH<JONES<<MARY` and
+  `SMYTH-JONES<<MARY` are two values. GB drops the `XXX` passport forename of a person with one name (`SMITH<<XXX` is
+  `SMITH`); CA does not (no Passport Program text describes a placeholder).
 - **The transliteration variant cap (4096) is per ICAO word**, so a long list of given names with umlauts is accepted
   with an override. A single word with more than twelve two-way letters (`Ä` = `AE`/`A`) or more than seven three-way
   letters (`Ü` = `UE`/`UXX`/`U`) is still refused when an override that differs from the derived form is given.

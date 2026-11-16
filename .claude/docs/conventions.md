@@ -22,7 +22,7 @@
   `valueObjectClass()`, `shape()`, `create()` and `givenValue()` (a required given name: `$given ?? throw
   $this->malformed()`). Another layout (ES) extends `AbstractLatinPersonName`. The derived form uses `toLatin()` (never
   `variants()`); the override goes through a `Name\LatinOverridePolicy` subclass chosen per country: `AnyIcaoSpelling`
-  when the passport authority writes a documented spelling (RU, GB), `TransliterationVariant` with a lazy `Closure` of
+  when the passport authority writes a documented spelling (RU, GB, CA), `TransliterationVariant` with a lazy `Closure` of
   the spellings when only table spellings are acceptable (AU, DE, FR, IT, ES, NL, CH, TR, US); the choice and its quote
   go in the country's source note. `resolve()` drops an override equal to the derived form in MRZ terms (hyphen ≡ `<`),
   so equality and the codec payload agree.

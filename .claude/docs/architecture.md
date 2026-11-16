@@ -12,7 +12,7 @@ core.
 | `Icao\Table\*` | `@internal` `TransliterationTable` per script (LatinMultinational, Cyrillic); add a class + register it in the `Transliterator` constructor for a new script |
 | `Name\AbstractNamePart` | Base of every national name part: `letters()` (regex class), `label()` (message), `innerSeparators()` (default `-' `) |
 | `Name\LatinSpelling` | `@internal`: finds a Latin override among the ICAO spellings of a name, word by word (`Name\IdentifierSpellings`: variants per word + national separators; hyphen ≡ `<`; cap 4096 per word) |
-| `Name\LatinOverridePolicy` | `@internal` abstract: `resolve(?override, derived)` (template method, drops the derived form); `withoutDerivedForm()` (refuses, except `AnyIcaoSpelling` with an override); subclasses `AnyIcaoSpelling` (RU, GB) and `TransliterationVariant` (AU, DE, FR, IT, ES, NL, CH, TR, US; via `LatinSpelling`) |
+| `Name\LatinOverridePolicy` | `@internal` abstract: `resolve(?override, derived)` (template method, drops the derived form); `withoutDerivedForm()` (refuses, except `AnyIcaoSpelling` with an override); subclasses `AnyIcaoSpelling` (RU, GB, CA) and `TransliterationVariant` (AU, DE, FR, IT, ES, NL, CH, TR, US; via `LatinSpelling`) |
 | `Name\PersonName` | Interface of a national full name: `latin(): Icao\PersonName`, `full()` |
 | `Name\Latin\*` | `AbstractLatinNamePart` (`\p{Latin}` part); `@internal`: `LatinPersonNameBuilder` (derived form, spellings per word for `TransliterationVariant`), `AbstractLatinPersonName` (effective Latin form + kept override, hook `overridePolicy()`), `AbstractFamilyGivenPersonName<TFamily, TGiven>` (public `family`/`given`, `full()`, `equals()`, JSON view; AU DE FR IT TR NL CH GB), `AbstractFamilyGivenPersonNameCodec<TName>` (keys `family`/`given`/`latin`; hooks `shape()`, `create()`) |
 | `Name\RU\*` | `AbstractRussianNamePart` (letters, word pattern), `FamilyName`, `GivenName`, `Patronymic`, `PersonName` (+ `short()`, `initialsFirst()`), `PersonNameCodec`; `@internal RussianTransliteration` (drops Ь, then `Icao\Transliterator`) |
@@ -95,3 +95,9 @@ interface, `DlId\AbstractDlIdNumber` (hooks `shapes(): NumberShapes`, `layout()`
 `fitsLength()`) + one final `<Abbr>DlIdNumber` per covered jurisdiction (30), `DlIdNumberFactory` on
 `SubdivisionResolver` over the covered cases only; `classFor()` lists the 21 uncovered cases explicitly (`=> null`), so a
 new enum case breaks the `match`. FL, WI, WY add `formatted()` (published hyphen layout) and mask in it.
+
+`Document\CA\*` (federal, plan 3 Task 4): `SocialInsuranceNumber` (9 digits, format only; `formatted()`
+`123 456 789`, mask `*** **6 789`; `isTemporaryResident()` = first digit 9), `PassportNumber` (`A123456BC` since
+2023-05-10 or `AB123456` before; mask 4, 3 for 8 characters). `Name\CA\PersonName($family, ?$given, ?$latin)` on
+`AbstractFamilyGivenPersonName` like GB (one-word name = `given` null), policy `AnyIcaoSpelling`, no `XXX` handling;
+codec keys `family`, `given`, `latin`.

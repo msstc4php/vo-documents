@@ -288,3 +288,20 @@ script classes use `\p{sc=Latin}` / `\p{sc=Cyrillic}` (Script property only); `c
   resolves the class with `coveredClassFor()` (`?? throw`) instead.
 - Infection: `array_values(array_filter(...))` handed to `SubdivisionResolver` escapes `UnwrapArrayValues` (the
   resolver only iterates); build the list with a `foreach` + `[] =`.
+
+## CA sources and decisions (plan 3 Task 4, 2026-11-16 UTC)
+
+- **Reachability:** `www.canada.ca` resets HTTP/2 streams and stalls HTTP/1.1 from curl (no answer in 90 s); WebFetch
+  reads it. For verbatim text use the Internet Archive `id_` capture (`web.archive.org/web/2026id_/<url>` redirects to
+  the latest; the body is gzip-encoded, `zcat` it). `ircc.canada.ca` help-centre pages answer WebFetch; the pre-2023
+  version of qnum=1446 is under the old host `www.cic.gc.ca` in the CDX index.
+- **SIN check digit not enforced:** ESDC publishes none; the CRA rejection codes name a "Modulus 10 (Mod 10) check
+  digit formula" without the algorithm, and the CRA's own sample SINs `123 456 789` and `111 111 111` fail Luhn. Do not
+  add `Checksum::luhn()` to the SIN without an official text giving the algorithm (owner's rule). No leading digit is
+  refused (no ESDC "0 or 8 not assigned" text; the CRA ITN starts `08`/`09` and is indistinguishable by shape).
+- **CA override policy is `AnyIcaoSpelling`**, not the plan default: the Passport Program's change-name page lets an
+  adult drop or invert given names and points to "alternative spellings" for letters it cannot print, so a passport
+  name need not be a table spelling. An override equal to the derived form with `<` for a hyphen is dropped (test
+  examples for "kept as typed" must differ in a letter, `BERUBE<LEVESQUE<<ANNIE`).
+- **Adding a country codec** touches every `tests/Unit/Name/*/PersonNameCodecTest.php` (`#[UsesClass]` for the new
+  codec, since each test builds the mapper from `Codecs::all()`) and `CodecsTest`.
