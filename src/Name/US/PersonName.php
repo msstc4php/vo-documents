@@ -55,7 +55,7 @@ final readonly class PersonName extends AbstractLatinPersonName
     }
 
     /**
-     * @return non-empty-string e.g. "José Luis O'Brien III"
+     * @return non-empty-string e.g. "José Luis O'Brien 3RD"
      */
     #[Override]
     public function full(): string

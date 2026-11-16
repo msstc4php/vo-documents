@@ -237,6 +237,10 @@ final class PersonNameCodecTest extends TestCase
             ['family' => 'Smith', 'given' => 'John', 'suffix' => 'Jr.'],
             'Invalid American name suffix.',
         ];
+        yield 'suffix without a given name' => [
+            ['family' => 'Smith', 'suffix' => 'JR'],
+            'Invalid American person name (suffix without a given name).',
+        ];
         yield 'middle name without a given name' => [
             ['family' => 'Smith', 'middle' => 'Lee'],
             'Invalid American person name (middle name without a given name).',

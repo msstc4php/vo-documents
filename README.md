@@ -142,12 +142,13 @@ for AU**; use `fromNumberIn()` when the issuer is known (see `docs/sources/AU.md
 
 A national name part (`Name\RU\FamilyName`, `GivenName`, `Patronymic`, and `FamilyName`, `GivenName` of `Name\AU`,
 `Name\DE`, `Name\FR`, `Name\IT`, `Name\ES`, `Name\NL`, `Name\CH`, `Name\GB`, `Name\TR`, `Name\US`, plus
-`Name\US\MiddleName`) is NFC-normalised, trimmed, has inner whitespace runs collapsed to one space, and keeps its letter case. Limits: 100
-characters per part. Russian parts accept only the 33 Russian letters; a Cyrillic name typed with Latin look-alikes
-(Latin `a`, `o`, `e`, `c`) is refused. A compatibility character (its NFKC form differs: fullwidth `Ｓｍｉｔｈ`, `ª`, the
-ligature `ﬁ`) is refused in every country, because it would be a second stored spelling of the same name; the ones an
-ICAO table lists itself (`Ĳ`, `Ŀ`) are kept. Messages say "(N characters)" for an empty or too long part,
-"(compatibility character)", or "(invalid character)" for a letter or separator that is not allowed where it stands.
+`Name\US\MiddleName`) is NFC-normalised, trimmed, has inner whitespace runs collapsed to one space, and keeps its letter
+case. Limits: 100 characters per part. Russian parts accept only the 33 Russian letters; a Cyrillic name typed with
+Latin look-alikes (Latin `a`, `o`, `e`, `c`) is refused. A compatibility character (its NFKC form differs: fullwidth
+`Ｓｍｉｔｈ`, `ª`, the ligature `ﬁ`) is refused in every country, because it would be a second stored spelling of the same
+name; the ones an ICAO table lists itself (`Ĳ`, `Ŀ`) are kept. Messages say "(N characters)" for an empty or too long
+part, "(compatibility character)", or "(invalid character)" for a letter or separator that is not allowed where it
+stands.
 
 ```php
 use MSSTC4PHP\ValueObject\Documents\Icao\PersonName as IcaoPersonName;
@@ -238,8 +239,8 @@ it as unsupported (a configuration error, not a 500 on request input). The inter
 ### Composite names need the codecs
 
 Document numbers and name parts are strings and need nothing. The composite names (`Name\<CC>\PersonName` of every
-country: RU, AU, DE, FR, IT, ES, NL, CH, GB, TR, US) are read through a payload codec, so the mapper that the bridge uses
-must be built with `Codecs::all()`:
+country: RU, AU, DE, FR, IT, ES, NL, CH, GB, TR, US) are read through a payload codec, so the mapper that the bridge
+uses must be built with `Codecs::all()`:
 
 ```php
 use MSSTC4PHP\ValueObject\Documents\Codecs;
@@ -327,8 +328,8 @@ Collected from the source notes; each is a deliberate omission with its reason i
   (`docs/sources/GB.md`).
 - **TR:** sürücü belgesi number (a running sequence per province, no format), the identity card serial number
   (`docs/sources/TR.md`).
-- **US:** a middle name or suffix beside a one-word name (no source defines it), the IRM's open list of "never issued" SSN
-  examples (not refused), ATIN and IRSN; DL/ID numbers follow in a later task (`docs/sources/US.md`).
+- **US:** a middle name or suffix beside a one-word name (no source defines it), the IRM's open list of "never issued"
+  SSN examples (not refused), ATIN and IRSN; DL/ID numbers follow in a later task (`docs/sources/US.md`).
 - **No region value object for RU**: no field encodes a region with a published mapping to ISO 3166-2:RU (`RU.md`).
 - **RU driving licences of the 1999 form** (Cyrillic series): expired by 2026 (`RU.md`).
 - **RU old-form OMS policies** (series and number) and AU **11-digit Medicare individual numbers**.
@@ -355,11 +356,10 @@ Collected from the source notes; each is a deliberate omission with its reason i
   published rule for unproven birth dates); Italian codice fiscale accepts any omocodia substitution over the seven
   numeric positions and `29` February when the two-digit year is divisible by four (no century is encoded).
 - **Name limits by country:** FR names use the 2014 civil-status circular's letter list (`ñ`, `ł`, `ß` refused); NL
-  names use the BRP Teletex letters and refuse the `ĳ` ligature (written `ij`); TR names refuse `Q`, `W`, `X` (Law
-  1353 art. 3), hyphens and apostrophes; derived `Ö`/`Ü` stay `OE`/`UE` (table 6.A); ES refuses the Catalan middle dot
-  `l·l`; IT refuses the comma between given names; US parts store the Hawaiian ʻokina (U+02BB) as an apostrophe, as
-  the passport writes it; GB licence numbers of a holder with no first names would be refused (no published rule for
-  them).
+  names use the BRP Teletex letters and refuse the `ĳ` ligature (written `ij`); TR names refuse `Q`, `W`, `X` (Law 1353
+  art. 3), hyphens and apostrophes; derived `Ö`/`Ü` stay `OE`/`UE` (table 6.A); ES refuses the Catalan middle dot `l·l`;
+  IT refuses the comma between given names; US parts store the Hawaiian ʻokina (U+02BB, U+2018) as an apostrophe, as the
+  passport writes it; GB licence numbers of a holder with no first names would be refused (no published rule for them).
 - **Source access:** FR passport and licence formats are France Titres-ANTS answers; CH passport length comes from
   the Basel-Stadt passport office and fedpol; TR passport format from the PRADO register; the ES NIF/NIE algorithm and
   several GB texts are cited through unmodified Internet Archive copies of the official page (original URL, archive URL

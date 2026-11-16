@@ -15,7 +15,7 @@ use Override;
  * IRS Individual Taxpayer Identification Number, `9NN-NN-NNNN`: nine digits, the first always 9, the fourth and fifth
  * in 50-65, 70-88, 90-92 or 94-99 as the IRS assigns them (89 and 93 are "reserved for other programs": 93 is the
  * ATIN). There is no check digit, and it never passes as a {@see SocialSecurityNumber} (area 900-999). `masked()` is
- * the IRS truncated form (26 CFR 301.6109-4): `***-**-6789`.
+ * the IRS truncated form (26 CFR 301.6109-4): `***-**-1234`.
  *
  * @see https://www.irs.gov/irm/part3/irm_03-013-005 IRM 3.13.5.22 "Individual Taxpayer Identification Number (ITIN)
  *      Format"

@@ -34,7 +34,7 @@ final class PassportCardNumber extends AbstractStringValueObject implements Mask
     protected function parse(string $value): string
     {
         $number = new NumberFormat('0-9A-Z', 9, 9)->parse($value, self::DOCUMENT);
-        // The value has exactly nine characters, so the pattern spans it.
+        // Unanchored: the length is fixed at nine above, so anchors would be equivalent mutants.
         if (\preg_match('/C[0-9]{8}/', $number) !== 1) {
             throw new InvalidDocumentNumberException(\sprintf('Invalid %s (invalid character).', self::DOCUMENT));
         }

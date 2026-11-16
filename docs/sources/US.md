@@ -57,7 +57,8 @@ How the package applies this:
 | `GivenName` (first name, optional) | the same | the same | the same; null for a person with one name (5) |
 | `MiddleName` | the same | the same | the same; the second secondary identifier |
 
-- **ʻokina** (U+02BB) is stored as an apostrophe (U+0027), as the passport writes it (3); U+2019 already is.
+- **ʻokina** (U+02BB, and U+2018 as 8 FAM itself types it in (3)) is stored as an apostrophe (U+0027), as the
+  passport writes it (3); U+2019 already is.
   `Kalanianaʻole` → `Kalaniana'ole` → ICAO `KALANIANAOLE` (Doc 9303 Part 3 §4.6: the apostrophe is omitted).
 - **Derived Latin:** `LAST<<FIRST<MIDDLE<SUFFIX` through ICAO table 6.A: `O'Brien, José Luis, 3RD` →
   `OBRIEN<<JOSE<LUIS<III`, `Peña-Ruiz, Zoë` → `PENA-RUIZ<<ZOE`.

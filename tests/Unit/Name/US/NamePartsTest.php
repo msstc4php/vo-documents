@@ -49,6 +49,7 @@ final class NamePartsTest extends TestCase
         yield 'diacritics kept in the national form' => ['Peña', 'Peña'];
         yield 'decomposed accent composed' => ["Pen\u{0303}a", 'Peña'];
         yield 'okina stored as an apostrophe' => ["Kalaniana\u{02BB}ole", "Kalaniana'ole"];
+        yield 'okina typed as U+2018 (8 FAM)' => ["Kalaniana\u{2018}ole", "Kalaniana'ole"];
     }
 
     #[DataProvider('validFamilyNames')]
