@@ -210,7 +210,100 @@ issued before it (still valid until expiry) have no published format.
 
 ## State driving licences (Task 6b)
 
-Researched in plan 3 Task 6b.
+The licencia de conducir of each of the 32 federal entities, in ISO 3166-2:MX order. All sources were read on
+2026-11-16 between 09:30 and 11:10 UTC. **Result: no entity is covered (0/32).** No state, and no federal text,
+publishes the length, character set or layout of its licence number, so `Document\MX\Jurisdiction`, a
+`DriverLicenceNumber` interface, the per-state classes and the factory are not created (plan decision "Namespaces"
+names them "only for the states the research finds published"; with none, the enum would have no user).
+
+### Sources
+
+| Ref | Source | Publisher | Where read |
+|---|---|---|---|
+| LGMSV | Ley General de Movilidad y Seguridad Vial (DOF 17-05-2022), art. 29 | Congreso de la Unión | <https://dof.gob.mx/nota_detalle.php?codigo=5652187&fecha=17%2F05%2F2022&print=true> |
+| CMX-RLM | Reglamento de la Ley de Movilidad de la Ciudad de México (GOCDMX 15-09-2017, última reforma GOCDMX 10-10-2025) | Gobierno de la Ciudad de México; consolidated copy published by PAOT (a CDMX public body) | <https://paot.org.mx/centro/reglamentos/df/pdf/2025/RGTO_LEY_MOVILIDAD_10_10_2025.pdf> |
+| GUA-RLM | Reglamento de la Ley de Movilidad del Estado de Guanajuato y sus Municipios, Decreto Gubernativo 175 (POGEG 22-11-2016), art. 306 | Gobierno del Estado de Guanajuato; copy on the León municipal site | <https://leon.gob.mx/movilidad/adjunto.php?a=773> |
+| JAL-LMT | Ley de Movilidad y Transporte del Estado de Jalisco (Decreto 24451/LX/13), art. 58 | Congreso del Estado de Jalisco | <https://transparencia.info.jalisco.gob.mx/sites/default/files/Ley%20de%20Movilidad%20y%20Transporte%20del%20Estado%20de%20Jalisco_2.pdf> |
+| NLE-LRL | Ley que Regula la Expedición de Licencias para Conducir del Estado de Nuevo León (Decreto 282, POE 30-12-2005; última reforma integrada Decreto 443, POE 148-III, 24-11-2023), art. 18 | Congreso del Estado de Nuevo León ("Compilación Legislativa"); copy on the Galeana municipal site (`hcnl.gob.mx` failed the TLS handshake) | <https://galeana.gob.mx/wp-content/uploads/2025/11/51_Ley_Licencias_de_Conducir.pdf> |
+| SLP-SIPEL | "Enlace SIPEL — Licencia de Conducir" (renewal form) | Secretaría de Finanzas de San Luis Potosí | <https://enlacesipel.slp.gob.mx/LicenciasConductor> |
+| SLP-VAL | "Valida tu licencia" (CURP + licence number form) | Gobierno de San Luis Potosí | <https://validatulicencia.slp.gob.mx/> |
+| TAB-LGTV | Ley General de Tránsito y Vialidad del Estado de Tabasco (última reforma Decreto 265, POE 8733 "E", 16-05-2026), art. 21 | Congreso del Estado de Tabasco | <https://congresotabasco.gob.mx/wp-content/uploads/2026/05/Ley-General-de-Transito-y-Vialidad-del-Estado-de-Tabasco.pdf> |
+| MEX-VAL | "Validación de licencias" | Secretaría de Movilidad del Estado de México | <https://smovilidad.edomex.gob.mx/validacion_de_licencias> |
+
+Reachability: `semovi.cdmx.gob.mx` and its apps, `appsextssl.ebajacalifornia.gob.mx`, `hcnl.gob.mx`, `icvnl.gob.mx`,
+`michoacan.gob.mx`, `tramites.yucatan.gob.mx`, `ventanilla.puebla.gob.mx` and `diputados.gob.mx` did not answer
+(connection reset, TLS failure or timeout, also through WebFetch), and the Internet Archive was "Temporarily Offline"
+for the whole session, so no capture of them could be read. Searched without an official format (web search restricted
+to each state's `gob.mx` domain and by name, plus the state's transit or mobility law where found): all 32 entities.
+Secondary only (never a rule, never cited in code): vendor and insurer guides (Kavak, Ahorra Seguros), news sites,
+Justia copies, Wikipedia. Kavak's "en Sonora, el folio tiene 14 dígitos" cites no official text; a search-index
+snippet of a Baja California verification page shows a sample number, but the page could not be read and a sample is
+not a rule.
+
+**What the official texts say.** The laws and regulations that list a licence's contents name the number and stop
+there (verbatim):
+
+- LGMSV art. 29: the federal and state databases contain "II. Licencias de conducir, incluyendo el tipo de licencia y
+  seguros registrados por vehículo"; no number format, no national licence register with a layout.
+- NLE-LRL art. 18: "La licencia debe contener, al menos, los datos siguientes: […] II. Institucionales: a) Fechas de
+  expedición y de vigencia; b) Número de licencia; y c) Tipo de licencia".
+- JAL-LMT art. 58: "En las licencias o permisos para operar o conducir vehículos se precisarán: […] V. El número de
+  registro de dicha licencia;".
+- TAB-LGTV art. 21: "La Licencia de conducir de automovilista, motociclista o chofer, deberá contener indistintamente
+  los siguientes datos: […] IV. Número de identificación del Titular;".
+- GUA-RLM art. 306: "El registro estatal de licencias y de infracciones deberá contener al menos: I. La base de datos
+  de expedición de licencias y permisos para conducir emitidas por el Instituto;".
+- CMX-RLM: the licence number appears only as a datum to report ("Relación de conductores, identificados por nombre,
+  domicilio, número de licencia que lo autoriza a conducir este tipo de vehículos").
+- SLP-SIPEL: the "número de licencia" field carries the hint "No debe contener guiones, espacios, ni caracteres
+  especiales"; SLP-VAL: "Ingresa el número de licencia". Neither gives a length or character set.
+
+### Per entity
+
+| ISO | Source | Quoted format | Normalised shape | Encoded data | Official sample | Verdict |
+|---|---|---|---|---|---|---|
+| MX-AGU | Ley de Movilidad del Estado de Aguascalientes (searched) | none | — | — | — | not covered: no published format |
+| MX-BCN | Ley que Regula los Servicios de Control Vehicular (searched); verification page unreachable | none | — | — | none read (an index snippet only) | not covered: no published format; a sample is not a rule |
+| MX-BCS | state portal (searched) | none | — | — | — | not covered: no published format |
+| MX-CAM | state portal (searched) | none | — | — | — | not covered: no published format |
+| MX-CHH | state portal (searched) | none | — | — | — | not covered: no published format |
+| MX-CHP | state portal (searched) | none | — | — | — | not covered: no published format |
+| MX-CMX | CMX-RLM; SEMOVI pages unreachable | number named, no format | — | — | — | not covered: no published format |
+| MX-COA | state portal, RETYS (searched) | none | — | — | — | not covered: no published format |
+| MX-COL | state portal (searched) | none | — | — | — | not covered: no published format |
+| MX-DUR | state portal (searched) | none | — | — | — | not covered: no published format |
+| MX-GRO | state portal (searched) | none | — | — | — | not covered: no published format |
+| MX-GUA | GUA-RLM art. 306 | number not described | — | — | — | not covered: no published format |
+| MX-HID | state portal (searched) | none | — | — | — | not covered: no published format |
+| MX-JAL | JAL-LMT art. 58 | "El número de registro de dicha licencia" | — | — | — | not covered: no published format |
+| MX-MEX | MEX-VAL | none (no number field described) | — | — | — | not covered: no published format |
+| MX-MIC | state portal unreachable (searched) | none | — | — | — | not covered: no published format |
+| MX-MOR | state portal (searched) | none | — | — | — | not covered: no published format |
+| MX-NAY | state portal (searched) | none | — | — | — | not covered: no published format |
+| MX-NLE | NLE-LRL art. 18 | "b) Número de licencia" | — | — | — | not covered: no published format |
+| MX-OAX | state portal (searched) | none | — | — | — | not covered: no published format |
+| MX-PUE | Ventanilla Digital FAQ unreachable (searched) | none | — | — | — | not covered: no published format |
+| MX-QUE | SSC and CEMER pages (searched) | none | — | — | — | not covered: no published format |
+| MX-ROO | IMOVEQROO pages (searched) | none | — | — | — | not covered: no published format |
+| MX-SIN | state portal (searched) | none | — | — | — | not covered: no published format |
+| MX-SLP | SLP-SIPEL, SLP-VAL | "No debe contener guiones, espacios, ni caracteres especiales" | — | — | — | not covered: no length or character set |
+| MX-SON | state portal (searched); "14 dígitos" from a vendor guide only | none | — | — | — | not covered: no official format |
+| MX-TAB | TAB-LGTV art. 21 | "IV. Número de identificación del Titular" | — | — | — | not covered: no published format |
+| MX-TAM | Secretaría de Finanzas requirement and fee sheets (searched) | none | — | — | — | not covered: no published format |
+| MX-TLA | state portal (searched) | none | — | — | — | not covered: no published format |
+| MX-VER | state portal (searched) | none | — | — | — | not covered: no published format |
+| MX-YUC | Reglamento de Tránsito (only a Justia copy found; RETyS page unreachable) | number named, no format (secondary copy) | — | — | — | not covered: no published format |
+| MX-ZAC | state portal (searched) | none | — | — | — | not covered: no published format |
+
+### Overlap and worked examples
+
+With no entity covered there is no overlap to resolve and no factory: the overlap set is empty and there is nothing to
+route. The check script (`mx_state_licences.py`, Task 6b scratchpad) verifies that this table has 32 rows in ISO
+3166-2:MX order, that every verdict is "not covered", and that each verbatim quote above occurs in the downloaded
+source text.
+
+A future task that finds a published format adds the enum (all 32 cases, plan decision), the interface, the class and
+the factory in one step, following `Document\CA\DriverLicence\*`.
 
 ## Not covered
 
@@ -218,3 +311,5 @@ Researched in plan 3 Task 6b.
 - RFC of a legal person (12 characters, `t_RFC_PM`): the package covers natural persons.
 - CURP check digit, elector-key homoclave, RFC homoclave check character, NSS check digit: no algorithm published.
 - INE credential numbers other than the clave de elector (CIC, OCR, número de emisión): not researched in this task.
+- State driving licence numbers of all 32 entities (above): the state laws name the number without a format; no
+  `Document\MX\Jurisdiction` or licence classes exist.

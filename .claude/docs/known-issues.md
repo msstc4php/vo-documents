@@ -352,3 +352,15 @@ script classes use `\p{sc=Latin}` / `\p{sc=Cyrillic}` (Script property only); `c
   cast is a `TypeError` under strict types, so CastInt mutants die).
 - **RFC `Ñ`** is multibyte: `Digits::upperCasedOfLength()` uses ASCII `strtoupper()`, so `Rfc::parse()` upper-cases with
   `mb_strtoupper()` and NFC first; `Mask::keepLastCharacters()` is byte-based and is not used for the RFC.
+
+## MX state licences (plan 3 Task 6b, 2026-11-16 UTC)
+
+- **Verdict 0/32**: state laws name the licence number with no layout (NL Ley de licencias art. 18 "b) Número de
+  licencia", Jalisco LMT art. 58 "El número de registro de dicha licencia", Tabasco LGTV art. 21 "Número de
+  identificación del Titular"); LGMSV art. 29 has no national format. Vendor guides (Kavak "Sonora 14 dígitos") are
+  not sources.
+- **Reachability (that session)**: `semovi.cdmx.gob.mx`, `appsextssl.ebajacalifornia.gob.mx`, `hcnl.gob.mx` (TLS
+  failure), `icvnl.gob.mx`, `michoacan.gob.mx`, `tramites.yucatan.gob.mx`, `ventanilla.puebla.gob.mx`,
+  `diputados.gob.mx` did not answer; the Internet Archive was offline. Working copies: NL law on `galeana.gob.mx`,
+  CDMX reglamento on `paot.org.mx`, Guanajuato reglamento on `leon.gob.mx`. Retry the dead hosts before concluding a
+  state is still unpublished.

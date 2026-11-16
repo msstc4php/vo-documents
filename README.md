@@ -405,8 +405,9 @@ Collected from the source notes; each is a deliberate omission with its reason i
   passports have no published format), the RFC of a legal person, the CURP, RFC, NSS and elector-key check characters
   (no algorithm published), the RENAPO state catalogue and "palabras inconvenientes" list (not published with the
   Reglas: any two letters are accepted, substituted forms too), the INE sex and state code lists of the elector key,
-  the fields of the NSS, other INE card numbers (CIC, OCR). State driving
-  licences: plan 3 Task 6b (`docs/sources/MX.md`).
+  the fields of the NSS, other INE card numbers (CIC, OCR). State driving licences of all 32 entities: the state
+  laws (NL, JAL, TAB, GUA, CDMX) name the number without a format and no state or federal text publishes one, so
+  there is no `Document\MX\Jurisdiction` or licence class (`docs/sources/MX.md`).
 - **No region value object for RU**: no field encodes a region with a published mapping to ISO 3166-2:RU (`RU.md`).
 - **RU driving licences of the 1999 form** (Cyrillic series): expired by 2026 (`RU.md`).
 - **RU old-form OMS policies** (series and number) and AU **11-digit Medicare individual numbers**.
