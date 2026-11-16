@@ -325,3 +325,25 @@ script classes use `\p{sc=Latin}` / `\p{sc=Cyrillic}` (Script property only); `c
   (`property.readOnlyAssignNotInConstructor` and `property.uninitializedReadonly`). `OnHealthCardNumber::$versionCode`
   is an uninitialized `string` ('' = none) and `stored()` throws `LogicException` when `isset()` shows it already set,
   so `$card->__construct(...)` called again cannot change it (the readonly `$value` would throw only after `parse()`).
+
+## MX sources and decisions (plan 3 Task 6a, 2026-11-16 UTC)
+
+- **Reachability:** `dof.gob.mx` (`nota_detalle_popup.php?codigo=…`), `www.gob.mx/cms/uploads/…` and `www.sat.gob.mx`
+  answer curl. `repositoriodocumental.ine.mx` serves a Cloudflare challenge, `reposipot.imss.gob.mx` an Incapsula page,
+  `ayudarepresentantes.ine.mx` fails with a proxy 502 and `pautas.ine.mx` does not resolve for WebFetch: read their
+  Internet Archive `id_` copies (CDX with `filter=statuscode:200`). The DOF popup HTML is UTF-8 with the `Ú` of "Única"
+  dropped by the converter (`Clave nica`); table cells use `rowspan` for the "Naturaleza" column (rows 11-16 are all
+  "Alfabética").
+- **CURP `X` sex** comes from an INE DERFE report quoting RENAPO practice, not from the Instructivo (which still says
+  "H para hombre y M para mujer"); `Sex::Unspecified` was added for it. No other class returns it.
+- **CURP century letter** is limited to `A-J` (Instructivo and Reglas both say so): a CURP with `K`-`Z` at position 17 is
+  refused. If RENAPO ever issues one (more than ten letters needed in a homonymy run), widen it with a quote.
+- **RENAPO annexes** (state catalogue, "palabras altisonantes") are listed in the Reglas but not published in them; no
+  state list is applied and `NE` is not quoted from an official text.
+- **MX names refuse `/` and `.`** although RENAPO captures them as written (`D/AMICO`, `MA. GUADALUPE`): the ICAO
+  transliteration omits only apostrophes, so such a part could never derive a Latin form.
+- **`ElectorKey` clamps** in `birthMonth()`/`birthDay()` leave equivalent Increment/Decrement mutants (as `ChiNumber`).
+  The CURP date avoids them: `isoDate()` builds `YYYY-MM-DD` and `parse()` calls `checkdate()` with int casts (a removed
+  cast is a `TypeError` under strict types, so CastInt mutants die).
+- **RFC `Ñ`** is multibyte: `Digits::upperCasedOfLength()` uses ASCII `strtoupper()`, so `Rfc::parse()` upper-cases with
+  `mb_strtoupper()` and NFC first; `Mask::keepLastCharacters()` is byte-based and is not used for the RFC.

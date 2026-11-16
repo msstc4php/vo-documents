@@ -12,7 +12,7 @@ core.
 | `Icao\Table\*` | `@internal` `TransliterationTable` per script (LatinMultinational, Cyrillic); add a class + register it in the `Transliterator` constructor for a new script |
 | `Name\AbstractNamePart` | Base of every national name part: `letters()` (regex class), `label()` (message), `innerSeparators()` (default `-' `) |
 | `Name\LatinSpelling` | `@internal`: finds a Latin override among the ICAO spellings of a name, word by word (`Name\IdentifierSpellings`: variants per word + national separators; hyphen ≡ `<`; cap 4096 per word) |
-| `Name\LatinOverridePolicy` | `@internal` abstract: `resolve(?override, derived)` (template method, drops the derived form); `withoutDerivedForm()` (refuses, except `AnyIcaoSpelling` with an override); subclasses `AnyIcaoSpelling` (RU, GB, CA) and `TransliterationVariant` (AU, DE, FR, IT, ES, NL, CH, TR, US; via `LatinSpelling`) |
+| `Name\LatinOverridePolicy` | `@internal` abstract: `resolve(?override, derived)` (template method, drops the derived form); `withoutDerivedForm()` (refuses, except `AnyIcaoSpelling` with an override); subclasses `AnyIcaoSpelling` (RU, GB, CA) and `TransliterationVariant` (AU, DE, FR, IT, ES, NL, CH, TR, US, MX; via `LatinSpelling`) |
 | `Name\PersonName` | Interface of a national full name: `latin(): Icao\PersonName`, `full()` |
 | `Name\Latin\*` | `AbstractLatinNamePart` (`\p{Latin}` part); `@internal`: `LatinPersonNameBuilder` (derived form, spellings per word for `TransliterationVariant`), `AbstractLatinPersonName` (effective Latin form + kept override, hook `overridePolicy()`), `AbstractFamilyGivenPersonName<TFamily, TGiven>` (public `family`/`given`, `full()`, `equals()`, JSON view; AU DE FR IT TR NL CH GB), `AbstractFamilyGivenPersonNameCodec<TName>` (keys `family`/`given`/`latin`; hooks `shape()`, `create()`) |
 | `Name\RU\*` | `AbstractRussianNamePart` (letters, word pattern), `FamilyName`, `GivenName`, `Patronymic`, `PersonName` (+ `short()`, `initialsFirst()`), `PersonNameCodec`; `@internal RussianTransliteration` (drops Ь, then `Icao\Transliterator`) |
@@ -112,3 +112,12 @@ write-once property guarded by `isset()`). Licences: AB, BC, NS, ON, QC, SK (AB 
 `HealthCardNumberFactory::classFor()` is non-nullable and the resolver runs over `Jurisdiction::cases()`.
 `QcHealthCardNumber` implements `HasSex` (7th character `5`/`6` = female) with `birthDay()`, `birthMonth()`,
 `birthYearDigits()`; `OnHealthCardNumber::versionCode(): ?string`.
+
+`Document\MX\*` (national, plan 3 Task 6a): `Curp` (`HasBirthDate` + `HasSex`; century from character 17, digit →
+19YY, `A-J` → 20YY; date validated with `checkdate()`; `birthStateCode()` string; check digit format only), `ElectorKey`
+(INE clave de elector; two-digit year via `TwoDigitYearDate`, `birthStateCode()`/`sexCode()` raw strings, no `HasSex`),
+`Rfc` (natural person, SAT `t_RFC_PF` regex with `Ñ`/`&`, multibyte-aware `masked()`), `SocialSecurityNumber` (NSS, 11
+digits, format only). No passport class. `Sex::Unspecified` exists for the CURP `X`.
+`Name\MX\PersonName(?$first, ?$second, $given, ?$latin)` extends `AbstractLatinPersonName` like ES; no surnames → the
+given names are the primary identifier (`JUAN`); policy `TransliterationVariant`; codec keys `first`, `second`, `given`,
+`latin` (`first` and `second` nullable).

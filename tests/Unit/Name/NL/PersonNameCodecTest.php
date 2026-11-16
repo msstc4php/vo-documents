@@ -33,6 +33,7 @@ use MSSTC4PHP\ValueObject\Documents\Name\Latin\LatinPersonNameBuilder;
 use MSSTC4PHP\ValueObject\Documents\Name\LatinForm;
 use MSSTC4PHP\ValueObject\Documents\Name\LatinOverridePolicy;
 use MSSTC4PHP\ValueObject\Documents\Name\LatinSpelling;
+use MSSTC4PHP\ValueObject\Documents\Name\MX\PersonNameCodec as MxPersonNameCodec;
 use MSSTC4PHP\ValueObject\Documents\Name\NL\AbstractDutchNamePart;
 use MSSTC4PHP\ValueObject\Documents\Name\NL\FamilyName;
 use MSSTC4PHP\ValueObject\Documents\Name\NL\GivenName;
@@ -55,6 +56,7 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(AbstractFamilyGivenPersonName::class)]
 #[UsesClass(AbstractLatinPersonName::class)]
 #[UsesClass(Codecs::class)]
+#[UsesClass(MxPersonNameCodec::class)]
 #[UsesClass(CaPersonNameCodec::class)]
 #[UsesClass(RuPersonNameCodec::class)]
 #[UsesClass(AuPersonNameCodec::class)]

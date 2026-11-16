@@ -19,7 +19,7 @@ How each bridge gets its mapper (the README shows the code):
 - vo-base-yii2: `Yii::$container->get(ValueObjectMapper::class)`; define it as a singleton. The ActiveRecord behavior
   falls back to a codec-less default mapper unless given `mapper`.
 - vo-base-bundle: `PayloadCodec` services are autoconfigured and tagged; register every codec class of `Codecs::all()`
-  (ten today) as a service.
+  (thirteen today) as a service.
 - vo-base-codeigniter4: built-in codecs only; composites of this package are not supported.
 
 `vo-documents-doctrine` has a completeness test that fails when a class here lacks a type: add the type there in the

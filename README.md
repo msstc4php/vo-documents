@@ -112,6 +112,10 @@ official algorithm is published. A number with the right shape is accepted, neve
 | `Document\CA\DriverLicence\{Ab,Bc,Ns,On,Qc,Sk}DriverLicenceNumber` | Driver's licence number of 6 jurisdictions (NS and SK also cover the photo ID card): AB `123456-789`, BC and SK 1-8 digits stored zero-padded to 8, NS Master Number `FINCH220867001`, ON 15 alphanumerics, QC `L1531-171274-08` | shape only (no check digit published); NS day and month checked as calendar fields | none (the NS surname and birth fields are not decoded: two-digit year) | Service Alberta RDN; ICBC; Service Nova Scotia; MTO glossary; SAAQ; Government of Saskatchewan, SGI |
 | `Document\CA\HealthCard\{Ab,Bc,Mb,Nb,Nl,Ns,Nt,Nu,On,Pe,Qc,Sk,Yt}HealthCardNumber` | Health card number of all 13 jurisdictions (8-12 characters; NT letter `D`/`N`/`H`/`M`/`T` + 7 digits; QC NAM `YUXJ75021213`) | BC leading 9 and MOD-11, ON leading digit 1-9 and MOD 10 verified; QC month (01-12, 51-62) and day checked; the rest format only | ON `versionCode()` (kept apart from the value); QC `HasSex`, birth year digits, month, day (GIU REQ-19-53: a reading aid, not a value to fill a record with) | Ontario Ministry of Health "Province and Territory Codes" and HCV/IHCS specifications; BC Teleplan; Québec MSSS GIU; provincial ministries |
 | `Document\CA\Jurisdiction` | The 10 provinces and 3 territories (enum, ISO 3166-2:CA) | n/a | n/a | ISO 3166-2:CA |
+| `Document\MX\Curp` | CURP, 18 characters (`HEGJ561231HDFRRN04`) | RENAPO layout: letters/digits per position, sex `H`/`M`/`X`, character 17 `0-9` (born up to 1999) or `A-J` (from 2000), birth date must exist; check digit format only (algorithm not published) | `HasBirthDate` (century from character 17), `HasSex` (`X` → `Sex::Unspecified`), `birthStateCode()` (RENAPO code, not ISO) | RENAPO Instructivo Normativo (DOF 2018, 2021); RENAPO Reglas 2021; INE DERFE |
+| `Document\MX\ElectorKey` | Clave de elector of the INE voter card, 18 characters | INE layout: 6 letters, `AAMMDD` (day/month valid in some century), 2 state characters, a sex letter, 3 homoclave characters (no check verified) | birth year digits, month, day; `birthStateCode()` and `sexCode()` as written (no value list published) | INE lineamientos 2021; INE glossary |
+| `Document\MX\Rfc` | RFC of a natural person, 13 characters (`HEGJ5612311A2`) | SAT `t_RFC_PF` pattern (`A-Z&Ñ`, month and day ranges, final digit or `A`); homoclave not verified | none | SAT CFDI data types (`tdCFDI.xsd`) |
+| `Document\MX\SocialSecurityNumber` | NSS (IMSS), 11 digits | format only (check digit algorithm not published) | none | IMSS norm 3000-001-007 |
 
 Names: `Name\<CC>\FamilyName`, `GivenName` and `PersonName` for DE, FR, IT, ES, NL, CH, GB and TR, like the RU and AU
 ones. Spain's `PersonName` has two surnames (`first`, optional `second`); in the Dutch one the prefixes (`van der`) are
@@ -119,13 +123,16 @@ part of the family name; the Swiss, Dutch, British, US and Canadian ones accept 
 US one is `Name\US\PersonName($family, ?$given, ?$middle, ?$suffix)` (`given` null for a one-word name), the suffix a
 `Name\US\NameSuffix` (the AAMVA list `JR`, `SR`, `1ST`/`I` … `9TH`/`IX`), written last among the secondary
 identifiers of the ICAO form, ordinals as Roman numerals (`SMITH<<JOHN<MICHAEL<III`). The Canadian one is
-`Name\CA\PersonName($family, ?$given)`, letters of the Latin script (English and French names).
+`Name\CA\PersonName($family, ?$given)`, letters of the Latin script (English and French names). The Mexican one is
+`Name\MX\PersonName(?$first, ?$second, $given)`: two surnames, one, or none (RENAPO records persons without
+surnames; then the given names are the only ICAO identifier, `JUAN`).
 
 Contracts: `Contract\Maskable` (every number above), `Contract\Subdivision` and `Contract\IssuedBySubdivision` (AU,
 US and CA jurisdictions, AU licences, US DL/ID numbers, CA licence and health card numbers). `Contract\HasSex` and the `Sex` enum are implemented by the documents that encode a sex
-(`Nir`, `FiscalCode`, the DVLA licence number, `ChiNumber`, the Québec NAM). `Contract\HasBirthDate` is public API that no class
-implements yet: every encoded birth date of these countries lacks a century, so the classes expose the year digits,
-month and day instead, and impossible dates (30 February) are refused.
+(`Nir`, `FiscalCode`, the DVLA licence number, `ChiNumber`, the Québec NAM, the Mexican CURP); `Sex::Unspecified` is
+the CURP's `X` (RENAPO, non-binary persons). `Contract\HasBirthDate` is implemented by the Mexican CURP only (its
+17th character gives the century); the other encoded birth dates lack a century, so those classes expose the year
+digits, month and day instead, and impossible dates (30 February) are refused.
 
 ### AU driving licences and the jurisdiction factory
 
@@ -189,8 +196,8 @@ and storage forms carry the ten digits only.
 ## Personal names
 
 A national name part (`Name\RU\FamilyName`, `GivenName`, `Patronymic`, and `FamilyName`, `GivenName` of `Name\AU`,
-`Name\DE`, `Name\FR`, `Name\IT`, `Name\ES`, `Name\NL`, `Name\CH`, `Name\GB`, `Name\TR`, `Name\US`, `Name\CA`, plus
-`Name\US\MiddleName`) is NFC-normalised, trimmed, has inner whitespace runs collapsed to one space, and keeps its letter
+`Name\DE`, `Name\FR`, `Name\IT`, `Name\ES`, `Name\NL`, `Name\CH`, `Name\GB`, `Name\TR`, `Name\US`, `Name\CA`,
+`Name\MX`, plus `Name\US\MiddleName`) is NFC-normalised, trimmed, has inner whitespace runs collapsed to one space, and keeps its letter
 case. Limits: 100 characters per part. Russian parts accept only the 33 Russian letters; a Cyrillic name typed with
 Latin look-alikes (Latin `a`, `o`, `e`, `c`) is refused. A compatibility character (its NFKC form differs: fullwidth
 `Ｓｍｉｔｈ`, `ª`, the ligature `ﬁ`) is refused in every country, because it would be a second stored spelling of the same
@@ -247,7 +254,7 @@ then depends on the country's sources:
 | Country | Accepted override | Why |
 |---|---|---|
 | RU | any valid ICAO name (`IVANOVA<<YULIYA` for Иванова Юлия, where the table gives `IVANOVA<<IULIIA`) | MVD Orders 996/186 (§32, §140) write the name "так, как это указано в подтверждающем документе" |
-| AU, DE, FR, IT, ES, NL, CH, TR, US | only an ICAO spelling of the name (`MULLER<<ZOE` for Müller Zoë); `<` for a hyphen is stored as the hyphen (policy `TransliterationVariant`) | Latin-script names: no source lets a passport keep another spelling, so the table spellings are the only ones |
+| AU, DE, FR, IT, ES, NL, CH, TR, US, MX | only an ICAO spelling of the name (`MULLER<<ZOE` for Müller Zoë); `<` for a hyphen is stored as the hyphen (policy `TransliterationVariant`) | Latin-script names: no source lets a passport keep another spelling, so the table spellings are the only ones |
 | GB | any valid ICAO name (policy `AnyIcaoSpelling`) | HM Passport Office lets a passport carry an evidenced spelling (`docs/sources/GB.md`) |
 | CA | any valid ICAO name (policy `AnyIcaoSpelling`) | the Passport Program points to "alternative spellings" and lets an adult drop or invert given names (`docs/sources/CA.md`) |
 
@@ -288,8 +295,8 @@ it as unsupported (a configuration error, not a 500 on request input). The inter
 ### Composite names need the codecs
 
 Document numbers and name parts are strings and need nothing. The composite names (`Name\<CC>\PersonName` of every
-country: RU, AU, DE, FR, IT, ES, NL, CH, GB, TR, US, CA) are read through a payload codec, so the mapper that the bridge
-uses must be built with `Codecs::all()`:
+country: RU, AU, DE, FR, IT, ES, NL, CH, GB, TR, US, CA, MX) are read through a payload codec, so the mapper that the
+bridge uses must be built with `Codecs::all()`:
 
 ```php
 use MSSTC4PHP\ValueObject\Documents\Codecs;
@@ -349,6 +356,7 @@ services:
     MSSTC4PHP\ValueObject\Documents\Name\TR\PersonNameCodec: ~
     MSSTC4PHP\ValueObject\Documents\Name\US\PersonNameCodec: ~
     MSSTC4PHP\ValueObject\Documents\Name\CA\PersonNameCodec: ~
+    MSSTC4PHP\ValueObject\Documents\Name\MX\PersonNameCodec: ~
 ```
 
 ```php
@@ -393,6 +401,12 @@ Collected from the source notes; each is a deliberate omission with its reason i
   the Manitoba six-character family registration number; prior health number formats (AB 11, MB 6, NS 11 numerics);
   the QC temporary NAM; the QC "chiffre valideur" and every health check digit other than BC and ON (no algorithm
   published); whether an ON version code is the current card's (`docs/sources/CA.md`).
+- **MX:** the passport number (the 2021 e-passport agreement gives only the booklet number `N` + 8 digits; older
+  passports have no published format), the RFC of a legal person, the CURP, RFC, NSS and elector-key check characters
+  (no algorithm published), the RENAPO state catalogue and "palabras inconvenientes" list (not published with the
+  Reglas: any two letters are accepted, substituted forms too), the INE sex and state code lists of the elector key,
+  the fields of the NSS, other INE card numbers (CIC, OCR); `/` and `.` in names (no ICAO spelling). State driving
+  licences: plan 3 Task 6b (`docs/sources/MX.md`).
 - **No region value object for RU**: no field encodes a region with a published mapping to ISO 3166-2:RU (`RU.md`).
 - **RU driving licences of the 1999 form** (Cyrillic series): expired by 2026 (`RU.md`).
 - **RU old-form OMS policies** (series and number) and AU **11-digit Medicare individual numbers**.
@@ -402,8 +416,8 @@ Collected from the source notes; each is a deliberate omission with its reason i
 
 ## Limits to know about
 
-- **Format only, check digit not verified:** INN, TFN, Medicare card number, CA SIN and the CA health card numbers
-  other than BC and ON. No official algorithm is
+- **Format only, check digit not verified:** INN, TFN, Medicare card number, CA SIN, the CA health card numbers
+  other than BC and ON, and the MX CURP, RFC, NSS and clave de elector. No official algorithm is
   published (FNS says only "по алгоритму, определенному ФНС"; the ATO gives the TFN algorithm to registered developers
   only; the ADHA appendix is not reachable; the CRA names a "Mod 10" formula for the SIN without giving it), so a
   mistyped check digit is accepted. Only checksums quoted from an official source are verified: SNILS, OMS policy, DE
