@@ -386,7 +386,182 @@ None of the covered numbers encodes a sex; `Sex` is unchanged.
 
 ## RG per state (Task 7b)
 
-Not researched in Task 7a.
+The número do Registro Geral (RG) of the Carteira de Identidade issued by each of the 27 federative units before
+the CIN, in ISO 3166-2:BR order. All sources were read on 2026-11-16 (UTC); "IA" is an unmodified Internet Archive
+capture (`id_` form, found through the CDX API with `filter=statuscode:200`) cited with its UTC timestamp. **Result:
+one unit is covered (BR-SP), 26 are not.** Basis for the code: the Task 7 "Files" line builds the `Jurisdiction`,
+interface, classes and factory "for RG if any state is covered", and the controller's ruling counts a state body's
+own online form as its publication; once one unit is covered, the plan's decision "Namespaces" applies and the enum
+lists all 27 units. Classes: `Document\BR\Jurisdiction` (27 cases), `Document\BR\IdentityCardNumber`,
+`Document\BR\IdentityCard\SpIdentityCardNumber`, factory `Document\BR\IdentityCardNumberFactory` (pattern of
+`Document\MX\DriverLicence\*` and `Document\CA\HealthCard\*`).
+
+### Sources
+
+| Ref | Source | Publisher | Where read |
+|---|---|---|---|
+| DEC | Decreto nº 10.977, de 23 de fevereiro de 2022 (compiled text), arts. 3, 11, 25, 26, 28 | Presidência da República | <https://www.planalto.gov.br/ccivil_03/_ato2019-2022/2022/decreto/d10977.htm>, IA 2026-10-21 10:45:48 (`planalto.gov.br` answers 302 to `gov.br/planalto` to curl and WebFetch) |
+| SP-AAC | "Pesquisa de RG" form of the Atestado de Antecedentes Criminais (`carrega-formulario`) and its script `aac.js` (`validaFormulario`, `checaRG`, `somente_numero`, `somente_numero_Digito`) | Secretaria da Segurança Pública de São Paulo (IIRGD) | <https://www2.ssp.sp.gov.br/aacweb/carrega-formulario>; <https://www2.ssp.sp.gov.br/AACWEBSTATIC/style/aac.js> |
+| BA-AAC | "Emissão de Certificado" form (`solicitar_atestado.asp`) | Polícia Civil da Bahia (SSP/BA) | IA 2025-04-20 02:24:10 of <https://antecedentes.pc.ba.gov.br/solicitar_atestado.asp> (host: proxy 502 on 2026-11-16) |
+| CE-AAC | "Atestado de Antecedentes" form (`AtestadoPesquisa.do`) | SSPDS Ceará | IA 2019-01-25 21:46:51 of <http://sistemas.sspds.ce.gov.br/AtestadoAntecedentes/AtestadoPesquisa.do> (host: timeout on 2026-11-16) |
+| DF-AAC | "Antecedentes Criminais" request form (`cadastro.aspx`) | Polícia Civil do Distrito Federal | IA 2019-03-09 16:46:10 of <http://certidaoweb.pcdf.df.gov.br/Views/cadastro.aspx> |
+| MA-AAC | "Antecedentes Criminais - Maranhão" (single-page application; field rules in its bundle `index-Dwq8SGpy.js`) | Perícia Oficial do Maranhão (SSP/MA) | <https://antecedentes.ssp.ma.gov.br/> |
+| MG-AAC | "Solicitação de Atestado de Antecedentes" | Polícia Civil de Minas Gerais | IA 2024-06-10 07:44:40 of <https://wwws.pc.mg.gov.br/atestado/solicitarsel.do?evento=x&fwPlc=sou> (host: proxy 502 on 2026-11-16) |
+| PA-AAC | "Antecedente Criminal - Polícia Civil do Pará", consulta | Polícia Civil do Pará | IA 2026-08-09 13:11:09 of <https://antecedentes.pc.pa.gov.br/consulta> |
+| PB-AAC | "Emitir atestado de antecedentes criminais" | Polícia Civil da Paraíba | <https://antecedentes.pc.pb.gov.br/EmitirAAC> |
+| PE-AAC | "Certidão de Antecedentes Criminais" (`certidaoAntecedentesCriminaisEmitir.jsf`) | SDS Pernambuco (IITB) | IA 2026-07-20 21:55:51 of <http://www.servicos.sds.pe.gov.br/antecedentes/public/pages/certidaoAntecedentesCriminais/certidaoAntecedentesCriminaisEmitir.jsf> (host: timeout on 2026-11-16) |
+| PR-AAC | "Solicitação de Atestado de Antecedentes Criminais", etapa 1 de 3 | Polícia Civil do Paraná (Instituto de Identificação) | <https://www.atestados.pr.gov.br/solicitante/validar>; <https://www.atestados.pr.gov.br/info/aac> |
+| RJ-AAC | "Apresentação do Serviço" of the Atestado de Antecedentes Criminais | IIFP / Detran-RJ | <https://atestadodic.detran.rj.gov.br/apresentacao.aspx> (the "Solicitar Atestado" postback answered HTTP 500) |
+| RR-AAC | "Solicitação de Certidão Antecedentes Criminais" (`IUAtestado.aspx`, `Atestado.js`) | Polícia Civil de Roraima (IDNET) | <https://www.idnetbrasil.rr.gov.br/AtestadoWeb/pages/Atestado/IUAtestado.aspx> |
+| RS-AAC | "Emitir Certidão de Antecedentes Policiais" and `emissaodeantecedentes.js` | Polícia Civil do Rio Grande do Sul | <https://www.pc.rs.gov.br/emitir-certidao-de-antecedentes-policiais> |
+| SC-AAC | Delegacia Virtual, "Atestado de antecedentes" (Angular bundle `main-es2015.35f719b87b0ad5da7f72.js`) | Polícia Civil de Santa Catarina | <https://delegaciavirtual.sc.gov.br/antecedentes> |
+
+Searched without an official RG format (web search restricted to the unit's `<uf>.gov.br` domain for its RG and its
+online antecedentes form, 2026-11-16 UTC; the hit read is named in the row): every unit not in the table above.
+Secondary only (never a rule, never cited in code): RG generator and validator sites (e.g. a "Brazil RG generator"
+quoting "the SSP-SP weighted modulo 11 formula" without its weights), blogs, news sites.
+
+**What the federal decree says (verbatim).** DEC art. 3: "A Carteira de Identidade adota o número de inscrição no
+Cadastro de Pessoas Físicas - CPF como registro geral nacional previsto no inciso IV do caput do art. 11." Art. 11:
+"A Carteira de Identidade conterá: […] IV - o número do registro geral nacional;" (no format). Art. 25: "As Carteiras
+de Identidade expedidas de acordo com os padrões anteriores aos estabelecidos neste Decreto permanecerão válidas pelo
+prazo de dez anos, contado da data de entrada em vigor deste Decreto. Parágrafo único. Na hipótese prevista no caput
+, a Carteira de Identidade de pessoa com idade a partir de sessenta anos na data de entrada em vigor deste Decreto
+terá validade indeterminada." Art. 28: "Este Decreto entra em vigor em 1º de março de 2022." So a state RG of the old
+model stays valid until 2032-03-01 (UTC date; indefinitely for a holder aged sixty or more on 2022-03-01), and the
+number of a CIN is a CPF (`Document\BR\Cpf`), not a state RG.
+
+**São Paulo (verbatim).** SP-AAC, the page: "- com a indicação do número do RG e dígito de controle
+constantes na Carteira de Identidade (RG). Se não constar o dígito de controle após o Número do RG, dirija-se a um
+Posto Poupatempo ou Posto de Identificação da Polícia Civil para requerer a 2a. via da Carteira." "Em ambos os casos,
+o RG ou a CIN devem ter sido emitidos pelo Instituto de Identificação Ricardo Gumbleton Daunt - IIRGD de São Paulo."
+The fields: `<input name="numero" id="numero" type="text" size="8" maxlength="8"
+onkeyup="javascript:somente_numero(this);…"` and `<input name="digito" id="digito" size="2" maxlength="2"
+onkeyup="javascript:somente_numero_Digito(this);…"`. The script: `somente_numero` keeps `var
+digits="0123456789";`, `somente_numero_Digito` keeps `var digits="0123456789xX";`; `validaFormulario` refuses
+`(!verificaRange(form.numero.value, 1, 99999999))` with "Por favor, preencha o número do RG." and calls
+`checaRG(form.numero.value, form.digito.value.toUpperCase() )` (refused with "Por favor, preencha corretamente o
+dígito de controle do RG"), and an empty check field with "Por favor, preencha o dígito de controle do RG.". (An
+earlier wording, left in an HTML comment of the page, reads "O dígito de controle, após o Número do RG, é de
+preenchimento obrigatório.")
+
+```js
+function checaRG(rg, dc){
+	var produto = 0;
+	var multiplicador = 2;
+	var digito = 0;
+	var tamanhoRG = rg.length;
+	for (var i = tamanhoRG - 1; i >= 0; i--){
+		produto = produto + (rg.charAt(i) * multiplicador);
+		if(multiplicador==9){
+			multiplicador = 2;
+		} else{
+			multiplicador = multiplicador + 1;
+		}
+	}
+	digito = produto % 11; 	
+	if (digito == 10){
+		digito = "X";
+	}
+	var retorno = digito==dc.charAt(0);
+	return retorno;
+}
+```
+
+Rules applied to BR-SP, each from the quotes above:
+
+- The number: one to eight digits (`maxlength="8"`, digits only, `verificaRange(…, 1, 99999999)`), so a number of
+  zeros only is refused; leading zeros are kept (the weights run from the right, so they do not change the result).
+- The check character: one character, `0`-`9` or `X` (`"0123456789xX"`, upper-cased), equal to the sum of the digits
+  weighted 2, 3, …, 9 (then 2 again) from the rightmost digit, modulo 11, with 10 written `X`. `checaRG` compares only
+  `dc.charAt(0)`, so the field's second position is never part of the check character; the class takes exactly one.
+- The check character is required, as the form requires it. A card printed without it carries a number whose check
+  character the published algorithm still defines; the IIRGD's answer to such a card is a second copy. This is a
+  ruling, recorded as a concern in the Task 7b report.
+- Separators: those of `Internal\Digits::SEPARATORS` and the dot (the printed form `12.345.678-9` is common; dots are
+  removed as for `Cpf`). ASCII letters are upper-cased (`x` becomes `X`).
+- No display form is quoted, so there is no `formatted()`. `masked()` keeps four characters for a number of nine
+  characters and three for one of eight or fewer (plan default; the shape has several lengths).
+- No official sample number is published; the tests use numbers computed with the quoted algorithm.
+
+**Why the other forms do not give a format.** Each limits only the field (verbatim attributes): BA-AAC
+`id="rg" tabindex="2" size="20" maxlength="8" onkeypress="return numero(event);"` with "(digite apenas números, não use
+pontos ou hífens)" and "O dígito de controle, após o Número do RG, é opcional." (`id="digito" size="5"
+maxlength="2"`, no algorithm); CE-AAC `name="numRg" maxlength="13"` and "Não é preciso informa o dígito verificador.";
+DF-AAC `txtIdentidade" type="text" maxlength="20"`; MA-AAC `validarRg(e){return e?e.length<5?"RG deve ter ao menos 5
+dígitos":!0:"Campo obrigatório"}`; MG-AAC `name="rgAux_Arg" maxlength="10"`; PA-AAC `<input id="rg" name="rg"
+class="form-control" value="" onblur="oConsulta.validar(this)" required>`; PB-AAC `placeholder="Informe seu RG ou
+CIN"` (free text); PE-AAC `name="formBody:campoRg" type="text" maxlength="20"` (digits); PR-AAC `type="number"
+pattern="\d*"` "Somente números"; RR-AAC `maxlength="15"` … `id="txtRG"` and `maxlength="1"` … `id="txtDV"` (no
+algorithm); RS-AAC `name="fRG"` `maxlength="100"` (RG or CPF, script: `fRG: { required: true }`); SC-AAC
+`rg:["",wo.Validators.required],ufRg:["",wo.Validators.required]`. A maximum length is an input limit, not a published length
+(MX precedent: Edomex was covered on "es de 12 dígitos", an exact length); BA's maximum of eight digits matches SP's,
+but BA publishes no check algorithm and makes the control digit optional, so its shape is not known.
+
+### RG per state — per unit
+
+| ISO | Source | Quoted format | Normalised shape | Check digit / encoding | Official sample | Verdict |
+|---|---|---|---|---|---|---|
+| BR-AC | `ac.gov.br` (searched; Polícia Civil antecedentes service page accepts CIN, CNH or passport) | none | — | — | — | not covered: no published format |
+| BR-AL | `al.gov.br` (searched; Polícia Científica "Nada consta" page: number, "dígito verificador, quando houver", no rule) | none | — | — | — | not covered: no published format |
+| BR-AM | `am.gov.br` (searched; DPTC antecedentes page, no field rule) | none | — | — | — | not covered: no published format |
+| BR-AP | `ap.gov.br` (searched; in-person service only) | none | — | — | — | not covered: no published format |
+| BR-BA | BA-AAC | "maxlength=8", digits; control digit "opcional" | — | none published | — | not covered: input limit only, no check algorithm; live host unreachable on 2026-11-16 UTC, re-check |
+| BR-CE | CE-AAC | "maxlength=13"; "Não é preciso informa o dígito verificador" | — | — | — | not covered: input limit only; live host unreachable on 2026-11-16 UTC, re-check |
+| BR-DF | DF-AAC | "maxlength=20" | — | — | — | not covered: input limit only |
+| BR-ES | `es.gov.br` (searched; the PCIES form takes the number of any of nine documents) | none | — | — | — | not covered: no published format |
+| BR-GO | `go.gov.br` (searched; I.I. Virtual, no field rule read) | none | — | — | — | not covered: no published format |
+| BR-MA | MA-AAC | "RG deve ter ao menos 5 dígitos" | — | — | — | not covered: minimum length only |
+| BR-MG | MG-AAC | "maxlength=10" | — | — | — | not covered: input limit only; live host unreachable on 2026-11-16 UTC, re-check |
+| BR-MS | `ms.gov.br` (searched; antecedentes service lists the RG, no field rule) | none | — | — | — | not covered: no published format |
+| BR-MT | `mt.gov.br` (searched; SESP form takes CPF and a document type) | none | — | — | — | not covered: no published format |
+| BR-PA | PA-AAC | free text, required | — | — | — | not covered: no published format |
+| BR-PB | PB-AAC | free text ("RG ou CIN") | — | — | — | not covered: no published format |
+| BR-PE | PE-AAC | "maxlength=20", digits | — | — | — | not covered: input limit only; live host unreachable on 2026-11-16 UTC, re-check |
+| BR-PI | `pi.gov.br` (searched; requests by e-mail) | none | — | — | — | not covered: no published format |
+| BR-PR | PR-AAC | "Somente números", RG or CPF | — | — | — | not covered: no published format |
+| BR-RJ | RJ-AAC (request form not reached: postback HTTP 500) | none read | — | — | — | not covered: request form unreachable on 2026-11-16 UTC, re-check |
+| BR-RN | `www8.defesasocial.rn.gov.br/antecedentes/` (timeout; IA offline at the attempt) | none read | — | — | — | not covered: issuer's form unreachable on 2026-11-16 UTC, re-check |
+| BR-RO | `ro.gov.br` (searched; Portal do Cidadão service, no field rule) | none | — | — | — | not covered: no published format |
+| BR-RR | RR-AAC | "maxlength=15", DV "maxlength=1" | — | none published | — | not covered: input limit only, no check algorithm |
+| BR-RS | RS-AAC | free text (RG or CPF) | — | — | — | not covered: no published format |
+| BR-SC | SC-AAC | required, no rule | — | — | — | not covered: no published format |
+| BR-SE | `se.gov.br` (searched; in-person antecedentes) | none | — | — | — | not covered: no published format |
+| BR-SP | SP-AAC | number `maxlength="8"`, digits, `verificaRange(…, 1, 99999999)`; check character `"0123456789xX"`, required; `checaRG` | `[0-9]{1,8}[0-9X]` (2 to 9 characters) | `checaRG`: weights 2-9 from the right, sum mod 11, 10 = `X` | none | covered |
+| BR-TO | `to.gov.br` (searched; digital request without document fields) | none | — | — | — | not covered: no published format |
+
+### RG per state — overlap (the factory's test oracle)
+
+Only one unit is covered, so no shape overlaps another and `fromNumber()` never throws
+`AmbiguousJurisdictionException` today. An RG of one of the 26 uncovered units whose last character happens to be
+the SP check character of the rest is reported as BR-SP by `fromNumber()` (the factory can only match published
+formats); a caller that knows the issuer uses `fromNumberIn()`, which throws "(format not covered)" for the 26.
+
+| Length after normalisation | Shapes | Matching units |
+|---|---|---|
+| 2 to 9 | `[0-9]{1,8}[0-9X]` with the SP check character | BR-SP |
+| any other | — | none |
+
+Worked examples (`jurisdictionsMatching()`, then `fromNumber()`):
+
+| Input | Matching | `fromNumber()` |
+|---|---|---|
+| `` | none | "Invalid Brazilian identity card number (0 characters)." |
+| `12.345.678-2` | BR-SP | `SpIdentityCardNumber` `123456782` |
+| `123456782` | BR-SP | `SpIdentityCardNumber` `123456782` |
+| `24.681.357-X` | BR-SP | `SpIdentityCardNumber` `24681357X` |
+| `24681357x` | BR-SP | `SpIdentityCardNumber` `24681357X` |
+| `1-2` | BR-SP | `SpIdentityCardNumber` `12` |
+| `00000001-2` | BR-SP | `SpIdentityCardNumber` `000000012` |
+| `99.999.999-0` | BR-SP | `SpIdentityCardNumber` `999999990` |
+| `12.345.678-3` | none | "Invalid Brazilian identity card number (fits no jurisdiction)." |
+| `0-0` | none | "Invalid Brazilian identity card number (fits no jurisdiction)." |
+| `2` | none | "Invalid Brazilian identity card number (1 characters)." |
+| `1234567890` | none | "Invalid Brazilian identity card number (10 characters)." |
+| `12345678A` | none | "Invalid Brazilian identity card number (fits no jurisdiction)." |
+
+The check script (`br_rg.py`, Task 7b scratchpad) verifies the 27 rows in ISO 3166-2:BR order, the covered set, every
+verbatim quote above against the downloaded source, and the worked examples with a literal port of `checaRG`.
 
 ## Not covered
 
@@ -396,4 +571,6 @@ Not researched in Task 7a.
 - Passport formats other than the PF's two letters and six digits.
 - A CPF masking rule (the plan default is used; no official rule was researched).
 - A Brazilian with no surname (the CNJ code requires one; indigenous registration rules were not researched).
-- RG of each state: Task 7b.
+- RG of 26 units (all but BR-SP, above "RG per state — per unit"): no published format, or only an input
+  limit; BA, CE, MG, PE, RJ and RN to re-check when their hosts answer. An SP RG card printed without its check
+  character must be given with the character the IIRGD algorithm defines.
