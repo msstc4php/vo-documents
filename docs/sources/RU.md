@@ -154,7 +154,7 @@ refused by the codec instead of being read back as "no override".
 | derived `latin()` = `IVANOV<<IVAN<IVANOVICH` | Orders 996/186: "отчество не указывается" | `IVANOV<<IVAN` |
 | override "given + patronymic → secondary" | §32/§140 allow a documented spelling | any valid ICAO name is accepted, with or without the patronymic (`ivanov<<ivan<ivanovich`, `IVANOVA<<YULIYA`) |
 | Ь (absent from ICAO 6.B) | Order 996 table: no row, simple replacement | omitted |
-| letters `\p{Cyrillic}` | Russian alphabet only (Order 996 §14 excludes even І) | `А-ЯЁа-яё` |
+| letters `\p{sc=Cyrillic}` | Russian alphabet only (Order 996 §14 excludes even І) | `А-ЯЁа-яё` |
 
 ## Documents
 

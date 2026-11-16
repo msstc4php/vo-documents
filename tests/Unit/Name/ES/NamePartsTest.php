@@ -68,6 +68,7 @@ final class NamePartsTest extends TestCase
     {
         yield 'Cyrillic' => ['Хосе', 'Invalid Spanish given name (invalid character).'];
         yield 'Arabic' => ['محمد', 'Invalid Spanish given name (invalid character).'];
+        yield 'Greek' => ['Ιωσήφ', 'Invalid Spanish given name (invalid character).'];
         yield 'digit' => ['José2', 'Invalid Spanish given name (invalid character).'];
         yield 'Catalan middle dot U+00B7' => ["Marcel\u{00B7}lí", 'Invalid Spanish given name (invalid character).'];
         yield 'fullwidth' => ["\u{FF2A}osé", 'Invalid Spanish given name (compatibility character).'];

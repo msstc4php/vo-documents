@@ -43,10 +43,10 @@ How the package applies this:
 
 | Part | Letters | Separators inside | Why |
 |---|---|---|---|
-| `FamilyName` | `\p{Latin}` | hyphen, apostrophe, space | `Müller-Lüdenscheidt` (hyphenated double name), `von der Leyen`, `D'Angelo` |
-| `GivenName` | `\p{Latin}` | hyphen, apostrophe, space | several given names (`Anna Maria`), `Hans-Peter` |
+| `FamilyName` | `\p{sc=Latin}` | hyphen, apostrophe, space | `Müller-Lüdenscheidt` (hyphenated double name), `von der Leyen`, `D'Angelo` |
+| `GivenName` | `\p{sc=Latin}` | hyphen, apostrophe, space | several given names (`Anna Maria`), `Hans-Peter` |
 
-- String.Latin (TR-03123, now DIN 91379) is a list of Latin letters with diacritics; `\p{Latin}` (the shared
+- String.Latin (TR-03123, now DIN 91379) is a list of Latin letters with diacritics; `\p{sc=Latin}` (the shared
   `AbstractLatinNamePart`) is a superset of its letters. The package does not copy the String.Latin list (designer's
   call; the ICAO transliteration refuses a letter without a spelling anyway).
 - German letters: `ä ö ü ß` and the capital `ẞ` (U+1E9E). Table 6.A: `Ä` → `AE` or `A`, `Ö` → `OE` or `O`,

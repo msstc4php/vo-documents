@@ -55,7 +55,7 @@ How the package applies this:
 
 | Part | Letters | Separators inside | Why |
 |---|---|---|---|
-| `FamilyName` (surname) | `\p{Latin}` | hyphen, apostrophe, space | the national form is the name of the birth certificate or change-of-name document, which may hold diacritics (Welsh `ŵ ŷ`, Irish `á`) (2), (5); hyphens and apostrophes (1); digits are refused (6) |
+| `FamilyName` (surname) | `\p{sc=Latin}` | hyphen, apostrophe, space | the national form is the name of the birth certificate or change-of-name document, which may hold diacritics (Welsh `ŵ ŷ`, Irish `á`) (2), (5); hyphens and apostrophes (1); digits are refused (6) |
 | `GivenName` (forenames) | the same | the same | the same |
 
 - No UK act or agency publishes a letter list for the name itself, so the shared Latin base applies (as DE, IT, ES).
