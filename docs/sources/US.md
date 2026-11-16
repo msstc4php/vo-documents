@@ -200,10 +200,233 @@ example is valid and used in the tests.
 None of these documents encodes a sex or a birth date: `Sex` is unchanged and no class implements `HasSex` or
 `HasBirthDate`.
 
-## Driver's licence and state ID numbers (Task 2)
+## DL/ID numbers (`Document\US\DlId\*`)
 
-Not part of this note yet: the per-jurisdiction DL/ID numbers (AAMVA and the 50 states and DC) are researched in plan
-3, Task 2.
+All sources were read on 2026-11-16 (UTC). "IA" is an unmodified Internet Archive capture (`id_` form), cited with its
+UTC timestamp, read because the live page answered 403 or 404 or failed TLS.
+
+**The standard leaves the format to the state.** AAMVA 2020 DL/ID Card Design Standard, Table 1, ref. f, field `4d`
+"Customer identifier": "The alphanumeric string assigned or calculated by the issuing authority." (V25ANS). Table D.3,
+ref. q, element `DAQ` "Customer ID Number": "The number assigned or calculated by the issuing authority." (V25ANS).
+The standard gives no per-jurisdiction format. AAMVA's CDLIS State Procedures Manual (rel. 5.3.2.1, Aug 2013) does not
+either.
+The federal E-Verify web service accepts any 1–32 alphanumerics, saying the format "is subject to change at any time to
+support a change to any state's document number format". So each jurisdiction's format comes from that jurisdiction's
+own texts. For the 10 states in E-Verify's RIDE programme it also comes from USCIS's state fact sheets. This is the AU
+pattern: a federal agency's help text that states the field rule.
+
+### Sources
+
+| Ref | Source | Publisher | Where read |
+|---|---|---|---|
+| AAMVA | 2020 DL/ID Card Design Standard, Ver 1.0, Table 1 ref. f, Table D.3 ref. q | AAMVA | <https://www.aamva.org/getmedia/99ac7057-0f4d-4461-b0a2-3a5532e1b35c/AAMVA-2020-DLID-Card-Design-Standard.pdf> |
+| CDLIS | CDLIS State Procedures Manual, release 5.3.2.1 (Aug 2013): no DLN formats | AAMVA | IA 2024 copy of <https://malegislature.gov/Reports/8279/CDLIS%20SPM%20_Rel%205%203%202%201%20-%20Aug%202013_%20wo%20track%20changes.pdf> |
+| EV-ICA | E-Verify ICA v32 API schema, `drivers_license_number`, `document_bc_number` | USCIS (DHS) | <https://everify.uscis.gov/ica-docs/> (script chunks) |
+| RIDE | "<State> Driver's License and ID Card Information", RIDE fact sheets (PDF metadata of the FL sheet: 2013-09-06); identical copies under `factsheetsArchive/` | USCIS (DHS), E-Verify | `https://www.e-verify.gov/sites/default/files/everify/factsheets/<State>RIDEFactSheet.pdf` for Arizona, Florida, Idaho, Iowa, Maryland, Mississippi, Nebraska, NorthDakota, Wisconsin, Wyoming (other states: 404) |
+| AL-1 | "Alabama Driver License Number Changes" (news) | ALEA | <https://www.mvtrip.alabama.gov/News/ViewArticle/444>, IA 2021-11-19 15:14:20 |
+| CO-1 | Form DR 2330 (06/12/26) | Colorado DOR, DMV | <https://dmv.colorado.gov/sites/default/files/documents/DR_2330_e_wo.pdf> |
+| CT-1 | "About the Department of Motor Vehicles" (glossary) | CT DMV | <https://portal.ct.gov/dmv/resources/dmv-about-us> |
+| FL-1 | FACC eCitation Interface Control Document 6.1 (2025-09-02), field 28 | FL Assn. of Court Clerks, hosted by FLHSMV | <https://www.flhsmv.gov/pdf/courts/utc/eCitation_ICD_6.1_Rev%209.2.2025%20(1).pdf>, IA 2026-07-07 23:04:39 |
+| FL-2 | Driver License Check | FLHSMV | <https://mydmvportal.flhsmv.gov/home/en/publicweb/dlcheck>, IA 2026-11-10 01:21:00 |
+| FL-3 | News 2024-07-19 "FLHSMV Implements Legislation Requiring Driver Licenses and Identification Card numbers to Change"; F.S. 322.14(1)(a) | FLHSMV; Florida Senate | <https://www.flhsmv.gov/2024/07/19/flhsmv-implements-legislation-requiring-driver-licenses-and-identification-card-numbers-to-change/>, IA 2026-10-15 20:03:44; <https://m.flsenate.gov/statutes/322.14> |
+| HI-1 | State of Hawaii Driver's License Application (Rev. 3/15/2023) | City & County of Honolulu (state form) | <https://www4.honolulu.gov/docushare/dsweb/Get/Document-325980/State%20of%20Hawaii%20Driver_s%20License%20Application.pdf> |
+| ID-1 | "Driver Records and Suspensions" | Idaho Transportation Department | <https://itd.idaho.gov/guide/driver-records-and-suspensions/>, IA 2026-10-03 02:12:06 |
+| IL-1 | LEADS Operating Manual, Drivers License chapter (05/11/2022) | Illinois State Police | <https://isp.illinois.gov/LawEnforcement/GetFile/de672e4e-5074-484d-a82f-cbfc20145c54> |
+| IN-1 | "Electronic Insurance Forms Submission FAQs" | Indiana BMV | <https://www.in.gov/bmv/resources/insurance-agents/electronic-insurance-forms-submission-faqs> |
+| KS-1 | "How to Read a Driving Record" (Rev 8/01) | Kansas DOR | <https://www.ksrevenue.gov/pdf/readingdmvreport.pdf> |
+| KS-2 | Driver's License Status Check login | Kansas DOR | <https://www.kdor.ks.gov/Apps/DLStatus/login.aspx> |
+| KY-1 | Graduated Driver Licensing eligibility | KY Transportation Cabinet | <https://apps.transportation.ky.gov/gdl>, IA 2025-12-30 01:56:33 |
+| KY-2 | Three-year Driving History Records, more information | Commonwealth of Kentucky | <https://secure.kentucky.gov/dhronline/Records/MoreInformation> |
+| MA-1 | Driver's Manual, revised 2/2018, "SA" and "S" License Numbers | Massachusetts RMV | <https://www.mass.gov/files/documents/2018/03/21/Drivers_Manual.pdf>, IA 2026-08-31 13:26:31 |
+| MD-1 | IDVR web user guide | MDOT MVA | <https://egov.maryland.gov/mva/idvr/support/userguide> |
+| ME-1 | Driver's Record Check Service | Maine BMV | <https://apps1.web.maine.gov/cgi-bin/bmv/drc/step1.pl> |
+| MI-1 | "MiLogin and online accounts" FAQ | Michigan SOS | <https://www.michigan.gov/sos/faqs/resources/milogin-and-online-accounts>, IA 2026-06-06 13:21:39 |
+| MI-2 | Friend of the Court Manual FOC 340X1, FCB 2001-001 (1-1-2001) | Michigan Family Independence Agency | <https://mdhhs-pres-prod.michigan.gov/olmweb/ex/foc/340X1.pdf>, IA 2025-04-25 03:48:22 |
+| MS-1 | Mississippi Administrative Code, Title 31 Part 1 (Driver Services), Rule 4.4 and the driver-education rule | MS DPS (via MS SOS) | <https://www.sos.ms.gov/adminsearch/ACCode/00000383c.pdf> |
+| NJ-1 | MyMVC AVS help | NJ MVC | <https://emvc.state.nj.us/mvc/MVC_SUAAV_WS/html/AVSHelp.html> |
+| NM-1 | Online Driver History Records Service | NM MVD | <https://secure.mvd.newmexico.gov/RenewalServices/default.aspx> |
+| NY-1 | "Information about Transaction Entries" | NY DMV | <https://dmv.ny.gov/transaction-message/information-about-transaction-entries>, IA 2026-05-14 22:14:21 |
+| OK-1 | "Integrating External Court Records with the Oklahoma DPS Online Court Reporting System" (Rev. 2012-01-27), field 2 | Oklahoma DPS | <https://apps.ok.gov/dps/courts/external/documents/DPS.pdf> |
+| OK-2 | SOP A.01 "Original Issuance – Class D and State ID" (effective 3/11/2025), quoting the agency rule on driver licence numbers | Service Oklahoma | <https://oklahoma.gov/content/dam/service-oklahoma/intranet/job-resources/sops/a--driver-license/A.01%20-%20Original%20Issuance%20-%20Class%20D%20and%20State%20ID.pdf> |
+| PA-1 | "Where to Find Your Driver's License/Photo ID Number" | PennDOT | <https://www.pa.gov/agencies/dmv/faqs/driver-licensing-faqs/find-your-drivers-license-photo-id-number> |
+| RI-1 | RI DMV Driver Records | State of Rhode Island | <https://www.ri.gov/DMV/mvr/citizen/> |
+| RI-2 | Industry Alert 2017-2 "New 8 digit RI Drivers' Licenses" | RI Dept. of Business Regulation | <https://dbr.ri.gov/sites/g/files/xkgbur696/files/documents/divisions/insurance/consumers/IndustryAlert2017-2.pdf>, IA 2025-09-16 06:35:46 |
+| TX-1 | "Where's my license or ID?" status search | Texas DPS | <https://www.dps.texas.gov/apps/driverlicense/dlsearch/dlstatus.aspx>, IA 2026-11-07 21:34:58 |
+| VT-1 | "Law Enforcement Changes" (DMV modernization, 2025), "PID Format" | Vermont DMV | <https://dmv.vermont.gov/sites/dmv/files/documents/Law%20Enforcement%20Changes%202025.pdf> |
+| VT-2 | Driver Record Search help | Vermont DMV | <https://secure.vermont.gov/DMV/mvr/help/>, IA 2021-05-08 22:24:56 |
+| WA-1 | REAL ID information page | WA DOL | <http://www.dol.wa.gov/realid.html>, IA 2018-06-16 23:44:57 |
+| WA-2 | "Get your learner permit" | WA DOL | <https://dol.wa.gov/driver-licenses-and-permits/get-your-first-license-or-permit/get-your-learner-permit> |
+| WA-3 | ACCESS Operations Manual, chapter 8 "Department of Licensing" (revised November 2014) | Washington State Patrol | <https://www.wsp.wa.gov/wp-content/uploads/2023/10/08_licensing.pdf> |
+| WI-1 | "Interpreting Public DMV Record Abstracts" (October 24, 2024) | WisDOT DMV | <https://portal.wi.gov/Documents/Interpreting-DMV-Abstracts10242024.pdf> |
+| WI-2 | MV4000 Law Enforcement Officer's Instruction Manual (1998 ed.), field 29 | WisDOT | <https://wisconsindot.gov/Documents/dmv/shared/manual-mv4000.pdf> |
+
+Rejected (secondary, never a rule): state-by-state DL format lists, regex and validator pages, DLP vendor definitions
+(Microsoft Purview, Trellix, Skyhigh), barcode SDK documentation, library circulation guides. Sample cards and sample
+barcodes were not used as rules. One example is the VA DMV AAMVA test PDF with `DAQ T16700285`; see "Not covered".
+
+Rulings that apply to the whole table:
+
+- Official texts of state agencies other than the DMV (state police, courts, clerks' interface documents) count.
+- **Normalisation:** the separators of `Internal\Digits::SEPARATORS` are removed (hyphens are printed on FL, IL, WI and
+  WY cards, and the sources say to enter the number without them). ASCII letters are upper-cased. Leading zeros are
+  kept. For WA only, `*` is kept: it is a character of the legacy number (WA-3).
+- "N numbers" and "N numeric" are taken as digits `[0-9]`. "Alphanumeric" means `[0-9A-Z]`, and all-digit and
+  all-letter values are allowed, as in AU. A source that calls the characters "digits" when its own agency shows letters
+  is read for the length only.
+- A letter set or a fixed letter is enforced only where it is quoted (HI `H`, KS `K`, MA `S`/`SA`, MD `MD`, NE, VT, WA
+  `WDL`). Check digits: VT and WA mention one but publish no algorithm, so none is verified. IL gives digit ranges but
+  contradicts itself, so they are not enforced.
+- **ID card:** "shares" means the source states that the same numbering, or the same format, covers the ID card. Then
+  one `<Abbr>DlIdNumber` class covers both. "Separate" means the source states a different ID-card format, which gets
+  its own `<Abbr>IdCardNumber`. "Not stated" means the class covers the driving licence only.
+
+### Per jurisdiction
+
+| ISO | Source | Quoted format (verbatim) | Normalised shape | ID card | Encoded data | Official sample | Verdict |
+|---|---|---|---|---|---|---|---|
+| US-AK | DMV Form D1, online services (searched) | none: the forms show a "ALASKA LICENSE/ID #" field without a format | — | — | — | — | not covered |
+| US-AL | AL-1 | "Effective December 1, 2018, Alabama will begin issuing an 8-digit driver license number. Alabama will continue to support the existing 7-digit numbers and also the new 8-digit numbers. Alabama currently issues 8-digit non-driver identification cards." | `[0-9]{7,8}` | separate: `[0-9]{8}` (`AlIdCardNumber`) | none | none | covered |
+| US-AR | DFA Driver Services, voter form, ASP data handbook (searched) | none for the DL (the State Police handbook gives a CDL field "Alpha", size 10, which is a field width, not a format) | — | — | — | — | not covered |
+| US-AZ | RIDE (Arizona) | "Arizona driver's licenses and ID cards contain document numbers (circled) that are nine characters- one letter followed by eight numbers." | `[A-Z][0-9]{8}` | shares | none | none in text | covered |
+| US-CA | dmv.ca.gov forms DL 410, INF 1125 (searched) | none: the forms ask for the "driver license or ID card number" without a format | — | — | — | — | not covered |
+| US-CO | CO-1 | "Please write your 9-digit driver license or ID number on your check or money order." | `[0-9]{9}` | shares | none | none | covered |
+| US-CT | CT-1 | "Operator number: Refers to the nine-digit number assigned by DMV to an individual upon successful completion of a driver's test." | `[0-9]{9}` | not stated | none | none | covered (DL) |
+| US-DC | DC DMV brochure 2013, driver records page (searched) | none (a sample card printed `1234567`, which is a sample) | — | — | — | — | not covered |
+| US-DE | DMV manual 2024, Title 21 ch. 26, Reg. 2217 (searched) | none: the CDL text says only "a unique number or identifier deemed appropriate by the Division" | — | — | — | — | not covered |
+| US-FL | RIDE (Florida); FL-1; FL-2; FL-3 | RIDE: "Florida driver's licenses and ID cards contain document numbers (circled below) that are 13 alphanumeric characters (letters and numbers). The format is one letter followed by 12 numeric characters." FL-1: "A Florida driver's license, if non-blank, must be 13 characters long, may not contain any embedded spaces, and must begin with the first character of "Driver-Last Name"". FL-3: "While the license or identification card format will remain the same, a different formula utilizing randomization will now be used"; F.S. 322.14(1)(a): "a minimum of four randomly generated digits" | `[A-Z][0-9]{12}` | shares (RIDE) | first character = first letter of the last name (FL-1); not verified, because the holder's name is not an input | FL-2: "Example: Z123-456-78-901-0 (with or without the hyphens)" | covered |
+| US-GA | dds.georgia.gov FAQs and contact pages (searched) | none found on an official page | — | — | — | — | not covered |
+| US-HI | HI-1 | Field "DRIVER'S LICENSE NUMBER" printed as `H _ _ _ _ _ _ _ _` (a fixed `H` and eight boxes) | `H[0-9A-Z]{8}` (character set of the boxes not stated) | not stated | none | none | covered (DL) |
+| US-IA | RIDE (Iowa) | "Iowa driver's licenses and ID cards contain document numbers (circled) that are nine alphanumeric characters (letters and numbers)." | `[0-9A-Z]{9}` | shares | none | none in text | covered |
+| US-ID | RIDE (Idaho); ID-1 | RIDE: "Idaho driver's licenses and ID cards contain document numbers (circled) that are nine alphanumeric characters (letters and numbers). The current format is two letters followed by six numeric characters followed by one letter. Documents issued before January 1, 1993, contain nine numeric characters." ID-1 adds: "Previous Idaho license numbers began with 910, 920, or 940 assigned by the sheriffs' office, or a social security number." | `[A-Z]{2}[0-9]{6}[A-Z]` or `[0-9]{9}` | shares | none | none | covered |
+| US-IL | IL-1 | "An Illinois DLN (Driver's License Number) is a 12-position alphanumeric figure, computed by a special formula and assigned by the Secretary of State. Although two hyphens appear within the number (DLN) on the license itself, these hyphens are never used in a LEADS inquiry. Each DLN encodes a driver's name (including last name, first name or initial and middle initial), sex and birth date." "Y620 - First letter of the driver's last name followed by 3 numeric digits derived from the remainder of the last name" §2.1: "A PID is computed from name, sex, and date of birth exactly like a DLN, except that a PID carries the single alpha character in the last position." | `[A-Z][0-9]{11}` | separate: `[0-9]{11}[A-Z]` (`IlIdCardNumber`) | name, sex and birth date (formula not quoted; not decoded). Digit rule as quoted: "The numbers 7,8, and 9 never appear in the first three numeric positions. Also, the last three digits must be 001 through 372 if the driver is male, and 601 through 972 if female. The numbers 373 through 600 are invalid in the final three positions. For DLN's that compute out to be duplicated for more than one person the last three digits are replaced with an assigned number between 400 and 599." This is self-contradictory (400–599 falls inside "invalid" 373–600), so it is **not enforced** and `Sex` is not derived | `Y620 930 57 270` (IL-1) | covered |
+| US-IN | IN-1 | "you must provide your insured 10 digit Indiana DLN or their CUID number" | `[0-9]{10}` | not stated | none | none | covered (DL) |
+| US-KS | KS-1; KS-2 | KS-1: "DL Number-Drivers License or ID Card Number (either Social Security number, Computer Generated number that starts with "K" and 8 numbers, or a 6 digit alpha-numeric number)." KS-2: "( example: K12345678 ) … With no dashes or spaces" | `[0-9]{9}`, `K[0-9]{8}` or `[0-9A-Z]{6}` | shares | none (an SSN-based number is not checked as an SSN) | `K12345678` (KS-2) | covered |
+| US-KY | KY-1; KY-2 | KY-1: "The Driver's License/Permit Number listed will have a letter followed by 8 numbers. Enter the full license/permit number without the dashes onto the box provided." KY-2: "The license number is made up of 9 characters, 1 letter followed by 8 numbers." | `[A-Z][0-9]{8}` | not stated | none | `C21545427` (KY-1) | covered (DL) |
+| US-LA | expresslane.la.gov OMV pages (searched) | none: the forms ask for the number "as it appears on the physical card" | — | — | — | — | not covered |
+| US-MA | MA-1 | "Beginning March 26, 2018, the RMV license system will assign computer generated numbers beginning with an "SA" or an "S" followed by numbers equaling a total of nine characters on your license/ID card." | `S[0-9]{8}` or `SA[0-9]{7}` | shares | none | none | covered |
+| US-MD | RIDE (Maryland); MD-1 | RIDE: "Maryland driver's licenses and ID cards contain document numbers (circled) that are thirteen characters- one letter followed by twelve numbers." MD-1: "The MD ID must be entered as "MD" followed by 11 digits, or the driver's license number must start with a letter followed by 12 numbers." | `[A-Z][0-9]{12}` or `MD[0-9]{11}` | shares (RIDE; MD-1's Customer ID is the customer's number, not a card's) | none: MVA calls the letter-first number a "soundex" (MD PTP guide, `SoundexNumber`) but publishes no algorithm | `MD12345678900`, `A999999999999` (MD-1 field table) | covered |
+| US-ME | ME-1 | "Driver's License Number (7 digits):" | `[0-9]{7}` | not stated | none | none | covered (DL) |
+| US-MI | MI-1; MI-2 | MI-1: "When prompted to submit an ID number, enter the twelve-digit number from your driver's license or ID." MI-2: "Driver license number. The number begins with the first letter of the individual's last name." | `[A-Z][0-9]{12}` (the letter of MI-2 followed by the twelve digits of MI-1) | shares (MI-1) | first letter of the last name (MI-2); not verified | none | covered |
+| US-MN | revisor.mn.gov §171.07, DPS DVS pages (searched) | none: the statute says only "a distinguishing number assigned to the licensee" | — | — | — | — | not covered |
+| US-MO | dor.mo.gov forms; 12 CSR 10-24 (1999, superseded) (searched) | none current; Form 5443 shows a specimen `T123456789` (sample only) | — | — | — | — | not covered |
+| US-MS | RIDE (Mississippi); MS-1 | RIDE: "Mississippi driver's licenses and ID cards contain document numbers (circled below) that are nine numeric characters." MS-1: "The Social Security Number is used as the driver license number." Rule 4.4: "The wife's Social Security Number would be the same as her husband's except it would be followed by a letter of the alphabet." "Assigned Driver License and ID Card numbers will be taken from the same pool of numbers." | `[0-9]{9}` or `[0-9]{9}[A-Z]` (the rule 4.4 form, still in the code) | shares | none (an SSN-based number is not checked as an SSN) | none | covered |
+| US-MT | MVD record guide 2023, D300 brochure, forms (searched) | none | — | — | — | — | not covered |
+| US-NC | NCDMV forms, DL-DPPA-1, MyDMV (searched) | none | — | — | — | — | not covered |
+| US-ND | RIDE (North Dakota) | "North Dakota driver's licenses and ID cards contain document numbers (circled) that are nine characters- three letters followed by six numbers." | `[A-Z]{3}[0-9]{6}` | shares | none | none | covered |
+| US-NE | RIDE (Nebraska) | "Nebraska driver's licenses and ID cards contain document numbers (circled) that are one letter (A,B,C,E,G,H, or V) followed by eight numbers." | `[ABCEGHV][0-9]{8}` (letter set enforced) | shares | none | none | covered |
+| US-NH | Saf-C 1000, RSA 263:40, DSMV 450 (searched) | none: "a distinguishing number assigned to the licensee" | — | — | — | — | not covered |
+| US-NJ | NJ-1 | "Your driver license number consists of a letter followed by 14 digits. Enter your driver license number, without any spaces" | `[A-Z][0-9]{14}` | not stated | none | none | covered (DL) |
+| US-NM | NM-1 | "Your driver's license number : This 9-digit number can be found at the top of your license." | `[0-9]{9}` | not stated | none | none | covered (DL) |
+| US-NV | DMV handbook, 2021/2014 comparison sheet (searched) | none (a handbook card image shows `12345,67890`, a sample) | — | — | — | — | not covered |
+| US-NY | NY-1 | "DMV ID Number. This is the 9-digit "ID" number printed in the upper portion of your driver license, learner permit, or non-driver ID (DMV photo document). Enter the 9 digits only; do not enter spaces, hyphens, or other punctuation." | `[0-9]{9}` | shares | none | none | covered |
+| US-OH | codes.ohio.gov 4507.13, BMV pages (searched) | none: "The distinguishing number assigned to the licensee" | — | — | — | — | not covered |
+| US-OK | OK-1; OK-2 | OK-1: "In Oklahoma this number is made up of an alphabetic character followed by nine numeric digits." OK-2: "Driver license numbers shall be assigned by computer. Use of the applicant's SSN as the driver license number is prohibited" … "Any licensee may request to change his or her driver license number to any nine-digit number which is not in use or has not been previously used" | `[A-Z][0-9]{9}` or `[0-9]{9}` | not stated | none | none | covered (DL) |
+| US-OR | ODOT DMV chapter A, form 6665 (searched) | none: "A customer number for an individual person is usually their Oregon Driver License (ODL) number" | — | — | — | — | not covered |
+| US-PA | PA-1 | "Your eight (8) digit Driver's License Number (DLN) or Photo Identification Card Number (IDN) is located on your Driver's License, Photo Identification Card, Learner's Permit and on most correspondences from PennDOT." | `[0-9]{8}` | shares | none | none | covered |
+| US-RI | RI-1; RI-2 | RI-1: "Your driver's license number: This 7-digit number can be found at the top of your license." RI-2: "The upgraded system is designed to issue new RI drivers' licenses with 8 digits. This is a change from the current 7 digit drivers' licenses in use today, but existing 7 digits drivers' licenses will continue to be valid." | `[0-9]{7,8}` | not stated | none | none | covered (DL) |
+| US-SC | S.C. Code Title 56 ch. 1, SCDMV barcode guide (searched) | none (the barcode guide shows `DL#: 102245737`, a sample) | — | — | — | — | not covered |
+| US-SD | SDCL 32-12, DPS application forms (searched) | none | — | — | — | — | not covered |
+| US-TN | tn.gov MVR and inquiry pages (searched) | none | — | — | — | — | not covered |
+| US-TX | TX-1 | "Drivers License or ID Card # (8 digits number)" | `[0-9]{8}` | shares | none | none | covered |
+| US-UT | DLD MVR Online, UCJIS Utah DL Manual (IA 2026-01-06) (searched) | none (only "If your license number begins with zero, do not enter the zeros" and "Enter the number into field without the UT") | — | — | — | — | not covered |
+| US-VA | DMV glossary "Customer Number", PIN logon (searched) | none: "A DMV system-generated unique number associated with the customer" (the AAMVA test PDF `T16700285` is a sample) | — | — | — | — | not covered |
+| US-VT | VT-1; VT-2 | VT-1: "Driver's License and Non-Driver ID PID length will continue to be 8 characters long. The first 7 characters will always be a digit, and the final character can be a digit or letter. Examples: 10512345, 3470128A, 2054512V. The following letters are valid for use in the final character: A, F, J, K, L, Q, R, T, V, X, Y. New PIDs generated will not use a check digit calculation." VT-2 (older): "The Vermont PID is either an 8 digit number or a seven digit number followed by the character 'A'." | `[0-9]{7}[0-9AFJKLQRTVXY]` (letter set enforced) | shares | none (an older check digit is implied but not published) | `10512345`, `3470128A`, `2054512V` | covered |
+| US-WA | WA-1; WA-2; WA-3 | WA-1: "Starting September 4, 2018, all driver license and ID cards issued will receive new driver license numbers. All will have WDL as the first 3 letters, and will be followed by 9 randomly chosen alphabetical characters and numbers. Those who already have a driver license or ID card will get the new number when they renew or replace it after September 4." WA-2: "A WDL number is a unique 12-digit number that identifies you, and appears on learner permits, ID cards, and licenses." WA-3 (legacy PIC): "This is a 12-character code computed from name and date of birth. The first seven characters must be alphabetic or "*"; the eighth and ninth characters must be numeric, the tenth character must be numeric or "*", and the eleventh and twelfth characters may be alphabetic or numeric." | `WDL[0-9A-Z]{9}` or `[A-Z*]{7}[0-9]{2}[0-9*][0-9A-Z]{2}` | shares | legacy PIC only: five letters of the last name, initials, coded birth date, "self-checking digit" (algorithm not published; not verified, not decoded) | `GROSECM378NA`, `WEAVESE301C0` (WA-3) | covered |
+| US-WI | RIDE (Wisconsin); WI-1; WI-2 | RIDE: "Wisconsin's licenses and ID cards contain document numbers (circled) that are fourteen characters- one letter followed by thirteen numbers." WI-1: "Type driver's license number as it appears on the driver's license (no dashes)" | `[A-Z][0-9]{13}` | shares | none | `H300-1987-0162-04` (WI-2) | covered |
+| US-WV | WV DMV self-service, DS-23P form (searched) | none | — | — | — | — | not covered |
+| US-WY | RIDE (Wyoming) | "Wyoming driver's licenses and ID cards contain document numbers (circled) that are nine numbers- six numbers followed by a hyphen and three numbers." | `[0-9]{9}` (hyphen removed) | shares | none | none | covered |
+
+**Totals:** 30 of 51 covered (19 with the ID card shared, 9 for the driving licence only, and AL and IL with a separate
+ID-card class). 21 are not covered.
+
+### Overlap — the factory's test oracle
+
+`DlIdNumberFactory` matches the 30 covered `<Abbr>DlIdNumber` classes only. The ID-card classes `AlIdCardNumber` and
+`IlIdCardNumber` are not part of it. An input is normalised first (above). The groups below are in enum order:
+
+| Normalised input class | Jurisdictions it fits |
+|---|---|
+| 6 alphanumerics (digits or letters) | US-KS |
+| 7 digits | US-AL, US-ME, US-RI |
+| 8 digits | US-AL, US-PA, US-RI, US-TX, US-VT |
+| 9 digits | US-CO, US-CT, US-IA, US-ID, US-KS, US-MS, US-NM, US-NY, US-OK, US-WY |
+| 10 digits | US-IN |
+| 7 digits + one of `AFJKLQRTVXY` | US-VT |
+| 9 digits + a letter | US-MS |
+| letter + 8 digits | US-AZ, US-IA, US-KY, plus US-HI if the letter is `H`, US-KS if `K`, US-MA if `S`, US-NE if one of `ABCEGHV` |
+| `SA` + 7 digits | US-IA, US-MA |
+| other 9 alphanumerics with ≥ 1 letter | US-IA; plus US-HI if the first is `H`; US-ID for two letters + 6 digits + letter; US-ND for three letters + 6 digits |
+| letter + 9 digits | US-OK |
+| letter + 11 digits | US-IL |
+| letter + 12 digits | US-FL, US-MD, US-MI |
+| `MD` + 11 digits | US-MD |
+| letter + 13 digits | US-WI |
+| letter + 14 digits | US-NJ |
+| `WDL` + 9 alphanumerics; or the WA PIC layout | US-WA |
+| anything else (e.g. 1–5, 11–16 digits; 7 digits + `B`) | none |
+
+Worked examples (verified against the shapes above). Inputs are shown after normalisation. "1" means `fromNumber()`
+returns that class; "≥ 2" throws `AmbiguousJurisdictionException` with exactly these codes in this order; "0" throws
+`InvalidDocumentNumberException`.
+
+| Input | Matches | Jurisdictions (enum order) |
+|---|---|---|
+| `12345` | 0 | none |
+| `123456` | 1 | US-KS |
+| `AB1234` | 1 | US-KS |
+| `1234567` | 3 | US-AL, US-ME, US-RI |
+| `12345678` | 5 | US-AL, US-PA, US-RI, US-TX, US-VT |
+| `123456789` | 10 | US-CO, US-CT, US-IA, US-ID, US-KS, US-MS, US-NM, US-NY, US-OK, US-WY |
+| `1234567890` | 1 | US-IN |
+| `12345678901` | 0 | none |
+| `1234567890123` | 0 | none |
+| `1234567A` | 1 | US-VT |
+| `2054512V` | 1 | US-VT |
+| `1234567B` | 0 | none |
+| `123456789A` | 1 | US-MS |
+| `A12345678` | 4 | US-AZ, US-IA, US-KY, US-NE |
+| `D12345678` | 3 | US-AZ, US-IA, US-KY |
+| `H12345678` | 5 | US-AZ, US-HI, US-IA, US-KY, US-NE |
+| `K12345678` | 4 | US-AZ, US-IA, US-KS, US-KY |
+| `S12345678` | 4 | US-AZ, US-IA, US-KY, US-MA |
+| `C21545427` | 4 | US-AZ, US-IA, US-KY, US-NE |
+| `SA1234567` | 2 | US-IA, US-MA |
+| `HABCDEFGH` | 2 | US-HI, US-IA |
+| `A1B2C3D4E` | 1 | US-IA |
+| `AB123456C` | 2 | US-IA, US-ID |
+| `ABC123456` | 2 | US-IA, US-ND |
+| `A123456789` | 1 | US-OK |
+| `Y62093057270` (`Y620-9305-7270`) | 1 | US-IL |
+| `Z123456789010` (`Z123-456-78-901-0`) | 3 | US-FL, US-MD, US-MI |
+| `MD12345678900` | 1 | US-MD |
+| `H3001987016204` (`H300-1987-0162-04`) | 1 | US-WI |
+| `A12345678901234` | 1 | US-NJ |
+| `WDL123456789` | 1 | US-WA |
+| `GROSECM378NA` | 1 | US-WA |
+| `SMITH**12*AB` | 1 | US-WA |
+
+So unlike AU, several inputs do fit exactly one jurisdiction: 10 digits (IN), letter + 9 digits (OK), letter + 11
+digits (IL), letter + 13 or 14 digits (WI, NJ), `MD` + 11 digits (MD), WA's layouts, VT's lettered form, MS's lettered
+form, and six characters (KS). These exercise the single-match branch with real formats. Review Focus 1 holds:
+`fromNumber('123456789')` throws with the ten codes above.
+
+### DL/ID numbers not covered
+
+- **21 jurisdictions with no official format:** US-AK, US-AR, US-CA, US-DC, US-DE, US-GA, US-LA, US-MN, US-MO, US-MT,
+  US-NC, US-NH, US-NV, US-OH, US-OR, US-SC, US-SD, US-TN, US-UT, US-VA, US-WV. The table above gives what was read
+  for each.
+  - Their DMV pages, forms and statutes name the number but state no format. Where a page shows one, it is only a
+    sample card, image or barcode.
+  - None is in E-Verify RIDE with a published fact sheet.
+  - Secondary lists that give formats for all of them were rejected.
+  - They go on the README "not covered" list with this reason.
+- **ID cards where the source does not state the numbering:** US-CT, US-HI, US-IN, US-KY, US-ME, US-NJ, US-NM, US-OK and
+  US-RI. Their classes cover the driving licence only.
+- **Pre-1993 and earlier Idaho numbers** beyond the nine-digit form, i.e. the sheriff-assigned 910/920/940 numbers of
+  unstated length. Only the nine-digit numeric form is covered.
+- **Decoding of encoded data:** IL, WA PIC, FL and MI letters, MD "soundex". No algorithm is quoted, so no `HasSex` or
+  `HasBirthDate` comes from a DL/ID number, and no check digit is verified.
+- **US territories:** out of scope (plan header).
 
 ## Not covered
 
