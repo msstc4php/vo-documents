@@ -120,8 +120,8 @@ official algorithm is published. A number with the right shape is accepted, neve
 | `Document\MX\Jurisdiction` | The 32 federal entities (enum, ISO 3166-2:MX) | n/a | n/a | ISO 3166-2:MX |
 | `Document\BR\Cpf` | CPF, `280.012.389-38` | Receita Federal "DV módulo 11" (both check digits); a CPF of one repeated digit is accepted (no Receita Federal text refuses it) | `fiscalRegion()` (the ninth digit, a Receita Federal region spanning several states), `formatted()` | Receita Federal ADE COFIS nº 41/2017, Anexo II; Receita Federal CPF leaflet |
 | `Document\BR\VoterRegistrationNumber` | Número de inscrição eleitoral (título de eleitor), up to 12 digits, stored zero-padded to 12 | TSE state code `01`-`28`; check digits format only (TSE names "Módulo 11" without weights) | `stateCode()` (TSE code, not ISO: `28` is abroad), `isAbroad()` | TSE Resolução nº 23.659/2021, art. 36 |
-| `Document\BR\Nis` | NIS (PIS, PASEP, NIT), 11 digits | format only (no check-digit algorithm published by the issuers) | none | Manual de Orientação do eSocial 2.4 |
-| `Document\BR\Cns` | Cartão Nacional de Saúde, 15 digits | format only (no Ministério da Saúde check rule read) | none | DATASUS CADSUS integration specification |
+| `Document\BR\Nis` | NIS (PIS, PASEP, NIT), 11 digits (`118.16788.89-3`) | check digit verified (ANS `isDvPisPasepValido`: weights 2-9 from the right, `11 - sum % 11`, 10 or 11 → 0); repeated digits accepted | `formatted()` | Manual de Orientação do eSocial 2.4; ANS "Algoritmos do Aplicativo de Carga"; SIPREV (display form) |
+| `Document\BR\Cns` | Cartão Nacional de Saúde, 15 digits | check verified (ANS `isDvCnsValido`: digits weighted 15 to 1 sum to a multiple of 11, all zeros refused) | none | DATASUS CADSUS integration specification; ANS "Algoritmos do Aplicativo de Carga" |
 | `Document\BR\DriverLicenceNumber` | CNH número do registro nacional, 9 characters + 2 check digits | format only (CONTRAN names "módulo 11" without weights); letters accepted in the first nine ("caracteres") | none | CONTRAN Resoluções nº 1.020/2025 art. 10 and nº 886/2021 art. 4 |
 | `Document\BR\PassportNumber` | Passport, 2 letters ("série") + 6 digits (`CS265436`) | format only | `series()` | Polícia Federal |
 
@@ -436,8 +436,8 @@ Collected from the source notes; each is a deliberate omission with its reason i
   the fields of the NSS, other INE card numbers (CIC, OCR). State driving licences of 31 entities (all but MX-MEX): the
   state laws (NL, JAL, TAB, GUA, CDMX) name the number without a format; the issuer's pages of BCN, CMX, MIC, NLE, PUE
   and YUC could not be read on 2026-11-16 UTC and are to be re-checked (`docs/sources/MX.md`).
-- **BR:** the check digits of the título de eleitor, NIS, CNS and CNH registration number (the TSE and CONTRAN name
-  "módulo 11" without the weights; no issuer text gives the NIS or CNS rule), the CNH número do espelho and formulário
+- **BR:** the check digits of the título de eleitor and the CNH registration number (the TSE and CONTRAN name
+  "módulo 11" without the weights, and no government text found gives them), the CNH número do espelho and formulário
   Renach, passport formats other than the Polícia Federal's two letters and six digits, the masking rule of the CPF
   (plan default used), a person with no surname (the CNJ code requires one), the RG of each state (Task 7b)
   (`docs/sources/BR.md`).
@@ -451,13 +451,13 @@ Collected from the source notes; each is a deliberate omission with its reason i
 ## Limits to know about
 
 - **Format only, check digit not verified:** INN, TFN, Medicare card number, CA SIN, the CA health card numbers
-  other than BC and ON, the MX CURP, RFC, NSS and clave de elector, and the BR título de eleitor, NIS, CNS and CNH
-  registration number. No official algorithm is
+  other than BC and ON, the MX CURP, RFC, NSS and clave de elector, and the BR título de eleitor and CNH registration
+  number. No official algorithm is
   published (FNS says only "по алгоритму, определенному ФНС"; the ATO gives the TFN algorithm to registered developers
   only; the ADHA appendix is not reachable; the CRA names a "Mod 10" formula for the SIN without giving it), so a
   mistyped check digit is accepted. Only checksums quoted from an official source are verified: SNILS, OMS policy, DE
   pension insurance number, IT codice fiscale, ES DNI and NIE, NL BSN, CH AHV number, GB NHS and H&C numbers, BC and
-  ON health card numbers, BR CPF.
+  ON health card numbers, BR CPF, NIS and CNS.
 - **MX clave de elector letters are `A-Z` only** (positions 1-6): INE says only "primeras letras", so whether a key
   can hold `Ñ` there is unknown; such a key would be refused (`docs/sources/MX.md`).
 - **Not verified against the official PDF:** the 16-digit length of the OMS policy and the FFOMS Order 79 text it is

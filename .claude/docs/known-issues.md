@@ -389,11 +389,15 @@ script classes use `\p{sc=Latin}` / `\p{sc=Cyrillic}` (Script property only); `c
 - **CNH**: CONTRAN Res. 1.020/2025 art. 10 says "nove caracteres e dois dígitos verificadores" (not "algarismos"), so
   letters are accepted in the first nine. Res. 886/2021 (not revoked by 1.020's art. 140 list) gives "módulo 11" and
   "resto … 0 ou 1 → 0", no weights.
-- **CNS**: DATASUS only states "15 dígitos e conter somente números"; the weighted-sum routine (`Σ d·(15..1) ≡ 0 mod
-  11`) is published by the ANS (SIB-XML algorithms), not by the Ministério da Saúde/DATASUS; `rni-docs.anvisa.gov.br`
-  (says "algoritmo do Ministério da Saúde (em anexo)") answers 403. Not applied; re-check if a DATASUS text surfaces.
-- **NIS**: eSocial MOS 2.4 "11 dígitos numéricos, incluído o dv"; no issuer text for the DV algorithm found (the
-  DATASUS spec says "algoritmo de verificação (modulo 11) do PIS/NIS/PASEP" without weights).
+- **Official = any government body's own publication** (controller ruling, Task 7a fix round 1): the ANS SIB-XML
+  "Algoritmos do Aplicativo de Carga" page on `gov.br/ans` counts, so its CNS and PIS/PASEP routines are enforced.
+  Other bodies' *intake policies* (repeated-digit refusals, DATASUS RN048 "numérica" for the CNH) are still not applied.
+- **CNS**: `isDvCnsValido` = not all zeros AND (`validaCns` OR `validaCnsProv`); `validaCns` ⊆ `validaCnsProv` (its
+  check digit zeroes the 15..1 weighted sum mod 11), so `Cns` implements only the weighted sum — implementing
+  `validaCns` too would only add equivalent mutants. `700000000000004` (a sample often used) is **invalid** (sum 109).
+- **NIS**: ANS `isDvPisPasepValido`, weights 2..9 cycling from the right = `[3,2,9,8,7,6,5,4,3,2]` from the left; the
+  eSocial sample `11816788893` passes. Repeated digits accepted.
+- **Título and CNH weights**: re-searched (gov.br, jus.br, serpro, Detrans); none published. Still format only.
 - **BR names use `AnyIcaoSpelling`**: the PF FAQ ("Nome abreviado no passaporte") describes SINPA abbreviation at 30
   characters per field (particles first, then the penultimate word to one letter). A Brazilian `PersonName` cannot
   exceed `Icao\PersonName::MAX_LENGTH` (two parts of ≤100 characters), so "too long" never triggers here.

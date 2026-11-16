@@ -17,7 +17,14 @@ All dates UTC. Sources read 2026-11-16.
 | Passaporte, "Dúvidas": "Nome abreviado no passaporte", "Nome completo não cabe no campo, e agora?" | Polícia Federal | <https://www.gov.br/pf/pt-br/assuntos/passaporte/duvidas> |
 | "Dado pessoal errado, erro no passaporte, o que fazer?" (updated 2024-01-29) | Polícia Federal | <https://www.gov.br/pf/pt-br/assuntos/passaporte/ajuda/duvidas_/caderneta/caderneta-dado-errado-o-que> |
 | Código Nacional de Normas – Foro Extrajudicial (Provimento nº 149/2023, as amended by Provimento nº 153/2023), art. 515-B | Conselho Nacional de Justiça | <https://atos.cnj.jus.br/atos/detalhar/5243> |
+| "Algoritmos do Aplicativo de Carga" (SIB-XML; published 2021-04-06), 4 - CNS, 7 - PISPASEP; same routines in the PDF "Algoritmos Aplicativo de carga SIB-XML" (file `sib-algoritmos-xml10-17012019.pdf`) | Agência Nacional de Saúde Suplementar (ANS) | <https://www.gov.br/ans/pt-br/centrais-de-conteudo/manuais-do-portal-operadoras/sib-manual-de-instalacao-historico-de-versao-e-outros-arquivos/manual/algoritmos-do-aplicativo-de-carga>; <https://www.gov.br/ans/pt-br/arquivos/assuntos/espaco-da-operadora-de-plano-de-saude/aplicativos-ans/sib/sib-algoritmos-xml10-17012019.pdf> |
+| "Perguntas & Respostas sobre o Cartão Nacional de Saúde (CNS)" | ANS | <https://www.gov.br/ans/pt-br/centrais-de-conteudo/faq-cns-pdf> |
 | ICAO Doc 9303 Part 3, 8th ed. (2021), §4.6, §6.A | ICAO | see `ICAO.md` |
+
+Official source (controller ruling, Task 7a fix round 1): any federal or state government body's own publication
+counts, not only the issuer's; so the ANS routines are applied (CNS, NIS), while other bodies' **intake policies**
+(refusing repeated digits, "numérica") are still not applied where they would refuse a number the arithmetic or the
+issuer's text accepts.
 
 Reachability: `www.gov.br`, `sped.rfb.gov.br`, `datasus.saude.gov.br` and `atos.cnj.jus.br` answer curl.
 `www.tse.jus.br` answers 403 (curl and WebFetch): its unmodified Internet Archive copy (`id_` form, found through the
@@ -151,7 +158,11 @@ Rules applied:
 - The state code must be in the table, `01` to `28`; `00` and `29`-`99` are refused.
 - **Check digits: format only.** The TSE names "Módulo 11" and the digits each covers, but not the weights or the
   digit for a remainder of 10 (the special case for São Paulo and Minas Gerais that validators apply is quoted from no
-  TSE text).
+  TSE text). Re-searched in fix round 1 (2026-11-16 UTC) for any government publication of the weights: web searches
+  restricted to `jus.br` and `gov.br` for "título eleitoral dígito verificador cálculo pesos" and for "inscrição
+  eleitoral dígito verificador módulo 11 leiaute regra de validação" returned TSE service pages (Título Net, FAQ,
+  e-Título), Res. 23.659/2021 itself and state tax (SEFAZ) check-digit pages for other registrations; no TSE or TRE
+  manual, layout or validation rule gives the weights.
 - **State as a string**, `stateCode()` "01"-"28", plus `isAbroad()` for 28: the 27 state codes map one to one to the
   ISO 3166-2:BR units, but the table has a 28th code, "Exterior (ZZ)", with no ISO subdivision, so the codes do not
   map one to one and no `Jurisdiction` enum is created here (Task 7b may create one for the RG).
@@ -170,11 +181,48 @@ do dígito verificador conforme padrão do NIT; − Recusar todos os dígitos ig
 formato XXX.XXXXX.XX-X;". **DATASUS RN032**: "deve ser numérica com 11 caracteres e satisfizer o algoritmo de
 verificação (modulo 11) do PIS/NIS/PASEP."
 
+**ANS, "Algoritmos do Aplicativo de Carga", 7 - PISPASEP** (verbatim):
+
+```java
+public boolean isDvPisPasepValido(String pisOrPasep) {
+    final int DIGIT_COUNT = 11;
+    if (pisOrPasep == null) {
+        return false;
+    }
+    String n = pisOrPasep.replaceAll("[^0-9]*", "");
+    if (n.length() != DIGIT_COUNT) {
+        return false;
+    }
+    int i;
+    int digit;
+    int coeficient =2;
+    int sum = 0;
+    int foundDv;
+    int dv = Integer.parseInt(String.valueOf(n.charAt(n.length() - 1)));
+    for (i = n.length() - 2; i >= 0; i--) {
+        digit = Integer.parseInt(String.valueOf(n.charAt(i)));
+        sum += digit * coeficient;
+        coeficient++;
+        if (coeficient > 9) {
+            coeficient = 2;
+        }
+    }
+    foundDv = 11 - sum % 11;
+    if (foundDv >= 10) {
+        foundDv = 0;
+    }
+    return dv == foundDv;
+}
+```
+
 Rules applied:
 
 - Eleven digits; dots, spaces and hyphens are separators. One class for PIS, PASEP and NIT (one number, three issuers).
-- **Check digit: format only.** "Padrão do NIT" and "modulo 11" are named, no issuer text read (Caixa, INSS, Banco do
-  Brasil) gives the weights. Repeated digits are not refused (SIPREV's intake rule, as for the CPF).
+- **Check digit verified** as the ANS routine: the first ten digits weighted 2, 3, …, 9, 2, 3 from the right (3, 2, 9,
+  8, 7, 6, 5, 4, 3, 2 from the left), `11 - sum % 11`, a result of 10 or 11 read as 0. The eSocial sample `11816788893`
+  passes (sum 283, 283 mod 11 = 8, 11 − 8 = 3).
+- **Repeated digits are not refused**: SIPREV's "Recusar todos os dígitos iguais" is an intake policy, as for the CPF;
+  `00000000000` passes the arithmetic and is accepted.
 - `formatted()`: `118.16788.89-3` (SIPREV "XXX.XXXXX.XX-X"); `masked()` keeps the last four digits (plan default):
   `***.****8.89-3`.
 
@@ -183,15 +231,109 @@ Rules applied:
 **DATASUS, PIX-PDQ specification, serviço AuditoriaCadsusPS** (verbatim): "Parâmetros de entrada: Número do CNS (15
 posições)" and the error message "Número CNS “1111111” inválido. CNS deve ter 15 dígitos e conter somente números."
 
-Not applied: the ANS (Agência Nacional de Saúde Suplementar) publishes, for its SIB-XML intake, Java routines
-`validaCns` (numbers derived from a PIS, `pis + "000" + dv` or `pis + "001" + dv`) and `validaCnsProv` (the 15 digits
-weighted 15 to 1 sum to a multiple of 11), and refuses `000000000000000`; its FAQ describes numbers beginning with 7
-(DATASUS, "definitivos"), 8 or 9 ("gerados remotamente") and 1 or 2. Those are an agency's intake rules, not a
-Ministério da Saúde/DATASUS text, and the ANVISA page that says "Validar CNS de acordo com algoritmo do Ministério da
-Saúde (em anexo)" answered 403.
+**ANS, "Algoritmos do Aplicativo de Carga", 4 - CNS** (verbatim):
 
-Rules applied: fifteen digits, spaces and hyphens as separators (the card prints the number in groups), format only.
-No display form is quoted; `masked()` keeps the last four digits (plan default): `***********0004`.
+```java
+public boolean isDvCnsValido(String numCns) {
+    String cns = numCns.replaceAll("[^0-9]*", "");
+    if (cns.equals("000000000000000")) {
+        return false;
+    }
+    return validaCns(cns) || validaCnsProv(cns);
+}
+public boolean validaCnsProv(String cns) {
+    if (cns.trim().length() != 15) {
+        return (false);
+    }
+    float resto, soma;
+    soma = ((Integer.valueOf(cns.substring(0, 1)).intValue()) * 15)
+            + ((Integer.valueOf(cns.substring(1, 2)).intValue()) * 14)
+            + ((Integer.valueOf(cns.substring(2, 3)).intValue()) * 13)
+            + ((Integer.valueOf(cns.substring(3, 4)).intValue()) * 12)
+            + ((Integer.valueOf(cns.substring(4, 5)).intValue()) * 11)
+            + ((Integer.valueOf(cns.substring(5, 6)).intValue()) * 10)
+            + ((Integer.valueOf(cns.substring(6, 7)).intValue()) * 9)
+            + ((Integer.valueOf(cns.substring(7, 8)).intValue()) * 8)
+            + ((Integer.valueOf(cns.substring(8, 9)).intValue()) * 7)
+            + ((Integer.valueOf(cns.substring(9, 10)).intValue()) * 6)
+            + ((Integer.valueOf(cns.substring(10, 11)).intValue()) * 5)
+            + ((Integer.valueOf(cns.substring(11, 12)).intValue()) * 4)
+            + ((Integer.valueOf(cns.substring(12, 13)).intValue()) * 3)
+            + ((Integer.valueOf(cns.substring(13, 14)).intValue()) * 2)
+            + ((Integer.valueOf(cns.substring(14, 15)).intValue()) * 1);
+    resto = soma % 11;
+    if (resto != 0) {
+        return (false);
+    } else {
+        return (true);
+    }
+}
+public boolean validaCns(String cns) {
+    if (cns.trim().length() != 15) {
+        return (false);
+    }
+    float soma;
+    float resto, dv;
+    String pis = "";
+    String resultado = "";
+    pis = cns.substring(0, 11);
+    soma = ((Integer.valueOf(pis.substring(0, 1)).intValue()) * 15)
+            + ((Integer.valueOf(pis.substring(1, 2)).intValue()) * 14)
+            + ((Integer.valueOf(pis.substring(2, 3)).intValue()) * 13)
+            + ((Integer.valueOf(pis.substring(3, 4)).intValue()) * 12)
+            + ((Integer.valueOf(pis.substring(4, 5)).intValue()) * 11)
+            + ((Integer.valueOf(pis.substring(5, 6)).intValue()) * 10)
+            + ((Integer.valueOf(pis.substring(6, 7)).intValue()) * 9)
+            + ((Integer.valueOf(pis.substring(7, 8)).intValue()) * 8)
+            + ((Integer.valueOf(pis.substring(8, 9)).intValue()) * 7)
+            + ((Integer.valueOf(pis.substring(9, 10)).intValue()) * 6)
+            + ((Integer.valueOf(pis.substring(10, 11)).intValue()) * 5);
+    resto = soma % 11;
+    dv = 11 - resto;
+    if (dv == 11) {
+        dv = 0;
+    }
+    if (dv == 10) {
+        soma = ((Integer.valueOf(pis.substring(0, 1)).intValue()) * 15) +
+                ((Integer.valueOf(pis.substring(1, 2)).intValue()) * 14) +
+                ((Integer.valueOf(pis.substring(2, 3)).intValue()) * 13) +
+                ((Integer.valueOf(pis.substring(3, 4)).intValue()) * 12) +
+                ((Integer.valueOf(pis.substring(4, 5)).intValue()) * 11) +
+                ((Integer.valueOf(pis.substring(5, 6)).intValue()) * 10) +
+                ((Integer.valueOf(pis.substring(6, 7)).intValue()) * 9) +
+                ((Integer.valueOf(pis.substring(7, 8)).intValue()) * 8) +
+                ((Integer.valueOf(pis.substring(8, 9)).intValue()) * 7) +
+                ((Integer.valueOf(pis.substring(9, 10)).intValue()) * 6) +
+                ((Integer.valueOf(pis.substring(10, 11)).intValue()) * 5)
+                + 2;
+        resto = soma % 11;
+        dv = 11 - resto;
+        resultado = pis + "001" + String.valueOf((int) dv);
+    } else {
+        resultado = pis + "000" + String.valueOf((int) dv);
+    }
+    if (!cns.equals(resultado)) {
+        return (false);
+    } else {
+        return (true);
+    }
+}
+```
+
+The ANS FAQ adds that numbers beginning with 7 are generated by DATASUS ("definitivos"), with 8 or 9 "gerados
+remotamente", and with 1 or 2 derived from a PIS; that is descriptive and not applied as a first-digit rule.
+
+Rules applied:
+
+- Fifteen digits; spaces and hyphens are separators (the card prints the number in groups); dots are not.
+- **Check verified** as `isDvCnsValido`: `000000000000000` is refused; otherwise the number must pass `validaCns` or
+  `validaCnsProv`. Implemented as the weighted sum of `validaCnsProv` alone (15 to 1, a multiple of 11), because every
+  number `validaCns` accepts passes it: with `S` the sum of the first 11 digits weighted 15 to 5, the `000` form adds
+  `dv = 11 − S mod 11` (0 for 11) at weight 1, so the full sum is `S + dv ≡ 0`; the `001` form adds 1 at weight 2 and
+  `dv = 11 − (S + 2) mod 11`, so the sum is `S + 2 + dv ≡ 0` (a `dv` of 10 or 11 makes a 16-character string that never
+  equals the number). The union is therefore `validaCnsProv`. Both branches have test samples: `200000000000003` (`000`),
+  `100000000060018` (`001`, first result 10), `700000000000005` and `898000000000002` (`validaCnsProv`).
+- No display form is quoted; `masked()` keeps the last four digits (plan default): `***********0005`.
 
 ## CNH (`Document\BR\DriverLicenceNumber`)
 
@@ -214,7 +356,15 @@ Rules applied:
 
 - Eleven characters: nine of `0-9A-Z` ("caracteres": no text restricts them to digits, so letters are not refused)
   and two digits ("dígitos verificadores"). Separators removed, letters upper-cased, leading zeros kept.
-- **Check digits: format only**: "módulo 11" and the 0/1 rule are given, the weights are not.
+- **Check digits: format only**: "módulo 11" and the 0/1 rule are given, the weights are not. Re-searched in fix round
+  1 (2026-11-16 UTC) for any government publication of the weights: web searches restricted to `gov.br`,
+  `serpro.gov.br` and the SP, RS, MG and PR Detran domains for "CNH número registro RENACH dígito verificador cálculo
+  pesos módulo 11" found only the CONTRAN resolutions (511/2014, 598/2016, 718/2017, 886/2021, 1.020/2025), which
+  repeat "módulo 11" without weights; the CNH validation code is generated by an algorithm "de propriedade" of the
+  federal traffic body (Res. 718/2017, 886/2021), not published.
+- **DATASUS RN048** ("A informação é numérica") is a CADSUS intake rule for its own register, not a rule of the
+  issuer or of CONTRAN; it is deliberately not applied, so letters stay accepted in the first nine characters as
+  CONTRAN's "caracteres" allows.
 - Only the registro nacional is covered; the número do espelho (per document) and the formulário Renach (per service)
   are other numbers (not covered).
 - No display form; `masked()` keeps the last four characters (plan default): `*******8901`.
@@ -240,7 +390,8 @@ Not researched in Task 7a.
 
 ## Not covered
 
-- Check digits of the título de eleitor, NIS, CNS and CNH registration number (above).
+- Check digits of the título de eleitor and the CNH registration number (no government text gives the weights; the
+  searches are recorded above).
 - CNH número do espelho and número do formulário Renach.
 - Passport formats other than the PF's two letters and six digits.
 - A CPF masking rule (the plan default is used; no official rule was researched).
