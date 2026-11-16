@@ -12,7 +12,7 @@ core.
 | `Icao\Table\*` | `@internal` `TransliterationTable` per script (LatinMultinational, Cyrillic); add a class + register it in the `Transliterator` constructor for a new script |
 | `Name\AbstractNamePart` | Base of every national name part: `letters()` (regex class), `label()` (message), `innerSeparators()` (default `-' `) |
 | `Name\LatinSpelling` | `@internal`: finds a Latin override among the ICAO spellings of a name, word by word (`Name\IdentifierSpellings`: variants per word + national separators; hyphen ≡ `<`; cap 4096 per word) |
-| `Name\LatinOverridePolicy` | `@internal` abstract: `resolve(?override, derived)` (template method, drops the derived form); `withoutDerivedForm()` (refuses, except `AnyIcaoSpelling` with an override); subclasses `AnyIcaoSpelling` (RU, GB) and `TransliterationVariant` (AU, DE, FR, IT, ES, NL, CH, TR; via `LatinSpelling`) |
+| `Name\LatinOverridePolicy` | `@internal` abstract: `resolve(?override, derived)` (template method, drops the derived form); `withoutDerivedForm()` (refuses, except `AnyIcaoSpelling` with an override); subclasses `AnyIcaoSpelling` (RU, GB) and `TransliterationVariant` (AU, DE, FR, IT, ES, NL, CH, TR, US; via `LatinSpelling`) |
 | `Name\PersonName` | Interface of a national full name: `latin(): Icao\PersonName`, `full()` |
 | `Name\Latin\*` | `AbstractLatinNamePart` (`\p{Latin}` part); `@internal`: `LatinPersonNameBuilder` (derived form, spellings per word for `TransliterationVariant`), `AbstractLatinPersonName` (effective Latin form + kept override, hook `overridePolicy()`), `AbstractFamilyGivenPersonName<TFamily, TGiven>` (public `family`/`given`, `full()`, `equals()`, JSON view; AU DE FR IT TR NL CH GB), `AbstractFamilyGivenPersonNameCodec<TName>` (keys `family`/`given`/`latin`; hooks `shape()`, `create()`) |
 | `Name\RU\*` | `AbstractRussianNamePart` (letters, word pattern), `FamilyName`, `GivenName`, `Patronymic`, `PersonName` (+ `short()`, `initialsFirst()`), `PersonNameCodec`; `@internal RussianTransliteration` (drops Ь, then `Icao\Transliterator`) |
@@ -76,3 +76,15 @@ algorithm), `PassportNumber` (letter + 8 digits, PRADO composition). Sürücü b
 layout). `Name\TR\PersonName($family, $given, ?$latin)`: letters of the Law 1353 alphabet plus `â î û`
 (`Name\TR\AbstractTurkishNamePart`), space as the only separator, override policy `TransliterationVariant`; codec
 keys `family`, `given`, `latin`.
+
+`Document\US\*` (federal only; DL/ID numbers come with plan 3 Task 2): `SocialSecurityNumber` (SSA refusals: area
+000/666/9xx, group 00, serial 0000; `formatted()` `123-45-6789`), `Itin` (first digit 9, digits 4-5 in the IRM ranges;
+string range bounds, no int cast), `PassportBookNumber` (9 digits, letter + 7 or 8 digits; mask 3 for 8 characters),
+`PassportCardNumber` (`C` + 8 digits), `MedicareBeneficiaryIdentifier` (CMS position layout, `formatted()`
+`1EG4-TE5-MK73`). SSN and ITIN mask with the TTIN rule (26 CFR 301.6109-4): `***-**-6789`.
+`Name\US\PersonName($family, $given, ?$middle, ?$suffix, ?$latin)` extends `AbstractLatinPersonName` directly (like ES):
+secondary identifiers are given, middle, `NameSuffix::icao()` (ordinals as Roman numerals); policy
+`TransliterationVariant`. `Name\US\NameSuffix` is a string-backed enum of the 20 AAMVA `DCU` codes (`fromCode()`
+case-insensitive, message "Invalid American name suffix."), not a value object: `PersonName::equals()` compares it
+with `===`. `Name\US\AbstractAmericanNamePart` maps the ʻokina U+02BB to `'` before the shared parse. Codec keys
+`family`, `given`, `middle`, `suffix` (AAMVA code), `latin`.

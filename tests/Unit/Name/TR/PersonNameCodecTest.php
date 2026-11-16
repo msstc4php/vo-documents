@@ -40,6 +40,7 @@ use MSSTC4PHP\ValueObject\Documents\Name\TR\GivenName;
 use MSSTC4PHP\ValueObject\Documents\Name\TR\PersonName;
 use MSSTC4PHP\ValueObject\Documents\Name\TR\PersonNameCodec;
 use MSSTC4PHP\ValueObject\Documents\Name\TransliterationVariant;
+use MSSTC4PHP\ValueObject\Documents\Name\US\PersonNameCodec as UsPersonNameCodec;
 use MSSTC4PHP\ValueObject\Documents\Tests\Fixture\RefusesNameWithoutEchoingInput;
 use MSSTC4PHP\ValueObject\Exception\InvalidPayloadException;
 use MSSTC4PHP\ValueObject\Payload\ValueObjectMapper;
@@ -62,6 +63,7 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(ChPersonNameCodec::class)]
 #[UsesClass(DePersonNameCodec::class)]
 #[UsesClass(GbPersonNameCodec::class)]
+#[UsesClass(UsPersonNameCodec::class)]
 #[UsesClass(PersonName::class)]
 #[UsesClass(AbstractNamePart::class)]
 #[UsesClass(AbstractLatinNamePart::class)]

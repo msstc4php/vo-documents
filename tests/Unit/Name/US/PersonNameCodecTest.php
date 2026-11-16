@@ -1,0 +1,267 @@
+<?php
+
+declare(strict_types=1);
+
+namespace MSSTC4PHP\ValueObject\Documents\Tests\Unit\Name\US;
+
+use LogicException;
+use MSSTC4PHP\ValueObject\Documents\Codecs;
+use MSSTC4PHP\ValueObject\Documents\Icao\PersonName as IcaoPersonName;
+use MSSTC4PHP\ValueObject\Documents\Icao\Table\Cyrillic;
+use MSSTC4PHP\ValueObject\Documents\Icao\Table\LatinMultinational;
+use MSSTC4PHP\ValueObject\Documents\Icao\Transliterator;
+use MSSTC4PHP\ValueObject\Documents\Internal\Optional;
+use MSSTC4PHP\ValueObject\Documents\Internal\PayloadFields;
+use MSSTC4PHP\ValueObject\Documents\Internal\Text;
+use MSSTC4PHP\ValueObject\Documents\Internal\UnicodeText;
+use MSSTC4PHP\ValueObject\Documents\Name\AbstractNamePart;
+use MSSTC4PHP\ValueObject\Documents\Name\AU\PersonNameCodec as AuPersonNameCodec;
+use MSSTC4PHP\ValueObject\Documents\Name\CH\PersonNameCodec as ChPersonNameCodec;
+use MSSTC4PHP\ValueObject\Documents\Name\DE\PersonNameCodec as DePersonNameCodec;
+use MSSTC4PHP\ValueObject\Documents\Name\ES\PersonNameCodec as EsPersonNameCodec;
+use MSSTC4PHP\ValueObject\Documents\Name\FR\PersonNameCodec as FrPersonNameCodec;
+use MSSTC4PHP\ValueObject\Documents\Name\GB\PersonNameCodec as GbPersonNameCodec;
+use MSSTC4PHP\ValueObject\Documents\Name\IdentifierSpellings;
+use MSSTC4PHP\ValueObject\Documents\Name\IT\PersonNameCodec as ItPersonNameCodec;
+use MSSTC4PHP\ValueObject\Documents\Name\Latin\AbstractLatinNamePart;
+use MSSTC4PHP\ValueObject\Documents\Name\Latin\AbstractLatinPersonName;
+use MSSTC4PHP\ValueObject\Documents\Name\Latin\LatinPersonNameBuilder;
+use MSSTC4PHP\ValueObject\Documents\Name\LatinForm;
+use MSSTC4PHP\ValueObject\Documents\Name\LatinOverridePolicy;
+use MSSTC4PHP\ValueObject\Documents\Name\LatinSpelling;
+use MSSTC4PHP\ValueObject\Documents\Name\NL\PersonNameCodec as NlPersonNameCodec;
+use MSSTC4PHP\ValueObject\Documents\Name\RU\PersonNameCodec as RuPersonNameCodec;
+use MSSTC4PHP\ValueObject\Documents\Name\TR\PersonNameCodec as TrPersonNameCodec;
+use MSSTC4PHP\ValueObject\Documents\Name\TransliterationVariant;
+use MSSTC4PHP\ValueObject\Documents\Name\US\AbstractAmericanNamePart;
+use MSSTC4PHP\ValueObject\Documents\Name\US\FamilyName;
+use MSSTC4PHP\ValueObject\Documents\Name\US\GivenName;
+use MSSTC4PHP\ValueObject\Documents\Name\US\MiddleName;
+use MSSTC4PHP\ValueObject\Documents\Name\US\NameSuffix;
+use MSSTC4PHP\ValueObject\Documents\Name\US\PersonName;
+use MSSTC4PHP\ValueObject\Documents\Name\US\PersonNameCodec;
+use MSSTC4PHP\ValueObject\Documents\Tests\Fixture\RefusesNameWithoutEchoingInput;
+use MSSTC4PHP\ValueObject\Exception\InvalidPayloadException;
+use MSSTC4PHP\ValueObject\Payload\ValueObjectMapper;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\UsesClass;
+use PHPUnit\Framework\TestCase;
+
+#[CoversClass(PersonNameCodec::class)]
+#[UsesClass(Codecs::class)]
+#[UsesClass(RuPersonNameCodec::class)]
+#[UsesClass(AuPersonNameCodec::class)]
+#[UsesClass(DePersonNameCodec::class)]
+#[UsesClass(FrPersonNameCodec::class)]
+#[UsesClass(ItPersonNameCodec::class)]
+#[UsesClass(EsPersonNameCodec::class)]
+#[UsesClass(NlPersonNameCodec::class)]
+#[UsesClass(ChPersonNameCodec::class)]
+#[UsesClass(GbPersonNameCodec::class)]
+#[UsesClass(TrPersonNameCodec::class)]
+#[UsesClass(PersonName::class)]
+#[UsesClass(AbstractLatinPersonName::class)]
+#[UsesClass(AbstractNamePart::class)]
+#[UsesClass(AbstractLatinNamePart::class)]
+#[UsesClass(AbstractAmericanNamePart::class)]
+#[UsesClass(LatinPersonNameBuilder::class)]
+#[UsesClass(LatinSpelling::class)]
+#[UsesClass(IdentifierSpellings::class)]
+#[UsesClass(LatinOverridePolicy::class)]
+#[UsesClass(TransliterationVariant::class)]
+#[UsesClass(FamilyName::class)]
+#[UsesClass(GivenName::class)]
+#[UsesClass(MiddleName::class)]
+#[UsesClass(NameSuffix::class)]
+#[UsesClass(IcaoPersonName::class)]
+#[UsesClass(Transliterator::class)]
+#[UsesClass(Cyrillic::class)]
+#[UsesClass(LatinMultinational::class)]
+#[UsesClass(UnicodeText::class)]
+#[UsesClass(PayloadFields::class)]
+#[UsesClass(Optional::class)]
+#[UsesClass(Text::class)]
+#[UsesClass(LatinForm::class)]
+final class PersonNameCodecTest extends TestCase
+{
+    use RefusesNameWithoutEchoingInput;
+
+    private const string SHAPE = 'Expected an American person name payload with string "family" and "given", '
+        . 'string, null or missing "middle", "suffix" and "latin", and no other keys.';
+
+    public function testMapsItsClass(): void
+    {
+        self::assertSame(PersonName::class, new PersonNameCodec()->valueObjectClass());
+    }
+
+    public function testRoundTripWithEveryPart(): void
+    {
+        $codec = new PersonNameCodec();
+        $name = new PersonName(
+            FamilyName::from("O'Brien"),
+            GivenName::from('Mary Ann'),
+            MiddleName::from('Lee'),
+            NameSuffix::Third,
+        );
+
+        $payload = $codec->encode($name);
+
+        self::assertSame(
+            ['family' => "O'Brien", 'given' => 'Mary Ann', 'middle' => 'Lee', 'suffix' => '3RD', 'latin' => null],
+            $payload,
+        );
+        $decoded = $codec->decode($payload);
+        self::assertTrue($decoded->equals($name));
+        self::assertSame(NameSuffix::Third, $decoded->suffix);
+    }
+
+    public function testRoundTripWithoutOptionalPartsUnchanged(): void
+    {
+        $codec = new PersonNameCodec();
+        $name = new PersonName(FamilyName::from('de la Cruz'), GivenName::from('Ana'));
+
+        $payload = $codec->encode($name);
+
+        self::assertSame(
+            ['family' => 'de la Cruz', 'given' => 'Ana', 'middle' => null, 'suffix' => null, 'latin' => null],
+            $payload,
+        );
+        $decoded = $codec->decode($payload);
+        self::assertTrue($decoded->equals($name));
+        self::assertNull($decoded->middle);
+        self::assertNull($decoded->suffix);
+        self::assertSame('DE<LA<CRUZ<<ANA', $decoded->latin()->value);
+    }
+
+    public function testRoundTripWithOverride(): void
+    {
+        $codec = new PersonNameCodec();
+        $name = new PersonName(
+            FamilyName::from('Möller'),
+            GivenName::from('Anna'),
+            null,
+            NameSuffix::Junior,
+            IcaoPersonName::from('MOLLER<<ANNA<JR'),
+        );
+
+        $payload = $codec->encode($name);
+
+        self::assertSame(
+            ['family' => 'Möller', 'given' => 'Anna', 'middle' => null, 'suffix' => 'JR', 'latin' => 'MOLLER<<ANNA<JR'],
+            $payload,
+        );
+        $decoded = $codec->decode($payload);
+        self::assertTrue($decoded->equals($name));
+        self::assertSame('MOLLER<<ANNA<JR', $decoded->latinOverride()?->value);
+    }
+
+    public function testDecodeAcceptsMissingOptionalKeys(): void
+    {
+        $name = new PersonNameCodec()->decode(['family' => 'Smith', 'given' => 'John']);
+
+        self::assertNull($name->middle);
+        self::assertNull($name->suffix);
+        self::assertNull($name->latinOverride());
+    }
+
+    /**
+     * @return iterable<string, array{array<array-key, mixed>}>
+     */
+    public static function malformedPayloads(): iterable
+    {
+        yield 'family is an int' => [['family' => 1, 'given' => 'John']];
+        yield 'family missing' => [['given' => 'John']];
+        yield 'given missing' => [['family' => 'Smith']];
+        yield 'given null' => [['family' => 'Smith', 'given' => null]];
+        yield 'middle is an int' => [['family' => 'Smith', 'given' => 'John', 'middle' => 1]];
+        yield 'suffix is an int' => [['family' => 'Smith', 'given' => 'John', 'suffix' => 2]];
+        yield 'latin is an int' => [['family' => 'Smith', 'given' => 'John', 'latin' => 1]];
+        yield 'first key of ES' => [['first' => 'Smith', 'given' => 'John']];
+        yield 'int key' => [['family' => 'Smith', 'given' => 'John', 0 => 'x']];
+    }
+
+    /**
+     * @param array<array-key, mixed> $payload
+     */
+    #[DataProvider('malformedPayloads')]
+    public function testDecodeRefusesAMalformedPayload(array $payload): void
+    {
+        self::assertNameRefusedWithoutEcho(
+            fn (): PersonName => new PersonNameCodec()->decode($payload),
+            '',
+            self::SHAPE,
+            InvalidPayloadException::class,
+        );
+    }
+
+    public function testTheJsonViewIsNotACodecPayload(): void
+    {
+        self::assertNameRefusedWithoutEcho(
+            fn (): PersonName => new PersonNameCodec()->decode(
+                new PersonName(FamilyName::from('Smith'), GivenName::from('John'))->jsonSerialize(),
+            ),
+            '',
+            self::SHAPE,
+            InvalidPayloadException::class,
+        );
+    }
+
+    /**
+     * @return iterable<string, array{array<array-key, mixed>, string}>
+     */
+    public static function invalidFields(): iterable
+    {
+        yield 'middle' => [
+            ['family' => 'Smith', 'given' => 'John', 'middle' => 'Лee'],
+            'Invalid American middle name (invalid character).',
+        ];
+        yield 'suffix' => [
+            ['family' => 'Smith', 'given' => 'John', 'suffix' => 'Jr.'],
+            'Invalid American name suffix.',
+        ];
+    }
+
+    /**
+     * @param array<array-key, mixed> $payload
+     */
+    #[DataProvider('invalidFields')]
+    public function testDecodeRefusesAnInvalidField(array $payload, string $message): void
+    {
+        self::assertNameRefusedWithoutEcho(
+            fn (): PersonName => new PersonNameCodec()->decode($payload),
+            '',
+            $message,
+        );
+    }
+
+    public function testEncodeRefusesAnotherValueObject(): void
+    {
+        self::assertNameRefusedWithoutEcho(
+            fn (): array => new PersonNameCodec()->encode(GivenName::from('Ana')),
+            '',
+            PersonNameCodec::class . ' encodes ' . PersonName::class . ', ' . GivenName::class . ' given.',
+            LogicException::class,
+        );
+    }
+
+    public function testWorksThroughTheMapperFromUntrustedInput(): void
+    {
+        $mapper = new ValueObjectMapper(Codecs::all());
+
+        $name = $mapper->fromUntrustedPayload(
+            PersonName::class,
+            ['family' => 'Peña', 'given' => 'Ana', 'suffix' => 'ii', 'latin' => 'penxxa<<ana<ii'],
+        );
+
+        self::assertSame('PENXXA<<ANA<II', $name->latin()->value);
+        $expected = [
+            'family' => 'Peña',
+            'given' => 'Ana',
+            'middle' => null,
+            'suffix' => 'II',
+            'latin' => 'PENXXA<<ANA<II',
+        ];
+        self::assertSame($expected, $mapper->toPayload($name));
+    }
+}

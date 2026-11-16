@@ -15,6 +15,7 @@ use MSSTC4PHP\ValueObject\Documents\Name\IT\PersonNameCodec as ItPersonNameCodec
 use MSSTC4PHP\ValueObject\Documents\Name\NL\PersonNameCodec as NlPersonNameCodec;
 use MSSTC4PHP\ValueObject\Documents\Name\RU\PersonNameCodec as RuPersonNameCodec;
 use MSSTC4PHP\ValueObject\Documents\Name\TR\PersonNameCodec as TrPersonNameCodec;
+use MSSTC4PHP\ValueObject\Documents\Name\US\PersonNameCodec as UsPersonNameCodec;
 use MSSTC4PHP\ValueObject\Payload\PayloadCodec;
 
 /**
@@ -38,6 +39,7 @@ final class Codecs
             new ChPersonNameCodec(),
             new GbPersonNameCodec(),
             new TrPersonNameCodec(),
+            new UsPersonNameCodec(),
         ];
     }
 }

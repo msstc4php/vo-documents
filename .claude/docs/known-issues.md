@@ -256,3 +256,23 @@ Script_Extensions of U+00B7 MIDDLE DOT (Catalan `l·l`), so on PHP builds with a
 GitHub runners) `\p{Latin}` accepted `Marcel·lí`, while PHP 8.4.17 locally (PCRE2 10.44, Unicode 15) refused it. All
 script classes use `\p{sc=Latin}` / `\p{sc=Cyrillic}` (Script property only); `composer.json` requires
 `lib-pcre >=10.40` for the `sc=` syntax. A CI-only name test failure is the first thing to check against this.
+
+## US sources and decisions (plan 3 Task 1, 2026-11-16 UTC)
+
+- **Reachability:** `www.ssa.gov` answers 403 (Akamai) and `travel.state.gov` a Cloudflare block page to curl and
+  WebFetch (recent Internet Archive captures hold the block page too: pick a capture with status 200 from the CDX API,
+  `web.archive.org/cdx/search/cdx?url=…&filter=statuscode:200`). `fam.state.gov` fails TLS verification (use its
+  archive capture; `curl -k` is refused by the auto-mode classifier). `www.irs.gov` (IRM), `www.ecfr.gov` (use the
+  `api/renderer/v1/content/enhanced/current/title-26?part=…&section=…` endpoint), `www.cms.gov`, `www.aamva.org` and
+  `www.icao.int/sites/default/files/publications/DocSeries/…` answer. The E-Verify ICA docs are a Docusaurus SPA: the
+  page text is in `assets/js/<chunk>.js`, found through `main.*.js` and `runtime~main.*.js`.
+- **SSN:** only the SSA refusals (area 000/666/900-999, group 00, serial 0000) are applied. The IRM 3.13.5.21 list of
+  "never issued" examples (`123-45-6789`, `111-11-1111`, …, "etc.") is open-ended and not refused.
+- **US passport book:** any letter is accepted (no letter set published), so a card number `C12345678` also parses as a
+  book number. Old 9-digit books stay valid until expiry.
+- **US one-word names** (8 FAM 403.1-3(D): printed in the last-name field) cannot be represented: the plan fixes a
+  required `GivenName`.
+- **US name suffix in the ICAO form:** included as the last secondary component because 8 FAM 403.1-5(B) treats it as
+  part of the name and Doc 9303 Part 3 §4.6 then puts it in the secondary identifier; an override without the suffix
+  is refused (model a passport that dropped it as a name without suffix). Table 6.A's default for `Ö` is `OE`, so the
+  derived form of `Möller` is `MOELLER`; the crossed-out passport spelling `MOLLER` is an accepted override.

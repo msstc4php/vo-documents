@@ -2,7 +2,8 @@
 
 Value objects for identity documents and personal names of the world's largest economies, with ICAO Doc 9303 Latin
 names. Built on [`msstc4php/vo-base`](https://github.com/msstc4php/vo-base); PHP >= 8.4. Today: the Russian Federation,
-Australia, Germany, France, Italy, Spain, the Netherlands, Switzerland, the United Kingdom and Türkiye.
+Australia, Germany, France, Italy, Spain, the Netherlands, Switzerland, the United Kingdom, Türkiye and the United
+States (names and federal documents).
 
 Every format, checksum and table cites its official source on the class (`@see`); the full notes, with quotes and the
 places where the sources disagree with the obvious guess, are in [`docs/sources/`](docs/sources).
@@ -99,10 +100,18 @@ official algorithm is published. A number with the right shape is accepted, neve
 | `Document\GB\ChiNumber` | CHI number (Scotland), 10 digits | date validated; check digit format only | `HasSex`, birth year digits, month, day | NHS Data Dictionary; PHS |
 | `Document\TR\IdentityNumber` | T.C. Kimlik No, 11 digits | format only | none (NVİ: encodes nothing) | NVİ; Nüfus Hizmetleri Yönetmeliği Madde 4 |
 | `Document\TR\PassportNumber` | Passport, letter + 8 digits | format only | none | Council of the EU PRADO |
+| `Document\US\SocialSecurityNumber` | SSN, `123-45-6789` | SSA rules: area not 000/666/900-999, group not 00, serial not 0000 (no check digit exists); masked `***-**-6789` (26 CFR 301.6109-4) | none | SSA; IRM 3.13.5.21 |
+| `Document\US\Itin` | ITIN, `9NN-NN-NNNN` | first digit 9, digits 4-5 in the IRS ranges; masked `***-**-1234` (26 CFR 301.6109-4) | none | IRM 3.13.5.22 |
+| `Document\US\PassportBookNumber` | Passport book, 9 digits or letter + 7/8 digits | format only | none | State Department; USCIS E-Verify |
+| `Document\US\PassportCardNumber` | Passport card, `C` + 8 digits | format only | none | USCIS E-Verify |
+| `Document\US\MedicareBeneficiaryIdentifier` | MBI, `1EG4-TE5-MK73` | CMS position layout (no check digit exists) | none | CMS |
 
 Names: `Name\<CC>\FamilyName`, `GivenName` and `PersonName` for DE, FR, IT, ES, NL, CH, GB and TR, like the RU and AU
 ones. Spain's `PersonName` has two surnames (`first`, optional `second`); in the Dutch one the prefixes (`van der`) are
-part of the family name; the Swiss, Dutch and British ones accept a person without a given name.
+part of the family name; the Swiss, Dutch and British ones accept a person without a given name. The US one is
+`Name\US\PersonName($family, $given, ?$middle, ?$suffix)`, the suffix a `Name\US\NameSuffix` (the AAMVA list `JR`,
+`SR`, `1ST`/`I` … `9TH`/`IX`), written last among the secondary identifiers of the ICAO form, ordinals as Roman
+numerals (`SMITH<<JOHN<MICHAEL<III`).
 
 Contracts: `Contract\Maskable` (every number above), `Contract\Subdivision` and `Contract\IssuedBySubdivision` (AU
 jurisdictions and licences). `Contract\HasSex` and the `Sex` enum are implemented by the documents that encode a sex
@@ -132,8 +141,8 @@ for AU**; use `fromNumberIn()` when the issuer is known (see `docs/sources/AU.md
 ## Personal names
 
 A national name part (`Name\RU\FamilyName`, `GivenName`, `Patronymic`, and `FamilyName`, `GivenName` of `Name\AU`,
-`Name\DE`, `Name\FR`, `Name\IT`, `Name\ES`, `Name\NL`, `Name\CH`, `Name\GB`, `Name\TR`) is
-NFC-normalised, trimmed, has inner whitespace runs collapsed to one space, and keeps its letter case. Limits: 100
+`Name\DE`, `Name\FR`, `Name\IT`, `Name\ES`, `Name\NL`, `Name\CH`, `Name\GB`, `Name\TR`, `Name\US`, plus
+`Name\US\MiddleName`) is NFC-normalised, trimmed, has inner whitespace runs collapsed to one space, and keeps its letter case. Limits: 100
 characters per part. Russian parts accept only the 33 Russian letters; a Cyrillic name typed with Latin look-alikes
 (Latin `a`, `o`, `e`, `c`) is refused. A compatibility character (its NFKC form differs: fullwidth `Ｓｍｉｔｈ`, `ª`, the
 ligature `ﬁ`) is refused in every country, because it would be a second stored spelling of the same name; the ones an
@@ -189,7 +198,7 @@ then depends on the country's sources:
 | Country | Accepted override | Why |
 |---|---|---|
 | RU | any valid ICAO name (`IVANOVA<<YULIYA` for Иванова Юлия, where the table gives `IVANOVA<<IULIIA`) | MVD Orders 996/186 (§32, §140) write the name "так, как это указано в подтверждающем документе" |
-| AU, DE, FR, IT, ES, NL, CH, TR | only an ICAO spelling of the name (`MULLER<<ZOE` for Müller Zoë); `<` for a hyphen is stored as the hyphen (policy `TransliterationVariant`) | Latin-script names: no source lets a passport keep another spelling, so the table spellings are the only ones |
+| AU, DE, FR, IT, ES, NL, CH, TR, US | only an ICAO spelling of the name (`MULLER<<ZOE` for Müller Zoë); `<` for a hyphen is stored as the hyphen (policy `TransliterationVariant`) | Latin-script names: no source lets a passport keep another spelling, so the table spellings are the only ones |
 | GB | any valid ICAO name (policy `AnyIcaoSpelling`) | HM Passport Office lets a passport carry an evidenced spelling (`docs/sources/GB.md`) |
 
 An override that is the derived form (also when it writes a hyphen as `<`) is not kept, so `latinOverride()` is null
@@ -229,7 +238,7 @@ it as unsupported (a configuration error, not a 500 on request input). The inter
 ### Composite names need the codecs
 
 Document numbers and name parts are strings and need nothing. The composite names (`Name\<CC>\PersonName` of every
-country: RU, AU, DE, FR, IT, ES, NL, CH, GB, TR) are read through a payload codec, so the mapper that the bridge uses
+country: RU, AU, DE, FR, IT, ES, NL, CH, GB, TR, US) are read through a payload codec, so the mapper that the bridge uses
 must be built with `Codecs::all()`:
 
 ```php
@@ -288,6 +297,7 @@ services:
     MSSTC4PHP\ValueObject\Documents\Name\CH\PersonNameCodec: ~
     MSSTC4PHP\ValueObject\Documents\Name\GB\PersonNameCodec: ~
     MSSTC4PHP\ValueObject\Documents\Name\TR\PersonNameCodec: ~
+    MSSTC4PHP\ValueObject\Documents\Name\US\PersonNameCodec: ~
 ```
 
 ```php
@@ -317,6 +327,8 @@ Collected from the source notes; each is a deliberate omission with its reason i
   (`docs/sources/GB.md`).
 - **TR:** sürücü belgesi number (a running sequence per province, no format), the identity card serial number
   (`docs/sources/TR.md`).
+- **US:** one-word names (the constructor requires a given name), the IRM's open list of "never issued" SSN
+  examples (not refused), ATIN and IRSN; DL/ID numbers follow in a later task (`docs/sources/US.md`).
 - **No region value object for RU**: no field encodes a region with a published mapping to ISO 3166-2:RU (`RU.md`).
 - **RU driving licences of the 1999 form** (Cyrillic series): expired by 2026 (`RU.md`).
 - **RU old-form OMS policies** (series and number) and AU **11-digit Medicare individual numbers**.
@@ -345,8 +357,9 @@ Collected from the source notes; each is a deliberate omission with its reason i
 - **Name limits by country:** FR names use the 2014 civil-status circular's letter list (`ñ`, `ł`, `ß` refused); NL
   names use the BRP Teletex letters and refuse the `ĳ` ligature (written `ij`); TR names refuse `Q`, `W`, `X` (Law
   1353 art. 3), hyphens and apostrophes; derived `Ö`/`Ü` stay `OE`/`UE` (table 6.A); ES refuses the Catalan middle dot
-  `l·l`; IT refuses the comma between given names; GB licence numbers of a holder with no first names would be refused
-  (no published rule for them).
+  `l·l`; IT refuses the comma between given names; US parts store the Hawaiian ʻokina (U+02BB) as an apostrophe, as
+  the passport writes it; GB licence numbers of a holder with no first names would be refused (no published rule for
+  them).
 - **Source access:** FR passport and licence formats are France Titres-ANTS answers; CH passport length comes from
   the Basel-Stadt passport office and fedpol; TR passport format from the PRADO register; the ES NIF/NIE algorithm and
   several GB texts are cited through unmodified Internet Archive copies of the official page (original URL, archive URL
