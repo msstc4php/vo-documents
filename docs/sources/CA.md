@@ -194,7 +194,7 @@ Rulings that apply to both tables:
 | ISO | Source | Quoted format (verbatim) | Normalised shape | ID card | Encoded data | Official sample | Verdict |
 |---|---|---|---|---|---|---|---|
 | CA-AB | AB-RDN | RDN 01/2024, "Driver's Licence Information Data": "Driver's Licence No. ######-### provides the unique DL#". RDN 05/2025: "Operator No: ######-### provides the unique DL (operator) number" | `[0-9]{9}`; `formatted()` `######-###` | not stated | none | none | covered (DL) |
-| CA-BC | BC-DLN | Technical guide §5.1: "Maximum 7-digit integer" / "7 numeric character string, padded with leading zeros" (current) and "8 numeric character string, padded with leading zeros" (future); §7: "driver's licences in circulation may show either 7- or 8-digit numbers: Existing cards will show 7-digits; Newly issued, renewed or replaced cards will show 8-digits". FAQ Q5: "Existing customers will now see a leading zero (0) when cards get replaced or renewed. Driver licences that are issued to new customers will start with a leading three (3)." FAQ: "the ICBC client number (CLN) and BC Identification card (BCID) numbers will not change." | `[0-9]{7,8}`, canonical `value()` 8 digits (a 7-digit input is left-padded with one `0`); the leading `3` of new numbers is not enforced | not stated (BCID is a separate number, format not stated) | none | `31098794` (a new number in the guide's §5.1 table) | covered (DL) |
+| CA-BC | BC-DLN | Technical guide §5.1: "Maximum 7-digit integer" / "7 numeric character string, padded with leading zeros" (current) and "8 numeric character string, padded with leading zeros" (future); §7: "driver's licences in circulation may show either 7- or 8-digit numbers: Existing cards will show 7-digits; Newly issued, renewed or replaced cards will show 8-digits". FAQ Q5: "Existing customers will now see a leading zero (0) when cards get replaced or renewed. Driver licences that are issued to new customers will start with a leading three (3)." FAQ: "the ICBC client number (CLN) and BC Identification card (BCID) numbers will not change." | `[0-9]{1,8}`, canonical `value()` left-padded with zeros to 8 digits (§5.1 "DL Number Integer Format": "Maximum 7-digit integer", example `347631`, string form `0347631`); the leading `3` of new numbers is not enforced | not stated (BCID is a separate number, format not stated) | none | `31098794` (a new number in the guide's §5.1 table) | covered (DL) |
 | CA-MB | MB-DVA; MPI pages (searched) | MB-DVA: ""driver's licence number" means the unique alpha-numeric identifier associated with a particular driver's licence." No length or layout found | — | — | — | — | not covered |
 | CA-NB | SNB/GNB pages and forms (searched) | none: the pages ask for the "New Brunswick Driver's Licence number" without a format | — | — | — | — | not covered |
 | CA-NL | MRD forms, driver's handbook, Highway Traffic Act (searched) | none: "Driver's Licence Number" fields only | — | — | — | — | not covered |
@@ -221,8 +221,13 @@ Decisions in this table:
 - **BC:** BC-DLN §5.1, change summary: "Existing DLNs: add additional leading zero to increase length to 8
   characters"; FAQ Q5: "Existing customers will now see a leading zero (0) when cards get replaced or renewed." The
   7-digit card form is the 8-digit number without its leading zero, so a 7-digit input is canonicalised to 8 digits
-  (`1234567` and `01234567` are one number, `value()` `01234567`). Shorter inputs are not accepted: BC-DLN says cards
-  show 7 or 8 digits.
+  (`1234567` and `01234567` are one number, `value()` `01234567`). Shorter inputs are BC numbers too. BC-DLN §5.1 (read
+  2026-11-16 UTC, <https://partners.icbc.com/assets/3r0rg6eeZ7PkeCIz3K9Usq/dln-technical-guidelines.pdf>), row "DL
+  Number Integer Format", current state: "Maximum 7-digit integer" (future state: "Maximum 8-digit integer"; change
+  summary: "No change to integer format"). Its examples are `347631`, `2346789` and `31098794`. The row "DL Number
+  String Format" gives the same numbers as "7 numeric character string, padded with leading zeros": `0347631`, later
+  `00347631`. So the class accepts 1–8 digits and left-pads to 8 for `value()`: `347631`, `0347631` and `00347631` are
+  one number (controller ruling). Cards show the padded 7- or 8-digit string (§7).
 - **NS:** the hyphens in `FINCH--220867001` and the padding spaces are separators; the normalised value keeps the
   letters and nine digits. The letter set is `[A-Z]` ("letters of your last name"; no accented letters appear on the
   page). The day and month are checked as calendar fields (`DD` 01–31, `MM` 01–12). Both checks and the letter class
@@ -248,9 +253,7 @@ Decisions in this table:
 
 | Normalised input class | Jurisdictions it fits |
 |---|---|
-| 1–6 digits | CA-SK |
-| 7 digits | CA-BC, CA-SK |
-| 8 digits | CA-BC, CA-SK |
+| 1–8 digits | CA-BC, CA-SK |
 | 9 digits | CA-AB |
 | 1–5 letters + valid `DDMM` + 5 digits (10–14 characters) | CA-NS |
 | letter + 12 digits | CA-QC |
@@ -263,8 +266,9 @@ Worked examples (verified by the script below). "1" means `fromNumber()` returns
 | Input | Normalised | Matches | Jurisdictions (enum order) |
 |---|---|---|---|
 | (empty) | (empty) | 0 | none |
-| `1` | `1` | 1 | CA-SK (`value()` `00000001`) |
-| `890562` | `890562` | 1 | CA-SK (`value()` `00890562`) |
+| `1` | `1` | 2 | CA-BC, CA-SK (both `value()` `00000001`) |
+| `347631` | `347631` | 2 | CA-BC, CA-SK (BC `value()` `00347631`; ICBC integer-format example) |
+| `890562` | `890562` | 2 | CA-BC, CA-SK (both `value()` `00890562`) |
 | `1234567` | `1234567` | 2 | CA-BC, CA-SK (BC `value()` `01234567`) |
 | `0567450` | `0567450` | 2 | CA-BC, CA-SK |
 | `12345678` | `12345678` | 2 | CA-BC, CA-SK |
@@ -289,8 +293,8 @@ Worked examples (verified by the script below). "1" means `fromNumber()` returns
 | `X0915264359571` | `X0915264359571` | 0 | none |
 | `X091526435957189` | `X091526435957189` | 0 | none |
 
-Only the 7- and 8-digit classes are ambiguous (BC and SK), so the factory exercises the single-match branch for
-every other covered shape, and `fromNumber('12345678')` throws with CA-BC, CA-SK.
+Every all-digit input of 1–8 digits is ambiguous (BC and SK). The factory still exercises the single-match branch for
+every other covered shape, and `fromNumber('12345678')` and `fromNumber('347631')` throw with CA-BC, CA-SK.
 
 ### Health card numbers — per jurisdiction
 
