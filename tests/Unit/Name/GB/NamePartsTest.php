@@ -40,6 +40,7 @@ final class NamePartsTest extends TestCase
     {
         yield 'apostrophe' => ["O'Brien", "O'Brien"];
         yield 'typographic apostrophe' => ["O\u{2019}Brien", "O'Brien"];
+        yield 'modifier letter apostrophe U+02BC' => ["O\u{02BC}neill", "O'neill"];
         yield 'double-barrelled' => ['Smith-Jones', 'Smith-Jones'];
         yield 'Welsh ap, spaces collapsed' => ['  ap   Rhys ', 'ap Rhys'];
         yield 'Welsh circumflex' => ['Llŷr', 'Llŷr'];

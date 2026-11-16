@@ -12,8 +12,9 @@ use MSSTC4PHP\ValueObject\Documents\Internal\SubdivisionResolver;
 
 /**
  * Builds the driver's licence number of the entity a bare number belongs to, and never picks one of several. Only the
- * entities with a published format are matched (today only MX-MEX); the other 31 have no class, so a bare number
- * from them may be read as MX-MEX: callers that know the issuer use {@see fromNumberIn()}.
+ * entities with a published format are matched. Today only MX-MEX is covered, so {@see fromNumber()} assigns every
+ * number that fits its shape (twelve digits) to MX-MEX, whichever state issued it; callers that know the issuer must
+ * use {@see fromNumberIn()}, which refuses the 31 other entities with "(format not covered)".
  *
  * @see docs/sources/MX.md "State driving licences — overlap (the factory's test oracle)"
  */

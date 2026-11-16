@@ -4,22 +4,20 @@ declare(strict_types=1);
 
 namespace MSSTC4PHP\ValueObject\Documents\Document\CA\HealthCard;
 
-use LogicException;
 use MSSTC4PHP\ValueObject\Documents\Document\CA\Jurisdiction;
 use MSSTC4PHP\ValueObject\Documents\Exception\InvalidDocumentNumberException;
 use MSSTC4PHP\ValueObject\Documents\Internal\Checksum;
 use MSSTC4PHP\ValueObject\Documents\Internal\NumberShapes;
-use MSSTC4PHP\ValueObject\Documents\Internal\Text;
 use Override;
 
 /**
  * Ontario: the health number, `pattern="[1-9]\d{9}"`, "a ten-digit number that appears on the face of every health
- * card", verified by the MOD 10 check digit (ON-IHCS example `9876543217`; HCV response `FAILED_MOD10`).
+ * card", verified by the MOD 10 check digit (ON-IHCS example `9876543217`; HCV response `FAILED_MOD10`). Two cards of
+ * one person have the same number and differ in the {@see OnHealthCardVersionCode}.
  *
- * The input may end with the card's version code, "one letter or two letters" (`9876543217 YM`): it is kept apart
- * from the value, which is the ten digits, so two cards of one person have the same value and equal each other, and
- * the string and JSON forms drop the code. Photo cards always carry two letters, but a red-and-white card may have
- * none. Whether a version code is the current card's needs the ministry's validation service and is not modelled.
+ * The printed card adds the version code, "one letter or two letters" (`9876543217 YM`): {@see fromCard()} splits it.
+ * {@see from()} refuses a number followed by letters with "(version code: use fromCard())" instead of dropping them,
+ * so a code is never lost without the caller choosing to.
  *
  * @see https://www.ontario.ca/files/2025-10/moh-ohip-technical-specification-health-card-validation-service-via-electronic-business-services-en-2025-10-08.pdf
  *      Ontario Ministry of Health, "Technical Specification for Health Card Validation (HCV) Service via EBS" v4.6
@@ -33,18 +31,23 @@ final class OnHealthCardNumber extends AbstractHealthCardNumber
 {
     private const int DIGITS = 10;
 
-    /**
-     * Empty when the card has none. Not readonly: `parse()` assigns it, which PHPStan allows only in a constructor, so
-     * {@see stored()} enforces the single assignment instead.
-     */
-    private string $versionCode;
+    private const string DOCUMENT = 'CA-ON health card number';
 
     /**
-     * @return non-empty-string|null one or two upper-case letters, null when the input had none
+     * Splits the printed card, `9876543217 YM`, into the number and the version code (null when none is printed).
+     *
+     * @throws InvalidDocumentNumberException as {@see from()} for the number, or "(invalid character)" for a version
+     *                                        code of other than one or two letters
      */
-    public function versionCode(): ?string
+    public static function fromCard(string $printed): OnHealthCard
     {
-        return $this->versionCode === '' ? null : $this->versionCode;
+        $normalized = self::shapes()->parse($printed, self::DOCUMENT);
+        $versionCode = \substr($normalized, self::DIGITS);
+
+        return new OnHealthCard(
+            self::from(\substr($normalized, 0, self::DIGITS)),
+            $versionCode === '' ? null : OnHealthCardVersionCode::from($versionCode),
+        );
     }
 
     #[Override]
@@ -53,6 +56,10 @@ final class OnHealthCardNumber extends AbstractHealthCardNumber
         return Jurisdiction::On;
     }
 
+    /**
+     * The number with or without the version code, so that {@see fromCard()} and a refusal of the printed form in
+     * {@see from()} share one shape check.
+     */
     #[Override]
     protected static function shapes(): NumberShapes
     {
@@ -62,17 +69,14 @@ final class OnHealthCardNumber extends AbstractHealthCardNumber
     #[Override]
     protected function stored(string $normalized, string $document): string
     {
-        if (isset($this->versionCode)) {
-            throw new LogicException('A health card number is immutable.');
+        if (\strlen($normalized) !== self::DIGITS) {
+            throw new InvalidDocumentNumberException(\sprintf('Invalid %s (version code: use fromCard()).', $document));
         }
 
-        $healthNumber = Text::nonEmpty(\substr($normalized, 0, self::DIGITS));
-        if (!Checksum::luhn($healthNumber)) {
+        if (!Checksum::luhn($normalized)) {
             throw new InvalidDocumentNumberException(\sprintf('Invalid %s checksum.', $document));
         }
 
-        $this->versionCode = \substr($normalized, self::DIGITS);
-
-        return $healthNumber;
+        return $normalized;
     }
 }

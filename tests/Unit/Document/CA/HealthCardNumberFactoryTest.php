@@ -91,9 +91,9 @@ final class HealthCardNumberFactoryTest extends TestCase
         yield 'example 0123456789' => ['0123456789', [Jurisdiction::Ns]];
         yield 'example 5584486674 (AB-PRG illustration)' => ['5584486674', [Jurisdiction::Ns]];
         yield 'example 5584486674YM' => ['5584486674YM', []];
-        yield 'example 9876543217YM' => ['9876543217YM', [Jurisdiction::On]];
-        yield 'example 9876543217 ym' => ['9876543217 ym', [Jurisdiction::On]];
-        yield 'example 9876543217A' => ['9876543217A', [Jurisdiction::On]];
+        yield 'example 9876543217YM (printed ON card)' => ['9876543217YM', []];
+        yield 'example 9876543217 ym (printed ON card)' => ['9876543217 ym', []];
+        yield 'example 9876543217A (printed ON card)' => ['9876543217A', []];
         yield 'example 9876543217ABC' => ['9876543217ABC', []];
         yield 'example 1234567890AB' => ['1234567890AB', []];
         yield 'example 123456789012' => ['123456789012', [Jurisdiction::Nl]];
@@ -174,9 +174,6 @@ final class HealthCardNumberFactoryTest extends TestCase
         yield '9012372175' => ['9012372175', NsHealthCardNumber::class, '9012372175'];
         yield '0123456789' => ['0123456789', NsHealthCardNumber::class, '0123456789'];
         yield '5584486674' => ['5584486674', NsHealthCardNumber::class, '5584486674'];
-        yield '9876543217YM' => ['9876543217YM', OnHealthCardNumber::class, '9876543217'];
-        yield '9876543217 ym' => ['9876543217 ym', OnHealthCardNumber::class, '9876543217'];
-        yield '9876543217A' => ['9876543217A', OnHealthCardNumber::class, '9876543217'];
         yield '123456789012' => ['123456789012', NlHealthCardNumber::class, '123456789012'];
         yield 'N1234567' => ['N1234567', NtHealthCardNumber::class, 'N1234567'];
         yield 'H1234567' => ['H1234567', NtHealthCardNumber::class, 'H1234567'];
@@ -198,12 +195,13 @@ final class HealthCardNumberFactoryTest extends TestCase
         self::assertTrue($class::from($number)->equals($card));
     }
 
-    public function testKeepsTheOntarioVersionCodeThroughTheFactory(): void
+    public function testRefusesAnOntarioVersionCodeInsteadOfDroppingIt(): void
     {
-        $card = HealthCardNumberFactory::fromNumber('9876543217 ym');
-
-        self::assertInstanceOf(OnHealthCardNumber::class, $card);
-        self::assertSame('YM', $card->versionCode());
+        self::assertRefusedWithoutEcho(
+            static fn (string $value): mixed => HealthCardNumberFactory::fromNumberIn($value, Jurisdiction::On),
+            '9876543217 YM',
+            'Invalid CA-ON health card number (version code: use fromCard()).',
+        );
     }
 
     /**
@@ -217,6 +215,8 @@ final class HealthCardNumberFactoryTest extends TestCase
         yield 'eleven digits, an ON length' => ['12345678901', $noJurisdiction];
         yield 'thirteen characters' => ['9876543217ABC', 'Invalid Canadian health card number (13 characters).'];
         yield 'AB illustration with version code' => ['5584486674YM', $noJurisdiction];
+        yield 'printed ON card with a version code' => ['9876543217 YM', $noJurisdiction];
+        yield 'printed ON card with one letter' => ['9876543217A', $noJurisdiction];
         yield 'ten digits + two letters failing ON' => ['1234567890AB', $noJurisdiction];
         yield 'letter outside the NT set' => ['A1234567', $noJurisdiction];
         yield 'QC month 31' => ['BOUF94311419', $noJurisdiction];

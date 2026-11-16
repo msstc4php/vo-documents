@@ -10,10 +10,10 @@ use MSSTC4PHP\ValueObject\Documents\Name\Latin\AbstractFamilyGivenPersonNameCode
 use Override;
 
 /**
- * {family: string, given: string|null, latin: string|null}; given is null for a person without a family name, latin
- * holds only an override, the derived form is never stored; a missing "given" or "latin" key reads as null. Other keys
- * are refused, so the {@see PersonName::jsonSerialize()} view (which has `effectiveLatin`) is never read as a payload
- * that silently drops an override.
+ * {family: string, given: string|null, latin: string|null}; given is null for a one-word name (IRCC: the name goes in
+ * the surname field), latin holds only an override, the derived form is never stored; a missing "given" or "latin"
+ * key reads as null. Other keys are refused, so the {@see PersonName::jsonSerialize()} view (which has
+ * `effectiveLatin`) is never read as a payload that silently drops an override.
  *
  * @extends AbstractFamilyGivenPersonNameCodec<PersonName, string|null>
  */

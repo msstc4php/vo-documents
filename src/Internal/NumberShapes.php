@@ -12,13 +12,14 @@ use MSSTC4PHP\ValueObject\Documents\Exception\InvalidDocumentNumberException;
  * the separators of {@see Digits::SEPARATORS} are removed and ASCII letters upper-cased.
  *
  * A shape is a run of atoms, each an upper-case letter, a digit or a `[...]` class, optionally repeated `{n}` times;
- * its length is computed from the atoms, so it cannot drift from the pattern.
+ * its length is computed from the atoms, so it cannot drift from the pattern. A negated `[^...]` class is refused: it
+ * would admit any other character, punctuation and multibyte letters included.
  *
  * @internal
  */
 final readonly class NumberShapes
 {
-    private const string ATOM = '/\G(?:[A-Z0-9]|\[[^\[\]\\\\]+\])(?:\{([1-9][0-9]*)\})?/';
+    private const string ATOM = '/\G(?:[A-Z0-9]|\[(?!\^)[^\[\]\\\\]+\])(?:\{([1-9][0-9]*)\})?/';
 
     private string $pattern;
 

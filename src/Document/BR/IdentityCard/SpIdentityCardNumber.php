@@ -13,7 +13,9 @@ use Override;
 
 /**
  * São Paulo (IIRGD): one to eight digits and a check character, `12.345.678-2` stored as `123456782`. The
- * Secretaria da Segurança Pública's own antecedentes form takes the number (`maxlength="8"`, digits only,
+ * number part is left-padded with zeros to eight digits (`1.234.567-2` is stored as `012345672`), so one RG has one
+ * stored value; `checaRG` weighs from the rightmost digit and a leading zero adds nothing, so the check is unchanged.
+ * The Secretaria da Segurança Pública's own antecedentes form takes the number (`maxlength="8"`, digits only,
  * `verificaRange(…, 1, 99999999)`, so all zeros is refused) and the required "dígito de controle" (`0`-`9` or `X`),
  * and checks it with its `checaRG`: the digits weighted 2 to 9 (then 2 again) from the rightmost, summed modulo 11,
  * 10 written `X`. No display form is quoted, so there is no `formatted()`.
@@ -41,6 +43,8 @@ final class SpIdentityCardNumber extends AbstractIdentityCardNumber
      * to 2 never applies to eight digits, and a leading zero adds nothing.
      */
     private const array WEIGHTS = [9, 8, 7, 6, 5, 4, 3, 2];
+
+    private const int STORED_LENGTH = 9;
 
     private const string FORM_FIELDS = 'BR-SP identity card number';
 
@@ -110,7 +114,7 @@ final class SpIdentityCardNumber extends AbstractIdentityCardNumber
             throw new InvalidDocumentNumberException(\sprintf('Invalid %s checksum.', $document));
         }
 
-        return $normalized;
+        return \str_pad($normalized, self::STORED_LENGTH, '0', \STR_PAD_LEFT);
     }
 
     private static function numberField(): NumberShapes

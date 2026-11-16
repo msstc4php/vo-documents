@@ -63,13 +63,20 @@
   and apostrophes.
 - `Sex::Unspecified` exists for the CURP's `X` (RENAPO, non-binary persons); no other document returns it.
 - Mexican name parts accept `/` and `.` as RENAPO records them and the ICAO form omits them (Doc 9303 Part 3 §4.6); no
-  other country accepts them.
+  other country accepts them. Spanish name parts accept the Catalan middle dot U+00B7 only in `l·l`, omitted likewise
+  (`Marcel·lí` → `MARCELLI`); `ŀ`/`Ŀ` are stored as `l·`/`L·`. Name parts with an apostrophe separator store U+02BC
+  as U+0027, as they do U+2019.
 - Americas decisions: US SSN refuses only the SSA rules (the IRM's open list of "never issued" numbers is not applied);
   BC and SK licence numbers are stored zero-padded to 8 digits and are always ambiguous for `fromNumber()`; the Ontario
-  health version code is kept outside `value()`; the CPF accepts repeated digits; checksums of the BC and ON health
+  health number is the ten digits and its version code a value object of its own (`OnHealthCardVersionCode`), split
+  from the printed card by `OnHealthCardNumber::fromCard()` (an `OnHealthCard` result); `OnHealthCardNumber::from()`
+  refuses a trailing version code instead of dropping it; the SP RG is stored with its number part zero-padded to 8
+  digits (9 characters), so `1.234.567-2` and `01.234.567-2` are one value; the CPF accepts repeated digits; checksums of the BC and ON health
   cards, the BR CPF, NIS, CNS and SP RG are verified, those of the CURP, RFC, NSS, SIN, título de eleitor and CNH are
   not (no published algorithm). An official source is any government body's own publication; uncovered jurisdictions
   and their reasons are in README "Not covered" (`fromNumberIn()` throws "(format not covered)").
+- With one covered unit (MX licences, BR RG), `fromNumber()` assigns any fitting number to that unit; callers that
+  know the issuer must use `fromNumberIn()`.
 - Name classes use `\p{sc=Latin}` and `\p{sc=Cyrillic}` (Script property): requires `lib-pcre >=10.40`.
 - Requires `msstc4php/vo-base ^1.1.1`.
 

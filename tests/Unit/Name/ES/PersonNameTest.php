@@ -70,6 +70,8 @@ final class PersonNameTest extends TestCase
         yield 'particles, upper in Latin' => ['de la Fuente', 'del Río', 'Pilar', 'DE<LA<FUENTE<DEL<RIO<<PILAR'];
         yield 'apostrophe omitted, hyphen kept' => ["d'Ors", 'Rovira', 'Josep-Lluís', 'DORS<ROVIRA<<JOSEP-LLUIS'];
         yield 'l with middle dot' => ["Ge\u{0140}la", null, 'Marta', 'GELLA<<MARTA'];
+        yield 'middle dot omitted (Doc 9303 Part 3 §4.6)' => ['Puig', null, "Marcel\u{00B7}lí", 'PUIG<<MARCELLI'];
+        yield 'middle dot in a surname omitted' => ["Paral\u{00B7}lel", 'Vila', 'Núria', 'PARALLEL<VILA<<NURIA'];
     }
 
     #[DataProvider('derivedSpellings')]
@@ -121,6 +123,19 @@ final class PersonNameTest extends TestCase
 
         self::assertSame($stored, $name->latin()->value);
         self::assertSame($stored, $name->latinOverride()?->value);
+    }
+
+    public function testAMiddleDotNameTakesAnOverrideOfItsDotlessParts(): void
+    {
+        $name = new PersonName(
+            FamilyName::from('Muñoz'),
+            FamilyName::from("Paral\u{00B7}lel"),
+            GivenName::from('Ana'),
+            IcaoPersonName::from('MUNXXOZ<PARALLEL<<ANA'),
+        );
+
+        self::assertSame('MUNXXOZ<PARALLEL<<ANA', $name->latinOverride()?->value);
+        self::assertSame('MUNXXOZ<PARALLEL<<ANA', $name->latin()->value);
     }
 
     public function testAnOverrideThatIsTheDerivedFormIsNotKept(): void

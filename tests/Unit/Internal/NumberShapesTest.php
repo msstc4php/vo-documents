@@ -110,6 +110,8 @@ final class NumberShapesTest extends TestCase
         yield 'lower-case letter' => ['a[0-9]'];
         yield 'unclosed class' => ['[0-9'];
         yield 'empty class' => ['[]'];
+        yield 'negated class' => ['[^0-9]'];
+        yield 'negated class after an atom' => ['A[^A-Z]{2}'];
         yield 'escape inside a class' => ['[\\d]'];
         yield 'nested bracket' => ['[[0-9]]'];
         yield 'trailing junk after a valid atom' => ['[0-9]{2}.'];

@@ -14,8 +14,8 @@ use Override;
 /**
  * One part of a national personal name (a family name, a given name, …): NFC-normalised, trimmed, inner whitespace
  * collapsed, letter case kept. Every word matches {@see word()} (by default letters of {@see letters()}); words are
- * joined by one of {@see innerSeparators()}, never two in a row. Where the apostrophe is a separator, U+2019 (’) is
- * stored as U+0027 (').
+ * joined by one of {@see innerSeparators()}, never two in a row. Where the apostrophe is a separator, U+2019 (’) and
+ * U+02BC (ʼ, the modifier letter apostrophe) are stored as U+0027 (').
  *
  * A compatibility character (NFKC differs from NFC: fullwidth `Ｓｍｉｔｈ`, `ª`, `ﬁ`) is refused: it looks like another
  * spelling of the same name, so two stored values would denote one person. Characters an ICAO table lists itself
@@ -27,6 +27,8 @@ abstract class AbstractNamePart extends AbstractStringValueObject
      * Longest accepted name part, in characters after normalisation.
      */
     public const int MAX_LENGTH = 100;
+
+    private const array APOSTROPHES = ["\u{2019}", "\u{02BC}"];
 
     /**
      * @return non-empty-string a regex class body, e.g. \p{sc=Latin}
@@ -59,7 +61,7 @@ abstract class AbstractNamePart extends AbstractStringValueObject
     {
         $separators = $this->innerSeparators();
         $normalized = UnicodeText::normalizeName(
-            \str_contains($separators, "'") ? \str_replace("\u{2019}", "'", $value) : $value,
+            \str_contains($separators, "'") ? \str_replace(self::APOSTROPHES, "'", $value) : $value,
         );
         $word = '(?:' . $this->word() . ')';
         $pattern = $separators === ''

@@ -14,7 +14,7 @@ core.
 | `Name\LatinSpelling` | `@internal`: finds a Latin override among the ICAO spellings of a name, word by word (`Name\IdentifierSpellings`: variants per word + national separators; hyphen ≡ `<`; cap 4096 per word) |
 | `Name\LatinOverridePolicy` | `@internal` abstract: `resolve(?override, derived)` (template method, drops the derived form); `withoutDerivedForm()` (refuses, except `AnyIcaoSpelling` with an override); subclasses `AnyIcaoSpelling` (RU, GB, CA, BR) and `TransliterationVariant` (AU, DE, FR, IT, ES, NL, CH, TR, US, MX; via `LatinSpelling`) |
 | `Name\PersonName` | Interface of a national full name: `latin(): Icao\PersonName`, `full()` |
-| `Name\Latin\*` | `AbstractLatinNamePart` (`\p{Latin}` part); `@internal`: `LatinPersonNameBuilder` (derived form, spellings per word for `TransliterationVariant`; strips the `$omitted` punctuation first), `AbstractLatinPersonName` (effective Latin form + kept override, hook `overridePolicy()`; constructor argument `$omittedPunctuation` (MRZ-omitted punctuation, default none, MX `.` `/`)), `AbstractFamilyGivenPersonName<TFamily, TGiven>` (public `family`/`given`, `full()`, `equals()`, JSON view; AU DE FR IT TR NL CH GB CA BR), `AbstractFamilyGivenPersonNameCodec<TName>` (keys `family`/`given`/`latin`; hooks `shape()`, `create()`) |
+| `Name\Latin\*` | `AbstractLatinNamePart` (`\p{Latin}` part); `@internal`: `LatinPersonNameBuilder` (derived form, spellings per word for `TransliterationVariant`; strips the `$omitted` punctuation first), `AbstractLatinPersonName` (effective Latin form + kept override, hook `overridePolicy()`; constructor argument `$omittedPunctuation` (MRZ-omitted punctuation, default none, MX `.` `/`, ES `·`)), `AbstractFamilyGivenPersonName<TFamily, TGiven>` (public `family`/`given`, `full()`, `equals()`, JSON view; AU DE FR IT TR NL CH GB CA BR), `AbstractFamilyGivenPersonNameCodec<TName>` (keys `family`/`given`/`latin`; hooks `shape()`, `create()`) |
 | `Name\RU\*` | `AbstractRussianNamePart` (letters, word pattern), `FamilyName`, `GivenName`, `Patronymic`, `PersonName` (+ `short()`, `initialsFirst()`), `PersonNameCodec`; `@internal RussianTransliteration` (drops Ь, then `Icao\Transliterator`) |
 | `Document\RU\*` | Number VOs (`Snils`, `Inn`, `InternalPassportNumber`, `PassportIssuingUnitCode`, `InternationalPassportNumber`, `DriverLicenceNumber`, `OmsPolicyNumber`): `final`, extend `AbstractStringValueObject`, implement `Maskable`, store digits only, `formatted()`; enum `DriverLicenceCategory`. No `Region` (no published ISO mapping, RU.md) |
 | `Codecs` | `Codecs::all()`: every payload codec, for `new ValueObjectMapper(Codecs::all())`; add each new composite's codec here |
@@ -44,7 +44,9 @@ through lookup tables; year as two digits, `birthMonth()`/`birthDay()` ints, `bi
 internal `ControlLetter`; pre-2008 X + 8 digits + letter, format only), `SocialSecurityNumber` (12 digits, format only;
 `provinceCode()` string). The driving licence number is the DNI or NIE (no class); the passport number is not covered.
 `Name\ES\PersonName($first, ?$second, $given, ?$latin)` extends `AbstractLatinPersonName` only: both surnames are family
-parts (primary identifier joined by a space); codec keys `first`, `second`, `given`, `latin`.
+parts (primary identifier joined by a space); codec keys `first`, `second`, `given`, `latin`. Parts extend
+`Name\ES\AbstractSpanishNamePart` (U+00B7 only in `l·l`, matched as `\x{00B7}`; `ŀ`/`Ŀ` folded to `l·`/`L·`); the
+`PersonName` passes `['·']` as `$omittedPunctuation`.
 
 `Document\NL\*`: `Bsn` (9 digits, elfproef verified per LO BSN; 8 digits read with a leading zero and stored with 9),
 `IdentityDocumentNumber` (passport, emergency documents and identity card: 2 letters, 6 letters/digits, 1 digit, no
@@ -106,12 +108,15 @@ codec keys `family`, `given`, `latin`.
 and `HealthCardNumber`, bases `DriverLicence\AbstractDriverLicenceNumber` (hooks `shapes()`, `layout()`, `stored()`)
 and `HealthCard\AbstractHealthCardNumber` (hooks `shapes()`, `stored()`; no layout: no health display form is
 published). `stored(normalized, document)` is an instance hook run after the shape match: extra checks (BC MOD-11, ON
-MOD 10, QC and NS month/day regexes), BC/SK licence zero padding to 8, and the ON version code split (it sets a private
-write-once property guarded by `isset()`). Licences: AB, BC, NS, ON, QC, SK (AB and QC add `formatted()` and mask in
+MOD 10, QC and NS month/day regexes), and BC/SK licence zero padding to 8 (ON refuses a trailing version code there).
+Licences: AB, BC, NS, ON, QC, SK (AB and QC add `formatted()` and mask in
 that layout); `DriverLicenceNumberFactory::classFor()` maps the other 7 to `null`. Health cards: all 13;
 `HealthCardNumberFactory::classFor()` is non-nullable and the resolver runs over `Jurisdiction::cases()`.
 `QcHealthCardNumber` implements `HasSex` (7th character `5`/`6` = female) with `birthDay()`, `birthMonth()`,
-`birthYearDigits()`; `OnHealthCardNumber::versionCode(): ?string`.
+`birthYearDigits()`. Ontario (final review of plan 3): `OnHealthCardNumber` is the ten digits, readonly;
+`OnHealthCardVersionCode` (1-2 letters, `Maskable`, masks every letter) is a string VO of its own;
+`OnHealthCardNumber::fromCard($printed): OnHealthCard` splits the printed form (`OnHealthCard` is a `final readonly`
+result with `number()`/`versionCode()`, not a value object, so no codec and no bridge type).
 
 `Document\MX\*` (national, plan 3 Task 6a): `Curp` (`HasBirthDate` + `HasSex`; century from character 17, digit → 19YY,
 `A-J` → 20YY; date validated with `checkdate()`; `birthStateCode()` string; check digit format only), `ElectorKey` (INE
@@ -138,8 +143,8 @@ accepted), `VoterRegistrationNumber` (TSE art. 36: 5-12 digits left-padded to 12
 cases, ISO 3166-2:BR code order, `Df` for the Distrito Federal; not used by `VoterRegistrationNumber`, whose TSE codes
 are not one-to-one: `28` is abroad), `Document\BR\IdentityCardNumber`,
 `Document\BR\IdentityCard\{AbstractIdentityCardNumber, SpIdentityCardNumber}` and
-`Document\BR\IdentityCardNumberFactory` (CA HealthCard pattern: abstract `stored()` hook for the check, masks `<= 8 ?
-min(3, length - 1) : 4`, never the whole value; `SpIdentityCardNumber::fromNumberAndCheckCharacter()` for a card
+`Document\BR\IdentityCardNumberFactory` (CA HealthCard pattern: abstract `stored()` hook for the check and the canonical form, masks the last 4 (every
+covered value has 9 characters: SP pads the number part to 8 digits); `SpIdentityCardNumber::fromNumberAndCheckCharacter()` for a card
 without a printed check character; dots stripped in the base and, for the resolver's length messages, in the factory;
 resolver document "Brazilian identity card"). Named `IdentityCard…`, not `Rg…`, like the other English role names
 (`DriverLicenceNumber`, `VoterRegistrationNumber`). Only BR-SP is covered. No `Sex` change.

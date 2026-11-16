@@ -112,7 +112,7 @@ official algorithm is published. A number with the right shape is accepted, neve
 | `Document\CA\SocialInsuranceNumber` | SIN, `123 456 789` | format only (no check digit verified: no algorithm published) | `isTemporaryResident()` (first digit 9, ESDC) | ESDC; CRA |
 | `Document\CA\PassportNumber` | Passport, letter + 6 digits + 2 letters (since 2023-05-10) or 2 letters + 6 digits | format only | none | IRCC |
 | `Document\CA\DriverLicence\{Ab,Bc,Ns,On,Qc,Sk}DriverLicenceNumber` | Driver's licence number of 6 jurisdictions (NS and SK also cover the photo ID card): AB `123456-789`, BC and SK 1-8 digits stored zero-padded to 8, NS Master Number `FINCH220867001`, ON 15 alphanumerics, QC `L1531-171274-08` | shape only (no check digit published); NS day and month checked as calendar fields | none (the NS surname and birth fields are not decoded: two-digit year) | Service Alberta RDN; ICBC; Service Nova Scotia; MTO glossary; SAAQ; Government of Saskatchewan, SGI |
-| `Document\CA\HealthCard\{Ab,Bc,Mb,Nb,Nl,Ns,Nt,Nu,On,Pe,Qc,Sk,Yt}HealthCardNumber` | Health card number of all 13 jurisdictions (8-12 characters; NT letter `D`/`N`/`H`/`M`/`T` + 7 digits; QC NAM `YUXJ75021213`) | BC leading 9 and MOD-11, ON leading digit 1-9 and MOD 10 verified; QC month (01-12, 51-62) and day checked; the rest format only | ON `versionCode()` (kept apart from the value); QC `HasSex`, birth year digits, month, day (GIU REQ-19-53: a reading aid, not a value to fill a record with) | Ontario Ministry of Health "Province and Territory Codes" and HCV/IHCS specifications; BC Teleplan; Québec MSSS GIU; provincial ministries |
+| `Document\CA\HealthCard\{Ab,Bc,Mb,Nb,Nl,Ns,Nt,Nu,On,Pe,Qc,Sk,Yt}HealthCardNumber` | Health card number of all 13 jurisdictions (8-12 characters; NT letter `D`/`N`/`H`/`M`/`T` + 7 digits; QC NAM `YUXJ75021213`) | BC leading 9 and MOD-11, ON leading digit 1-9 and MOD 10 verified; QC month (01-12, 51-62) and day checked; the rest format only | ON: `OnHealthCardNumber::fromCard()` splits the printed card into the number and an `OnHealthCardVersionCode` (`from()` refuses the version code); QC `HasSex`, birth year digits, month, day (GIU REQ-19-53: a reading aid, not a value to fill a record with) | Ontario Ministry of Health "Province and Territory Codes" and HCV/IHCS specifications; BC Teleplan; Québec MSSS GIU; provincial ministries |
 | `Document\CA\Jurisdiction` | The 10 provinces and 3 territories (enum, ISO 3166-2:CA) | n/a | n/a | ISO 3166-2:CA |
 | `Document\CA\DriverLicenceNumber`, `DriverLicenceNumberFactory`, `HealthCardNumber`, `HealthCardNumberFactory` | Interfaces of the 6 licence and 13 health card classes, and their factories | n/a | n/a | the provincial sources above |
 | `Document\MX\Curp` | CURP, 18 characters (`HEGJ561231HDFRRN04`) | RENAPO layout: letters/digits per position, sex `H`/`M`/`X`, character 17 `0-9` (born up to 1999) or `A-J` (from 2000), birth date must exist; check digit format only (algorithm not published) | `HasBirthDate` (century from character 17), `HasSex` (`X` → `Sex::Unspecified`), `birthStateCode()` (RENAPO code, not ISO) | RENAPO Instructivo Normativo (DOF 2018, 2021); RENAPO Reglas 2021; INE DERFE |
@@ -138,7 +138,8 @@ the RU and AU ones. Spain's `PersonName` has two surnames (`first`, optional `se
 given name. The US one is `Name\US\PersonName($family, ?$given, ?$middle, ?$suffix)` (`given` null for a one-word
 name), the suffix a `Name\US\NameSuffix` (the AAMVA list `JR`, `SR`, `1ST`/`I` … `9TH`/`IX`), written last among the
 secondary identifiers of the ICAO form, ordinals as Roman numerals (`SMITH<<JOHN<MICHAEL<III`). The Canadian one is
-`Name\CA\PersonName($family, ?$given)`, letters of the Latin script (English and French names). The Mexican one is
+`Name\CA\PersonName($family, ?$given)` (`given` null for a one-word name; IRCC: the name goes in the surname field),
+letters of the Latin script (English and French names). The Mexican one is
 `Name\MX\PersonName(?$first, ?$second, $given)`: two surnames, one, or none (RENAPO records persons without surnames;
 then the given names are the only ICAO identifier, `JUAN`). The Brazilian one is `Name\BR\PersonName($family, $given)`:
 both required (CNJ Código Nacional de Normas art. 515-B), each part holding several words with particles in the case
@@ -192,6 +193,7 @@ class, and `fromNumberIn()` refuses them (`docs/sources/US.md` "DL/ID numbers").
 
 ```php
 use MSSTC4PHP\ValueObject\Documents\Document\CA\DriverLicenceNumberFactory;
+use MSSTC4PHP\ValueObject\Documents\Document\CA\HealthCard\OnHealthCardNumber;
 use MSSTC4PHP\ValueObject\Documents\Document\CA\HealthCardNumberFactory;
 use MSSTC4PHP\ValueObject\Documents\Document\CA\Jurisdiction;
 
@@ -200,16 +202,19 @@ DriverLicenceNumberFactory::fromNumber('L1531-171274-08');            // QcDrive
 DriverLicenceNumberFactory::fromNumber('347631');                     // AmbiguousJurisdictionException: CA-BC, CA-SK
 DriverLicenceNumberFactory::fromNumberIn('123', Jurisdiction::Mb);     // "Invalid CA-MB driver's licence number (format not covered)."
 
-$card = HealthCardNumberFactory::fromNumber('9876543217 YM');          // OnHealthCardNumber, value 9876543217
-$card->versionCode();                                                  // "YM"
+$card = OnHealthCardNumber::fromCard('9876543217 YM');                // OnHealthCard
+$card->number();                                                       // OnHealthCardNumber, value 9876543217
+$card->versionCode();                                                  // OnHealthCardVersionCode "YM" (null if none printed)
+HealthCardNumberFactory::fromNumber('9876543217');                     // AmbiguousJurisdictionException: CA-NS, CA-ON
 HealthCardNumberFactory::fromNumber('123456789');                      // AmbiguousJurisdictionException, 6 jurisdictions
 ```
 
 Both factories work like the AU and US ones. BC and SK licence numbers share every shape (1-8 digits, stored padded to
 8), so a bare BC or SK number is always ambiguous: pass the issuer. All 13 health card formats are published (Ontario's
 reciprocal-billing table, checked against each province's own text where one exists). The ON version code is part of
-the card, not of the health number: two cards of one person have the same value and are equal, and the string, JSON
-and storage forms carry the ten digits only.
+the card, not of the health number: two cards of one person have the same number and are equal, and they differ in
+the `OnHealthCardVersionCode`. Store the two in their own columns. `OnHealthCardNumber::from()` and the factories refuse
+a number followed by its version code instead of dropping the code: split the printed card with `fromCard()`.
 
 ### Mexican state driving licences
 
@@ -223,8 +228,8 @@ DriverLicenceNumberFactory::fromNumberIn('123456789012', Jurisdiction::Cmx);    
 ```
 
 Only the Estado de México publishes a number format (its validator's field rule: twelve digits). The other 31
-entities have no class and `fromNumberIn()` refuses them; because `fromNumber()` can only match published formats, a
-twelve-digit licence of another state is reported as MX-MEX, so pass the issuer when it is known
+entities have no class and `fromNumberIn()` refuses them. With one covered entity, `fromNumber()` assigns any
+twelve-digit number to MX-MEX, whichever state issued it: callers that know the issuer must use `fromNumberIn()`
 (`docs/sources/MX.md` "State driving licences").
 
 ### Brazilian state identity cards (RG)
@@ -238,13 +243,13 @@ IdentityCardNumberFactory::fromNumberIn('12.345.678-2', Jurisdiction::Sp);   // 
 IdentityCardNumberFactory::fromNumber('24.681.357-X');                       // SpIdentityCardNumber, the only covered unit
 IdentityCardNumberFactory::fromNumber('12.345.678-3');                       // "Invalid Brazilian identity card number (fits no jurisdiction)."
 IdentityCardNumberFactory::fromNumberIn('1234567', Jurisdiction::Rj);        // "Invalid BR-RJ identity card number (format not covered)."
-SpIdentityCardNumber::fromNumberAndCheckCharacter('1.234.567', null);         // card without a printed check character: value 12345672
+SpIdentityCardNumber::fromNumberAndCheckCharacter('1.234.567', null);         // card without a printed check character: value 012345672
 ```
 
 Only São Paulo publishes an RG format (the SSP's antecedentes form: up to eight digits and a required check character
-with its algorithm). The other 26 units have no class and `fromNumberIn()` refuses them; `fromNumber()` can only match
-SP, so an RG of another state whose last character happens to be SP's check character is reported as BR-SP: pass the
-issuer when it is known. An old SP card that does not print its check character is still valid:
+with its algorithm). The other 26 units have no class and `fromNumberIn()` refuses them. With one covered unit, `fromNumber()`
+assigns any number that fits the SP shape to BR-SP (an RG of another state whose last character happens to be SP's
+check character included): callers that know the issuer must use `fromNumberIn()`. An old SP card that does not print its check character is still valid:
 `fromNumberAndCheckCharacter()` takes the form's two fields and stores the computed character (`from()` and the factory
 want both in one string). The RG of a CIN is its CPF: use `Document\BR\Cpf`. Old-model cards stay valid until
 2032-03-01 (Decreto nº 10.977/2022, art. 25) (`docs/sources/BR.md` "RG per state").
@@ -517,7 +522,9 @@ Collected from the source notes; each is a deliberate omission with its reason i
   numeric positions and `29` February when the two-digit year is divisible by four (no century is encoded).
 - **Name limits by country:** FR names use the 2014 civil-status circular's letter list (`ñ`, `ł`, `ß` refused); NL
   names use the BRP Teletex letters and refuse the `ĳ` ligature (written `ij`); TR names refuse `Q`, `W`, `X` (Law 1353
-  art. 3), hyphens and apostrophes; derived `Ö`/`Ü` stay `OE`/`UE` (table 6.A); ES refuses the Catalan middle dot `l·l`;
+  art. 3), hyphens and apostrophes; derived `Ö`/`Ü` stay `OE`/`UE` (table 6.A); ES accepts the Catalan middle dot
+  only in `l·l` (omitted from the ICAO form, Doc 9303 Part 3 §4.6: `Marcel·lí` → `MARCELLI`; `ŀ` is stored as `l·`);
+  every country with an apostrophe separator stores U+2019 and U+02BC as `'`;
   IT refuses the comma between given names; US parts store the Hawaiian ʻokina (U+02BB, U+2018) as an apostrophe, as the
   passport writes it; GB licence numbers of a holder with no first names would be refused (no published rule for them).
 - **Source access:** FR passport and licence formats are France Titres-ANTS answers; CH passport length comes from

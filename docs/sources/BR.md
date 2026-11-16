@@ -471,7 +471,10 @@ function checaRG(rg, dc){
 Rules applied to BR-SP, each from the quotes above:
 
 - The number: one to eight digits (`maxlength="8"`, digits only, `verificaRange(…, 1, 99999999)`), so a number of
-  zeros only is refused; leading zeros are kept (the weights run from the right, so they do not change the result).
+  zeros only is refused. The number part is stored left-padded with zeros to eight digits (final review of plan 3,
+  controller ruling, as the BC and SK licences): `1.234.567-2`, `01.234.567-2` and the form fields `('1234567', null)`
+  are one RG, stored `012345672`, and equal. The weights run from the right, so a leading zero does not change the
+  check character.
 - The check character: one character, `0`-`9` or `X` (`"0123456789xX"`, upper-cased), equal to the sum of the digits
   weighted 2, 3, …, 9 (then 2 again) from the rightmost digit, modulo 11, with 10 written `X`. `checaRG` compares only
   `dc.charAt(0)`, so the field's second position is never part of the check character; the class takes exactly one.
@@ -492,10 +495,10 @@ Rules applied to BR-SP, each from the quotes above:
   a bare form there would match every string of one to eight digits.
 - Separators: those of `Internal\Digits::SEPARATORS` and the dot (the printed form `12.345.678-9` is common; dots are
   removed as for `Cpf`). ASCII letters are upper-cased (`x` becomes `X`).
-- No display form is quoted, so there is no `formatted()`. `masked()` keeps four characters for a number of nine
-  characters and three for one of eight or fewer (plan default; the shape has several lengths), and never the whole
-  value: a value of two or three characters keeps one fewer than its length (`*2`, `*03`; controller ruling, fix
-  round 1).
+- No display form is quoted, so there is no `formatted()`. Every stored value has nine characters, so `masked()`
+  keeps the last four (plan default): `*****0012` for `1-2`. (The earlier "three for eight or fewer, never the whole
+  value" rule of fix round 1 became unreachable with the padding and was removed; restore it when a unit with shorter
+  values is covered.)
 - No official sample number is published; the tests use numbers computed with the quoted algorithm.
 
 **Why the other forms do not give a format.** Each limits only the field (verbatim attributes): BA-AAC
@@ -565,7 +568,7 @@ Worked examples (`jurisdictionsMatching()`, then `fromNumber()`):
 | `123456782` | BR-SP | `SpIdentityCardNumber` `123456782` |
 | `24.681.357-X` | BR-SP | `SpIdentityCardNumber` `24681357X` |
 | `24681357x` | BR-SP | `SpIdentityCardNumber` `24681357X` |
-| `1-2` | BR-SP | `SpIdentityCardNumber` `12` |
+| `1-2` | BR-SP | `SpIdentityCardNumber` `000000012` |
 | `00000001-2` | BR-SP | `SpIdentityCardNumber` `000000012` |
 | `99.999.999-0` | BR-SP | `SpIdentityCardNumber` `999999990` |
 | `12.345.678-3` | none | "Invalid Brazilian identity card number (fits no jurisdiction)." |

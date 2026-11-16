@@ -12,8 +12,9 @@ use MSSTC4PHP\ValueObject\Documents\Internal\SubdivisionResolver;
 
 /**
  * Builds the RG number of the unit a bare number belongs to, and never picks one of several. Only the units with a
- * published format are matched (today only BR-SP); the other 26 have no class, so a bare RG from them may be read as
- * BR-SP: callers that know the issuer use {@see fromNumberIn()}.
+ * published format are matched. Today only BR-SP is covered, so {@see fromNumber()} assigns every number that fits
+ * its shape (one to eight digits and the SP check character) to BR-SP, whichever state issued it; callers that know
+ * the issuer must use {@see fromNumberIn()}, which refuses the 26 other units with "(format not covered)".
  *
  * @see docs/sources/BR.md "RG per state — overlap (the factory's test oracle)"
  */

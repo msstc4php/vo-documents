@@ -24,7 +24,9 @@
 - Infection only runs tests that cover a mutated line: a base-class hook overridden in every real subclass needs a
   `tests/Fixture` subclass that uses the default (see `LatinNamePart`, `SingleWordNamePart`).
 - php-cs-fixer rewrites `@link <url>` to `@see <url>` in class docblocks; source citations therefore use `@see`.
-- `Transliterator` omits only U+0027 and U+2019 apostrophes (Part 3 §4.6); U+02BC and other punctuation are refused.
+- `Transliterator` omits only U+0027 and U+2019 apostrophes (Part 3 §4.6); U+02BC and other punctuation are refused
+  there. Name parts fold U+02BC (and U+2019) to U+0027 before validation wherever the apostrophe is a separator
+  (`AbstractNamePart::APOSTROPHES`), so `Oʼneill` is stored `O'neill`; TR and RU given names/patronymics refuse it.
 - `PersonName::fromParts()` refuses `<` inside a part (it would silently split identifiers); `from()` accepts the
   canonical `<`/`<<` form. `mrzField()` maps hyphens to `<` in both identifiers before cutting.
 - **INN digits 3-4 changed meaning on 2026-01-01** (Order ЕД-7-14/559@): NN = FNS directorate, YY = FNS index, so there
@@ -167,7 +169,9 @@
   published check algorithm; `Nie` accepts it with any letter `A-Z` (format only). The DNI requires eight digits
   (leading zeros kept).
 - **ES names:** the table default for `Ü` is `UE` (`Argüelles` → `ARGUEELLES`), not the Spanish `U`; `ARGUELLES` is an
-  accepted override. Catalan `l·l` with U+00B7 is refused (no ICAO row); `ŀ` (U+0140) is accepted.
+  accepted override. Catalan `l·l` (U+00B7) is accepted only between two `l`/`L` (`Name\ES\AbstractSpanishNamePart`,
+  matched as `\x{00B7}`, not through `\p{sc=Latin}`) and omitted from the ICAO form (`Marcel·lí` → `MARCELLI`); `ŀ`/`Ŀ`
+  are folded to `l·`/`L·` (NFKC) first, so `Marceŀlí` equals `Marcel·lí` (final review of plan 3).
 - Escaped equivalent mutants in `Document\ES\*`: the `(int)` cast in `ControlLetter::of()` (a numeric string divides
   the same), and the `substr()` length / unwrap in
   `Dni`/`Nie` (an `(int)` cast stops at the trailing check letter).
@@ -310,10 +314,13 @@ script classes use `\p{sc=Latin}` / `\p{sc=Cyrillic}` (Script property only); `c
 
 - **BC and SK licences are always ambiguous** for `fromNumber()` (both 1-8 digits, both stored padded to 8): test them
   through `fromNumberIn()`. `347631`, `0347631` and `00347631` are one BC number (`value()` `00347631`).
-- **ON health version code is not in `value()`**: `OnHealthCardNumber::from('9876543217YM')` has value `9876543217` and
-  `versionCode()` `YM`; `equals()`, `__toString()` and `jsonSerialize()` ignore the code, so a round trip through the
-  string (or a Doctrine column holding `value`) loses it. `vo-documents-doctrine` decided: the type stores the number
-  only (the code is lost on reload).
+- **ON health version code is its own value object** (final review of plan 3; replaces the 5b `versionCode()` on the
+  number, which every string, JSON or Doctrine round trip lost): `OnHealthCardNumber` is the ten digits only;
+  `OnHealthCardNumber::fromCard('9876543217YM')` returns `OnHealthCard(number, ?OnHealthCardVersionCode)`.
+  `from('9876543217YM')` throws "Invalid CA-ON health card number (version code: use fromCard())." and the factory's
+  `fromNumber()` says "(fits no jurisdiction)": the letter shapes stay in `shapes()` so that `fromCard()` and the
+  refusal share one shape check, and `stored()` refuses any normalised length but 10. `OnHealthCard` is not a value
+  object (no codec, no bridge type): store the number and the version code in two columns.
 - **ON MOD 10 is plain Luhn** over the ten digits (`Checksum::luhn()`); the AB-PRG illustration `5584486674` fails it
   and is refused as ON (fits NS only). "Subtract from ten" leaving 10 is read as check digit 0.
 - **BC MOD-11:** a remainder of 0 or 1 gives 11 or 10, equal to no digit, so every number with such a prefix is refused
@@ -322,10 +329,9 @@ script classes use `\p{sc=Latin}` / `\p{sc=Cyrillic}` (Script property only); `c
   The `birthDay()`/`birthMonth()` clamps leave equivalent Increment/Decrement mutants, as in `ChiNumber`.
 - **NS licence:** the padding spaces of a short surname are separators (`FOY  220867001` → `FOY220867001`); a 10-14
   digit input fits the NS length, so the factory reports it as "(fits no jurisdiction)", not by length.
-- **Extra state set in `parse()` is write-once, not readonly:** `readonly` there fails PHPStan
-  (`property.readOnlyAssignNotInConstructor` and `property.uninitializedReadonly`). `OnHealthCardNumber::$versionCode`
-  is an uninitialized `string` ('' = none) and `stored()` throws `LogicException` when `isset()` shows it already set,
-  so `$card->__construct(...)` called again cannot change it (the readonly `$value` would throw only after `parse()`).
+- **Extra state set in `parse()` cannot be readonly:** `readonly` there fails PHPStan
+  (`property.readOnlyAssignNotInConstructor` and `property.uninitializedReadonly`). Model the extra part as its own
+  value object with a splitting factory (`OnHealthCardNumber::fromCard()`), not as write-once state on the number.
 
 ## MX sources and decisions (plan 3 Task 6a, 2026-11-16 UTC)
 

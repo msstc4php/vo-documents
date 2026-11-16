@@ -88,6 +88,7 @@ final class NamePartsTest extends TestCase
         yield 'letter of another Latin alphabet' => ['Jürgenß', 'Invalid Turkish given name (invalid character).'];
         yield 'hyphen' => ['Ahmet-Can', 'Invalid Turkish given name (invalid character).'];
         yield 'apostrophe' => ["O'Neil", 'Invalid Turkish given name (invalid character).'];
+        yield 'modifier letter apostrophe U+02BC' => ["O\u{02BC}Neil", 'Invalid Turkish given name (invalid character).'];
         yield 'Cyrillic' => ['Иван', 'Invalid Turkish given name (invalid character).'];
         yield 'digit' => ['Ayşe2', 'Invalid Turkish given name (invalid character).'];
         yield 'fullwidth' => ["\u{FF21}yşe", 'Invalid Turkish given name (compatibility character).'];

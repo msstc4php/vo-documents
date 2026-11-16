@@ -56,8 +56,16 @@ The same section ends with (verbatim):
 `Transliterator` omits two apostrophe characters: U+0027 APOSTROPHE (`'`) and U+2019 RIGHT SINGLE QUOTATION MARK (`’`,
 the one printed in the ICAO examples). Other punctuation is omitted only where a country's name parts accept it: the
 `$omittedPunctuation` argument of `Name\Latin\AbstractLatinPersonName` lists it (MX: `.` and `/`, RENAPO records them)
-and `LatinPersonNameBuilder` removes it before transliterating (`D/Amico` → `DAMICO`). `Transliterator` itself still
-refuses any other punctuation (e.g. U+02BC MODIFIER LETTER APOSTROPHE), as do the parts of the other countries.
+and `LatinPersonNameBuilder` removes it before transliterating (`D/Amico` → `DAMICO`). Per §4.6 "All other
+punctuation characters shall be omitted from the MRZ (i.e. no filler character shall be inserted in their place in
+the MRZ)", so each such character simply disappears. ES lists the middle dot U+00B7 of the Catalan `l·l` (`Marcel·lí`
+→ `MARCELLI`; final review of plan 3). `Transliterator` itself still refuses any other punctuation, as do the parts of
+the other countries.
+
+U+02BC MODIFIER LETTER APOSTROPHE is an apostrophe in use (Hawaiian, Ukrainian and some English texts type it):
+`Name\AbstractNamePart::parse()` stores it as U+0027 wherever the apostrophe is an allowed separator, exactly as
+U+2019 (GB `Oʼneill` → `O'neill`, MRZ `ONEILL`). A part without an apostrophe separator (TR, RU given names and
+patronymics) still refuses it; `Transliterator` called directly refuses it too.
 
 ## 2. Transliteration tables (Part 3 §6)
 

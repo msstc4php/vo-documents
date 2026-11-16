@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace MSSTC4PHP\ValueObject\Documents\Tests\Unit\Document\CA\HealthCard;
 
-use LogicException;
 use MSSTC4PHP\ValueObject\Documents\Document\CA\HealthCard\AbHealthCardNumber;
 use MSSTC4PHP\ValueObject\Documents\Document\CA\HealthCard\AbstractHealthCardNumber;
 use MSSTC4PHP\ValueObject\Documents\Document\CA\HealthCard\BcHealthCardNumber;
@@ -31,7 +30,6 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
-use ReflectionMethod;
 
 /**
  * Expectations follow docs/sources/CA.md "Health card numbers — per jurisdiction": every quoted shape, the BC-TP and
@@ -87,9 +85,7 @@ final class HealthCardNumbersTest extends TestCase
         yield 'NT letter T' => [NtHealthCardNumber::class, 'T1234567', 'T1234567'];
         yield 'NU nine digits' => [NuHealthCardNumber::class, '123456789', '123456789'];
         yield 'ON IHCS example' => [OnHealthCardNumber::class, '9876543217', '9876543217'];
-        yield 'ON with a two-letter version code' => [OnHealthCardNumber::class, '9876543217YM', '9876543217'];
-        yield 'ON spaced, lower-case version code' => [OnHealthCardNumber::class, '9876-543-217 ym', '9876543217'];
-        yield 'ON with a one-letter version code' => [OnHealthCardNumber::class, '9876543217A', '9876543217'];
+        yield 'ON spaced' => [OnHealthCardNumber::class, '9876-543-217', '9876543217'];
         yield 'ON check digit 7' => [OnHealthCardNumber::class, '1234567897', '1234567897'];
         yield 'ON check digit 3' => [OnHealthCardNumber::class, '9123456783', '9123456783'];
         yield 'ON check digit 5' => [OnHealthCardNumber::class, '5555555555', '5555555555'];
@@ -210,6 +206,7 @@ final class HealthCardNumbersTest extends TestCase
         $character = 'health card number (invalid character).';
         $checksum = 'health card number checksum.';
         $birthDate = 'health card number (invalid birth date).';
+        $code = 'health card number (version code: use fromCard()).';
 
         yield 'AB letter' => [AbHealthCardNumber::class, '12345678A', 'Invalid CA-AB ' . $character];
         yield 'BC without the leading 9' => [BcHealthCardNumber::class, '8012372173', 'Invalid CA-BC ' . $character];
@@ -224,10 +221,13 @@ final class HealthCardNumbersTest extends TestCase
         yield 'ON digit as version code' => [OnHealthCardNumber::class, '98765432171', 'Invalid CA-ON ' . $character];
         yield 'ON wrong check digit' => [OnHealthCardNumber::class, '9876543218', 'Invalid CA-ON ' . $checksum];
         yield 'ON BC example' => [OnHealthCardNumber::class, '9012372173', 'Invalid CA-ON ' . $checksum];
+        yield 'ON two-letter version code' => [OnHealthCardNumber::class, '9876543217YM', 'Invalid CA-ON ' . $code];
+        yield 'ON lower-case version code' => [OnHealthCardNumber::class, '9876543217 ym', 'Invalid CA-ON ' . $code];
+        yield 'ON one-letter version code' => [OnHealthCardNumber::class, '9876543217A', 'Invalid CA-ON ' . $code];
         yield 'ON AB illustration with version code' => [
             OnHealthCardNumber::class,
             '5584486674YM',
-            'Invalid CA-ON ' . $checksum,
+            'Invalid CA-ON ' . $code,
         ];
         yield 'ON three-letter version code' => [
             OnHealthCardNumber::class,
@@ -273,7 +273,7 @@ final class HealthCardNumbersTest extends TestCase
         yield 'eight characters keep three' => [PeHealthCardNumber::class, '12345678', '*****678'];
         yield 'NT letter is masked' => [NtHealthCardNumber::class, 'N1234567', '*****567'];
         yield 'nine characters keep four' => [AbHealthCardNumber::class, '123456789', '*****6789'];
-        yield 'ON version code left out' => [OnHealthCardNumber::class, '9876543217YM', '******3217'];
+        yield 'ON ten digits keep four' => [OnHealthCardNumber::class, '9876543217', '******3217'];
         yield 'QC twelve characters keep four' => [QcHealthCardNumber::class, 'BOUF94011419', '********1419'];
     }
 
@@ -284,45 +284,6 @@ final class HealthCardNumbersTest extends TestCase
     public function testMasksAllButTheLastCharacters(string $class, string $input, string $expected): void
     {
         self::assertSame($expected, $class::from($input)->masked());
-    }
-
-    /**
-     * @return iterable<string, array{string, string|null}>
-     */
-    public static function versionCodes(): iterable
-    {
-        yield 'none (red-and-white card)' => ['9876543217', null];
-        yield 'one letter' => ['9876543217A', 'A'];
-        yield 'two letters, upper-cased' => ['9876543217 ym', 'YM'];
-    }
-
-    #[DataProvider('versionCodes')]
-    public function testKeepsTheOntarioVersionCodeApartFromTheValue(string $input, ?string $versionCode): void
-    {
-        $number = OnHealthCardNumber::from($input);
-
-        self::assertSame($versionCode, $number->versionCode());
-        self::assertSame('9876543217', $number->value);
-    }
-
-    public function testTwoOntarioCardsOfOnePersonShareTheHealthNumber(): void
-    {
-        self::assertTrue(OnHealthCardNumber::from('9876543217AB')->equals(OnHealthCardNumber::from('9876543217YM')));
-    }
-
-    public function testCallingTheConstructorAgainCannotChangeTheVersionCode(): void
-    {
-        $number = OnHealthCardNumber::from('9876543217YM');
-
-        try {
-            new ReflectionMethod($number, '__construct')->invoke($number, '9876543217');
-            self::fail('Expected a LogicException.');
-        } catch (LogicException $exception) {
-            self::assertSame('A health card number is immutable.', $exception->getMessage());
-        }
-
-        self::assertSame('YM', $number->versionCode());
-        self::assertSame('9876543217', $number->value);
     }
 
     /**

@@ -42,6 +42,7 @@ final readonly class PersonName extends AbstractLatinPersonName
             $second instanceof FamilyName ? [$first->value, $second->value] : [$first->value],
             [$given->value],
             $latin,
+            AbstractSpanishNamePart::OMITTED_PUNCTUATION,
         );
     }
 

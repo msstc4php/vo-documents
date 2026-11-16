@@ -50,7 +50,7 @@ How the package applies this:
 | Part | Letters | Separators inside | Why |
 |---|---|---|---|
 | `FamilyName` (surname) | `\p{sc=Latin}` | hyphen, apostrophe, space | (1) names no closed list ("some accented letters"), so the Latin script is the rule; English and French names (`Gagné`, `Bérubé-Lévesque`, `D'Amours`, `de la Fontaine`) fit; other scripts (Cyrillic, Canadian syllabics) are refused |
-| `GivenName` (optional) | the same | the same | the same; null for a person without a family name (4) |
+| `GivenName` (optional) | the same | the same | the same; null for a one-word name, which goes in the surname field (4) |
 
 - **One-word names (4)**: `PersonName($family, null)`, the one name as the surname, ICAO form `KIAWENTI` (the primary
   identifier alone), as GB, CH, NL and US.
@@ -309,7 +309,7 @@ every other covered shape, and `fromNumber('12345678')` and `fromNumber('347631'
 | CA-NS | ON-PTC; AB-PRG; NL-PIM | ON-PTC: "10 numerics-individual registration (effective January 1, 1994)"; prior "Prior to January 1, 1994, 11 numerics (Family Based)". AB-PRG: "The card includes the insured person's ten-digit health insurance number" | `[0-9]{10}` | none | none | none | covered |
 | CA-NT | ON-PTC; ON-B | ON-PTC: "8 characters-individual registration. One alpha (D, N, H, M or T and 7 numerics)". ON-B: "updated to include "H" to the valid characters in the Northwest Territories (NWT) Health Service Number (HSN) format." | `[DNHMT][0-9]{7}` (letter set enforced) | none | none | none | covered |
 | CA-NU | ON-PTC; AB-PRG; NL-PIM | ON-PTC: "9 numerics-individual registration". AB-PRG: "The card shows the following information: the nine-digit health insurance number" | `[0-9]{9}` | none | none | none | covered |
-| CA-ON | ON-PTC; ON-HCV; ON-HCM; ON-IHCS | ON-HCV: `name="healthNumber" type="xs:string" pattern="[1-9]\d{9}"`; "The health number is a ten-digit number that appears on the face of every health card." `name="versionCode" … pattern=" [A-Z]{0, 2}"`; "Version code is an alphabetic identifier that along with the health number uniquely identifies a health card version. This field appears on the face of all photo cards and some standard ("red & white") cards. When present on the card, a version code is one letter or two letters." "Photo health cards are assigned a two-letter version code; standard "red & white" cards might have no version code, a single or two-letter version code." Response code 10 `FAILED_MOD10`. ON-IHCS §4.14: "it is recommended that the health number is verified by the MOD 10 Check Digit." Field "Health Number": "Satisfies the Mod 10 Check Digit routine"; example "Double 1st, 3rd, 5th, 7th and 9th Digits … Add The Unit Position Numbers Across … Subtract The Unit Position From Ten … The Check Digit is (7) therefore the Health Number 9876543217 is valid" | `[1-9][0-9]{9}` + optional `[A-Z]{1,2}` version code | 0, 1 or 2 letters, exposed separately (`versionCode(): ?string`); photo cards always have two, but a missing code is valid on red-and-white cards, so none is required | MOD 10 (Luhn): double digits 1,3,5,7,9, add the digits of each product and the even-position digits, check = `(10 − sum mod 10) mod 10` | `9876543217` (ON-IHCS worked example) | covered |
+| CA-ON | ON-PTC; ON-HCV; ON-HCM; ON-IHCS | ON-HCV: `name="healthNumber" type="xs:string" pattern="[1-9]\d{9}"`; "The health number is a ten-digit number that appears on the face of every health card." `name="versionCode" … pattern=" [A-Z]{0, 2}"`; "Version code is an alphabetic identifier that along with the health number uniquely identifies a health card version. This field appears on the face of all photo cards and some standard ("red & white") cards. When present on the card, a version code is one letter or two letters." "Photo health cards are assigned a two-letter version code; standard "red & white" cards might have no version code, a single or two-letter version code." Response code 10 `FAILED_MOD10`. ON-IHCS §4.14: "it is recommended that the health number is verified by the MOD 10 Check Digit." Field "Health Number": "Satisfies the Mod 10 Check Digit routine"; example "Double 1st, 3rd, 5th, 7th and 9th Digits … Add The Unit Position Numbers Across … Subtract The Unit Position From Ten … The Check Digit is (7) therefore the Health Number 9876543217 is valid" | `[1-9][0-9]{9}` + optional `[A-Z]{1,2}` version code | 0, 1 or 2 letters, its own value object `OnHealthCardVersionCode`, split from the printed form by `OnHealthCardNumber::fromCard()`; photo cards always have two, but a missing code is valid on red-and-white cards, so none is required | MOD 10 (Luhn): double digits 1,3,5,7,9, add the digits of each product and the even-position digits, check = `(10 − sum mod 10) mod 10` | `9876543217` (ON-IHCS worked example) | covered |
 | CA-PE | ON-PTC; AB-PRG | ON-PTC: "8 numerics (SIN)-individual registration". AB-PRG: "Both cards show a unique 8-digit lifetime identification number" | `[0-9]{8}` | none | none (ON-PTC's "(SIN)" is not explained; no SIN rule is applied) | none | covered |
 | CA-QC | ON-PTC; QC-GIU; QC-X | ON-PTC: "12 characters-individual. 4 alpha and 8 numerics". QC-GIU: "FORMAT Alphanumérique Longueur : 12 Gabarit : XXXX99999999" and "Le NAM est constitué des trois premières lettres du nom, de la première lettre du prénom, des deux derniers chiffres de l'année de naissance, du mois de naissance (additionné de 50 pour les femmes), du jour de la naissance et, en fin, d'un chiffre valideur. Si le nom de famille de l'usager a seulement deux caractères, la RAMQ ajoute un « X » à la 3e position de son NAM. Exemple : Juli Yu, le NAM sera YUXJ75021213." Sex: "le 7e et 8e caractère des hommes correspond au mois de naissance de l'usager et à ce nombre est ajouté 50 pour les femmes. Ainsi si le 7e chiffre est « 0 » ou « 1 » il faudra inscrire « M » pour le sexe et si le 7e chiffre est « 5 » ou « 6 » il faudra inscrire « F »." QC-X lists the parts ending "du code administratif de la RAMQ" with "BOUF 9401 1419 = masculin / BOUF 9451 1419 = féminin (mois de naissance + 50)" | `[A-Z]{4}[0-9]{2}(0[1-9]\|1[0-2]\|5[1-9]\|6[0-2])(0[1-9]\|[12][0-9]\|3[01])[0-9]{2}` | none | characters 1–3 surname, 4 given-name initial (no accessor needed); 5–6 two-digit birth year (no century); 7–8 birth month, +50 for female (`Sex::Female` for 51–62, `Sex::Male` for 01–12); 9–10 birth day; 11–12 RAMQ administrative code and "chiffre valideur" (algorithm not published: not verified) | `YUXJ75021213` (QC-GIU), `BOUF 9401 1419`, `BOUF 9451 1419` (QC-X) | covered |
 | CA-SK | ON-PTC; SK-EH | ON-PTC: "9 numerics-individual registration". SK-EH: "Your health card number is nine digits." | `[0-9]{9}` | none | none | none | covered |
@@ -324,9 +324,16 @@ Decisions in this table:
 - **MB:** the card carries two numbers. The covered one is the nine-digit PHIN (the personal health insurance number,
   the one ON-PTC and AB-PRG name). The six-character family "registration number" (since 2024-03-01 with "one
   alphanumeric character (ie: A12345)") is not covered; see below.
-- **ON:** the version code is part of the card's identity but not of the health number. 5b: `value()` is the ten
-  digits; the class keeps the code separately (one letter or two). Two cards of one person share `value()` and differ
-  in `versionCode()`. Whether a version code is current needs the ministry's validation service and is not modelled.
+- **ON:** the version code is part of the card's identity but not of the health number. Final review of plan 3
+  (controller ruling, replacing the 5b write-once property): `OnHealthCardNumber` is the ten digits only and readonly;
+  `OnHealthCardVersionCode` is one or two upper-case letters (ON-HCV "one letter or two letters"; `masked()` hides
+  both); `OnHealthCardNumber::fromCard('9876543217 YM')` returns an `OnHealthCard` with `number()` and
+  `versionCode()` (null when none is printed). `OnHealthCard` is a plain result, not a value object: ON-HCV takes
+  `healthNumber` and `versionCode` as two fields and the number alone identifies the person across card versions, so
+  each part is stored on its own (two columns). `OnHealthCardNumber::from()` and the factory refuse a number followed
+  by letters (`from()`: "Invalid CA-ON health card number (version code: use fromCard())."; `fromNumber()`: "(fits no
+  jurisdiction)") rather than drop the code silently, which is how 5b lost it on every string or storage round trip.
+  Whether a version code is current needs the ministry's validation service and is not modelled.
   The IHCS example and the HCV rejection code make MOD 10 a
   published rule, so a number that fails it is refused. "Subtract the unit position from ten" leaves 10 when the unit is
   0; read as the standard Luhn result 0, because a 10 cannot be a check digit and refusing every such number would
@@ -354,7 +361,7 @@ Decisions in this table:
 | 8 digits | CA-PE |
 | 9 digits | CA-AB, CA-MB, CA-NB, CA-NU, CA-SK, CA-YT |
 | 10 digits | CA-NS; plus CA-BC if it starts with `9` and passes MOD-11; plus CA-ON if it does not start with `0` and passes MOD 10 |
-| 10 digits + 1 or 2 letters | CA-ON if the ten digits pass ON's rules; otherwise none |
+| 10 digits + 1 or 2 letters | none: a printed ON card with its version code; `OnHealthCardNumber::fromCard()` splits it (final review of plan 3) |
 | 12 digits | CA-NL |
 | one of `DNHMT` + 7 digits | CA-NT |
 | 4 letters + 8 digits with a valid month (01–12, 51–62) and day | CA-QC |
@@ -377,9 +384,9 @@ Worked examples (verified by the script below), same conventions as above:
 | `0123456789` | `0123456789` | 1 | CA-NS (ON refuses a leading 0) |
 | `5584486674` | `5584486674` | 1 | CA-NS (fails ON MOD 10, see concern below) |
 | `5584486674YM` | `5584486674YM` | 0 | none |
-| `9876543217YM` | `9876543217YM` | 1 | CA-ON |
-| `9876543217 ym` | `9876543217YM` | 1 | CA-ON |
-| `9876543217A` | `9876543217A` | 1 | CA-ON |
+| `9876543217YM` | `9876543217YM` | 0 | none (printed ON card: `fromCard()`) |
+| `9876543217 ym` | `9876543217YM` | 0 | none (printed ON card: `fromCard()`) |
+| `9876543217A` | `9876543217A` | 0 | none (printed ON card: `fromCard()`) |
 | `9876543217ABC` | `9876543217ABC` | 0 | none |
 | `1234567890AB` | `1234567890AB` | 0 | none |
 | `123456789012` | `123456789012` | 1 | CA-NL |

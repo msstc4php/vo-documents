@@ -48,8 +48,8 @@ apellidos a cualquiera de las lenguas oficiales correspondiente al origen o domi
 
 | Part | Letters | Separators inside |
 |---|---|---|
-| `FamilyName` (`first`, `second`) | `\p{sc=Latin}` (`ñ`, `á é í ó ú`, `ü`, `ç` and foreign diacritics) | hyphen, apostrophe (`d'Ors`), space (`de la Fuente`) |
-| `GivenName` | `\p{sc=Latin}` | hyphen, apostrophe, space (`María José`) |
+| `FamilyName` (`first`, `second`) | `\p{sc=Latin}` (`ñ`, `á é í ó ú`, `ü`, `ç` and foreign diacritics) | hyphen, apostrophe (`d'Ors`), space (`de la Fuente`); U+00B7 between two `l` (`Paral·lel`) |
+| `GivenName` | `\p{sc=Latin}` | hyphen, apostrophe, space (`María José`); U+00B7 between two `l` (`Marcel·lí`) |
 
 - No Spanish text lists the letters of a civil-status name; the co-official languages (art. 50.4, 53.4.º) and the
   foreign surnames of art. 56 rule out a Castilian-only list, so the package's Latin default applies.
@@ -61,8 +61,19 @@ apellidos a cualquiera de las lenguas oficiales correspondiente al origen o domi
   the first surname (`Ortega y Gasset`, second `null`).
 - The art. 51 limit of two simple names or one compound name is a rule for naming a child, not for older names:
   the count is not checked. A compound name is one `GivenName` with a space (`María José`).
-- **Catalan middle dot.** `l·l` written with U+00B7 is refused (U+00B7 is not a Latin letter and ICAO table 6.A has
-  no row for it); written with `ŀ` (U+0140, table 6.A: `Ŀ` → `L`) it is accepted: `Marceŀlí` → `MARCELLI`.
+- **Catalan middle dot** (final review of plan 3, controller ruling; reverses the earlier refusal). The "ela
+  geminada" `l·l` is written with U+00B7 MIDDLE DOT: `Name\ES\AbstractSpanishNamePart::word()` accepts it only
+  strictly between two `l`/`L` (`Marcel·lí`, `Paral·lel`, `Gel·La`); a dot elsewhere (`Joa·na`, `Marcel·a`, a leading,
+  trailing or doubled dot, a dot next to a space) is refused with "(invalid character)". The dot is matched by its code
+  point (`\x{00B7}`), never through `\p{sc=Latin}`: U+00B7 is Script=Common (Latin only in its Script_Extensions), so
+  no PCRE2 build's letter class decides it. The ICAO form omits it, as Doc 9303 Part 3 §4.6 says for "All other
+  punctuation characters" ("no filler character shall be inserted in their place in the MRZ"): `PersonName` passes
+  `['·']` as `$omittedPunctuation`, so `Marcel·lí` → `MARCELLI`.
+- **`ŀ` and `Ŀ`** (U+0140, U+013F) are folded to their NFKC forms `l·` and `L·` before validation, so `Marceŀlí` and
+  `Marcel·lí` are one stored value (`Marcel·lí`) and equal. This follows the package's compatibility-character rule
+  (two spellings of one name must not give two values): elsewhere the rule refuses such characters, but table 6.A
+  lists `Ŀ`, so the other countries keep accepting it as typed (no `·` is allowed there to fold it to); in ES, where
+  `l·` is valid, the fold gives the one canonical spelling. The Latin form is unchanged (`Geŀla` → `GELLA`).
 - **Derived Latin:** the primary identifier is both surnames joined by a space (plan decision), the given name the
   secondary identifier, through ICAO Doc 9303 Part 3 table 6.A (`ICAO.md`): `García López, María José` →
   `GARCIA<LOPEZ<<MARIA<JOSE`; `Ñ` → `N` (table default; `NXX` is a variant), `Ü` → `UE` (table default; `U` and

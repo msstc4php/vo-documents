@@ -25,7 +25,9 @@ use MSSTC4PHP\ValueObject\Documents\Internal\SubdivisionResolver;
 /**
  * Builds the health card number of the jurisdiction a bare number belongs to, and never picks one of several: nine
  * digits fit six jurisdictions and ten digits up to three (overlap table in CA.md), so callers that know the issuer
- * use {@see fromNumberIn()}. All 13 jurisdictions publish a format.
+ * use {@see fromNumberIn()}. All 13 jurisdictions publish a format. A number is the health number only: an Ontario
+ * card's version code (`9876543217 YM`) fits no jurisdiction here, and
+ * {@see OnHealthCardNumber::fromCard()} splits it off.
  *
  * @see docs/sources/CA.md "Health card numbers — overlap (the factory's test oracle)"
  */

@@ -45,7 +45,11 @@ final class NamePartsTest extends TestCase
         yield 'contracted particle' => ['del Río', 'del Río'];
         yield 'Catalan apostrophe' => ["d\u{2019}Ors", "d'Ors"];
         yield 'hyphenated' => ['Sánchez-Vicario', 'Sánchez-Vicario'];
-        yield 'Catalan l with middle dot' => ["Ge\u{0140}la", "Ge\u{0140}la"];
+        yield 'Catalan l with middle dot U+0140 stored as its NFKC form' => ["Ge\u{0140}la", "Gel\u{00B7}la"];
+        yield 'Catalan L with middle dot U+013F stored as its NFKC form' => ["PARA\u{013F}LEL", "PARAL\u{00B7}LEL"];
+        yield 'Catalan middle dot U+00B7 between two l' => ["Gel\u{00B7}la", "Gel\u{00B7}la"];
+        yield 'middle dot between upper and lower case' => ["Gel\u{00B7}La", "Gel\u{00B7}La"];
+        yield 'modifier letter apostrophe' => ["d\u{02BC}Ors", "d'Ors"];
         yield 'decomposed tilde composed' => ["Mun\u{0303}oz", 'Muñoz'];
     }
 
@@ -53,6 +57,12 @@ final class NamePartsTest extends TestCase
     public function testFamilyNameIsNormalised(string $input, string $expected): void
     {
         self::assertSame($expected, FamilyName::from($input)->value);
+    }
+
+    public function testGivenNameAcceptsTheCatalanMiddleDot(): void
+    {
+        self::assertSame("Marcel\u{00B7}lí", GivenName::from("Marcel\u{00B7}lí")->value);
+        self::assertTrue(GivenName::from("Marce\u{0140}lí")->equals(GivenName::from("Marcel\u{00B7}lí")));
     }
 
     public function testGivenNameMayBeCompound(): void
@@ -70,7 +80,14 @@ final class NamePartsTest extends TestCase
         yield 'Arabic' => ['محمد', 'Invalid Spanish given name (invalid character).'];
         yield 'Greek' => ['Ιωσήφ', 'Invalid Spanish given name (invalid character).'];
         yield 'digit' => ['José2', 'Invalid Spanish given name (invalid character).'];
-        yield 'Catalan middle dot U+00B7' => ["Marcel\u{00B7}lí", 'Invalid Spanish given name (invalid character).'];
+        yield 'middle dot between other letters' => ["Joa\u{00B7}na", 'Invalid Spanish given name (invalid character).'];
+        yield 'middle dot after l only' => ["Marcel\u{00B7}a", 'Invalid Spanish given name (invalid character).'];
+        yield 'middle dot before l only' => ["Mare\u{00B7}la", 'Invalid Spanish given name (invalid character).'];
+        yield 'leading middle dot' => ["\u{00B7}llum", 'Invalid Spanish given name (invalid character).'];
+        yield 'trailing middle dot' => ["Marcel\u{00B7}", 'Invalid Spanish given name (invalid character).'];
+        yield 'two middle dots' => ["Marcel\u{00B7}\u{00B7}lí", 'Invalid Spanish given name (invalid character).'];
+        yield 'middle dot next to a space' => ["Marcel \u{00B7}lí", 'Invalid Spanish given name (invalid character).'];
+        yield 'l with middle dot before another letter' => ["Ge\u{0140}a", 'Invalid Spanish given name (invalid character).'];
         yield 'fullwidth' => ["\u{FF2A}osé", 'Invalid Spanish given name (compatibility character).'];
         yield 'ordinal indicator' => ["Mar\u{00AA}", 'Invalid Spanish given name (compatibility character).'];
         yield 'empty' => ['  ', 'Invalid Spanish given name (0 characters).'];

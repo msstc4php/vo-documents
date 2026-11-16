@@ -46,6 +46,7 @@ final class NamePartsTest extends TestCase
         yield 'NFC й' => [GivenName::class, "Андреи\u{0306}", 'Андрей'];
         yield 'NFC ё' => [FamilyName::class, "Фе\u{0308}доров", 'Фёдоров'];
         yield 'U+2019 apostrophe stored as U+0027' => [FamilyName::class, "д\u{2019}Артаньян", "д'Артаньян"];
+        yield 'U+02BC apostrophe stored as U+0027' => [FamilyName::class, "д\u{02BC}Артаньян", "д'Артаньян"];
         yield 'word starting with Ы' => [FamilyName::class, 'Ытыкова', 'Ытыкова'];
         yield 'Ь and Ъ inside a word' => [FamilyName::class, 'Объедков-Ильин', 'Объедков-Ильин'];
     }
@@ -122,6 +123,11 @@ final class NamePartsTest extends TestCase
         yield 'U+2019 in a given name' => [
             GivenName::class,
             "Д\u{2019}Анна",
+            'Invalid Russian given name (invalid character).',
+        ];
+        yield 'U+02BC in a given name' => [
+            GivenName::class,
+            "Д\u{02BC}Анна",
             'Invalid Russian given name (invalid character).',
         ];
         yield 'separator alone' => [FamilyName::class, "'", 'Invalid Russian family name (invalid character).'];

@@ -12,8 +12,8 @@ use MSSTC4PHP\ValueObject\Documents\Name\Latin\LatinPersonNameBuilder;
 use Override;
 
 /**
- * Surname and optional given names: a person without a family name has the name in the surname field and no given
- * name (IRCC: "enter all your given name(s) in the surname field and leave the given name field blank"), here `null`.
+ * Surname and optional given names: a one-word name goes in the surname field with no given name (IRCC: "enter all
+ * your given name(s) in the surname field and leave the given name field blank"), here `null`.
  * The derived Latin form is SURNAME<<GIVEN, or SURNAME alone, through the ICAO multinational Latin table
  * (`Bérubé-Lévesque Jean-François` → `BERUBE-LEVESQUE<<JEAN-FRANCOIS`). Override policy {@see AnyIcaoSpelling}: the
  * Passport Program prints only "the Roman alphabet and some accented letters" and points to "alternative spellings of

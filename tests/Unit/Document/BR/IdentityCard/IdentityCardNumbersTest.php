@@ -48,9 +48,10 @@ final class IdentityCardNumbersTest extends TestCase
         yield 'check character x upper-cased' => ['24681357x', '24681357X'];
         yield 'check character 0' => ['99.999.999-0', '999999990'];
         yield 'check character X after a zero' => ['10000006-X', '10000006X'];
-        yield 'one digit' => ['1-2', '12'];
-        yield 'seven digits' => ['1.234.567-2', '12345672'];
+        yield 'one digit, padded to eight' => ['1-2', '000000012'];
+        yield 'seven digits, padded to eight' => ['1.234.567-2', '012345672'];
         yield 'leading zeros kept' => ['00000001-2', '000000012'];
+        yield 'leading zero typed' => ['01.234.567-2', '012345672'];
         yield 'separators, tabs and NBSP' => [" 12 345\t678\u{00A0}2 ", '123456782'];
     }
 
@@ -124,28 +125,18 @@ final class IdentityCardNumbersTest extends TestCase
         );
     }
 
-    public function testMasksAllButTheLastFourCharactersOfANineCharacterNumber(): void
-    {
-        self::assertSame('*****6782', SpIdentityCardNumber::from('123456782')->masked());
-    }
-
-    public function testMasksAllButTheLastThreeCharactersOfAnEightCharacterNumber(): void
-    {
-        self::assertSame('*****672', SpIdentityCardNumber::from('12345672')->masked());
-    }
-
     /**
      * @return iterable<string, array{string, string}>
      */
-    public static function shortValues(): iterable
+    public static function maskedValues(): iterable
     {
-        yield 'two characters' => ['1-2', '*2'];
-        yield 'three characters' => ['10-3', '*03'];
-        yield 'four characters' => ['123-5', '*235'];
+        yield 'eight digits' => ['123456782', '*****6782'];
+        yield 'seven digits' => ['1.234.567-2', '*****5672'];
+        yield 'one digit' => ['1-2', '*****0012'];
     }
 
-    #[DataProvider('shortValues')]
-    public function testNeverMasksAShortValueToItsWholeSelf(string $input, string $masked): void
+    #[DataProvider('maskedValues')]
+    public function testMasksAllButTheLastFourOfTheNineStoredCharacters(string $input, string $masked): void
     {
         self::assertSame($masked, SpIdentityCardNumber::from($input)->masked());
     }
@@ -158,8 +149,8 @@ final class IdentityCardNumbersTest extends TestCase
      */
     public static function formFields(): iterable
     {
-        yield 'no check character printed (null)' => ['1234567', null, '12345672'];
-        yield 'no check character printed (empty)' => ['1.234.567', '', '12345672'];
+        yield 'no check character printed (null)' => ['1234567', null, '012345672'];
+        yield 'no check character printed (empty)' => ['1.234.567', '', '012345672'];
         yield 'blank check field' => ['24681357', ' ', '24681357X'];
         yield 'computed X' => ['24.681.357', null, '24681357X'];
         yield 'supplied check character' => ['12.345.678', '2', '123456782'];
@@ -182,6 +173,27 @@ final class IdentityCardNumbersTest extends TestCase
             SpIdentityCardNumber::fromNumberAndCheckCharacter('1234567', null)
                 ->equals(SpIdentityCardNumber::from('1.234.567-2')),
         );
+    }
+
+    /**
+     * @return iterable<string, array{SpIdentityCardNumber}>
+     */
+    public static function spellingsOfOneRg(): iterable
+    {
+        yield 'form, seven digits' => [SpIdentityCardNumber::fromNumberAndCheckCharacter('1234567', null)];
+        yield 'form, leading zero' => [SpIdentityCardNumber::fromNumberAndCheckCharacter('01234567', null)];
+        yield 'form, check given' => [SpIdentityCardNumber::fromNumberAndCheckCharacter('1.234.567', '2')];
+        yield 'printed, seven digits' => [SpIdentityCardNumber::from('1.234.567-2')];
+        yield 'printed, leading zero' => [SpIdentityCardNumber::from('01.234.567-2')];
+        yield 'bare, seven digits' => [SpIdentityCardNumber::from('12345672')];
+    }
+
+    #[DataProvider('spellingsOfOneRg')]
+    public function testStoresEverySpellingOfOneRgTheSameWay(SpIdentityCardNumber $card): void
+    {
+        self::assertSame('012345672', $card->value);
+        self::assertTrue(SpIdentityCardNumber::from('012345672')->equals($card));
+        self::assertTrue(SpIdentityCardNumber::from((string) $card)->equals($card));
     }
 
     public function testAnEightDigitBareNumberRoundTripsThroughFrom(): void
