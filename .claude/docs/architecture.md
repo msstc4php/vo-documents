@@ -118,9 +118,12 @@ write-once property guarded by `isset()`). Licences: AB, BC, NS, ON, QC, SK (AB 
 (INE clave de elector; two-digit year via `TwoDigitYearDate`, `birthStateCode()`/`sexCode()` raw strings, no `HasSex`),
 `Rfc` (natural person, SAT `t_RFC_PF` regex with `Ñ`/`&`, multibyte-aware `masked()`), `SocialSecurityNumber` (NSS, 11
 digits, format only). No passport class. `Sex::Unspecified` exists for the CURP `X`.
-No MX state licences (plan 3 Task 6b): 0/32 entities publish a number format, so `Document\MX\Jurisdiction`, a
-`DriverLicenceNumber` interface and a factory were deliberately not created (YAGNI); add all of them, with the 32-case
-enum, in the task that first finds a published format.
+MX state licences (plan 3 Task 6b): `Document\MX\Jurisdiction` (32 cases, ISO 3166-2:MX order, `Cmx` for Mexico
+City), `Document\MX\DriverLicenceNumber`, `Document\MX\DriverLicence\{AbstractDriverLicenceNumber,
+MexDriverLicenceNumber}` and `Document\MX\DriverLicenceNumberFactory` (CA pattern, resolver document "Mexican driver's
+licence"). Only MX-MEX (12 digits) is covered, so `fromNumber()` reports any 12-digit number as MX-MEX; the base's
+`masked()` always keeps 4 (no covered shape is 8 characters or shorter: restore the CA `<= 8 ? 3 : 4` rule, with a
+test, when one is added).
 `Name\MX\PersonName(?$first, ?$second, $given, ?$latin)` extends `AbstractLatinPersonName` like ES (parts on `AbstractMexicanNamePart`: `/` separator, `.` after or between letters, both omitted in the ICAO form); no surnames → the
 given names are the primary identifier (`JUAN`); policy `TransliterationVariant`; codec keys `first`, `second`, `given`,
 `latin` (`first` and `second` nullable).

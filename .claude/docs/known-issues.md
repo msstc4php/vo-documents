@@ -355,12 +355,19 @@ script classes use `\p{sc=Latin}` / `\p{sc=Cyrillic}` (Script property only); `c
 
 ## MX state licences (plan 3 Task 6b, 2026-11-16 UTC)
 
-- **Verdict 0/32**: state laws name the licence number with no layout (NL Ley de licencias art. 18 "b) Número de
-  licencia", Jalisco LMT art. 58 "El número de registro de dicha licencia", Tabasco LGTV art. 21 "Número de
+- **Verdict 1/32 (MX-MEX)**: state laws name the licence number with no layout (NL Ley de licencias art. 18 "b) Número
+  de licencia", Jalisco LMT art. 58 "El número de registro de dicha licencia", Tabasco LGTV art. 21 "Número de
   identificación del Titular"); LGMSV art. 29 has no national format. Vendor guides (Kavak "Sonora 14 dígitos") are
-  not sources.
+  not sources. **Look at online validators' form fields**: the Edomex rule was found only there (`maxlength`,
+  `data-val-regex-pattern="^\d{12}$"` of the validator linked from `smovilidad.edomex.gob.mx/validacion_de_licencias`,
+  on a `dev-…run.app` host; the older validator `187.237.233.54/ValidadorLicencias` is in the IA). The first pass
+  missed it by grepping the gob.mx page only, not the page its button links to.
+- **Equivalent mutant**: with one covered entity, Infection's `ArrayOneItem` on
+  `MX\DriverLicenceNumberFactory::coveredJurisdictions()` escapes (a one-item list sliced to one item); it dies once a
+  second entity is covered.
 - **Reachability (that session)**: `semovi.cdmx.gob.mx`, `appsextssl.ebajacalifornia.gob.mx`, `hcnl.gob.mx` (TLS
   failure), `icvnl.gob.mx`, `michoacan.gob.mx`, `tramites.yucatan.gob.mx`, `ventanilla.puebla.gob.mx`,
-  `diputados.gob.mx` did not answer; the Internet Archive was offline. Working copies: NL law on `galeana.gob.mx`,
+  `diputados.gob.mx` did not answer (twice); the Internet Archive was offline at first, then answered but had no
+  capture of those licence pages. Working copies: NL law on `galeana.gob.mx`,
   CDMX reglamento on `paot.org.mx`, Guanajuato reglamento on `leon.gob.mx`. Retry the dead hosts before concluding a
   state is still unpublished.

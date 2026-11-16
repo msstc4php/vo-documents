@@ -116,6 +116,8 @@ official algorithm is published. A number with the right shape is accepted, neve
 | `Document\MX\ElectorKey` | Clave de elector of the INE voter card, 18 characters | INE layout: 6 letters, `AAMMDD` (day/month valid in some century), 2 state characters, a sex letter, 3 homoclave characters (no check verified) | birth year digits, month, day; `birthStateCode()` and `sexCode()` as written (no value list published) | INE lineamientos 2021; INE glossary |
 | `Document\MX\Rfc` | RFC of a natural person, 13 characters (`HEGJ5612311A2`) | SAT `t_RFC_PF` pattern (`A-Z&Ñ`, month and day ranges, final digit or `A`); homoclave not verified | none | SAT CFDI data types (`tdCFDI.xsd`) |
 | `Document\MX\SocialSecurityNumber` | NSS (IMSS), 11 digits | format only (check digit algorithm not published) | none | IMSS norm 3000-001-007 |
+| `Document\MX\DriverLicence\MexDriverLicenceNumber` | Licencia de conducir of the Estado de México, 12 digits | format only (no check digit or encoding published) | none | Secretaría de Movilidad del Estado de México, licence validator |
+| `Document\MX\Jurisdiction` | The 32 federal entities (enum, ISO 3166-2:MX) | n/a | n/a | ISO 3166-2:MX |
 
 Names: `Name\<CC>\FamilyName`, `GivenName` and `PersonName` for DE, FR, IT, ES, NL, CH, GB and TR, like the RU and AU
 ones. Spain's `PersonName` has two surnames (`first`, optional `second`); in the Dutch one the prefixes (`van der`) are
@@ -128,7 +130,7 @@ identifiers of the ICAO form, ordinals as Roman numerals (`SMITH<<JOHN<MICHAEL<I
 surnames; then the given names are the only ICAO identifier, `JUAN`).
 
 Contracts: `Contract\Maskable` (every number above), `Contract\Subdivision` and `Contract\IssuedBySubdivision` (AU,
-US and CA jurisdictions, AU licences, US DL/ID numbers, CA licence and health card numbers). `Contract\HasSex` and the `Sex` enum are implemented by the documents that encode a sex
+US, CA and MX jurisdictions, AU licences, US DL/ID numbers, CA licence and health card numbers, MX licence numbers). `Contract\HasSex` and the `Sex` enum are implemented by the documents that encode a sex
 (`Nir`, `FiscalCode`, the DVLA licence number, `ChiNumber`, the Québec NAM, the Mexican CURP); `Sex::Unspecified` is
 the CURP's `X` (RENAPO, non-binary persons). `Contract\HasBirthDate` is implemented by the Mexican CURP only (its
 17th character gives the century); the other encoded birth dates lack a century, so those classes expose the year
@@ -192,6 +194,22 @@ Both factories work like the AU and US ones. BC and SK licence numbers share eve
 reciprocal-billing table, checked against each province's own text where one exists). The ON version code is part of
 the card, not of the health number: two cards of one person have the same value and are equal, and the string, JSON
 and storage forms carry the ten digits only.
+
+### Mexican state driving licences
+
+```php
+use MSSTC4PHP\ValueObject\Documents\Document\MX\DriverLicenceNumberFactory;
+use MSSTC4PHP\ValueObject\Documents\Document\MX\Jurisdiction;
+
+DriverLicenceNumberFactory::fromNumberIn('1234 5678 9012', Jurisdiction::Mex);   // MexDriverLicenceNumber, value 123456789012
+DriverLicenceNumberFactory::fromNumber('123456789012');                         // MexDriverLicenceNumber, the only covered entity
+DriverLicenceNumberFactory::fromNumberIn('123456789012', Jurisdiction::Cmx);    // "Invalid MX-CMX driver's licence number (format not covered)."
+```
+
+Only the Estado de México publishes a number format (its validator's field rule: twelve digits). The other 31
+entities have no class and `fromNumberIn()` refuses them; because `fromNumber()` can only match published formats, a
+twelve-digit licence of another state is reported as MX-MEX, so pass the issuer when it is known
+(`docs/sources/MX.md` "State driving licences").
 
 ## Personal names
 
@@ -405,9 +423,9 @@ Collected from the source notes; each is a deliberate omission with its reason i
   passports have no published format), the RFC of a legal person, the CURP, RFC, NSS and elector-key check characters
   (no algorithm published), the RENAPO state catalogue and "palabras inconvenientes" list (not published with the
   Reglas: any two letters are accepted, substituted forms too), the INE sex and state code lists of the elector key,
-  the fields of the NSS, other INE card numbers (CIC, OCR). State driving licences of all 32 entities: the state
-  laws (NL, JAL, TAB, GUA, CDMX) name the number without a format and no state or federal text publishes one, so
-  there is no `Document\MX\Jurisdiction` or licence class (`docs/sources/MX.md`).
+  the fields of the NSS, other INE card numbers (CIC, OCR). State driving licences of 31 entities (all but MX-MEX): the
+  state laws (NL, JAL, TAB, GUA, CDMX) name the number without a format; the issuer's pages of BCN, CMX, MIC, NLE, PUE
+  and YUC could not be read on 2026-11-16 UTC and are to be re-checked (`docs/sources/MX.md`).
 - **No region value object for RU**: no field encodes a region with a published mapping to ISO 3166-2:RU (`RU.md`).
 - **RU driving licences of the 1999 form** (Cyrillic series): expired by 2026 (`RU.md`).
 - **RU old-form OMS policies** (series and number) and AU **11-digit Medicare individual numbers**.
