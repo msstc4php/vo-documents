@@ -109,6 +109,9 @@ Verdict:
 - "Features of Canada's new passport": "The first character is always a letter, the next 6 characters are always
   numbers, and the last 2 characters are always letters."
 
+Scope: only the general (regular) passport format IRCC publishes is covered; the special, diplomatic, temporary and
+emergency travel document formats are not published and not covered.
+
 Implemented: `[A-Z][0-9]{6}[A-Z]{2}` (since 2023-05-10) or `[A-Z]{2}[0-9]{6}` (before; such passports are still
 valid). Format only: no check digit or letter set published (the MRZ check digit is a separate field). No official
 example number. Mask: no official rule; last four characters, three for the 8-character form (`*****56BC`,
@@ -129,3 +132,4 @@ Driver's licence and health card numbers of the 13 provinces and territories: pl
 - The SIN check digit (no published algorithm, see above), the province meaning of a SIN's first digit and the SIN
   expiry date (in the SIN record, not in the number).
 - The passport print form of a one-word name (no Passport Program text found).
+- Special, diplomatic, temporary and emergency passport numbers: IRCC publishes the general passport format only.

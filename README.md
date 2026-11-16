@@ -359,7 +359,8 @@ Collected from the source notes; each is a deliberate omission with its reason i
   numbers (`docs/sources/US.md`).
 - **CA:** the SIN check digit (the CRA names a "Mod 10" formula but no official text gives the algorithm), the
   province meaning of a SIN's first digit, the CRA individual and temporary tax numbers, the passport print form of a
-  one-word name; provincial documents follow in a later task (`docs/sources/CA.md`).
+  one-word name, special, diplomatic, temporary and emergency passport numbers (only the general format is
+  published); provincial documents follow in a later task (`docs/sources/CA.md`).
 - **No region value object for RU**: no field encodes a region with a published mapping to ISO 3166-2:RU (`RU.md`).
 - **RU driving licences of the 1999 form** (Cyrillic series): expired by 2026 (`RU.md`).
 - **RU old-form OMS policies** (series and number) and AU **11-digit Medicare individual numbers**.

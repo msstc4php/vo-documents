@@ -33,9 +33,9 @@ final class SocialInsuranceNumberTest extends TestCase
     {
         yield 'CRA sample, display form' => ['123 456 789', '123456789'];
         yield 'CRA sample for Nova Scotia (fails the Luhn sum, accepted)' => ['111 111 111', '111111111'];
-        yield 'hyphens' => ['046-454-286', '046454286'];
-        yield 'compact' => ['046454286', '046454286'];
-        yield 'tabs and NBSP' => ["046\t454\u{00A0}286", '046454286'];
+        yield 'synthetic, hyphens' => ['024-681-357', '024681357'];
+        yield 'synthetic, compact' => ['024681357', '024681357'];
+        yield 'synthetic, tabs and NBSP' => ["024\t681\u{00A0}357", '024681357'];
         yield 'leading 8 (no ESDC rule)' => ['800 000 002', '800000002'];
         yield 'temporary resident' => ['912 345 678', '912345678'];
     }
@@ -66,7 +66,7 @@ final class SocialInsuranceNumberTest extends TestCase
         yield 'begins with 9' => ['912 345 678', true];
         yield 'nine only at the end' => ['123 456 789', false];
         yield 'begins with 8' => ['812 345 678', false];
-        yield 'begins with 0' => ['046 454 286', false];
+        yield 'begins with 0' => ['024 681 357', false];
     }
 
     #[DataProvider('temporaryResidentNumbers')]

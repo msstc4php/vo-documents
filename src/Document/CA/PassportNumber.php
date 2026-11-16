@@ -17,6 +17,8 @@ use Override;
  * and six digits (`AB123456`), still on passports issued before that date. Format only: no check digit or letter set
  * is published (the MRZ check digit is separate). `masked()` keeps the last four characters, three for the
  * eight-character form (no official masking rule): `*****56BC`, `*****456`.
+ * Only the general passport format IRCC publishes is covered; special, diplomatic, temporary and emergency passport
+ * formats are not published (CA.md "Not covered").
  *
  * @see https://www.ircc.canada.ca/english/helpcentre/answer.asp?qnum=1446 IRCC Help Centre, "Where is my status in
  *      Canada document number?"
