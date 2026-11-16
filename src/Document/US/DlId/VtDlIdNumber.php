@@ -28,8 +28,6 @@ final class VtDlIdNumber extends AbstractDlIdNumber
     #[Override]
     protected static function shapes(): NumberShapes
     {
-        return new NumberShapes([
-            '[0-9]{7}[0-9AFJKLQRTVXY]' => 8,
-        ]);
+        return new NumberShapes('[0-9]{7}[0-9AFJKLQRTVXY]');
     }
 }

@@ -26,8 +26,6 @@ final class IaDlIdNumber extends AbstractDlIdNumber
     #[Override]
     protected static function shapes(): NumberShapes
     {
-        return new NumberShapes([
-            '[0-9A-Z]{9}' => 9,
-        ]);
+        return new NumberShapes('[0-9A-Z]{9}');
     }
 }

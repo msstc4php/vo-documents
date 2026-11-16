@@ -25,8 +25,6 @@ final class TxDlIdNumber extends AbstractDlIdNumber
     #[Override]
     protected static function shapes(): NumberShapes
     {
-        return new NumberShapes([
-            '[0-9]{8}' => 8,
-        ]);
+        return new NumberShapes('[0-9]{8}');
     }
 }

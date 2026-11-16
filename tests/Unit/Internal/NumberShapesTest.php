@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MSSTC4PHP\ValueObject\Documents\Tests\Unit\Internal;
 
+use InvalidArgumentException;
 use MSSTC4PHP\ValueObject\Documents\Exception\InvalidDocumentNumberException;
 use MSSTC4PHP\ValueObject\Documents\Internal\Digits;
 use MSSTC4PHP\ValueObject\Documents\Internal\NumberShapes;
@@ -69,8 +70,65 @@ final class NumberShapesTest extends TestCase
         self::assertFalse($this->shapes()->fitsLength(''));
     }
 
+    /**
+     * @return iterable<string, array{non-empty-string, int}>
+     */
+    public static function derivedLengths(): iterable
+    {
+        yield 'one class' => ['[0-9]', 1];
+        yield 'one letter' => ['H', 1];
+        yield 'repeated class' => ['[0-9]{9}', 9];
+        yield 'two-digit count' => ['[0-9]{12}', 12];
+        yield 'letters and classes' => ['WDL[0-9A-Z]{9}', 12];
+        yield 'classes with an asterisk' => ['[A-Z*]{7}[0-9]{2}[0-9*][0-9A-Z]{2}', 12];
+    }
+
+    /**
+     * @param non-empty-string $shape
+     */
+    #[DataProvider('derivedLengths')]
+    public function testComputesTheLengthFromTheShape(string $shape, int $length): void
+    {
+        $shapes = new NumberShapes($shape);
+
+        self::assertTrue($shapes->fitsLength(\str_repeat('x', $length)));
+        self::assertFalse($shapes->fitsLength(\str_repeat('x', $length - 1)));
+        self::assertFalse($shapes->fitsLength(\str_repeat('x', $length + 1)));
+    }
+
+    /**
+     * @return iterable<string, array{non-empty-string}>
+     */
+    public static function unsupportedShapes(): iterable
+    {
+        yield 'range quantifier' => ['[0-9]{7,8}'];
+        yield 'zero count' => ['[0-9]{0}'];
+        yield 'leading-zero count' => ['[0-9]{07}'];
+        yield 'open quantifier' => ['[0-9]+'];
+        yield 'alternation' => ['[0-9]{9}|[A-Z]'];
+        yield 'group' => ['(?:[0-9])'];
+        yield 'lower-case letter' => ['a[0-9]'];
+        yield 'unclosed class' => ['[0-9'];
+        yield 'empty class' => ['[]'];
+        yield 'escape inside a class' => ['[\\d]'];
+        yield 'nested bracket' => ['[[0-9]]'];
+        yield 'trailing junk after a valid atom' => ['[0-9]{2}.'];
+    }
+
+    /**
+     * @param non-empty-string $shape
+     */
+    #[DataProvider('unsupportedShapes')]
+    public function testRefusesAShapeOutsideTheAtomSyntax(string $shape): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('A shape is a run of letters, digits and [...] classes with {n}.');
+
+        new NumberShapes($shape);
+    }
+
     private function shapes(): NumberShapes
     {
-        return new NumberShapes(['[A-Z][0-9]{2}' => 3, '[0-9]{3}' => 3, '[0-9]{5}' => 5]);
+        return new NumberShapes('[A-Z][0-9]{2}', '[0-9]{3}', '[0-9]{5}');
     }
 }

@@ -26,8 +26,6 @@ final class MeDlIdNumber extends AbstractDlIdNumber
     #[Override]
     protected static function shapes(): NumberShapes
     {
-        return new NumberShapes([
-            '[0-9]{7}' => 7,
-        ]);
+        return new NumberShapes('[0-9]{7}');
     }
 }

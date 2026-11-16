@@ -28,8 +28,6 @@ final class MiDlIdNumber extends AbstractDlIdNumber
     #[Override]
     protected static function shapes(): NumberShapes
     {
-        return new NumberShapes([
-            '[A-Z][0-9]{12}' => 13,
-        ]);
+        return new NumberShapes('[A-Z][0-9]{12}');
     }
 }

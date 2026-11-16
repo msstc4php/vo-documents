@@ -52,8 +52,9 @@
   layout (`Nir`: `* ** ** ** *** *32 - 50`, FR TIN `** ** *** **0 053`, DE VSNR); otherwise `masked()` masks the
   compact stored value (`*****2345`). Letters are masked with `Mask::keepLastCharacters()` before the layout is
   applied; digit-only layouts use `Mask::keepLastDigits(formatted(), n)`.
-- A sub-national number with several shapes (US DL/ID) uses `Internal\NumberShapes([regex => length, …])`: wrong length
-  → `(N characters)`, a length some shape has but no match → `(invalid character)`. One class per jurisdiction, even
-  where the licence and ID card have different shapes (AL, IL): the class accepts the union and its doc says which is
-  which. `fromNumberIn()` for a jurisdiction with no published format throws `Invalid US-XX DL/ID number (format not
-  covered).`; the factory's document label is `American DL/ID` (as Task 1's `American passport book number`).
+- A sub-national number with several shapes (US DL/ID) uses `Internal\NumberShapes(shape, …)` (length derived from the
+  atoms `A`, `9`, `[...]`, `{n}`; anything else is an `InvalidArgumentException`): wrong length → `(N characters)`, a
+  length some shape has but no match → `(invalid character)`. One class per jurisdiction, even where the licence and ID
+  card have different shapes (AL, IL): the class accepts the union and its doc says which is which. `fromNumberIn()` for
+  a jurisdiction with no published format throws `Invalid US-XX DL/ID number (format not covered).`; the factory's
+  document label is `American DL/ID` (as Task 1's `American passport book number`).

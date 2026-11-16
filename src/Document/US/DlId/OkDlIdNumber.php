@@ -29,9 +29,6 @@ final class OkDlIdNumber extends AbstractDlIdNumber
     #[Override]
     protected static function shapes(): NumberShapes
     {
-        return new NumberShapes([
-            '[A-Z][0-9]{9}' => 10,
-            '[0-9]{9}' => 9,
-        ]);
+        return new NumberShapes('[A-Z][0-9]{9}', '[0-9]{9}');
     }
 }

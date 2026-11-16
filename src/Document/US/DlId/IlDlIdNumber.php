@@ -29,9 +29,6 @@ final class IlDlIdNumber extends AbstractDlIdNumber
     #[Override]
     protected static function shapes(): NumberShapes
     {
-        return new NumberShapes([
-            '[A-Z][0-9]{11}' => 12,
-            '[0-9]{11}[A-Z]' => 12,
-        ]);
+        return new NumberShapes('[A-Z][0-9]{11}', '[0-9]{11}[A-Z]');
     }
 }

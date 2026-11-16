@@ -26,8 +26,6 @@ final class NjDlIdNumber extends AbstractDlIdNumber
     #[Override]
     protected static function shapes(): NumberShapes
     {
-        return new NumberShapes([
-            '[A-Z][0-9]{14}' => 15,
-        ]);
+        return new NumberShapes('[A-Z][0-9]{14}');
     }
 }

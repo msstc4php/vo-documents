@@ -28,8 +28,6 @@ final class HiDlIdNumber extends AbstractDlIdNumber
     #[Override]
     protected static function shapes(): NumberShapes
     {
-        return new NumberShapes([
-            'H[0-9A-Z]{8}' => 9,
-        ]);
+        return new NumberShapes('H[0-9A-Z]{8}');
     }
 }

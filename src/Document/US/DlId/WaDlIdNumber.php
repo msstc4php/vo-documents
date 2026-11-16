@@ -30,9 +30,6 @@ final class WaDlIdNumber extends AbstractDlIdNumber
     #[Override]
     protected static function shapes(): NumberShapes
     {
-        return new NumberShapes([
-            'WDL[0-9A-Z]{9}' => 12,
-            '[A-Z*]{7}[0-9]{2}[0-9*][0-9A-Z]{2}' => 12,
-        ]);
+        return new NumberShapes('WDL[0-9A-Z]{9}', '[A-Z*]{7}[0-9]{2}[0-9*][0-9A-Z]{2}');
     }
 }

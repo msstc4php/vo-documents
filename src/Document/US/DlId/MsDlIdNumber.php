@@ -28,9 +28,6 @@ final class MsDlIdNumber extends AbstractDlIdNumber
     #[Override]
     protected static function shapes(): NumberShapes
     {
-        return new NumberShapes([
-            '[0-9]{9}' => 9,
-            '[0-9]{9}[A-Z]' => 10,
-        ]);
+        return new NumberShapes('[0-9]{9}', '[0-9]{9}[A-Z]');
     }
 }

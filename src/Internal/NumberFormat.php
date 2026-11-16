@@ -42,10 +42,7 @@ final readonly class NumberFormat
      */
     public function parse(string $input, string $document): string
     {
-        $normalized = \strtoupper(Digits::strip($input));
-        if (!$this->allowsLength(\mb_strlen($normalized, 'UTF-8'))) {
-            throw Digits::invalidLength($normalized, $document);
-        }
+        $normalized = Digits::upperCasedOfLength($input, $this->allowsLength(...), $document);
 
         if (\preg_match('/^[' . $this->characters . ']+$/D', $normalized) !== 1) {
             throw new InvalidDocumentNumberException(\sprintf('Invalid %s (invalid character).', $document));
@@ -59,7 +56,7 @@ final readonly class NumberFormat
      */
     public function fitsLength(string $input): bool
     {
-        return $this->allowsLength(\mb_strlen(Digits::strip($input), 'UTF-8'));
+        return $this->allowsLength(Digits::strippedLength($input));
     }
 
     private function allowsLength(int $length): bool

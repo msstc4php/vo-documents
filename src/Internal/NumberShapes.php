@@ -4,22 +4,43 @@ declare(strict_types=1);
 
 namespace MSSTC4PHP\ValueObject\Documents\Internal;
 
+use InvalidArgumentException;
 use MSSTC4PHP\ValueObject\Documents\Exception\InvalidDocumentNumberException;
 
 /**
  * A document number that has one of several fixed shapes (e.g. a letter and eight digits, or nine digits), read after
  * the separators of {@see Digits::SEPARATORS} are removed and ASCII letters upper-cased.
  *
+ * A shape is a run of atoms, each an upper-case letter, a digit or a `[...]` class, optionally repeated `{n}` times;
+ * its length is computed from the atoms, so it cannot drift from the pattern.
+ *
  * @internal
  */
 final readonly class NumberShapes
 {
+    private const string ATOM = '/\G(?:[A-Z0-9]|\[[^\[\]\\\\]+\])(?:\{([1-9][0-9]*)\})?/';
+
+    private string $pattern;
+
+    /** @var list<int> */
+    private array $lengths;
+
     /**
-     * @param non-empty-array<non-empty-string, positive-int> $shapes each shape's unanchored regex over upper-case
-     *                                                                ASCII, mapped to the one length it matches
+     * @param non-empty-string $shape
+     * @param non-empty-string ...$moreShapes
+     *
+     * @throws InvalidArgumentException for a shape outside the atom syntax above
      */
-    public function __construct(private array $shapes)
+    public function __construct(string $shape, string ...$moreShapes)
     {
+        $shapes = [$shape, ...$moreShapes];
+        $lengths = [];
+        foreach ($shapes as $each) {
+            $lengths[] = $this->lengthOf($each);
+        }
+
+        $this->lengths = $lengths;
+        $this->pattern = '/^(?:' . \implode('|', $shapes) . ')$/D';
     }
 
     /**
@@ -33,13 +54,8 @@ final readonly class NumberShapes
      */
     public function parse(string $input, string $document): string
     {
-        $normalized = \strtoupper(Digits::strip($input));
-        if (!$this->allowsLength(\mb_strlen($normalized, 'UTF-8'))) {
-            throw Digits::invalidLength($normalized, $document);
-        }
-
-        $pattern = '/^(?:' . \implode('|', \array_keys($this->shapes)) . ')$/D';
-        if (\preg_match($pattern, $normalized) !== 1) {
+        $normalized = Digits::upperCasedOfLength($input, $this->allowsLength(...), $document);
+        if (\preg_match($this->pattern, $normalized) !== 1) {
             throw new InvalidDocumentNumberException(\sprintf('Invalid %s (invalid character).', $document));
         }
 
@@ -51,11 +67,27 @@ final readonly class NumberShapes
      */
     public function fitsLength(string $input): bool
     {
-        return $this->allowsLength(\mb_strlen(Digits::strip($input), 'UTF-8'));
+        return $this->allowsLength(Digits::strippedLength($input));
+    }
+
+    private function lengthOf(string $shape): int
+    {
+        $offset = 0;
+        $length = 0;
+        do {
+            if (\preg_match(self::ATOM, $shape, $atom, 0, $offset) !== 1) {
+                throw new InvalidArgumentException('A shape is a run of letters, digits and [...] classes with {n}.');
+            }
+
+            $offset += \strlen($atom[0]);
+            $length += (int) ($atom[1] ?? 1);
+        } while ($offset < \strlen($shape));
+
+        return $length;
     }
 
     private function allowsLength(int $length): bool
     {
-        return \in_array($length, $this->shapes, true);
+        return \in_array($length, $this->lengths, true);
     }
 }

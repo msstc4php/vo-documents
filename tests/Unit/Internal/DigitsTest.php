@@ -114,4 +114,31 @@ final class DigitsTest extends TestCase
         self::assertSame('Invalid X (40 characters).', Digits::invalidLength(\str_repeat('1', 40), 'X')->getMessage());
         self::assertSame('Invalid X (too long).', Digits::invalidLength(\str_repeat('1', 41), 'X')->getMessage());
     }
+
+    public function testUpperCasedOfLengthStripsUpperCasesAsciiOnlyAndPassesTheCharacterCount(): void
+    {
+        $seen = [];
+        $allow = static function (int $length) use (&$seen): bool {
+            $seen[] = $length;
+
+            return true;
+        };
+
+        self::assertSame("A\u{00E9}1*", Digits::upperCasedOfLength(" a-\u{00E9}\t1* ", $allow, 'X'));
+        self::assertSame([4], $seen);
+    }
+
+    public function testUpperCasedOfLengthRefusesALengthTheCallerRefuses(): void
+    {
+        $this->expectException(InvalidDocumentNumberException::class);
+        $this->expectExceptionMessage('Invalid X (2 characters).');
+
+        Digits::upperCasedOfLength('a-b', static fn (int $length): bool => $length !== 2, 'X');
+    }
+
+    public function testStrippedLengthCountsCharactersWithoutSeparators(): void
+    {
+        self::assertSame(3, Digits::strippedLength(" \u{00E9}-1\u{00A0}2 "));
+        self::assertSame(0, Digits::strippedLength(' - '));
+    }
 }

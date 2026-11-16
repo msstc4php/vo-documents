@@ -26,9 +26,6 @@ final class MaDlIdNumber extends AbstractDlIdNumber
     #[Override]
     protected static function shapes(): NumberShapes
     {
-        return new NumberShapes([
-            'S[0-9]{8}' => 9,
-            'SA[0-9]{7}' => 9,
-        ]);
+        return new NumberShapes('S[0-9]{8}', 'SA[0-9]{7}');
     }
 }

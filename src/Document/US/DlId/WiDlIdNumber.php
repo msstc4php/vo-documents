@@ -38,9 +38,7 @@ final class WiDlIdNumber extends AbstractDlIdNumber
     #[Override]
     protected static function shapes(): NumberShapes
     {
-        return new NumberShapes([
-            '[A-Z][0-9]{13}' => 14,
-        ]);
+        return new NumberShapes('[A-Z][0-9]{13}');
     }
 
     #[Override]

@@ -27,10 +27,6 @@ final class KsDlIdNumber extends AbstractDlIdNumber
     #[Override]
     protected static function shapes(): NumberShapes
     {
-        return new NumberShapes([
-            '[0-9]{9}' => 9,
-            'K[0-9]{8}' => 9,
-            '[0-9A-Z]{6}' => 6,
-        ]);
+        return new NumberShapes('[0-9]{9}', 'K[0-9]{8}', '[0-9A-Z]{6}');
     }
 }

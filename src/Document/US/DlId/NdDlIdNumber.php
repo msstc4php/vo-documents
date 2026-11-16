@@ -26,8 +26,6 @@ final class NdDlIdNumber extends AbstractDlIdNumber
     #[Override]
     protected static function shapes(): NumberShapes
     {
-        return new NumberShapes([
-            '[A-Z]{3}[0-9]{6}' => 9,
-        ]);
+        return new NumberShapes('[A-Z]{3}[0-9]{6}');
     }
 }

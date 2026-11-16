@@ -36,9 +36,7 @@ final class WyDlIdNumber extends AbstractDlIdNumber
     #[Override]
     protected static function shapes(): NumberShapes
     {
-        return new NumberShapes([
-            '[0-9]{9}' => 9,
-        ]);
+        return new NumberShapes('[0-9]{9}');
     }
 
     #[Override]

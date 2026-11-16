@@ -28,9 +28,6 @@ final class RiDlIdNumber extends AbstractDlIdNumber
     #[Override]
     protected static function shapes(): NumberShapes
     {
-        return new NumberShapes([
-            '[0-9]{7}' => 7,
-            '[0-9]{8}' => 8,
-        ]);
+        return new NumberShapes('[0-9]{7}', '[0-9]{8}');
     }
 }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MSSTC4PHP\ValueObject\Documents\Internal;
 
+use Closure;
 use MSSTC4PHP\ValueObject\Documents\Exception\InvalidDocumentNumberException;
 
 /**
@@ -55,7 +56,7 @@ final class Digits
      */
     public static function exactlyStripped(string $digits, int $length, string $document): string
     {
-        if (\mb_strlen($digits, 'UTF-8') !== $length) {
+        if (self::length($digits) !== $length) {
             throw self::invalidLength($digits, $document);
         }
 
@@ -67,17 +68,54 @@ final class Digits
     }
 
     /**
+     * Strips the separators, upper-cases ASCII letters and requires a length `$allowsLength` accepts; the characters
+     * are left to the caller.
+     *
+     * @param Closure(int): bool $allowsLength
+     * @param non-empty-string $document the document's name in the exception message
+     *
+     * @throws InvalidDocumentNumberException as {@see invalidLength()} when the length is refused
+     */
+    public static function upperCasedOfLength(string $input, Closure $allowsLength, string $document): string
+    {
+        $normalized = \strtoupper(self::strip($input));
+        if (!$allowsLength(self::length($normalized))) {
+            throw self::invalidLength($normalized, $document);
+        }
+
+        return $normalized;
+    }
+
+    /**
+     * The number of characters of `$input` once the separators are removed.
+     *
+     * @return non-negative-int
+     */
+    public static function strippedLength(string $input): int
+    {
+        return self::length(self::strip($input));
+    }
+
+    /**
      * @param string $normalized the input with the separators removed
      * @param non-empty-string $document the document's name in the exception message
      */
     public static function invalidLength(string $normalized, string $document): InvalidDocumentNumberException
     {
-        $count = \mb_strlen($normalized, 'UTF-8');
+        $count = self::length($normalized);
 
         return new InvalidDocumentNumberException(
             $count > self::MAX_REPORTED_LENGTH
                 ? \sprintf('Invalid %s (too long).', $document)
                 : \sprintf('Invalid %s (%d characters).', $document, $count),
         );
+    }
+
+    /**
+     * @return non-negative-int
+     */
+    private static function length(string $value): int
+    {
+        return \mb_strlen($value, 'UTF-8');
     }
 }

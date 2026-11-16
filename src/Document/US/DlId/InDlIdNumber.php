@@ -27,8 +27,6 @@ final class InDlIdNumber extends AbstractDlIdNumber
     #[Override]
     protected static function shapes(): NumberShapes
     {
-        return new NumberShapes([
-            '[0-9]{10}' => 10,
-        ]);
+        return new NumberShapes('[0-9]{10}');
     }
 }

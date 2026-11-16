@@ -27,8 +27,6 @@ final class NeDlIdNumber extends AbstractDlIdNumber
     #[Override]
     protected static function shapes(): NumberShapes
     {
-        return new NumberShapes([
-            '[ABCEGHV][0-9]{8}' => 9,
-        ]);
+        return new NumberShapes('[ABCEGHV][0-9]{8}');
     }
 }
