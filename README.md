@@ -105,6 +105,8 @@ official algorithm is published. A number with the right shape is accepted, neve
 | `Document\US\PassportBookNumber` | Passport book, 9 digits or letter + 7/8 digits | format only | none | State Department; USCIS E-Verify |
 | `Document\US\PassportCardNumber` | Passport card, `C` + 8 digits | format only | none | USCIS E-Verify |
 | `Document\US\MedicareBeneficiaryIdentifier` | MBI, `1EG4-TE5-MK73` | CMS position layout (no check digit exists) | none | CMS |
+| `Document\US\DlId\{Al,Az,Co,Ct,Fl,Hi,Ia,Id,Il,In,Ks,Ky,Ma,Md,Me,Mi,Ms,Nd,Ne,Nj,Nm,Ny,Ok,Pa,Ri,Tx,Vt,Wa,Wi,Wy}DlIdNumber` | DL/ID number of 30 states (one class covers a state's licence and ID card where the source says so) | shape only (no check digit verified; HI, KS, MA, NE, VT, WA letters enforced as quoted) | none (the IL, WA, FL and MI name and birth data is not decoded) | state DMV and police publications; USCIS E-Verify RIDE fact sheets |
+| `Document\US\Jurisdiction` | The 50 states and DC (enum, ISO 3166-2:US) | n/a | n/a | ISO 3166-2:US |
 
 Names: `Name\<CC>\FamilyName`, `GivenName` and `PersonName` for DE, FR, IT, ES, NL, CH, GB and TR, like the RU and AU
 ones. Spain's `PersonName` has two surnames (`first`, optional `second`); in the Dutch one the prefixes (`van der`) are
@@ -114,7 +116,7 @@ part of the family name; the Swiss, Dutch, British and US ones accept a person w
 identifiers of the ICAO form, ordinals as Roman numerals (`SMITH<<JOHN<MICHAEL<III`).
 
 Contracts: `Contract\Maskable` (every number above), `Contract\Subdivision` and `Contract\IssuedBySubdivision` (AU
-jurisdictions and licences). `Contract\HasSex` and the `Sex` enum are implemented by the documents that encode a sex
+and US jurisdictions, AU licences, US DL/ID numbers). `Contract\HasSex` and the `Sex` enum are implemented by the documents that encode a sex
 (`Nir`, `FiscalCode`, the DVLA licence number, `ChiNumber`). `Contract\HasBirthDate` is public API that no class
 implements yet: every encoded birth date of these countries lacks a century, so the classes expose the year digits,
 month and day instead, and impossible dates (30 February) are refused.
@@ -137,6 +139,23 @@ when the length fits some jurisdiction, otherwise the length). `AmbiguousJurisdi
 caller that catches invalid input catches it too, and `jurisdictions()` tells which `fromNumberIn()` calls would work.
 **With the formats published today every valid number fits two or more jurisdictions, so `fromNumber()` always throws
 for AU**; use `fromNumberIn()` when the issuer is known (see `docs/sources/AU.md`).
+
+### US DL/ID numbers and the jurisdiction factory
+
+```php
+use MSSTC4PHP\ValueObject\Documents\Document\US\DlIdNumberFactory;
+use MSSTC4PHP\ValueObject\Documents\Document\US\Jurisdiction;
+
+DlIdNumberFactory::fromNumberIn('123456789', Jurisdiction::Ny);   // NyDlIdNumber
+DlIdNumberFactory::fromNumber('Y620-9305-7270');                  // IlDlIdNumber, the only match
+DlIdNumberFactory::fromNumber('123456789');                       // AmbiguousJurisdictionException, 11 states
+DlIdNumberFactory::fromNumberIn('123456789', Jurisdiction::Ca);   // "Invalid US-CA DL/ID number (format not covered)."
+```
+
+`DlIdNumberFactory` works like the AU factory, over the 30 jurisdictions with a published format only. Unlike AU,
+some numbers fit exactly one state (10 digits: IN; a letter and 13 digits: WI; WA's `WDL` numbers). A plain 7-9 digit
+number fits several, so pass the issuer when it is known. The 21 jurisdictions without a published format have no
+class, and `fromNumberIn()` refuses them (`docs/sources/US.md` "DL/ID numbers").
 
 ## Personal names
 
@@ -329,7 +348,10 @@ Collected from the source notes; each is a deliberate omission with its reason i
 - **TR:** sürücü belgesi number (a running sequence per province, no format), the identity card serial number
   (`docs/sources/TR.md`).
 - **US:** a middle name or suffix beside a one-word name (no source defines it), the IRM's open list of "never issued"
-  SSN examples (not refused), ATIN and IRSN; DL/ID numbers follow in a later task (`docs/sources/US.md`).
+  SSN examples (not refused), ATIN and IRSN; the DL/ID numbers of AK, AR, CA, DC, DE, GA, LA, MN, MO, MT, NC, NH, NV,
+  OH, OR, SC, SD, TN, UT, VA and WV (no official format published), the ID cards of CT, HI, IN, KY, ME, NJ, NM, OK and
+  RI (numbering not stated), the Maryland customer ID, and the decoding of name or birth data in IL, WA, FL and MI
+  numbers (`docs/sources/US.md`).
 - **No region value object for RU**: no field encodes a region with a published mapping to ISO 3166-2:RU (`RU.md`).
 - **RU driving licences of the 1999 form** (Cyrillic series): expired by 2026 (`RU.md`).
 - **RU old-form OMS policies** (series and number) and AU **11-digit Medicare individual numbers**.

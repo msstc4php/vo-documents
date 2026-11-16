@@ -6,7 +6,7 @@ core.
 | Area | Purpose |
 |---|---|
 | `Contract\`, `Exception\`, `Sex` | Shared interfaces, the three exception families, the sex enum |
-| `Internal\` | `@internal` helpers: `Checksum`, `Mask`, `Digits`, `UnicodeText`/`Text`, `NumberFormat` (character class + length range of a licence), `SubdivisionResolver` (one match / none / ambiguous over an enum of subdivisions), `PayloadFields` (codec payload validation), `Optional` (`equal()` of two optional value objects), `TwoDigitYearDate` (day/month valid in some century: DVLA, CHI, IT codice fiscale) |
+| `Internal\` | `@internal` helpers: `Checksum`, `Mask`, `Digits`, `UnicodeText`/`Text`, `NumberFormat` (character class + length range of a licence), `NumberShapes` (several fixed regex shapes, each with its length: US DL/ID), `SubdivisionResolver` (one match / none / ambiguous over an enum of subdivisions), `PayloadFields` (codec payload validation), `Optional` (`equal()` of two optional value objects), `TwoDigitYearDate` (day/month valid in some century: DVLA, CHI, IT codice fiscale) |
 | `Icao\PersonName` | MRZ-style Latin name (`A-Z`, `-`, `<`; `<<` between primary and secondary), `mrzField()` truncation |
 | `Icao\Transliterator` | National name part → ICAO Latin (`toLatin()` default, `variants()` all spellings) |
 | `Icao\Table\*` | `@internal` `TransliterationTable` per script (LatinMultinational, Cyrillic); add a class + register it in the `Transliterator` constructor for a new script |
@@ -77,7 +77,7 @@ layout). `Name\TR\PersonName($family, $given, ?$latin)`: letters of the Law 1353
 (`Name\TR\AbstractTurkishNamePart`), space as the only separator, override policy `TransliterationVariant`; codec
 keys `family`, `given`, `latin`.
 
-`Document\US\*` (federal only; DL/ID numbers come with plan 3 Task 2): `SocialSecurityNumber` (SSA refusals: area
+`Document\US\*` (federal): `SocialSecurityNumber` (SSA refusals: area
 000/666/9xx, group 00, serial 0000; `formatted()` `123-45-6789`), `Itin` (first digit 9, digits 4-5 in the IRM ranges;
 string range bounds, no int cast), `PassportBookNumber` (9 digits, letter + 7 or 8 digits; mask 3 for 8 characters),
 `PassportCardNumber` (`C` + 8 digits), `MedicareBeneficiaryIdentifier` (CMS position layout, `formatted()`
@@ -89,3 +89,9 @@ secondary identifiers are given, middle, `NameSuffix::icao()` (ordinals as Roman
 case-insensitive, message "Invalid American name suffix."), not a value object: `PersonName::equals()` compares it
 with `===`. `Name\US\AbstractAmericanNamePart` maps the ʻokina U+02BB to `'` before the shared parse. Codec keys
 `family`, `given` (null for one name), `middle`, `suffix` (AAMVA code), `latin`.
+
+`Document\US\*` DL/ID (plan 3 Task 3): `Jurisdiction` (51 cases, ISO 3166-2:US, the states and DC), `DlIdNumber`
+interface, `DlId\AbstractDlIdNumber` (hooks `shapes(): NumberShapes`, `layout()`; final `masked()`/`parse()`/
+`fitsLength()`) + one final `<Abbr>DlIdNumber` per covered jurisdiction (30), `DlIdNumberFactory` on
+`SubdivisionResolver` over the covered cases only; `classFor()` lists the 21 uncovered cases explicitly (`=> null`), so a
+new enum case breaks the `match`. FL, WI, WY add `formatted()` (published hyphen layout) and mask in it.

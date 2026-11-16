@@ -278,15 +278,22 @@ Rulings that apply to the whole table:
   `WDL`). Check digits: VT and WA mention one but publish no algorithm, so none is verified. IL gives digit ranges but
   contradicts itself, so they are not enforced.
 - **ID card:** "shares" means the source states that the same numbering, or the same format, covers the ID card. Then
-  one `<Abbr>DlIdNumber` class covers both. "Separate" means the source states a different ID-card format, which gets
-  its own `<Abbr>IdCardNumber`. "Not stated" means the class covers the driving licence only.
+  one `<Abbr>DlIdNumber` class covers both. "Separate" means the source states a different ID-card format; by the
+  plan-3 Task 3 ruling (one class per jurisdiction) the jurisdiction's one `<Abbr>DlIdNumber` class accepts the union
+  of the licence and ID-card shapes, and its doc says which shape is which (no `<Abbr>IdCardNumber` class). "Not
+  stated" means the class covers the driving licence only.
+- **Display form and mask:** `formatted()` exists only where a source prints the hyphenated form: FL (FL-2
+  `Z123-456-78-901-0`), WI (WI-2 `H300-1987-0162-04`) and WY (RIDE "six numbers followed by a hyphen and three
+  numbers"); `masked()` keeps that layout there. IL is left without one: IL-1 says two hyphens are printed but not
+  where, and its spaced example is a LEADS listing. No source states a masking rule, so `masked()` keeps the last four
+  characters, three for a number of eight characters or fewer (plan default).
 
 ### Per jurisdiction
 
 | ISO | Source | Quoted format (verbatim) | Normalised shape | ID card | Encoded data | Official sample | Verdict |
 |---|---|---|---|---|---|---|---|
 | US-AK | DMV Form D1, online services (searched) | none: the forms show a "ALASKA LICENSE/ID #" field without a format | — | — | — | — | not covered |
-| US-AL | AL-1 | "Effective December 1, 2018, Alabama will begin issuing an 8-digit driver license number. Alabama will continue to support the existing 7-digit numbers and also the new 8-digit numbers. Alabama currently issues 8-digit non-driver identification cards." | `[0-9]{7,8}` | separate: `[0-9]{8}` (`AlIdCardNumber`) | none | none | covered |
+| US-AL | AL-1 | "Effective December 1, 2018, Alabama will begin issuing an 8-digit driver license number. Alabama will continue to support the existing 7-digit numbers and also the new 8-digit numbers. Alabama currently issues 8-digit non-driver identification cards." | `[0-9]{7,8}` | separate: `[0-9]{8}` (accepted by `AlDlIdNumber`; also a DL shape) | none | none | covered |
 | US-AR | DFA Driver Services, voter form, ASP data handbook (searched) | none for the DL (the State Police handbook gives a CDL field "Alpha", size 10, which is a field width, not a format) | — | — | — | — | not covered |
 | US-AZ | RIDE (Arizona); AZ-1 | RIDE: "Arizona driver's licenses and ID cards contain document numbers (circled) that are nine characters- one letter followed by eight numbers." AZ-1: "If your Social Security Number appears on your driver license, please contact the LECU to lift your redaction then visit AZMVDNow.gov or an authorized MVD office to request a duplicate driver license with the SSN replaced by an MVD system generated number." | `[A-Z][0-9]{8}` or `[0-9]{9}` (an SSN printed as the number is still in circulation, AZ-1; the SSN's nine digits, as for KS and MS) | shares | none (an SSN-based number is not checked as an SSN) | none in text | covered |
 | US-CA | dmv.ca.gov forms DL 410, INF 1125 (searched) | none: the forms ask for the "driver license or ID card number" without a format | — | — | — | — | not covered |
@@ -299,7 +306,7 @@ Rulings that apply to the whole table:
 | US-HI | HI-1 | Field "DRIVER'S LICENSE NUMBER" printed as `H _ _ _ _ _ _ _ _` (a fixed `H` and eight boxes) | `H[0-9A-Z]{8}` (character set of the boxes not stated) | not stated | none | none | covered (DL) |
 | US-IA | RIDE (Iowa) | "Iowa driver's licenses and ID cards contain document numbers (circled) that are nine alphanumeric characters (letters and numbers)." | `[0-9A-Z]{9}` | shares | none | none in text | covered |
 | US-ID | RIDE (Idaho); ID-1 | RIDE: "Idaho driver's licenses and ID cards contain document numbers (circled) that are nine alphanumeric characters (letters and numbers). The current format is two letters followed by six numeric characters followed by one letter. Documents issued before January 1, 1993, contain nine numeric characters." ID-1 adds: "Previous Idaho license numbers began with 910, 920, or 940 assigned by the sheriffs' office, or a social security number." | `[A-Z]{2}[0-9]{6}[A-Z]` or `[0-9]{9}` | shares | none | none | covered |
-| US-IL | IL-1 | "An Illinois DLN (Driver's License Number) is a 12-position alphanumeric figure, computed by a special formula and assigned by the Secretary of State. Although two hyphens appear within the number (DLN) on the license itself, these hyphens are never used in a LEADS inquiry. Each DLN encodes a driver's name (including last name, first name or initial and middle initial), sex and birth date." "Y620 - First letter of the driver's last name followed by 3 numeric digits derived from the remainder of the last name" §2.1: "A PID is computed from name, sex, and date of birth exactly like a DLN, except that a PID carries the single alpha character in the last position." | `[A-Z][0-9]{11}` | separate: `[0-9]{11}[A-Z]` (`IlIdCardNumber`) | name, sex and birth date (formula not quoted; not decoded). Digit rule as quoted: "The numbers 7,8, and 9 never appear in the first three numeric positions. Also, the last three digits must be 001 through 372 if the driver is male, and 601 through 972 if female. The numbers 373 through 600 are invalid in the final three positions. For DLN's that compute out to be duplicated for more than one person the last three digits are replaced with an assigned number between 400 and 599." This is self-contradictory (400–599 falls inside "invalid" 373–600), so it is **not enforced** and `Sex` is not derived | `Y620 930 57 270` (IL-1) | covered |
+| US-IL | IL-1 | "An Illinois DLN (Driver's License Number) is a 12-position alphanumeric figure, computed by a special formula and assigned by the Secretary of State. Although two hyphens appear within the number (DLN) on the license itself, these hyphens are never used in a LEADS inquiry. Each DLN encodes a driver's name (including last name, first name or initial and middle initial), sex and birth date." "Y620 - First letter of the driver's last name followed by 3 numeric digits derived from the remainder of the last name" §2.1: "A PID is computed from name, sex, and date of birth exactly like a DLN, except that a PID carries the single alpha character in the last position." | `[A-Z][0-9]{11}` | separate: `[0-9]{11}[A-Z]` (accepted by `IlDlIdNumber`) | name, sex and birth date (formula not quoted; not decoded). Digit rule as quoted: "The numbers 7,8, and 9 never appear in the first three numeric positions. Also, the last three digits must be 001 through 372 if the driver is male, and 601 through 972 if female. The numbers 373 through 600 are invalid in the final three positions. For DLN's that compute out to be duplicated for more than one person the last three digits are replaced with an assigned number between 400 and 599." This is self-contradictory (400–599 falls inside "invalid" 373–600), so it is **not enforced** and `Sex` is not derived | `Y620 930 57 270` (IL-1) | covered |
 | US-IN | IN-1 | "you must provide your insured 10 digit Indiana DLN or their CUID number" | `[0-9]{10}` | not stated | none | none | covered (DL) |
 | US-KS | KS-1; KS-2 | KS-1: "DL Number-Drivers License or ID Card Number (either Social Security number, Computer Generated number that starts with "K" and 8 numbers, or a 6 digit alpha-numeric number)." KS-2: "( example: K12345678 ) … With no dashes or spaces" | `[0-9]{9}`, `K[0-9]{8}` or `[0-9A-Z]{6}` | shares | none (an SSN-based number is not checked as an SSN) | `K12345678` (KS-2) | covered |
 | US-KY | KY-1; KY-2 | KY-1: "The Driver's License/Permit Number listed will have a letter followed by 8 numbers. Enter the full license/permit number without the dashes onto the box provided." KY-2: "The license number is made up of 9 characters, 1 letter followed by 8 numbers." | `[A-Z][0-9]{8}` | not stated | none | `C21545427` (KY-1) | covered (DL) |
@@ -337,13 +344,14 @@ Rulings that apply to the whole table:
 | US-WV | WV DMV self-service, DS-23P form (searched) | none | — | — | — | — | not covered |
 | US-WY | RIDE (Wyoming) | "Wyoming driver's licenses and ID cards contain document numbers (circled) that are nine numbers- six numbers followed by a hyphen and three numbers." | `[0-9]{9}` (hyphen removed) | shares | none | none | covered |
 
-**Totals:** 30 of 51 covered (19 with the ID card shared, 9 for the driving licence only, and AL and IL with a separate
-ID-card class). 21 are not covered.
+**Totals:** 30 of 51 covered (19 with the ID card shared, 9 for the driving licence only, and AL and IL whose one class
+also accepts the separately stated ID-card shape). 21 are not covered.
 
 ### Overlap — the factory's test oracle
 
-`DlIdNumberFactory` matches the 30 covered `<Abbr>DlIdNumber` classes only. The ID-card classes `AlIdCardNumber` and
-`IlIdCardNumber` are not part of it. An input is normalised first (above). The groups below are in enum order:
+`DlIdNumberFactory` matches the 30 covered `<Abbr>DlIdNumber` classes only. Each class accepts its jurisdiction's
+licence and ID-card shapes (AL and IL included), so the IL ID card has its own row. An input is normalised first
+(above). The groups below are in enum order:
 
 | Normalised input class | Jurisdictions it fits |
 |---|---|
@@ -359,6 +367,7 @@ ID-card class). 21 are not covered.
 | other 9 alphanumerics with ≥ 1 letter | US-IA; plus US-HI if the first is `H`; US-ID for two letters + 6 digits + letter; US-ND for three letters + 6 digits |
 | letter + 9 digits | US-OK |
 | letter + 11 digits | US-IL |
+| 11 digits + a letter (IL ID card) | US-IL |
 | letter + 12 digits | US-FL, US-MD, US-MI |
 | letter + 13 digits | US-WI |
 | letter + 14 digits | US-NJ |
@@ -406,7 +415,7 @@ returns that class; "≥ 2" throws `AmbiguousJurisdictionException` with exactly
 | `SMITH**12*AB` | 1 | US-WA |
 
 So unlike AU, several inputs do fit exactly one jurisdiction: 10 digits (IN), letter + 9 digits (OK), letter + 11
-digits (IL), letter + 13 or 14 digits (WI, NJ), WA's layouts, VT's lettered form, MS's lettered
+digits or 11 digits + a letter (IL), letter + 13 or 14 digits (WI, NJ), WA's layouts, VT's lettered form, MS's lettered
 form, and six characters (KS). These exercise the single-match branch with real formats. Review Focus 1 holds:
 `fromNumber('123456789')` throws with the eleven codes above.
 

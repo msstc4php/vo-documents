@@ -276,3 +276,15 @@ script classes use `\p{sc=Latin}` / `\p{sc=Cyrillic}` (Script property only); `c
   part of the name and Doc 9303 Part 3 §4.6 then puts it in the secondary identifier; an override without the suffix
   is refused (model a passport that dropped it as a name without suffix). Table 6.A's default for `Ö` is `OE`, so the
   derived form of `Möller` is `MOELLER`; the crossed-out passport spelling `MOLLER` is an accepted override.
+
+## US DL/ID numbers (plan 3 Task 3, 2026-11-16 UTC)
+
+- `docs/sources/US.md` "Overlap" is the factory test oracle; `DlIdNumberFactoryTest` has every worked example and one
+  row per remaining overlap-table class (including the IL ID-card row `11 digits + letter` added with the one-class
+  ruling). `123456789` fits 11 states (Review Focus 1).
+- The WA legacy PIC keeps `*` as data (`SMITH**12*AB`), so its `masked()` output cannot tell a stored `*` from a
+  masked one; `*` is never a separator.
+- `class-string` statics cannot be called through `?->` (`$class?->tryFrom()` is a method call on a string); the factory
+  resolves the class with `coveredClassFor()` (`?? throw`) instead.
+- Infection: `array_values(array_filter(...))` handed to `SubdivisionResolver` escapes `UnwrapArrayValues` (the
+  resolver only iterates); build the list with a `foreach` + `[] =`.
