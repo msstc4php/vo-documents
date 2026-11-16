@@ -340,8 +340,13 @@ script classes use `\p{sc=Latin}` / `\p{sc=Cyrillic}` (Script property only); `c
   refused. If RENAPO ever issues one (more than ten letters needed in a homonymy run), widen it with a quote.
 - **RENAPO annexes** (state catalogue, "palabras altisonantes") are listed in the Reglas but not published in them; no
   state list is applied and `NE` is not quoted from an official text.
-- **MX names refuse `/` and `.`** although RENAPO captures them as written (`D/AMICO`, `MA. GUADALUPE`): the ICAO
-  transliteration omits only apostrophes, so such a part could never derive a Latin form.
+- **MX names accept `/` and `.`** as RENAPO captures them (`D/AMICO`, `MA. GUADALUPE`; `Name\MX\AbstractMexicanNamePart`:
+  `/` a separator, `.` after or between letters). Doc 9303 Part 3 §4.6 omits "all other punctuation characters", so
+  `MX\PersonName` passes `['.', '/']` as `$omittedPunctuation` and `LatinPersonNameBuilder` strips it before transliterating
+  (`DAMICO`, `MA<GUADALUPE`). `Icao\Transliterator` is unchanged (still refuses them), so no other country's accepted
+  characters changed. Package-wide re-check (U+02BC, the ES `l·l`) is deferred to the final review.
+- **MX clave de elector positions 1-6 are `A-Z`**: a key with `Ñ` there (INE says only "primeras letras") would be
+  refused; open risk, also in the README limits.
 - **`ElectorKey` clamps** in `birthMonth()`/`birthDay()` leave equivalent Increment/Decrement mutants (as `ChiNumber`).
   The CURP date avoids them: `isoDate()` builds `YYYY-MM-DD` and `parse()` calls `checkdate()` with int casts (a removed
   cast is a `TypeError` under strict types, so CastInt mutants die).

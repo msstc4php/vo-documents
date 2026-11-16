@@ -197,8 +197,8 @@ and storage forms carry the ten digits only.
 
 A national name part (`Name\RU\FamilyName`, `GivenName`, `Patronymic`, and `FamilyName`, `GivenName` of `Name\AU`,
 `Name\DE`, `Name\FR`, `Name\IT`, `Name\ES`, `Name\NL`, `Name\CH`, `Name\GB`, `Name\TR`, `Name\US`, `Name\CA`,
-`Name\MX`, plus `Name\US\MiddleName`) is NFC-normalised, trimmed, has inner whitespace runs collapsed to one space, and keeps its letter
-case. Limits: 100 characters per part. Russian parts accept only the 33 Russian letters; a Cyrillic name typed with
+`Name\MX`, plus `Name\US\MiddleName`) is NFC-normalised, trimmed, has inner whitespace runs collapsed to one space, and
+keeps its letter case. Limits: 100 characters per part. Russian parts accept only the 33 Russian letters; a Cyrillic name typed with
 Latin look-alikes (Latin `a`, `o`, `e`, `c`) is refused. A compatibility character (its NFKC form differs: fullwidth
 `Ｓｍｉｔｈ`, `ª`, the ligature `ﬁ`) is refused in every country, because it would be a second stored spelling of the same
 name; the ones an ICAO table lists itself (`Ĳ`, `Ŀ`) are kept. Messages say "(N characters)" for an empty or too long
@@ -405,7 +405,7 @@ Collected from the source notes; each is a deliberate omission with its reason i
   passports have no published format), the RFC of a legal person, the CURP, RFC, NSS and elector-key check characters
   (no algorithm published), the RENAPO state catalogue and "palabras inconvenientes" list (not published with the
   Reglas: any two letters are accepted, substituted forms too), the INE sex and state code lists of the elector key,
-  the fields of the NSS, other INE card numbers (CIC, OCR); `/` and `.` in names (no ICAO spelling). State driving
+  the fields of the NSS, other INE card numbers (CIC, OCR). State driving
   licences: plan 3 Task 6b (`docs/sources/MX.md`).
 - **No region value object for RU**: no field encodes a region with a published mapping to ISO 3166-2:RU (`RU.md`).
 - **RU driving licences of the 1999 form** (Cyrillic series): expired by 2026 (`RU.md`).
@@ -423,6 +423,8 @@ Collected from the source notes; each is a deliberate omission with its reason i
   mistyped check digit is accepted. Only checksums quoted from an official source are verified: SNILS, OMS policy, DE
   pension insurance number, IT codice fiscale, ES DNI and NIE, NL BSN, CH AHV number, GB NHS and H&C numbers, BC and
   ON health card numbers.
+- **MX clave de elector letters are `A-Z` only** (positions 1-6): INE says only "primeras letras", so whether a key
+  can hold `Ñ` there is unknown; such a key would be refused (`docs/sources/MX.md`).
 - **Not verified against the official PDF:** the 16-digit length of the OMS policy and the FFOMS Order 79 text it is
   checked against (www.ffoms.gov.ru is unreachable from here, the text is quoted from a copy), and the 2 + 7 split of
   the international passport number (no text read states it; `RU.md`).

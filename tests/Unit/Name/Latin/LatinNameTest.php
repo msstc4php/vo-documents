@@ -157,4 +157,26 @@ final class LatinNameTest extends TestCase
             'Refused.',
         );
     }
+
+    public function testOmitsTheGivenPunctuationBeforeTransliterating(): void
+    {
+        $builder = new LatinPersonNameBuilder(['D/Amico', 'López'], ['Ma. Guadalupe'], ['.', '/']);
+
+        self::assertSame('DAMICO<LOPEZ<<MA<GUADALUPE', $builder->derive()->value);
+        self::assertNull(
+            $builder->transliterationVariant('Refused.')
+                ->resolve(IcaoPersonName::from('DAMICO<LOPEZ<<MA<GUADALUPE'), $builder->derive()),
+        );
+    }
+
+    public function testPunctuationThatIsNotOmittedHasNoSpelling(): void
+    {
+        $builder = new LatinPersonNameBuilder(['D/Amico'], ['Ana']);
+
+        self::assertNameRefusedWithoutEcho(
+            static fn (): IcaoPersonName => $builder->derive(),
+            'D/Amico Ana',
+            'Invalid personal name (no ICAO transliteration for a character).',
+        );
+    }
 }

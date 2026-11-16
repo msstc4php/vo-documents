@@ -19,6 +19,7 @@ use MSSTC4PHP\ValueObject\Documents\Name\Latin\LatinPersonNameBuilder;
 use MSSTC4PHP\ValueObject\Documents\Name\LatinForm;
 use MSSTC4PHP\ValueObject\Documents\Name\LatinOverridePolicy;
 use MSSTC4PHP\ValueObject\Documents\Name\LatinSpelling;
+use MSSTC4PHP\ValueObject\Documents\Name\MX\AbstractMexicanNamePart;
 use MSSTC4PHP\ValueObject\Documents\Name\MX\FamilyName;
 use MSSTC4PHP\ValueObject\Documents\Name\MX\GivenName;
 use MSSTC4PHP\ValueObject\Documents\Name\MX\PersonName;
@@ -36,6 +37,7 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(AbstractLatinPersonName::class)]
 #[UsesClass(AbstractNamePart::class)]
 #[UsesClass(AbstractLatinNamePart::class)]
+#[UsesClass(AbstractMexicanNamePart::class)]
 #[UsesClass(LatinPersonNameBuilder::class)]
 #[UsesClass(FamilyName::class)]
 #[UsesClass(GivenName::class)]
@@ -71,6 +73,10 @@ final class PersonNameTest extends TestCase
         yield 'apostrophe omitted, hyphen kept' => ["O'Hara", 'López-Castillo', 'Juan', 'OHARA<LOPEZ-CASTILLO<<JUAN'];
         yield 'no surnames: the given names alone' => [null, null, 'Juan', 'JUAN'];
         yield 'no surnames, two given names' => [null, null, 'María José', 'MARIA<JOSE'];
+        yield 'slash omitted (ICAO 4.6)' => ['D/Amico', 'Álvarez', 'Juan José', 'DAMICO<ALVAREZ<<JUAN<JOSE'];
+        yield 'full stop omitted (ICAO 4.6)' => ['Estrada', 'López', 'Ma. Guadalupe', 'ESTRADA<LOPEZ<<MA<GUADALUPE'];
+        yield 'initials' => ['Pérez', null, 'M.A.', 'PEREZ<<MA'];
+        yield 'J. alone, no surnames' => [null, null, 'J.', 'J'];
     }
 
     #[DataProvider('derivedSpellings')]
@@ -98,6 +104,36 @@ final class PersonNameTest extends TestCase
             new PersonName(FamilyName::from('Zaro'), null, GivenName::from('Margarita'))->full(),
         );
         self::assertSame('Nancy', new PersonName(null, null, GivenName::from('Nancy'))->full());
+    }
+
+    public function testPunctuationIsKeptInThePartsAndTellsNamesApart(): void
+    {
+        $dotted = new PersonName(FamilyName::from('Estrada'), null, GivenName::from('Ma. Guadalupe'));
+        $plain = new PersonName(FamilyName::from('Estrada'), null, GivenName::from('Ma Guadalupe'));
+
+        self::assertSame('Ma. Guadalupe Estrada', $dotted->full());
+        self::assertSame($plain->latin()->value, $dotted->latin()->value);
+        self::assertFalse($dotted->equals($plain));
+    }
+
+    public function testAnOverrideOfAPunctuatedNameIsATableSpelling(): void
+    {
+        $name = new PersonName(
+            FamilyName::from('D/Amico'),
+            null,
+            GivenName::from('Núñez'),
+            IcaoPersonName::from('DAMICO<<NUNXXEZ'),
+        );
+
+        self::assertSame('DAMICO<<NUNXXEZ', $name->latinOverride()?->value);
+        self::assertNull(
+            new PersonName(
+                FamilyName::from('D/Amico'),
+                null,
+                GivenName::from('Ana'),
+                IcaoPersonName::from('DAMICO<<ANA'),
+            )->latinOverride(),
+        );
     }
 
     public function testRefusesASecondSurnameWithoutAFirst(): void

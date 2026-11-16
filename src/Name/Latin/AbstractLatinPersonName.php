@@ -25,13 +25,20 @@ abstract readonly class AbstractLatinPersonName implements NationalPersonName
     /**
      * @param non-empty-list<string> $familyParts the family parts, joined by a space into the primary identifier
      * @param list<string> $givenParts the given parts, one secondary identifier each
+     * @param list<non-empty-string> $omittedPunctuation punctuation the country's parts allow and the MRZ omits (Doc
+     *                                                   9303 Part 3 §4.6 "All other punctuation characters shall be
+     *                                                   omitted from the MRZ"); none by default
      *
      * @throws InvalidPersonNameException when a letter has no ICAO spelling, the Latin form is too long or the
      *                                    policy refuses $latin
      */
-    protected function __construct(array $familyParts, array $givenParts, ?IcaoPersonName $latin)
-    {
-        $builder = new LatinPersonNameBuilder($familyParts, $givenParts);
+    protected function __construct(
+        array $familyParts,
+        array $givenParts,
+        ?IcaoPersonName $latin,
+        array $omittedPunctuation = [],
+    ) {
+        $builder = new LatinPersonNameBuilder($familyParts, $givenParts, $omittedPunctuation);
         $form = $this->overridePolicy($builder)->effective($builder->derive(...), $latin);
         $this->effective = $form->effective;
         $this->override = $form->override;

@@ -48,8 +48,16 @@ Comma (VIZ `ERIKSSON, ANNA MARIA` → MRZ `ERIKSSON<<ANNA<MARIA`) and apostrophe
 > character shall be inserted in its place in the MRZ.
 > Example VIZ: D’ARTAGNAN MRZ: DARTAGNAN
 
+The same section ends with (verbatim):
+
+> Other punctuation characters: All other punctuation characters shall be omitted from the MRZ (i.e. no filler
+> character shall be inserted in their place in the MRZ).
+
 `Transliterator` omits two apostrophe characters: U+0027 APOSTROPHE (`'`) and U+2019 RIGHT SINGLE QUOTATION MARK (`’`,
-the one printed in the ICAO examples). Others (e.g. U+02BC MODIFIER LETTER APOSTROPHE) are not covered and are refused.
+the one printed in the ICAO examples). Other punctuation is omitted only where a country's name parts accept it: the
+`$omittedPunctuation` argument of `Name\Latin\AbstractLatinPersonName` lists it (MX: `.` and `/`, RENAPO records them)
+and `LatinPersonNameBuilder` removes it before transliterating (`D/Amico` → `DAMICO`). `Transliterator` itself still
+refuses any other punctuation (e.g. U+02BC MODIFIER LETTER APOSTROPHE), as do the parts of the other countries.
 
 ## 2. Transliteration tables (Part 3 §6)
 

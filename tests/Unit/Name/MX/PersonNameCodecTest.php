@@ -29,6 +29,7 @@ use MSSTC4PHP\ValueObject\Documents\Name\Latin\LatinPersonNameBuilder;
 use MSSTC4PHP\ValueObject\Documents\Name\LatinForm;
 use MSSTC4PHP\ValueObject\Documents\Name\LatinOverridePolicy;
 use MSSTC4PHP\ValueObject\Documents\Name\LatinSpelling;
+use MSSTC4PHP\ValueObject\Documents\Name\MX\AbstractMexicanNamePart;
 use MSSTC4PHP\ValueObject\Documents\Name\MX\FamilyName;
 use MSSTC4PHP\ValueObject\Documents\Name\MX\GivenName;
 use MSSTC4PHP\ValueObject\Documents\Name\MX\PersonName;
@@ -63,6 +64,7 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(PersonName::class)]
 #[UsesClass(AbstractNamePart::class)]
 #[UsesClass(AbstractLatinNamePart::class)]
+#[UsesClass(AbstractMexicanNamePart::class)]
 #[UsesClass(LatinPersonNameBuilder::class)]
 #[UsesClass(LatinSpelling::class)]
 #[UsesClass(IdentifierSpellings::class)]
@@ -130,6 +132,26 @@ final class PersonNameCodecTest extends TestCase
 
         self::assertSame(['first' => null, 'second' => null, 'given' => 'Nancy', 'latin' => null], $payload);
         self::assertTrue($codec->decode($payload)->equals($name));
+    }
+
+    public function testRoundTripWithRenapoPunctuationUnchanged(): void
+    {
+        $codec = new PersonNameCodec();
+        $name = new PersonName(
+            FamilyName::from('D/Amico'),
+            FamilyName::from('Álvarez'),
+            GivenName::from('Ma. Guadalupe'),
+        );
+
+        $payload = $codec->encode($name);
+
+        self::assertSame(
+            ['first' => 'D/Amico', 'second' => 'Álvarez', 'given' => 'Ma. Guadalupe', 'latin' => null],
+            $payload,
+        );
+        $decoded = $codec->decode($payload);
+        self::assertTrue($decoded->equals($name));
+        self::assertSame('DAMICO<ALVAREZ<<MA<GUADALUPE', $decoded->latin()->value);
     }
 
     public function testRoundTripWithOverride(): void

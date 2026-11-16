@@ -37,18 +37,26 @@ Wikipedia, news sites, CURP/RFC generator and validator sites, law-firm summarie
    ("JUAN ANGEL DE LAS LOMAS GARCES").
 3. **Characters** (§5.1, 1.4): "Si en los apellidos o en el nombre aparecieran caracteres especiales como diagonal (/),
    guión (-), punto (.), apóstrofo (‘) y diéresis (¨) en alguna de las vocales, se captura tal cual viene en el
-   documento probatorio" (examples "JUAN JOSE D/AMICO ALVAREZ", "MA. GUADALUPE ESTRADA LOPEZ"). Several given names are
-   captured as one name field (1.2: "Cuando el nombre es compuesto por más de una palabra").
+   documento probatorio" (example "JUAN JOSE D/AMICO ALVAREZ"). Abbreviated given names are recorded too: 1.3 and 5.2
+   1.16 list "MARIA, MA., MA, M., M, JOSE, J., J" as first given names (example "MA. GUADALUPE ESTRADA LOPEZ"). Several
+   given names are captured as one name field (1.2: "Cuando el nombre es compuesto por más de una palabra").
+4. **ICAO** (Doc 9303 Part 3, 8th ed., §4.6, verbatim): "Punctuation characters are not allowed in the MRZ. Where these
+   appear as part of a name, they should be treated as follows: […] Other punctuation characters: All other punctuation
+   characters shall be omitted from the MRZ (i.e. no filler character shall be inserted in their place in the MRZ)."
 
 | Part | Letters | Separators inside |
 |---|---|---|
-| `FamilyName` (`first`, `second`) | `\p{sc=Latin}` (`ñ`, `á é í ó ú`, `ü` and foreign diacritics) | hyphen, apostrophe (`O'Hara`), space (`de la Cruz`, `Riva Palacio`) |
-| `GivenName` | `\p{sc=Latin}` | hyphen, apostrophe, space (`María Guadalupe`) |
+| `FamilyName` (`first`, `second`) | `\p{sc=Latin}` (`ñ`, `á é í ó ú`, `ü` and foreign diacritics) | hyphen, apostrophe (`O'Hara`), space (`de la Cruz`, `Riva Palacio`), slash (`D/Amico`); a full stop after or between letters |
+| `GivenName` | `\p{sc=Latin}` | the same (`María Guadalupe`, `Ma. Guadalupe`, `J. Ricardo`, `M.A.`) |
 
 - No RENAPO text lists the letters of a name ("tal cual viene en el documento probatorio"), so the package's Latin
-  default applies. `/` and `.` are refused: the ICAO transliteration omits only apostrophes (Part 3 §4.6) and has no
-  spelling for them, so a part holding them could never give a Latin form. Abbreviations (`Ma.`) must be written
-  without the dot or in full.
+  default applies. `/` and `.` are accepted as RENAPO records them (`Name\MX\AbstractMexicanNamePart`): `/` between
+  words, `.` after or between letters (never two in a row, never leading). Other punctuation stays refused (none is
+  quoted).
+- **ICAO form of `/` and `.`:** omitted without a filler (§4.6 "Other punctuation characters", quoted above), through
+  the `$omittedPunctuation` constructor argument of `Name\Latin\AbstractLatinPersonName` (default none, MX `.` `/`):
+  `D/Amico` → `DAMICO`, `Ma. Guadalupe` → `MA<GUADALUPE`. The parts are stored as typed (`Ma.`), so `Ma. Guadalupe` and
+  `Ma Guadalupe` are different names with the same ICAO form.
 - **`PersonName(?$first, ?$second, $given)`**: two surnames, one (`$second` null, 1.10), or none (both null, 1.11). A
   second surname without a first is refused (no RENAPO text describes it). This widens the plan's `FamilyName $first`
   to nullable because 1.11 records persons without surnames.
@@ -90,17 +98,17 @@ for one, `latin` the override only. The JSON view `{first, second, given, effect
 "1.1. Composición: Alfanumérica; 1.2. Longitud: 18 caracteres". The 2021 modification leaves rows 1-11 and 14-18
 unchanged ("..."), and moves the state catalogue of row 12 to the Reglas.
 
-**Reglas 2021, §5.2** (verbatim): "Carácter 17: 1. Números del 0 al 9 para las personas nacidas hasta el 31 de diciembre
+**Reglas 2021, §5.3** (verbatim): "Carácter 17: 1. Números del 0 al 9 para las personas nacidas hasta el 31 de diciembre
 del año 1999. 2. Letras de la “A” a la” J” para las personas nacidas a partir del 1º de enero del año 2000. Carácter 18:
 Invariablemente consistirá en un número que va del 0 al 9, el cual es asignado por la aplicación de un algoritmo que
 permite calcular y verificar la correcta conformación de la clave."
 
-**Substitutions** (Reglas §5.1, verbatim excerpts): 1.1 "Si la letra inicial del nombre o de alguno de los apellidos
-consiste en la letra Ñ, se asignará una “X” en su lugar"; 1.8 "Si de la conformación de las primeras cuatro letras de
-la CURP se lee una palabra considerada como inconveniente o altisonante señalada en el Anexo 1. Catálogo de palabras
-altisonantes, la segunda letra será sustituida por una “X”" (examples "OFELIA PEDRERO DOMINGUEZ PXDO"); 1.9 no
-internal vowel → `X` in position 2; 1.10-1.11 one or no surname → `X`; 1.12-1.14, 1.17-1.18 the same for positions
-14-16.
+**Substitutions** (Reglas §5.1 for positions 1-4, §5.2 for positions 14-16, verbatim excerpts): 1.1 "Si la letra inicial
+del nombre o de alguno de los apellidos consiste en la letra Ñ, se asignará una “X” en su lugar"; 1.8 "Si de la
+conformación de las primeras cuatro letras de la CURP se lee una palabra considerada como inconveniente o altisonante
+señalada en el Anexo 1. Catálogo de palabras altisonantes, la segunda letra será sustituida por una “X”" (examples
+"OFELIA PEDRERO DOMINGUEZ PXDO"); 1.9 no internal vowel → `X` in position 2; 1.10-1.11 one or no surname → `X`; under
+5.2, 1.12-1.14 and 1.17-1.18 the same for positions 14-16.
 
 **Third sex value** (INE DERFE report, p. 6, verbatim): "se tiene conocimiento que el RENAPO ya ha emitido la CURP con un
 elemento que reconoce a las personas no binarias, derivado de sendas resoluciones jurisdiccionales. Dicho elemento se
@@ -113,7 +121,9 @@ Rules applied:
 - 18 characters, `A-Z` at 1-4 and 12-16, digits at 5-10 and 18, `H`/`M`/`X` at 11, `0-9` or `A-J` at 17. A `K`-`Z` at 17
   is refused (the Instructivo and the Reglas both give `A-J`).
 - **Century (Review Focus 3):** a digit at 17 → 19YY, a letter → 20YY, as RENAPO states it. The date must exist in that
-  year: 30 February, month 13 and 1900-02-29 (digit at 17) are refused; 2000-02-29 (letter) is accepted.
+  year: 30 February, month 13 and 1900-02-29 (digit at 17) are refused; 2000-02-29 (letter) is accepted. The
+  Instructivo gives "0-9 … hasta el 31 de diciembre de 1999" with no lower bound, so a person born before 1900 reads
+  as 19YY (the key cannot tell 1899 from 1999).
 - `birthDate()` is midnight UTC; `sex()`: `H` → `Male`, `M` → `Female`, `X` → `Sex::Unspecified` (added for this,
   plan decision "Sex"). The Instructivo still reads "H para hombre y M para mujer"; the `X` is accepted because RENAPO
   issues it (INE report) and a still-valid number is never refused.
@@ -127,8 +137,8 @@ Rules applied:
 
 ## Clave de elector (`Document\MX\ElectorKey`)
 
-**INE lineamientos 2021, numeral 1, fracción III, inciso b)** (verbatim): "Clave de Elector: Elemento de información y control de la Credencial para
-Votar, compuesto por 18 caracteres, que se conforma con las primeras letras de los apellidos y nombre, año, mes, día y
+**INE lineamientos 2021, numeral 1, fracción III, inciso b)** (verbatim): "Clave de Elector: Elemento de información y
+control de la Credencial para Votar, compuesto por 18 caracteres, que se conforma con las primeras letras de los apellidos y nombre, año, mes, día y
 clave de la entidad federativa en que la o el titular nació, su sexo y una homoclave interna de registro;"
 
 **INE glossary** (verbatim): "Secuencia alfanumérica de 18 caracteres, que se contiene en la credencial para votar con

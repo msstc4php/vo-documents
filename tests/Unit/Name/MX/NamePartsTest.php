@@ -10,6 +10,7 @@ use MSSTC4PHP\ValueObject\Documents\Icao\Transliterator;
 use MSSTC4PHP\ValueObject\Documents\Internal\UnicodeText;
 use MSSTC4PHP\ValueObject\Documents\Name\AbstractNamePart;
 use MSSTC4PHP\ValueObject\Documents\Name\Latin\AbstractLatinNamePart;
+use MSSTC4PHP\ValueObject\Documents\Name\MX\AbstractMexicanNamePart;
 use MSSTC4PHP\ValueObject\Documents\Name\MX\FamilyName;
 use MSSTC4PHP\ValueObject\Documents\Name\MX\GivenName;
 use MSSTC4PHP\ValueObject\Documents\Tests\Fixture\RefusesNameWithoutEchoingInput;
@@ -25,6 +26,7 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(GivenName::class)]
 #[UsesClass(AbstractNamePart::class)]
 #[UsesClass(AbstractLatinNamePart::class)]
+#[CoversClass(AbstractMexicanNamePart::class)]
 #[UsesClass(UnicodeText::class)]
 #[UsesClass(Transliterator::class)]
 #[UsesClass(LatinMultinational::class)]
@@ -45,6 +47,8 @@ final class NamePartsTest extends TestCase
         yield 'hyphenated' => ['López-Castillo', 'López-Castillo'];
         yield 'apostrophe' => ["O\u{2019}Hara", "O'Hara"];
         yield 'Nahuatl surname' => ['Zitlalpopoca', 'Zitlalpopoca'];
+        yield 'slash between words (Reglas 1.4)' => ['D/Amico', 'D/Amico'];
+        yield 'full stop between letters' => ['St.Clair', 'St.Clair'];
     }
 
     #[DataProvider('validFamilyNames')]
@@ -60,14 +64,36 @@ final class NamePartsTest extends TestCase
     }
 
     /**
+     * @return iterable<string, array{string}>
+     */
+    public static function abbreviatedGivenNames(): iterable
+    {
+        yield 'Ma. (Reglas 1.3)' => ['Ma. Guadalupe'];
+        yield 'M.' => ['M. Luisa'];
+        yield 'J. alone' => ['J.'];
+        yield 'initials' => ['M.A.'];
+        yield 'slash' => ['Juan/José'];
+    }
+
+    #[DataProvider('abbreviatedGivenNames')]
+    public function testGivenNameKeepsRenapoPunctuationAsTyped(string $input): void
+    {
+        self::assertSame($input, GivenName::from($input)->value);
+    }
+
+    /**
      * @return iterable<string, array{string, string}>
      */
     public static function invalidParts(): iterable
     {
         yield 'Cyrillic' => ['Хосе', 'Invalid Mexican given name (invalid character).'];
         yield 'digit' => ['José2', 'Invalid Mexican given name (invalid character).'];
-        yield 'abbreviation dot' => ['Ma. Guadalupe', 'Invalid Mexican given name (invalid character).'];
-        yield 'slash (no ICAO spelling)' => ['Juan/José', 'Invalid Mexican given name (invalid character).'];
+        yield 'leading full stop' => ['.Juan', 'Invalid Mexican given name (invalid character).'];
+        yield 'two full stops' => ['Ma..Luisa', 'Invalid Mexican given name (invalid character).'];
+        yield 'full stop after a space' => ['Ma .Luisa', 'Invalid Mexican given name (invalid character).'];
+        yield 'trailing slash' => ['Juan/', 'Invalid Mexican given name (invalid character).'];
+        yield 'two slashes' => ['Juan//José', 'Invalid Mexican given name (invalid character).'];
+        yield 'other punctuation' => ['Juan, José', 'Invalid Mexican given name (invalid character).'];
         yield 'empty' => ['  ', 'Invalid Mexican given name (0 characters).'];
     }
 
@@ -81,11 +107,11 @@ final class NamePartsTest extends TestCase
         );
     }
 
-    public function testFamilyNameRefusesASlash(): void
+    public function testFamilyNameRefusesALeadingSlash(): void
     {
         self::assertNameRefusedWithoutEcho(
-            fn (): FamilyName => FamilyName::from('D/Amico'),
-            'D/Amico',
+            fn (): FamilyName => FamilyName::from('/Amico'),
+            '/Amico',
             'Invalid Mexican family name (invalid character).',
         );
     }

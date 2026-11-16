@@ -19,7 +19,9 @@ use Override;
  * refused). The derived Latin form has the surnames joined by a space as the primary identifier and the given names
  * as the secondary one, through the ICAO multinational Latin table (`Hernández de la Cruz, José Ángel` →
  * `HERNANDEZ<DE<LA<CRUZ<<JOSE<ANGEL`); a person without surnames has the given names as the only identifier
- * (`JUAN`). Override policy {@see TransliterationVariant}: no SRE rule that could be read lets a passport keep another
+ * (`JUAN`). The slash and the full stop RENAPO keeps in a name are omitted, as Doc 9303 Part 3 §4.6 omits "all other
+ * punctuation characters" (`D/Amico, Ma. Guadalupe` → `DAMICO<<MA<GUADALUPE`). Override policy
+ * {@see TransliterationVariant}: no SRE rule that could be read lets a passport keep another
  * Latin spelling, so an override must be another ICAO spelling of the parts (`NUNXXEZ<<ANA` for `Núñez Ana`). See
  * docs/sources/MX.md "Names".
  *
@@ -49,7 +51,7 @@ final readonly class PersonName extends AbstractLatinPersonName
                 throw new InvalidPersonNameException(self::SECOND_WITHOUT_FIRST);
             }
 
-            parent::__construct([$given->value], [], $latin);
+            parent::__construct([$given->value], [], $latin, AbstractMexicanNamePart::OMITTED_PUNCTUATION);
 
             return;
         }
@@ -58,6 +60,7 @@ final readonly class PersonName extends AbstractLatinPersonName
             $second instanceof FamilyName ? [$first->value, $second->value] : [$first->value],
             [$given->value],
             $latin,
+            AbstractMexicanNamePart::OMITTED_PUNCTUATION,
         );
     }
 

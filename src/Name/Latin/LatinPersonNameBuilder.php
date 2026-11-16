@@ -20,15 +20,24 @@ final readonly class LatinPersonNameBuilder
 {
     private Transliterator $transliterator;
 
+    /** @var non-empty-list<string> */
+    private array $family;
+
+    /** @var list<string> */
+    private array $given;
+
     /**
      * @param non-empty-list<string> $family
      * @param list<string> $given
+     * @param list<non-empty-string> $omitted punctuation the country's parts allow that the MRZ omits without a filler
+     *                                        (Doc 9303 Part 3 §4.6 "Other punctuation characters"), e.g. ['.', '/'];
+     *                                        removed before transliteration
      */
-    public function __construct(
-        private array $family,
-        private array $given,
-    ) {
+    public function __construct(array $family, array $given, array $omitted = [])
+    {
         $this->transliterator = new Transliterator();
+        $this->family = \array_map(static fn (string $part): string => \str_replace($omitted, '', $part), $family);
+        $this->given = \array_map(static fn (string $part): string => \str_replace($omitted, '', $part), $given);
     }
 
     /**
