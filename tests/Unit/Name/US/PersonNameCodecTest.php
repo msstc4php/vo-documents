@@ -87,8 +87,8 @@ final class PersonNameCodecTest extends TestCase
 {
     use RefusesNameWithoutEchoingInput;
 
-    private const string SHAPE = 'Expected an American person name payload with string "family" and "given", '
-        . 'string, null or missing "middle", "suffix" and "latin", and no other keys.';
+    private const string SHAPE = 'Expected an American person name payload with string "family", '
+        . 'string, null or missing "given", "middle", "suffix" and "latin", and no other keys.';
 
     public function testMapsItsClass(): void
     {
@@ -156,6 +156,24 @@ final class PersonNameCodecTest extends TestCase
         self::assertSame('MOLLER<<ANNA<JR', $decoded->latinOverride()?->value);
     }
 
+    public function testRoundTripWithOneNameUnchanged(): void
+    {
+        $codec = new PersonNameCodec();
+        $name = new PersonName(FamilyName::from('Teller'), null);
+
+        $payload = $codec->encode($name);
+
+        self::assertSame(
+            ['family' => 'Teller', 'given' => null, 'middle' => null, 'suffix' => null, 'latin' => null],
+            $payload,
+        );
+        $decoded = $codec->decode($payload);
+        self::assertTrue($decoded->equals($name));
+        self::assertNull($decoded->given);
+        self::assertSame('TELLER', $decoded->latin()->value);
+        self::assertTrue($codec->decode(['family' => 'Teller'])->equals($name));
+    }
+
     public function testDecodeAcceptsMissingOptionalKeys(): void
     {
         $name = new PersonNameCodec()->decode(['family' => 'Smith', 'given' => 'John']);
@@ -172,8 +190,7 @@ final class PersonNameCodecTest extends TestCase
     {
         yield 'family is an int' => [['family' => 1, 'given' => 'John']];
         yield 'family missing' => [['given' => 'John']];
-        yield 'given missing' => [['family' => 'Smith']];
-        yield 'given null' => [['family' => 'Smith', 'given' => null]];
+        yield 'given is an int' => [['family' => 'Smith', 'given' => 1]];
         yield 'middle is an int' => [['family' => 'Smith', 'given' => 'John', 'middle' => 1]];
         yield 'suffix is an int' => [['family' => 'Smith', 'given' => 'John', 'suffix' => 2]];
         yield 'latin is an int' => [['family' => 'Smith', 'given' => 'John', 'latin' => 1]];
@@ -219,6 +236,10 @@ final class PersonNameCodecTest extends TestCase
         yield 'suffix' => [
             ['family' => 'Smith', 'given' => 'John', 'suffix' => 'Jr.'],
             'Invalid American name suffix.',
+        ];
+        yield 'middle name without a given name' => [
+            ['family' => 'Smith', 'middle' => 'Lee'],
+            'Invalid American person name (middle name without a given name).',
         ];
     }
 

@@ -108,10 +108,10 @@ official algorithm is published. A number with the right shape is accepted, neve
 
 Names: `Name\<CC>\FamilyName`, `GivenName` and `PersonName` for DE, FR, IT, ES, NL, CH, GB and TR, like the RU and AU
 ones. Spain's `PersonName` has two surnames (`first`, optional `second`); in the Dutch one the prefixes (`van der`) are
-part of the family name; the Swiss, Dutch and British ones accept a person without a given name. The US one is
-`Name\US\PersonName($family, $given, ?$middle, ?$suffix)`, the suffix a `Name\US\NameSuffix` (the AAMVA list `JR`,
-`SR`, `1ST`/`I` … `9TH`/`IX`), written last among the secondary identifiers of the ICAO form, ordinals as Roman
-numerals (`SMITH<<JOHN<MICHAEL<III`).
+part of the family name; the Swiss, Dutch, British and US ones accept a person without a given name. The US one is
+`Name\US\PersonName($family, ?$given, ?$middle, ?$suffix)` (`given` null for a one-word name), the suffix a
+`Name\US\NameSuffix` (the AAMVA list `JR`, `SR`, `1ST`/`I` … `9TH`/`IX`), written last among the secondary
+identifiers of the ICAO form, ordinals as Roman numerals (`SMITH<<JOHN<MICHAEL<III`).
 
 Contracts: `Contract\Maskable` (every number above), `Contract\Subdivision` and `Contract\IssuedBySubdivision` (AU
 jurisdictions and licences). `Contract\HasSex` and the `Sex` enum are implemented by the documents that encode a sex
@@ -327,7 +327,7 @@ Collected from the source notes; each is a deliberate omission with its reason i
   (`docs/sources/GB.md`).
 - **TR:** sürücü belgesi number (a running sequence per province, no format), the identity card serial number
   (`docs/sources/TR.md`).
-- **US:** one-word names (the constructor requires a given name), the IRM's open list of "never issued" SSN
+- **US:** a middle name or suffix beside a one-word name (no source defines it), the IRM's open list of "never issued" SSN
   examples (not refused), ATIN and IRSN; DL/ID numbers follow in a later task (`docs/sources/US.md`).
 - **No region value object for RU**: no field encodes a region with a published mapping to ISO 3166-2:RU (`RU.md`).
 - **RU driving licences of the 1999 form** (Cyrillic series): expired by 2026 (`RU.md`).

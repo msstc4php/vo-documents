@@ -14,9 +14,11 @@ use MSSTC4PHP\ValueObject\Documents\Name\TransliterationVariant;
 use Override;
 
 /**
- * Last name, first name, optional middle name and optional suffix. The derived Latin form is
- * LAST<<FIRST<MIDDLE<SUFFIX through the ICAO multinational Latin table (`O'Brien, José Luis, 3RD` →
- * `OBRIEN<<JOSE<LUIS<III`): diacritics dropped as the passport crosses them out, the suffix as
+ * Last name, optional first name, optional middle name and optional suffix. A person with one name has it as the last
+ * name and no first name (8 FAM 403.1-3(D): "one-word names be printed in the last name field"); a middle name or a
+ * suffix without a first name is refused (no source defines that form). The derived Latin form is
+ * LAST<<FIRST<MIDDLE<SUFFIX, or LAST alone for one name, through the ICAO multinational Latin table (`O'Brien, José
+ * Luis, 3RD` → `OBRIEN<<JOSE<LUIS<III`): diacritics dropped as the passport crosses them out, the suffix as
  * {@see NameSuffix::icao()}. Override policy {@see TransliterationVariant}: the State Department spells a Latin-script
  * name from the applicant's evidence and only crosses diacritics out, which is a table spelling, so an override must
  * be another ICAO spelling of the parts (`MULLER<<ANNA`, the diacritic crossed out, for `Müller Anna`). A passport
@@ -30,16 +32,25 @@ use Override;
 final readonly class PersonName extends AbstractLatinPersonName
 {
     /**
-     * @throws InvalidPersonNameException when a letter has no ICAO spelling, the Latin form is too long or $latin is
-     *                                    not a transliteration of the parts
+     * @throws InvalidPersonNameException when a middle name or a suffix comes without a given name, a letter has no
+     *                                    ICAO spelling, the Latin form is too long or $latin is not a transliteration
+     *                                    of the parts
      */
     public function __construct(
         public FamilyName $family,
-        public GivenName $given,
+        public ?GivenName $given,
         public ?MiddleName $middle = null,
         public ?NameSuffix $suffix = null,
         ?IcaoPersonName $latin = null,
     ) {
+        if (!$given instanceof GivenName && $middle instanceof MiddleName) {
+            throw new InvalidPersonNameException('Invalid American person name (middle name without a given name).');
+        }
+
+        if (!$given instanceof GivenName && $suffix instanceof NameSuffix) {
+            throw new InvalidPersonNameException('Invalid American person name (suffix without a given name).');
+        }
+
         parent::__construct([$family->value], $this->secondaryParts($given, $middle, $suffix), $latin);
     }
 
@@ -50,7 +61,7 @@ final readonly class PersonName extends AbstractLatinPersonName
     public function full(): string
     {
         return \implode(' ', [
-            $this->given->value,
+            ...($this->given instanceof GivenName ? [$this->given->value] : []),
             ...($this->middle instanceof MiddleName ? [$this->middle->value] : []),
             $this->family->value,
             ...($this->suffix instanceof NameSuffix ? [$this->suffix->value] : []),
@@ -62,7 +73,7 @@ final readonly class PersonName extends AbstractLatinPersonName
     {
         return $other instanceof self
             && $this->family->equals($other->family)
-            && $this->given->equals($other->given)
+            && Optional::equal($this->given, $other->given)
             && Optional::equal($this->middle, $other->middle)
             && $this->suffix === $other->suffix
             && Optional::equal($this->latinOverride(), $other->latinOverride());
@@ -71,14 +82,20 @@ final readonly class PersonName extends AbstractLatinPersonName
     /**
      * A view, not the storage payload ({@see PersonNameCodec}): `effectiveLatin` is {@see latin()}, derived or not.
      *
-     * @return array{family: string, given: string, middle: string|null, suffix: string|null, effectiveLatin: string}
+     * @return array{
+     *     family: string,
+     *     given: string|null,
+     *     middle: string|null,
+     *     suffix: string|null,
+     *     effectiveLatin: string,
+     * }
      */
     #[Override]
     public function jsonSerialize(): array
     {
         return [
             'family' => $this->family->value,
-            'given' => $this->given->value,
+            'given' => $this->given?->value,
             'middle' => $this->middle?->value,
             'suffix' => $this->suffix?->value,
             'effectiveLatin' => $this->latin()->value,
@@ -94,12 +111,12 @@ final readonly class PersonName extends AbstractLatinPersonName
     }
 
     /**
-     * @return non-empty-list<string>
+     * @return list<string> empty for a person with one name
      */
-    private function secondaryParts(GivenName $given, ?MiddleName $middle, ?NameSuffix $suffix): array
+    private function secondaryParts(?GivenName $given, ?MiddleName $middle, ?NameSuffix $suffix): array
     {
         return [
-            $given->value,
+            ...($given instanceof GivenName ? [$given->value] : []),
             ...($middle instanceof MiddleName ? [$middle->value] : []),
             ...($suffix instanceof NameSuffix ? [$suffix->icao()] : []),
         ];

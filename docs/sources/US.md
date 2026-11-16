@@ -42,7 +42,11 @@ rule): barcode SDK documentation listing the AAMVA `DCU` values, Wikipedia.
    numeral on the application and in TDIS/ACS: b. If the applicant's name is an ordinal numeral (a numeral with a
    suffix), you must cross it out and write out the ordinal numeral".
 5. **8 FAM 403.1-3(D) One-Word Names**: "a. ICAO standards require that one-word names be printed in the last name
-   field. b. If an applicant has only one name […] the name must be recorded in the last name field".
+   field. b. If an applicant has only one name […] the name must be recorded in the last name field on the application
+   and in TDIS/ACS. For domestic U.S. passport applications, insert a caret (^) in the first and middle names field in
+   TDIS. […] NOTE: If an applicant submits documentation indicating she/he only has a first and middle name, and no
+   last name, the first and middle names must still be placed in the last name field." c. treats "No First Name" (NFN)
+   and "First Name Unknown" (FNU) the same way.
 6. **8 FAM 403.1-3(B) Name Spacing**: "U.S. passports […] are printed in all uppercase letters."
 
 How the package applies this:
@@ -50,7 +54,7 @@ How the package applies this:
 | Part | Letters | Separators inside | Why |
 |---|---|---|---|
 | `FamilyName` (last name) | `\p{sc=Latin}` | hyphen, apostrophe, space | no federal text lists the letters of a name; the national form keeps diacritics as the evidence writes them (1); non-Latin scripts are refused (2); digits refused (4) |
-| `GivenName` (first name) | the same | the same | the same |
+| `GivenName` (first name, optional) | the same | the same | the same; null for a person with one name (5) |
 | `MiddleName` | the same | the same | the same; the second secondary identifier |
 
 - **ʻokina** (U+02BB) is stored as an apostrophe (U+0027), as the passport writes it (3); U+2019 already is.
@@ -61,8 +65,13 @@ How the package applies this:
   evidence (2); a Latin-script name loses its diacritics (1), and the bare base letter is a table 6.A spelling of every
   diacritic letter (`Ü` → `UE`/`UXX`/`U`, `Ñ` → `N`/`NXX`), so the passport spelling is always a table spelling: an
   override must be one (`MULLER<<ANNA` for `Müller Anna`; the derived form is `MUELLER<<ANNA`).
-- **One-word names (5) are not representable**: the plan fixes `PersonName(FamilyName, GivenName, …)` with a required
-  given name (as AU). Not covered; see "Not covered".
+- **One-word names (5)**: `PersonName($family, null)`; the one name is the last name, so the ICAO form is the
+  primary identifier alone (`Teller` → `TELLER`), as GB, CH and NL. A middle name without a first name is refused
+  ("(middle name without a given name)"): the one-word rule puts even "a first and middle name, and no last name" into
+  the last-name field, so no source defines a middle name beside a single name. A suffix without a first name is
+  refused ("(suffix without a given name)"): 8 FAM 403.1-3(D) records only the one name, with a caret in the first and
+  middle fields, and Doc 9303 §4.6 puts a suffix among the secondary identifiers, which a one-word name does not have;
+  no source shows that combination, so it is not invented.
 
 ## Name suffix (`Name\US\NameSuffix`)
 
@@ -197,8 +206,7 @@ Not part of this note yet: the per-jurisdiction DL/ID numbers (AAMVA and the 50 
 
 ## Not covered
 
-- **One-word names** (8 FAM 403.1-3(D)): `PersonName` requires a given name (plan decision); a passport holder with a
-  single name cannot be represented yet.
+- **A middle name or a suffix beside a one-word name**: refused (no source defines it; see "Names").
 - **The IRM's "never issued" SSN examples** are not refused (open list ending in "etc.").
 - **ATIN** (`9nn-93-nnnn`) and **IRSN** (IRM 3.13.5.23): not in the plan's candidates; neither passes as an ITIN
   (93 is excluded; the IRSN campus digits listed there, 01-10, 17-19, 28-29, 37-39, 49, 66 and 89, are all outside

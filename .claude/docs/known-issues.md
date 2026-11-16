@@ -270,8 +270,8 @@ script classes use `\p{sc=Latin}` / `\p{sc=Cyrillic}` (Script property only); `c
   "never issued" examples (`123-45-6789`, `111-11-1111`, …, "etc.") is open-ended and not refused.
 - **US passport book:** any letter is accepted (no letter set published), so a card number `C12345678` also parses as a
   book number. Old 9-digit books stay valid until expiry.
-- **US one-word names** (8 FAM 403.1-3(D): printed in the last-name field) cannot be represented: the plan fixes a
-  required `GivenName`.
+- **US one-word names** (8 FAM 403.1-3(D): printed in the last-name field) are `PersonName($family, null)` (controller
+  ruling, GB/CH/NL precedent); a middle name or suffix without a given name is refused (no source defines it).
 - **US name suffix in the ICAO form:** included as the last secondary component because 8 FAM 403.1-5(B) treats it as
   part of the name and Doc 9303 Part 3 §4.6 then puts it in the secondary identifier; an override without the suffix
   is refused (model a passport that dropped it as a name without suffix). Table 6.A's default for `Ö` is `OE`, so the

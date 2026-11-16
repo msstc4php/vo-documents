@@ -82,9 +82,10 @@ keys `family`, `given`, `latin`.
 string range bounds, no int cast), `PassportBookNumber` (9 digits, letter + 7 or 8 digits; mask 3 for 8 characters),
 `PassportCardNumber` (`C` + 8 digits), `MedicareBeneficiaryIdentifier` (CMS position layout, `formatted()`
 `1EG4-TE5-MK73`). SSN and ITIN mask with the TTIN rule (26 CFR 301.6109-4): `***-**-6789`.
-`Name\US\PersonName($family, $given, ?$middle, ?$suffix, ?$latin)` extends `AbstractLatinPersonName` directly (like ES):
+`Name\US\PersonName($family, ?$given, ?$middle, ?$suffix, ?$latin)` (`given` null = one-word name; a middle name or
+suffix without a given name is refused) extends `AbstractLatinPersonName` directly (like ES):
 secondary identifiers are given, middle, `NameSuffix::icao()` (ordinals as Roman numerals); policy
 `TransliterationVariant`. `Name\US\NameSuffix` is a string-backed enum of the 20 AAMVA `DCU` codes (`fromCode()`
 case-insensitive, message "Invalid American name suffix."), not a value object: `PersonName::equals()` compares it
 with `===`. `Name\US\AbstractAmericanNamePart` maps the ʻokina U+02BB to `'` before the shared parse. Codec keys
-`family`, `given`, `middle`, `suffix` (AAMVA code), `latin`.
+`family`, `given` (null for one name), `middle`, `suffix` (AAMVA code), `latin`.

@@ -65,10 +65,11 @@ final class PersonNameTest extends TestCase
         'Invalid American person name (the Latin form is not a transliteration of the name).';
 
     /**
-     * @return iterable<string, array{string, string, string|null, NameSuffix|null, non-empty-string}>
+     * @return iterable<string, array{string, string|null, string|null, NameSuffix|null, non-empty-string}>
      */
     public static function derivedSpellings(): iterable
     {
+        yield 'one name (8 FAM 403.1-3(D))' => ['Teller', null, null, null, 'TELLER'];
         yield 'first name only' => ['Smith', 'John', null, null, 'SMITH<<JOHN'];
         yield 'with middle name' => ['Smith', 'John', 'Michael', null, 'SMITH<<JOHN<MICHAEL'];
         yield 'with suffix' => ['Smith', 'John', null, NameSuffix::Junior, 'SMITH<<JOHN<JR'];
@@ -84,14 +85,14 @@ final class PersonNameTest extends TestCase
     #[DataProvider('derivedSpellings')]
     public function testDerivesTheLatinForm(
         string $family,
-        string $given,
+        ?string $given,
         ?string $middle,
         ?NameSuffix $suffix,
         string $expected,
     ): void {
         $name = new PersonName(
             FamilyName::from($family),
-            GivenName::from($given),
+            $given === null ? null : GivenName::from($given),
             $middle === null ? null : MiddleName::from($middle),
             $suffix,
         );
@@ -109,9 +110,10 @@ final class PersonNameTest extends TestCase
             NameSuffix::Junior,
         );
 
-        self::assertSame('José', $name->given->value);
+        self::assertSame('José', $name->given?->value);
         self::assertSame('José Michael Smith JR', $name->full());
         self::assertSame('John Smith', new PersonName(FamilyName::from('Smith'), GivenName::from('John'))->full());
+        self::assertSame('Teller', new PersonName(FamilyName::from('Teller'), null)->full());
         self::assertSame(
             'John Smith 3RD',
             new PersonName(FamilyName::from('Smith'), GivenName::from('John'), null, NameSuffix::Third)->full(),
@@ -143,6 +145,49 @@ final class PersonNameTest extends TestCase
 
         self::assertSame($stored, $name->latin()->value);
         self::assertSame($stored, $name->latinOverride()?->value);
+    }
+
+    public function testOneNameTakesAnOverrideOfTheSameName(): void
+    {
+        $derived = new PersonName(FamilyName::from('Möller'), null, null, null, IcaoPersonName::from('moeller'));
+        $crossedOut = new PersonName(FamilyName::from('Möller'), null, null, null, IcaoPersonName::from('moller'));
+
+        self::assertNull($derived->latinOverride());
+        self::assertSame('MOLLER', $crossedOut->latin()->value);
+        self::assertNameRefusedWithoutEcho(
+            static fn (): PersonName => new PersonName(
+                FamilyName::from('Möller'),
+                null,
+                null,
+                null,
+                IcaoPersonName::from('MOLLER<<ANNA'),
+            ),
+            'Möller MOLLER ANNA',
+            self::NOT_A_TRANSLITERATION,
+        );
+    }
+
+    /**
+     * @return iterable<string, array{MiddleName|null, NameSuffix|null, non-empty-string}>
+     */
+    public static function partsWithoutAGivenName(): iterable
+    {
+        yield 'middle name' => [MiddleName::from('Lee'), null, 'middle name without a given name'];
+        yield 'suffix' => [null, NameSuffix::Junior, 'suffix without a given name'];
+        yield 'both' => [MiddleName::from('Lee'), NameSuffix::Junior, 'middle name without a given name'];
+    }
+
+    #[DataProvider('partsWithoutAGivenName')]
+    public function testRefusesAMiddleNameOrSuffixWithoutAGivenName(
+        ?MiddleName $middle,
+        ?NameSuffix $suffix,
+        string $reason,
+    ): void {
+        self::assertNameRefusedWithoutEcho(
+            fn (): PersonName => new PersonName(FamilyName::from('Teller'), null, $middle, $suffix),
+            'Teller Lee',
+            'Invalid American person name (' . $reason . ').',
+        );
     }
 
     public function testAnOverrideThatIsTheDerivedFormIsNotKept(): void
@@ -209,6 +254,10 @@ final class PersonNameTest extends TestCase
         self::assertTrue($name()->equals($name()));
         self::assertFalse($name()->equals($name(family: 'Moller')));
         self::assertFalse($name()->equals($name(given: 'Ann')));
+        $oneName = new PersonName(FamilyName::from('Möller'), null);
+        self::assertTrue($oneName->equals(new PersonName(FamilyName::from('Möller'), null)));
+        self::assertFalse($oneName->equals($name(middle: null, suffix: null)));
+        self::assertFalse($name(middle: null, suffix: null)->equals($oneName));
         self::assertFalse($name()->equals($name(middle: 'Leigh')));
         self::assertFalse($name()->equals($name(middle: null)));
         self::assertFalse($name(middle: null)->equals($name()));
@@ -222,6 +271,10 @@ final class PersonNameTest extends TestCase
 
     public function testJsonViewShowsTheEffectiveLatinForm(): void
     {
+        self::assertSame(
+            ['family' => 'Teller', 'given' => null, 'middle' => null, 'suffix' => null, 'effectiveLatin' => 'TELLER'],
+            new PersonName(FamilyName::from('Teller'), null)->jsonSerialize(),
+        );
         self::assertSame(
             ['family' => 'Smith', 'given' => 'John', 'middle' => null, 'suffix' => null,
                 'effectiveLatin' => 'SMITH<<JOHN'],
