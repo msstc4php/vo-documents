@@ -119,7 +119,11 @@ example number. Mask: no official rule; last four characters, three for the 8-ch
 
 ## Encoded sex and birth date
 
-Neither covered number encodes a sex or a birth date, so `Sex` is unchanged.
+Neither federal number (SIN, passport) encodes a sex or a birth date. Two provincial numbers do (see "Provincial
+documents"): the Québec health insurance number (NAM) encodes the birth year (two digits), month and day and a sex
+(birth month + 50 for women), and the Nova Scotia Master Number (driver's licence) encodes the birth day, month and
+two-digit year. Neither publishes a century rule, so no full birth date is built from either. Only the NAM yields a
+`Sex`, and only `Male` or `Female`: the card's X marker does not change the number, so `Sex` is unchanged.
 
 ## Provincial documents
 
@@ -190,7 +194,7 @@ Rulings that apply to both tables:
 | ISO | Source | Quoted format (verbatim) | Normalised shape | ID card | Encoded data | Official sample | Verdict |
 |---|---|---|---|---|---|---|---|
 | CA-AB | AB-RDN | RDN 01/2024, "Driver's Licence Information Data": "Driver's Licence No. ######-### provides the unique DL#". RDN 05/2025: "Operator No: ######-### provides the unique DL (operator) number" | `[0-9]{9}`; `formatted()` `######-###` | not stated | none | none | covered (DL) |
-| CA-BC | BC-DLN | Technical guide §5.1: "Maximum 7-digit integer" / "7 numeric character string, padded with leading zeros" (current) and "8 numeric character string, padded with leading zeros" (future); §7: "driver's licences in circulation may show either 7- or 8-digit numbers: Existing cards will show 7-digits; Newly issued, renewed or replaced cards will show 8-digits". FAQ Q5: "Existing customers will now see a leading zero (0) when cards get replaced or renewed. Driver licences that are issued to new customers will start with a leading three (3)." FAQ: "the ICBC client number (CLN) and BC Identification card (BCID) numbers will not change." | `[0-9]{7,8}` (the leading `3` of new numbers is not enforced: existing 8-digit numbers start with `0`) | not stated (BCID is a separate number, format not stated) | none | `31098794` (a new number in the guide's §5.1 table) | covered (DL) |
+| CA-BC | BC-DLN | Technical guide §5.1: "Maximum 7-digit integer" / "7 numeric character string, padded with leading zeros" (current) and "8 numeric character string, padded with leading zeros" (future); §7: "driver's licences in circulation may show either 7- or 8-digit numbers: Existing cards will show 7-digits; Newly issued, renewed or replaced cards will show 8-digits". FAQ Q5: "Existing customers will now see a leading zero (0) when cards get replaced or renewed. Driver licences that are issued to new customers will start with a leading three (3)." FAQ: "the ICBC client number (CLN) and BC Identification card (BCID) numbers will not change." | `[0-9]{7,8}`, canonical `value()` 8 digits (a 7-digit input is left-padded with one `0`); the leading `3` of new numbers is not enforced | not stated (BCID is a separate number, format not stated) | none | `31098794` (a new number in the guide's §5.1 table) | covered (DL) |
 | CA-MB | MB-DVA; MPI pages (searched) | MB-DVA: ""driver's licence number" means the unique alpha-numeric identifier associated with a particular driver's licence." No length or layout found | — | — | — | — | not covered |
 | CA-NB | SNB/GNB pages and forms (searched) | none: the pages ask for the "New Brunswick Driver's Licence number" without a format | — | — | — | — | not covered |
 | CA-NL | MRD forms, driver's handbook, Highway Traffic Act (searched) | none: "Driver's Licence Number" fields only | — | — | — | — | not covered |
@@ -200,7 +204,7 @@ Rulings that apply to both tables:
 | CA-ON | ON-BG | "Driver's Licence Number: A unique 15 character identifier assigned to each driver in Ontario." Format column: "Free form 15-character alphanumeric", sample `X0915-26435-95718` (also `X09152643595718` elsewhere in the glossary) | `[0-9A-Z]{15}` | not stated (the Photo Card holder has a 9-digit "Driver Identification Number (DIN)", a different number) | not defined in text (format only) | `X0915-26435-95718` (glossary sample) | covered (DL) |
 | CA-PE | Highway Traffic Act, handbook, forms (searched) | none: "a numbered driver's license in the form prescribed by the Registrar" | — | — | — | — | not covered |
 | CA-QC | QC-SAAQ | Aide-mémoire: "Numéro d'identification SAAQ (sur votre permis ou votre certificat d'immatriculation) - Ce numéro contient 13 caractères et commence par une lettre (format : A0000-000000-00). Sur le permis de conduire, ce numéro se trouve en dessous du titre « Permis de conduire »." Card guide: field "Driver's licence number (4d)" | `[A-Z][0-9]{12}`; `formatted()` `A0000-000000-00` | not stated | not defined in text (format only) | `L1531-171274-08` (card guide, field 4d) | covered (DL) |
-| CA-SK | SK-IV; SK-EH; SK-BG | SK-IV: "you'll need to provide information from your SGI-issued driver's licence or non-driver photo ID … Make sure your customer and validation numbers contain only numbers and no letters. Customer number is eight digits. Validation number is 10 digits." SK-BG: "On the front of the card the date of birth, date of expiry, customer number and wave are raised"; the sample card labels the printed number "LICENCE NUMBER (PIC)" | `[0-9]{8}` (the customer number) | shares (SK-IV: licence or non-driver photo ID) | none | `35890562` (SK-BG sample card) | covered |
+| CA-SK | SK-IV; SK-EH; SK-BG | SK-IV: "you'll need to provide information from your SGI-issued driver's licence or non-driver photo ID … Make sure your customer and validation numbers contain only numbers and no letters. Customer number is eight digits. Validation number is 10 digits." SK-BG: "On the front of the card the date of birth, date of expiry, customer number and wave are raised"; the sample card labels the printed number "LICENCE NUMBER (PIC)" | `[0-9]{1,8}`, canonical `value()` left-padded with zeros to 8 digits (the customer number) | shares (SK-IV: licence or non-driver photo ID) | none | `35890562` (SK-BG sample card) | covered |
 | CA-YT | Yukon licence and ID pages (searched) | none | — | — | — | — | not covered |
 
 **Totals:** 6 of 13 covered (NS and SK with the photo ID card, AB, BC, ON and QC for the licence only). 7 are not
@@ -210,22 +214,33 @@ Decisions in this table:
 
 - **SK:** SGI calls the eight-digit number the "customer number"; the 2010 card labels the same printed number "LICENCE
   NUMBER (PIC)". It is the number the province asks for to identify a licence holder, so it is the covered number. The
-  10-digit validation number changes with every card and is not a licence number (not covered). SK-IV says temporary
-  cards "may not display the leading 0s" and tells the reader to add them, so only the padded eight digits are accepted.
-- **BC:** a 7-digit number and its 8-digit form with a leading `0` are the same licence (ICBC adds the zero in its
-  systems). Both are accepted as typed; `value()` is not padded (no source says the 7-digit card form is wrong).
+  10-digit validation number changes with every card and is not a licence number (not covered). SK-IV: "Temporary cards
+  may not display the leading 0s. If your card does not have enough required digits, please add zeros to the front of
+  the number." So the class accepts 1–8 digits and left-pads to 8 for `value()`: `890562` and `00890562` are one
+  number.
+- **BC:** BC-DLN §5.1, change summary: "Existing DLNs: add additional leading zero to increase length to 8
+  characters"; FAQ Q5: "Existing customers will now see a leading zero (0) when cards get replaced or renewed." The
+  7-digit card form is the 8-digit number without its leading zero, so a 7-digit input is canonicalised to 8 digits
+  (`1234567` and `01234567` are one number, `value()` `01234567`). Shorter inputs are not accepted: BC-DLN says cards
+  show 7 or 8 digits.
 - **NS:** the hyphens in `FINCH--220867001` and the padding spaces are separators; the normalised value keeps the
   letters and nine digits. The letter set is `[A-Z]` ("letters of your last name"; no accented letters appear on the
-  page). The day and month are checked as calendar fields because the text defines them as the birth date; the year has
-  two digits and no century, so `birthDate()` cannot be built: 5b may expose day, month and two-digit year only. The
+  page). The day and month are checked as calendar fields (`DD` 01–31, `MM` 01–12). Both checks and the letter class
+  `[A-Z]{1,5}` are derived from the encoding text, not quoted as validation rules; the source defines no punctuation in
+  surnames (how `O'Neil` or `St-Pierre` is encoded is not stated), so letters only. The year has two digits and no
+  century rule is published: the class has no birth-date accessors (controller ruling). The
   "Master Number" of a group (joint ownership, "the last 9 digits are computer-assigned") is not on a licence or ID card
   and is not covered.
 - **ON:** the glossary is the only text; it says "alphanumeric", so a letter is not required in the first position
   (the sample's leading letter and its 5-5-5 grouping are samples). The licence number encodes nothing that MTO defines
-  in text. `formatted()` may follow the glossary sample's `X0000-00000-00000` as US followed its FL/WI samples; that is
-  5b's call, flagged in the report.
+  in text. No `formatted()`: the glossary's Collision entry for the same field reads "A unique 15 character identifier
+  assigned to each driver in Ontario." / "15-character alphanumeric; Display as is" with the sample `X09152643595718`,
+  so the number is displayed as stored, without the hyphens of the other entry's sample (controller ruling).
 - **QC:** SAAQ defines no encoding of the licence number in text, so it is format only.
 - **AB, QC:** `formatted()` follows the published masks (`######-###`, `A0000-000000-00`).
+- **AB:** the RDN mask `######-###` is the only text on the number. Nine digits are taken as the displayed form; a
+  shorter historical number would appear zero-padded to fit the mask. That padding is an assumption: no Alberta text
+  states it, and inputs shorter than nine digits are not accepted.
 
 ### Driver's licence numbers — overlap (the factory's test oracle)
 
@@ -233,22 +248,25 @@ Decisions in this table:
 
 | Normalised input class | Jurisdictions it fits |
 |---|---|
-| 7 digits | CA-BC |
+| 1–6 digits | CA-SK |
+| 7 digits | CA-BC, CA-SK |
 | 8 digits | CA-BC, CA-SK |
 | 9 digits | CA-AB |
 | 1–5 letters + valid `DDMM` + 5 digits (10–14 characters) | CA-NS |
 | letter + 12 digits | CA-QC |
 | 15 alphanumerics | CA-ON |
-| anything else (1–6 or 10–14 digits, the NS layout with a bad day or month, 2+ letters + 12 digits) | none |
+| anything else (empty, 10+ digits, the NS layout with a bad day or month, 2+ letters + 12 digits) | none |
 
 Worked examples (verified by the script below). "1" means `fromNumber()` returns that class; "≥ 2" throws
 `AmbiguousJurisdictionException` with exactly these codes in this order; "0" throws `InvalidDocumentNumberException`.
 
 | Input | Normalised | Matches | Jurisdictions (enum order) |
 |---|---|---|---|
-| `123456` | `123456` | 0 | none |
-| `1234567` | `1234567` | 1 | CA-BC |
-| `0567450` | `0567450` | 1 | CA-BC |
+| (empty) | (empty) | 0 | none |
+| `1` | `1` | 1 | CA-SK (`value()` `00000001`) |
+| `890562` | `890562` | 1 | CA-SK (`value()` `00890562`) |
+| `1234567` | `1234567` | 2 | CA-BC, CA-SK (BC `value()` `01234567`) |
+| `0567450` | `0567450` | 2 | CA-BC, CA-SK |
 | `12345678` | `12345678` | 2 | CA-BC, CA-SK |
 | `31098794` | `31098794` | 2 | CA-BC, CA-SK |
 | `35890562` | `35890562` | 2 | CA-BC, CA-SK |
@@ -266,12 +284,13 @@ Worked examples (verified by the script below). "1" means `fromNumber()` returns
 | `l153117127408` | `L153117127408` | 1 | CA-QC |
 | `LL53117127408` | `LL53117127408` | 0 | none |
 | `X0915-26435-95718` | `X09152643595718` | 1 | CA-ON |
+| `X09152643595718` | `X09152643595718` | 1 | CA-ON |
 | `ABCDEFGHIJKLMNO` | `ABCDEFGHIJKLMNO` | 1 | CA-ON |
 | `X0915264359571` | `X0915264359571` | 0 | none |
 | `X091526435957189` | `X091526435957189` | 0 | none |
 
-Only the 8-digit class is ambiguous (BC and SK), so the factory exercises the single-match branch for every other
-covered shape, and `fromNumber('12345678')` throws with CA-BC, CA-SK.
+Only the 7- and 8-digit classes are ambiguous (BC and SK), so the factory exercises the single-match branch for
+every other covered shape, and `fromNumber('12345678')` throws with CA-BC, CA-SK.
 
 ### Health card numbers — per jurisdiction
 
@@ -312,9 +331,14 @@ Decisions in this table:
   the X marker on the card "ne modifie pas le numéro d'assurance maladie (NAM) qui indique le sexe biologique". The
   temporary NAM (QC-GIU: "On reconnaît un NAM temporaire si celui-ci contient le caractère « M » à l'avant-dernière
   position. Exemple : BERC920401M2. La RAMQ n'émet aucune carte d'assurance maladie pour un NAM temporaire.") is on no
-  card and is refused by the shape.
+  card and is refused by the shape. QC-GIU REQ-19-53: "Le champ ne doit pas être alimenté automatiquement par le NAM
+  lorsque ce dernier est saisi manuellement" (applied to element 30100003 « Sexe de l'usager » and 30100004 « Date de
+  naissance de l'usager »). The 5b class doc should say that the decoded sex and birth fields are a reading aid, not
+  a value to fill a record with from a hand-typed NAM.
 - **BC:** the leading `9` and the MOD-11 check are both quoted, so both are enforced.
-- **NT:** the letter set `D N H M T` is closed and quoted, so it is enforced.
+- **NT:** the letter set `D N H M T` is closed and quoted, so it is enforced. Ontario's table has lagged GNWT once:
+  `H` was added on 2022-09-13 (ON-B). A future refresh of this row must check the later OHIP INFOBulletins, not only
+  ON-PTC.
 
 ### Health card numbers — overlap (the factory's test oracle)
 
