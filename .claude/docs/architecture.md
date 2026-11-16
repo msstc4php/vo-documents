@@ -5,7 +5,7 @@ core.
 
 | Area | Purpose |
 |---|---|
-| `Contract\`, `Exception\`, `Sex` | Shared interfaces, the three exception families, the sex enum |
+| `Contract\`, `Exception\`, `Sex` | Shared interfaces (`HasSex`, `HasBirthDate` (CURP only), `Maskable`, `Subdivision`, `IssuedBySubdivision`), the three exception families, the sex enum (`Female`, `Male`, `Unspecified` for the CURP `X`) |
 | `Internal\` | `@internal` helpers: `Checksum`, `Mask`, `Digits`, `UnicodeText`/`Text`, `NumberFormat` (character class + length range of a licence), `NumberShapes` (several fixed shapes, length derived from the shape: US DL/ID; shares `Digits::upperCasedOfLength()` with `NumberFormat`), `SubdivisionResolver` (one match / none / ambiguous over an enum of subdivisions), `PayloadFields` (codec payload validation), `Optional` (`equal()` of two optional value objects), `TwoDigitYearDate` (day/month valid in some century: DVLA, CHI, IT codice fiscale) |
 | `Icao\PersonName` | MRZ-style Latin name (`A-Z`, `-`, `<`; `<<` between primary and secondary), `mrzField()` truncation |
 | `Icao\Transliterator` | National name part → ICAO Latin (`toLatin()` default, `variants()` all spellings) |
@@ -93,8 +93,8 @@ with `===`. `Name\US\AbstractAmericanNamePart` maps the ʻokina U+02BB to `'` be
 `Document\US\*` DL/ID (plan 3 Task 3): `Jurisdiction` (51 cases, ISO 3166-2:US, the states and DC), `DlIdNumber`
 interface, `DlId\AbstractDlIdNumber` (hooks `shapes(): NumberShapes`, `layout()`; final `masked()`/`parse()`/
 `fitsLength()`) + one final `<Abbr>DlIdNumber` per covered jurisdiction (30), `DlIdNumberFactory` on
-`SubdivisionResolver` over the covered cases only; `classFor()` lists the 21 uncovered cases explicitly (`=> null`), so a
-new enum case breaks the `match`. FL, WI, WY add `formatted()` (published hyphen layout) and mask in it.
+`SubdivisionResolver` over the covered cases only; `classFor()` lists the 21 uncovered cases explicitly (`=> null`), so
+a new enum case breaks the `match`. FL, WI, WY add `formatted()` (published hyphen layout) and mask in it.
 
 `Document\CA\*` (federal, plan 3 Task 4): `SocialInsuranceNumber` (9 digits, format only; `formatted()`
 `123 456 789`, mask `*** **6 789`; `isTemporaryResident()` = first digit 9), `PassportNumber` (`A123456BC` since
@@ -107,39 +107,42 @@ and `HealthCardNumber`, bases `DriverLicence\AbstractDriverLicenceNumber` (hooks
 and `HealthCard\AbstractHealthCardNumber` (hooks `shapes()`, `stored()`; no layout: no health display form is
 published). `stored(normalized, document)` is an instance hook run after the shape match: extra checks (BC MOD-11, ON
 MOD 10, QC and NS month/day regexes), BC/SK licence zero padding to 8, and the ON version code split (it sets a private
-write-once property guarded by `isset()`). Licences: AB, BC, NS, ON, QC, SK (AB and QC add `formatted()` and mask in that layout);
-`DriverLicenceNumberFactory::classFor()` maps the other 7 to `null`. Health cards: all 13;
+write-once property guarded by `isset()`). Licences: AB, BC, NS, ON, QC, SK (AB and QC add `formatted()` and mask in
+that layout); `DriverLicenceNumberFactory::classFor()` maps the other 7 to `null`. Health cards: all 13;
 `HealthCardNumberFactory::classFor()` is non-nullable and the resolver runs over `Jurisdiction::cases()`.
 `QcHealthCardNumber` implements `HasSex` (7th character `5`/`6` = female) with `birthDay()`, `birthMonth()`,
 `birthYearDigits()`; `OnHealthCardNumber::versionCode(): ?string`.
 
-`Document\MX\*` (national, plan 3 Task 6a): `Curp` (`HasBirthDate` + `HasSex`; century from character 17, digit →
-19YY, `A-J` → 20YY; date validated with `checkdate()`; `birthStateCode()` string; check digit format only), `ElectorKey`
-(INE clave de elector; two-digit year via `TwoDigitYearDate`, `birthStateCode()`/`sexCode()` raw strings, no `HasSex`),
+`Document\MX\*` (national, plan 3 Task 6a): `Curp` (`HasBirthDate` + `HasSex`; century from character 17, digit → 19YY,
+`A-J` → 20YY; date validated with `checkdate()`; `birthStateCode()` string; check digit format only), `ElectorKey` (INE
+clave de elector; two-digit year via `TwoDigitYearDate`, `birthStateCode()`/`sexCode()` raw strings, no `HasSex`),
 `Rfc` (natural person, SAT `t_RFC_PF` regex with `Ñ`/`&`, multibyte-aware `masked()`), `SocialSecurityNumber` (NSS, 11
-digits, format only). No passport class. `Sex::Unspecified` exists for the CURP `X`.
-MX state licences (plan 3 Task 6b): `Document\MX\Jurisdiction` (32 cases, ISO 3166-2:MX order, `Cmx` for Mexico
-City), `Document\MX\DriverLicenceNumber`, `Document\MX\DriverLicence\{AbstractDriverLicenceNumber,
-MexDriverLicenceNumber}` and `Document\MX\DriverLicenceNumberFactory` (CA pattern, resolver document "Mexican driver's
-licence"). Only MX-MEX (12 digits) is covered, so `fromNumber()` reports any 12-digit number as MX-MEX; the base's
-`masked()` always keeps 4 (no covered shape is 8 characters or shorter: restore the CA `<= 8 ? 3 : 4` rule, with a
-test, when one is added).
-`Name\MX\PersonName(?$first, ?$second, $given, ?$latin)` extends `AbstractLatinPersonName` like ES (parts on `AbstractMexicanNamePart`: `/` separator, `.` after or between letters, both omitted in the ICAO form); no surnames → the
-given names are the primary identifier (`JUAN`); policy `TransliterationVariant`; codec keys `first`, `second`, `given`,
-`latin` (`first` and `second` nullable).
+digits, format only). No passport class. `Sex::Unspecified` exists for the CURP `X`. MX state licences (plan 3 Task
+6b): `Document\MX\Jurisdiction` (32 cases, ISO 3166-2:MX order, `Cmx` for Mexico City),
+`Document\MX\DriverLicenceNumber`, `Document\MX\DriverLicence\{AbstractDriverLicenceNumber, MexDriverLicenceNumber}`
+and `Document\MX\DriverLicenceNumberFactory` (CA pattern, resolver document "Mexican driver's licence"). Only MX-MEX
+(12 digits) is covered, so `fromNumber()` reports any 12-digit number as MX-MEX; the base's `masked()` always keeps 4
+(no covered shape is 8 characters or shorter: restore the CA `<= 8 ? 3 : 4` rule, with a test, when one is added).
+`Name\MX\PersonName(?$first, ?$second, $given, ?$latin)` extends `AbstractLatinPersonName` like ES (parts on
+`AbstractMexicanNamePart`: `/` separator, `.` after or between letters, both omitted in the ICAO form); no surnames →
+the given names are the primary identifier (`JUAN`); policy `TransliterationVariant`; codec keys `first`, `second`,
+`given`, `latin` (`first` and `second` nullable).
 
-`Document\BR\*` (national, plan 3 Task 7a): `Cpf` (Receita "DV módulo 11": weights 1-9 then 0-9 from the left,
-`sum % 11 % 10`; dots stripped; `fiscalRegion()` = 9th digit string; `formatted()` `XXX.XXX.XXX-XX`; repeated digits
+`Document\BR\*` (national, plan 3 Task 7a): `Cpf` (Receita "DV módulo 11": weights 1-9 then 0-9 from the left, `sum %
+11 % 10`; dots stripped; `fiscalRegion()` = 9th digit string; `formatted()` `XXX.XXX.XXX-XX`; repeated digits
 accepted), `VoterRegistrationNumber` (TSE art. 36: 5-12 digits left-padded to 12, state code `01`-`28` by regex,
-`stateCode()`/`isAbroad()`, check digits format only), `Nis` (11 digits, ANS PIS/PASEP check: weights `[3,2,9,8,7,6,5,4,3,2]`, `11 - r`, ≥10 → 0; `formatted()`), `Cns` (15 digits, ANS check reduced to `Σ d·(15..1) ≡ 0 mod 11` plus all-zero refusal), `DriverLicenceNumber` (CNH
-registro nacional, `NumberShapes('[0-9A-Z]{9}[0-9]{2}')`), `PassportNumber` (`[A-Z]{2}[0-9]{6}`, `series()`, masks 3).
-BR RG (plan 3 Task 7b): `Document\BR\Jurisdiction` (27 cases, ISO 3166-2:BR code order, `Df` for the Distrito
-Federal; not used by `VoterRegistrationNumber`, whose TSE codes are not one-to-one: `28` is abroad),
-`Document\BR\IdentityCardNumber`, `Document\BR\IdentityCard\{AbstractIdentityCardNumber, SpIdentityCardNumber}` and
-`Document\BR\IdentityCardNumberFactory` (CA HealthCard pattern: abstract `stored()` hook for the check, masks
-`<= 8 ? min(3, length - 1) : 4`, never the whole value; `SpIdentityCardNumber::fromNumberAndCheckCharacter()` for a card
-without a printed check character; dots stripped in the base and, for the resolver's length messages, in the factory; resolver document
-"Brazilian identity card"). Named `IdentityCard…`, not `Rg…`, like the other English role names
-(`DriverLicenceNumber`, `VoterRegistrationNumber`). Only BR-SP is covered. No `Sex` change. `Name\BR\PersonName($family, $given, ?$latin)` on `AbstractFamilyGivenPersonName` (both required),
-parts on the plain `AbstractLatinNamePart` (no extra punctuation), policy `AnyIcaoSpelling` (PF SINPA abbreviation);
-codec as IT (`given` required).
+`stateCode()`/`isAbroad()`, check digits format only), `Nis` (11 digits, ANS PIS/PASEP check: weights
+`[3,2,9,8,7,6,5,4,3,2]`, `11 - r`, ≥10 → 0; `formatted()`), `Cns` (15 digits, ANS check reduced to `Σ d·(15..1) ≡ 0 mod
+11` plus all-zero refusal), `DriverLicenceNumber` (CNH registro nacional, `NumberShapes('[0-9A-Z]{9}[0-9]{2}')`),
+`PassportNumber` (`[A-Z]{2}[0-9]{6}`, `series()`, masks 3). BR RG (plan 3 Task 7b): `Document\BR\Jurisdiction` (27
+cases, ISO 3166-2:BR code order, `Df` for the Distrito Federal; not used by `VoterRegistrationNumber`, whose TSE codes
+are not one-to-one: `28` is abroad), `Document\BR\IdentityCardNumber`,
+`Document\BR\IdentityCard\{AbstractIdentityCardNumber, SpIdentityCardNumber}` and
+`Document\BR\IdentityCardNumberFactory` (CA HealthCard pattern: abstract `stored()` hook for the check, masks `<= 8 ?
+min(3, length - 1) : 4`, never the whole value; `SpIdentityCardNumber::fromNumberAndCheckCharacter()` for a card
+without a printed check character; dots stripped in the base and, for the resolver's length messages, in the factory;
+resolver document "Brazilian identity card"). Named `IdentityCard…`, not `Rg…`, like the other English role names
+(`DriverLicenceNumber`, `VoterRegistrationNumber`). Only BR-SP is covered. No `Sex` change.
+`Name\BR\PersonName($family, $given, ?$latin)` on `AbstractFamilyGivenPersonName` (both required), parts on the plain
+`AbstractLatinNamePart` (no extra punctuation), policy `AnyIcaoSpelling` (PF SINPA abbreviation); codec as IT (`given`
+required).

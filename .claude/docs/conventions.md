@@ -9,8 +9,8 @@
   interface extending `\BackedEnum` (value = ISO 3166-2 code).
 - Name sources live in `docs/sources/<AREA>.md` with verbatim quotes and section numbers; code tables are copied from
   there and the class docblock cites the PDF (`@see`). ICAO "except …" (language-specific) spellings are not variants.
-- Official sources are cited with publication.pravo.gov.ru (RU) or the gazette when the portal has no entry;
-  aggregator copies (garant, legalacts) only as "quoted from" in the source note.
+- Official sources are cited with publication.pravo.gov.ru (RU) or the gazette when the portal has no entry; aggregator
+  copies (garant, legalacts) only as "quoted from" in the source note.
 - A national name part extends `Name\AbstractNamePart` (hooks: `letters()`, `word()`, `innerSeparators()`, `label()`);
   message `Invalid <label> (<n> characters).`; allowed separators per part come from the country's source note (RU:
   given names and patronymics have no apostrophe).
@@ -22,10 +22,10 @@
   `valueObjectClass()`, `shape()`, `create()` and `givenValue()` (a required given name: `$given ?? throw
   $this->malformed()`). Another layout (ES) extends `AbstractLatinPersonName`. The derived form uses `toLatin()` (never
   `variants()`); the override goes through a `Name\LatinOverridePolicy` subclass chosen per country: `AnyIcaoSpelling`
-  when the passport authority writes a documented spelling (RU, GB, CA, BR), `TransliterationVariant` with a lazy `Closure` of
-  the spellings when only table spellings are acceptable (AU, DE, FR, IT, ES, NL, CH, TR, US, MX); the choice and its quote
-  go in the country's source note. `resolve()` drops an override equal to the derived form in MRZ terms (hyphen ≡ `<`),
-  so equality and the codec payload agree.
+  when the passport authority writes a documented spelling (RU, GB, CA, BR), `TransliterationVariant` with a lazy
+  `Closure` of the spellings when only table spellings are acceptable (AU, DE, FR, IT, ES, NL, CH, TR, US, MX); the
+  choice and its quote go in the country's source note. `resolve()` drops an override equal to the derived form in MRZ
+  terms (hyphen ≡ `<`), so equality and the codec payload agree.
 - `Icao\Transliterator::variants()` caps at 4096 combinations (untrusted input); `toLatin()` has no cap. The builder
   calls it per ICAO word (split at spaces and hyphens), so the cap is per word.
 - Name tests use `Tests\Fixture\RefusesNameWithoutEchoingInput::assertNameRefusedWithoutEcho()`: exact message and no
@@ -33,12 +33,12 @@
 - A document number VO parses with `Internal\Digits::exactly($input, $length, $label)` (`exactlyStripped()` when the
   separators are already removed; strips `Digits::SEPARATORS`: space, `-`, tab, CR/LF, NBSP, U+2007, U+202F; message
   `Invalid <label> (<n> characters).`, or `(too long)` above `Digits::MAX_REPORTED_LENGTH` = 40; right length with a
-  non-digit: `(invalid character)`), then its checksum where an official algorithm exists (`Invalid <label> checksum.`).
-  The label is a `private const string DOCUMENT` per class, used in every message. `masked()` keeps the last 4
-  characters (`Mask::keepLastDigits(formatted(), 4)`) unless the source note records an official rule; a number of 8
-  characters or fewer keeps 3 (CH identity document, GB Northern Ireland licence), and the AU classes keep 3 (numbers of
-  at most 10 characters, AU.md "Masking rule"). A field without a published check digit is shape-only, said on the class
-  and in the source note.
+  non-digit: `(invalid character)`), then its checksum where an official algorithm exists (`Invalid <label>
+  checksum.`). The label is a `private const string DOCUMENT` per class, used in every message. `masked()` keeps the
+  last 4 characters (`Mask::keepLastDigits(formatted(), 4)`) unless the source note records an official rule; a number
+  of 8 characters or fewer keeps 3 (CH identity document, GB Northern Ireland licence), and the AU classes keep 3
+  (numbers of at most 10 characters, AU.md "Masking rule"). A field without a published check digit is shape-only, said
+  on the class and in the source note.
 - `AbstractStringValueObject::$value` is a plain `string`; where a getter must return `non-empty-string` without a
   literal in a `sprintf()` format, wrap it in `Internal\Text::nonEmpty()` (the only such helper); readonly helper
   properties assigned in `parse()` fail PHPStan `property.readOnlyAssignNotInConstructor`.
@@ -55,12 +55,34 @@
 - A sub-national number with several shapes (US DL/ID) uses `Internal\NumberShapes(shape, …)` (length derived from the
   atoms `A`, `9`, `[...]`, `{n}`; anything else is an `InvalidArgumentException`): wrong length → `(N characters)`, a
   length some shape has but no match → `(invalid character)`. One class per jurisdiction, even where the licence and ID
-  card have different shapes (AL, IL): the class accepts the union and its doc says which is which. `fromNumberIn()` for
-  a jurisdiction with no published format throws `Invalid US-XX DL/ID number (format not covered).`; the factory's
+  card have different shapes (AL, IL): the class accepts the union and its doc says which is which. `fromNumberIn()`
+  for a jurisdiction with no published format throws `Invalid US-XX DL/ID number (format not covered).`; the factory's
   document label is `American DL/ID` (as Task 1's `American passport book number`).
 - CA provincial documents (plan 3 Task 5b) copy the US DL/ID pattern with a `stored()` hook for rules beyond the shape.
   Labels: `CA-XX driver's licence number` / `CA-XX health card number` per class, `Canadian driver's licence` /
   `Canadian health card` in the factories; an uncovered licence jurisdiction throws `Invalid CA-XX driver's licence
-  number (format not covered).` (no health-card equivalent is reachable: all 13 are covered). A derived range check
-  (QC month/day, NS day/month) is a regex constant matched with `preg_match()`, not int casts and comparisons: casts of
+  number (format not covered).` (no health-card equivalent is reachable: all 13 are covered). A derived range check (QC
+  month/day, NS day/month) is a regex constant matched with `preg_match()`, not int casts and comparisons: casts of
   digit substrings are equivalent mutants for Infection.
+- **Per-subdivision factories with an overlap oracle** (AU, US, CA, MX, BR): one final class per covered jurisdiction
+  on an abstract base, a `Jurisdiction` enum of every subdivision (ISO 3166-2 order), and a factory over
+  `Internal\SubdivisionResolver` with `fromNumber()` (one match, none, or `AmbiguousJurisdictionException`),
+  `fromNumberIn()` and `jurisdictionsMatching()`. `docs/sources/<CC>.md` holds the shape table and its "Overlap" table;
+  the factory test has every overlap row (the oracle). `classFor()` lists uncovered cases as `=> null`, so a new enum
+  case breaks the `match`. With one covered subdivision (MX, BR) `fromNumber()` reports other states' numbers as that
+  state: say so in the docs.
+- **"Format not covered" message:** `fromNumberIn()` for a jurisdiction without a published format throws `Invalid
+  <CC>-XX <document> (format not covered).`; `fromNumber()` of an unmatched number says "(fits no jurisdiction)" when
+  some jurisdiction has the length, otherwise the length.
+- **Source notes list every candidate:** each jurisdiction gets a row with its verdict (covered, or not covered with a
+  reason). A host that could not be read (timeout, WAF, TLS, no Internet Archive capture) is marked "re-check" with the
+  UTC date; a missing format is "no published format" only after the search is recorded. Look at the issuer's online
+  form fields (`maxlength`, regex) before concluding that a format is unpublished; a maximum length is not a format.
+- **Official = any government body's own publication** (controller ruling): ANS routines, a state validator's field
+  rule and the SSP-SP form count; vendor guides, generator sites and other bodies' intake policies (repeated-digit
+  refusals) do not. Checksums are verified only when an official text gives the algorithm.
+- **Canonical value:** a number that the source says is padded or stripped (BC and SK licences to 8 digits, the BR
+  voter registration number to 12) is stored in the padded form, and `from(value())` round-trips; the checks that need
+  the raw input run in the `stored()` hook.
+- **Equivalent mutants with one covered subdivision:** `ArrayOneItem` on `coveredJurisdictions()` (MX, BR) escapes
+  until a second subdivision is covered.

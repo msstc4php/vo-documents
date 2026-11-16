@@ -312,11 +312,12 @@ script classes use `\p{sc=Latin}` / `\p{sc=Cyrillic}` (Script property only); `c
   through `fromNumberIn()`. `347631`, `0347631` and `00347631` are one BC number (`value()` `00347631`).
 - **ON health version code is not in `value()`**: `OnHealthCardNumber::from('9876543217YM')` has value `9876543217` and
   `versionCode()` `YM`; `equals()`, `__toString()` and `jsonSerialize()` ignore the code, so a round trip through the
-  string (or a Doctrine column holding `value`) loses it. Task 8 must decide whether the type stores it.
+  string (or a Doctrine column holding `value`) loses it. `vo-documents-doctrine` decided: the type stores the number
+  only (the code is lost on reload).
 - **ON MOD 10 is plain Luhn** over the ten digits (`Checksum::luhn()`); the AB-PRG illustration `5584486674` fails it
   and is refused as ON (fits NS only). "Subtract from ten" leaving 10 is read as check digit 0.
-- **BC MOD-11:** a remainder of 0 or 1 gives 11 or 10, equal to no digit, so every number with such a prefix is
-  refused (`912345678x`, `913579246x`).
+- **BC MOD-11:** a remainder of 0 or 1 gives 11 or 10, equal to no digit, so every number with such a prefix is refused
+  (`912345678x`, `913579246x`).
 - **QC NAM:** no 30-February check (the year has no century); the temporary NAM (`M` at position 11) fails the shape.
   The `birthDay()`/`birthMonth()` clamps leave equivalent Increment/Decrement mutants, as in `ChiNumber`.
 - **NS licence:** the padding spaces of a short surname are separators (`FOY  220867001` → `FOY220867001`); a 10-14
@@ -336,22 +337,23 @@ script classes use `\p{sc=Latin}` / `\p{sc=Cyrillic}` (Script property only); `c
   "Alfabética").
 - **CURP `X` sex** comes from an INE DERFE report quoting RENAPO practice, not from the Instructivo (which still says
   "H para hombre y M para mujer"); `Sex::Unspecified` was added for it. No other class returns it.
-- **CURP century letter** is limited to `A-J` (Instructivo and Reglas both say so): a CURP with `K`-`Z` at position 17 is
-  refused. If RENAPO ever issues one (more than ten letters needed in a homonymy run), widen it with a quote.
+- **CURP century letter** is limited to `A-J` (Instructivo and Reglas both say so): a CURP with `K`-`Z` at position 17
+  is refused. If RENAPO ever issues one (more than ten letters needed in a homonymy run), widen it with a quote.
 - **RENAPO annexes** (state catalogue, "palabras altisonantes") are listed in the Reglas but not published in them; no
   state list is applied and `NE` is not quoted from an official text.
-- **MX names accept `/` and `.`** as RENAPO captures them (`D/AMICO`, `MA. GUADALUPE`; `Name\MX\AbstractMexicanNamePart`:
-  `/` a separator, `.` after or between letters). Doc 9303 Part 3 §4.6 omits "all other punctuation characters", so
-  `MX\PersonName` passes `['.', '/']` as `$omittedPunctuation` and `LatinPersonNameBuilder` strips it before transliterating
-  (`DAMICO`, `MA<GUADALUPE`). `Icao\Transliterator` is unchanged (still refuses them), so no other country's accepted
-  characters changed. Package-wide re-check (U+02BC, the ES `l·l`) is deferred to the final review.
+- **MX names accept `/` and `.`** as RENAPO captures them (`D/AMICO`, `MA. GUADALUPE`;
+  `Name\MX\AbstractMexicanNamePart`: `/` a separator, `.` after or between letters). Doc 9303 Part 3 §4.6 omits "all
+  other punctuation characters", so `MX\PersonName` passes `['.', '/']` as `$omittedPunctuation` and
+  `LatinPersonNameBuilder` strips it before transliterating (`DAMICO`, `MA<GUADALUPE`). `Icao\Transliterator` is
+  unchanged (still refuses them), so no other country's accepted characters changed. Open: a package-wide re-check of
+  other omitted punctuation (U+02BC, the ES `l·l`) was not done.
 - **MX clave de elector positions 1-6 are `A-Z`**: a key with `Ñ` there (INE says only "primeras letras") would be
   refused; open risk, also in the README limits.
 - **`ElectorKey` clamps** in `birthMonth()`/`birthDay()` leave equivalent Increment/Decrement mutants (as `ChiNumber`).
-  The CURP date avoids them: `isoDate()` builds `YYYY-MM-DD` and `parse()` calls `checkdate()` with int casts (a removed
-  cast is a `TypeError` under strict types, so CastInt mutants die).
-- **RFC `Ñ`** is multibyte: `Digits::upperCasedOfLength()` uses ASCII `strtoupper()`, so `Rfc::parse()` upper-cases with
-  `mb_strtoupper()` and NFC first; `Mask::keepLastCharacters()` is byte-based and is not used for the RFC.
+  The CURP date avoids them: `isoDate()` builds `YYYY-MM-DD` and `parse()` calls `checkdate()` with int casts (a
+  removed cast is a `TypeError` under strict types, so CastInt mutants die).
+- **RFC `Ñ`** is multibyte: `Digits::upperCasedOfLength()` uses ASCII `strtoupper()`, so `Rfc::parse()` upper-cases
+  with `mb_strtoupper()` and NFC first; `Mask::keepLastCharacters()` is byte-based and is not used for the RFC.
 
 ## MX state licences (plan 3 Task 6b, 2026-11-16 UTC)
 
@@ -375,14 +377,14 @@ script classes use `\p{sc=Latin}` / `\p{sc=Cyrillic}` (Script property only); `c
 ## BR sources and decisions (plan 3 Task 7a, 2026-11-16 UTC)
 
 - **CPF algorithm source**: the Receita's own text is the REGRA_VALIDA_CPF of its SPED manuals (ADE COFIS nº 41/2017
-  Anexo II on `sped.rfb.gov.br`; same text in the e-Financeira Anexo II 2.1.1 of 2026). It writes the weights "9, 8, …, 1
-  e 0, a partir da unidade" with "O resto 10 é considerado 0" — equivalent to the usual `11 - r` formulation (weights
+  Anexo II on `sped.rfb.gov.br`; same text in the e-Financeira Anexo II 2.1.1 of 2026). It writes the weights "9, 8, …,
+  1 e 0, a partir da unidade" with "O resto 10 é considerado 0" — equivalent to the usual `11 - r` formulation (weights
   10..2), but implemented as written. `normas.receita.fazenda.gov.br` is an Angular SPA: curl/WebFetch get an empty
   shell (API under `/api`, not explored).
-- **Repeated-digit CPFs are accepted** (Review Focus 4): DATASUS (CADSUS spec RN001.3) and Previdência SIPREV
-  (RV_01 "Recusar todos os dígitos iguais") refuse them for their own intake; SIRC lists "Dígitos repetidos" as an
-  invalidity reason. None is the Receita Federal, so per the owner's rule they pass. If the owner wants the stricter
-  intake rule, it is a one-line refusal plus the test provider flip.
+- **Repeated-digit CPFs are accepted** (Review Focus 4): DATASUS (CADSUS spec RN001.3) and Previdência SIPREV (RV_01
+  "Recusar todos os dígitos iguais") refuse them for their own intake; SIRC lists "Dígitos repetidos" as an invalidity
+  reason. None is the Receita Federal, so per the owner's rule they pass. If the owner wants the stricter intake rule,
+  it is a one-line refusal plus the test provider flip.
 - **TSE**: `www.tse.jus.br` returns 403 to curl and WebFetch; the Internet Archive `id_` copy of 2026-11-10 22:48:11
   UTC of Res. 23.659/2021 was read. Art. 36 gives the table 01-28 and "Módulo 11" without weights (the widely copied
   SP/MG special case is unquoted), so check digits are format only.
@@ -391,7 +393,8 @@ script classes use `\p{sc=Latin}` / `\p{sc=Cyrillic}` (Script property only); `c
   "resto … 0 ou 1 → 0", no weights.
 - **Official = any government body's own publication** (controller ruling, Task 7a fix round 1): the ANS SIB-XML
   "Algoritmos do Aplicativo de Carga" page on `gov.br/ans` counts, so its CNS and PIS/PASEP routines are enforced.
-  Other bodies' *intake policies* (repeated-digit refusals, DATASUS RN048 "numérica" for the CNH) are still not applied.
+  Other bodies' *intake policies* (repeated-digit refusals, DATASUS RN048 "numérica" for the CNH) are still not
+  applied.
 - **CNS**: `isDvCnsValido` = not all zeros AND (`validaCns` OR `validaCnsProv`); `validaCns` ⊆ `validaCnsProv` (its
   check digit zeroes the 15..1 weighted sum mod 11), so `Cns` implements only the weighted sum — implementing
   `validaCns` too would only add equivalent mutants. `700000000000004` (a sample often used) is **invalid** (sum 109).
@@ -401,27 +404,27 @@ script classes use `\p{sc=Latin}` / `\p{sc=Cyrillic}` (Script property only); `c
 - **BR names use `AnyIcaoSpelling`**: the PF FAQ ("Nome abreviado no passaporte") describes SINPA abbreviation at 30
   characters per field (particles first, then the penultimate word to one letter). A Brazilian `PersonName` cannot
   exceed `Icao\PersonName::MAX_LENGTH` (two parts of ≤100 characters), so "too long" never triggers here.
-- **New codec ⇒ every codec test**: `Codecs::all()` instantiates every codec, and `beStrictAboutCoverageMetadata`
-  needs `#[UsesClass(<Cc>PersonNameCodec::class)]` in each test that builds the mapper (14 files for BR).
+- **New codec ⇒ every codec test**: `Codecs::all()` instantiates every codec, and `beStrictAboutCoverageMetadata` needs
+  `#[UsesClass(<Cc>PersonNameCodec::class)]` in each test that builds the mapper (14 files for BR).
 
 ## BR RG per state (plan 3 Task 7b, 2026-11-16 UTC)
 
 - **Verdict 1/27 (BR-SP)**: found in the SSP-SP antecedentes form, not in any law: `www2.ssp.sp.gov.br/aacweb/
   carrega-formulario` (fields `numero` maxlength 8, `digito`) and its `AACWEBSTATIC/style/aac.js` (`verificaRange(…, 1,
   99999999)`, `checaRG`: weights 2-9 from the right, `sum % 11`, 10 → `X`). The formulation on generator sites (2-9
-  from the left with `11 - r`) gives the same character for the number padded to 8 digits (review: 200k samples):
-  not a bug, do not "fix" either into the other. No official sample number exists.
+  from the left with `11 - r`) gives the same character for the number padded to 8 digits (review: 200k samples): not a
+  bug, do not "fix" either into the other. No official sample number exists.
 - **SP card without a printed check character** is valid (Decreto 10.977 art. 25; the SSP page admits such cards):
   `SpIdentityCardNumber::fromNumberAndCheckCharacter($number, null)` stores the computed character; `from()` and the
-  factory stay strict on purpose (a bare form would match any 1-8 digits). Its number field takes digits and dots
-  only: stripping a hyphen there turned `1234567-2` into the different RG `12345672` + computed character (re-review).
-- **SSP page HTML comments**: the "Se na sua Carteira de Identidade não constar…" sentence is in a commented-out
-  block; quote the rendered "Se não constar o dígito de controle…" as the live text.
-- **Look at every state's online antecedentes form**: they all take the RG, but the other 26 only limit the field
-  (BA maxlength 8 + optional control digit with no algorithm, CE 13, MG 10, DF/PE 20, RR 15 + 1-digit DV, MA ≥ 5, the
-  rest free text). A maximum length is not a published length.
-- **Decreto 10.977/2022**: the CIN's number is the CPF (art. 3); old cards valid until 2032-03-01 (art. 25, 60+ forever).
-  `planalto.gov.br` 302-redirects curl and WebFetch to `gov.br/planalto`; read the IA `id_` copy.
+  factory stay strict on purpose (a bare form would match any 1-8 digits). Its number field takes digits and dots only:
+  stripping a hyphen there turned `1234567-2` into the different RG `12345672` + computed character (re-review).
+- **SSP page HTML comments**: the "Se na sua Carteira de Identidade não constar…" sentence is in a commented-out block;
+  quote the rendered "Se não constar o dígito de controle…" as the live text.
+- **Look at every state's online antecedentes form**: they all take the RG, but the other 26 only limit the field (BA
+  maxlength 8 + optional control digit with no algorithm, CE 13, MG 10, DF/PE 20, RR 15 + 1-digit DV, MA ≥ 5, the rest
+  free text). A maximum length is not a published length.
+- **Decreto 10.977/2022**: the CIN's number is the CPF (art. 3); old cards valid until 2032-03-01 (art. 25, 60+
+  forever). `planalto.gov.br` 302-redirects curl and WebFetch to `gov.br/planalto`; read the IA `id_` copy.
 - **Sandbox**: a curl with several police hosts in one `allowed_domains` list was refused by the auto-mode classifier;
   one host per command worked. Unreachable live: `antecedentes.pc.ba.gov.br`, `wwws.pc.mg.gov.br` (proxy 502),
   `sistemas.sspds.ce.gov.br`, `www.servicos.sds.pe.gov.br`, `www8.defesasocial.rn.gov.br` (timeouts); the RJ request

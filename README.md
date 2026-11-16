@@ -2,8 +2,8 @@
 
 Value objects for identity documents and personal names of the world's largest economies, with ICAO Doc 9303 Latin
 names. Built on [`msstc4php/vo-base`](https://github.com/msstc4php/vo-base); PHP >= 8.4. Today: the Russian Federation,
-Australia, Germany, France, Italy, Spain, the Netherlands, Switzerland, the United Kingdom, Türkiye and the United
-States (names and federal documents).
+Australia, Germany, France, Italy, Spain, the Netherlands, Switzerland, the United Kingdom, Türkiye, the United States,
+Canada, Mexico and Brazil (names, national documents and, where an official format is published, subnational ones).
 
 Every format, checksum and table cites its official source on the class (`@see`); the full notes, with quotes and the
 places where the sources disagree with the obvious guess, are in [`docs/sources/`](docs/sources).
@@ -24,7 +24,8 @@ Not on Packagist yet; register the GitHub repositories:
 }
 ```
 
-Runtime requirements: `msstc4php/vo-base ^1.1.1`, `ext-mbstring`, `symfony/polyfill-intl-normalizer`. No framework.
+Runtime requirements: `msstc4php/vo-base ^1.1.1`, `ext-mbstring`, `lib-pcre >=10.40` (the `\p{sc=Latin}` script
+syntax of the name classes), `symfony/polyfill-intl-normalizer`. No framework.
 vo-base 1.1.1 (the mapper no longer reports interfaces as supported) must be tagged before this package is released.
 
 ## Document numbers
@@ -107,17 +108,20 @@ official algorithm is published. A number with the right shape is accepted, neve
 | `Document\US\MedicareBeneficiaryIdentifier` | MBI, `1EG4-TE5-MK73` | CMS position layout (no check digit exists) | none | CMS |
 | `Document\US\DlId\{Al,Az,Co,Ct,Fl,Hi,Ia,Id,Il,In,Ks,Ky,Ma,Md,Me,Mi,Ms,Nd,Ne,Nj,Nm,Ny,Ok,Pa,Ri,Tx,Vt,Wa,Wi,Wy}DlIdNumber` | DL/ID number of 30 states (one class covers a state's licence and ID card where the source says so) | shape only (no check digit verified; HI, KS, MA, NE, VT, WA letters enforced as quoted) | none (the IL, WA, FL and MI name and birth data is not decoded) | state DMV and police publications; USCIS E-Verify RIDE fact sheets |
 | `Document\US\Jurisdiction` | The 50 states and DC (enum, ISO 3166-2:US) | n/a | n/a | ISO 3166-2:US |
+| `Document\US\DlIdNumber`, `Document\US\DlIdNumberFactory` | Interface of the 30 DL/ID classes; factory `fromNumber()` / `fromNumberIn()` / `jurisdictionsMatching()` | n/a | n/a | the DL/ID sources above |
 | `Document\CA\SocialInsuranceNumber` | SIN, `123 456 789` | format only (no check digit verified: no algorithm published) | `isTemporaryResident()` (first digit 9, ESDC) | ESDC; CRA |
 | `Document\CA\PassportNumber` | Passport, letter + 6 digits + 2 letters (since 2023-05-10) or 2 letters + 6 digits | format only | none | IRCC |
 | `Document\CA\DriverLicence\{Ab,Bc,Ns,On,Qc,Sk}DriverLicenceNumber` | Driver's licence number of 6 jurisdictions (NS and SK also cover the photo ID card): AB `123456-789`, BC and SK 1-8 digits stored zero-padded to 8, NS Master Number `FINCH220867001`, ON 15 alphanumerics, QC `L1531-171274-08` | shape only (no check digit published); NS day and month checked as calendar fields | none (the NS surname and birth fields are not decoded: two-digit year) | Service Alberta RDN; ICBC; Service Nova Scotia; MTO glossary; SAAQ; Government of Saskatchewan, SGI |
 | `Document\CA\HealthCard\{Ab,Bc,Mb,Nb,Nl,Ns,Nt,Nu,On,Pe,Qc,Sk,Yt}HealthCardNumber` | Health card number of all 13 jurisdictions (8-12 characters; NT letter `D`/`N`/`H`/`M`/`T` + 7 digits; QC NAM `YUXJ75021213`) | BC leading 9 and MOD-11, ON leading digit 1-9 and MOD 10 verified; QC month (01-12, 51-62) and day checked; the rest format only | ON `versionCode()` (kept apart from the value); QC `HasSex`, birth year digits, month, day (GIU REQ-19-53: a reading aid, not a value to fill a record with) | Ontario Ministry of Health "Province and Territory Codes" and HCV/IHCS specifications; BC Teleplan; Québec MSSS GIU; provincial ministries |
 | `Document\CA\Jurisdiction` | The 10 provinces and 3 territories (enum, ISO 3166-2:CA) | n/a | n/a | ISO 3166-2:CA |
+| `Document\CA\DriverLicenceNumber`, `DriverLicenceNumberFactory`, `HealthCardNumber`, `HealthCardNumberFactory` | Interfaces of the 6 licence and 13 health card classes, and their factories | n/a | n/a | the provincial sources above |
 | `Document\MX\Curp` | CURP, 18 characters (`HEGJ561231HDFRRN04`) | RENAPO layout: letters/digits per position, sex `H`/`M`/`X`, character 17 `0-9` (born up to 1999) or `A-J` (from 2000), birth date must exist; check digit format only (algorithm not published) | `HasBirthDate` (century from character 17), `HasSex` (`X` → `Sex::Unspecified`), `birthStateCode()` (RENAPO code, not ISO) | RENAPO Instructivo Normativo (DOF 2018, 2021); RENAPO Reglas 2021; INE DERFE |
 | `Document\MX\ElectorKey` | Clave de elector of the INE voter card, 18 characters | INE layout: 6 letters, `AAMMDD` (day/month valid in some century), 2 state characters, a sex letter, 3 homoclave characters (no check verified) | birth year digits, month, day; `birthStateCode()` and `sexCode()` as written (no value list published) | INE lineamientos 2021; INE glossary |
 | `Document\MX\Rfc` | RFC of a natural person, 13 characters (`HEGJ5612311A2`) | SAT `t_RFC_PF` pattern (`A-Z&Ñ`, month and day ranges, final digit or `A`); homoclave not verified | none | SAT CFDI data types (`tdCFDI.xsd`) |
 | `Document\MX\SocialSecurityNumber` | NSS (IMSS), 11 digits | format only (check digit algorithm not published) | none | IMSS norm 3000-001-007 |
 | `Document\MX\DriverLicence\MexDriverLicenceNumber` | Licencia de conducir of the Estado de México, 12 digits | format only (no check digit or encoding published) | none | Secretaría de Movilidad del Estado de México, licence validator |
 | `Document\MX\Jurisdiction` | The 32 federal entities (enum, ISO 3166-2:MX) | n/a | n/a | ISO 3166-2:MX |
+| `Document\MX\DriverLicenceNumber`, `Document\MX\DriverLicenceNumberFactory` | Interface of the one covered licence class and its factory | n/a | n/a | the Edomex validator above |
 | `Document\BR\Cpf` | CPF, `280.012.389-38` | Receita Federal "DV módulo 11" (both check digits); a CPF of one repeated digit is accepted (no Receita Federal text refuses it) | `fiscalRegion()` (the ninth digit, a Receita Federal region spanning several states), `formatted()` | Receita Federal ADE COFIS nº 41/2017, Anexo II; Receita Federal CPF leaflet |
 | `Document\BR\VoterRegistrationNumber` | Número de inscrição eleitoral (título de eleitor), up to 12 digits, stored zero-padded to 12 | TSE state code `01`-`28`; check digits format only (TSE names "Módulo 11" without weights) | `stateCode()` (TSE code, not ISO: `28` is abroad), `isAbroad()` | TSE Resolução nº 23.659/2021, art. 36 |
 | `Document\BR\Nis` | NIS (PIS, PASEP, NIT), 11 digits (`118.16788.89-3`) | check digit verified (ANS `isDvPisPasepValido`: weights 2-9 from the right, `11 - sum % 11`, 10 or 11 → 0); repeated digits accepted | `formatted()` | Manual de Orientação do eSocial 2.4; ANS "Algoritmos do Aplicativo de Carga"; SIPREV (display form) |
@@ -126,18 +130,19 @@ official algorithm is published. A number with the right shape is accepted, neve
 | `Document\BR\PassportNumber` | Passport, 2 letters ("série") + 6 digits (`CS265436`) | format only | `series()` | Polícia Federal |
 | `Document\BR\IdentityCard\SpIdentityCardNumber` | RG of the São Paulo Carteira de Identidade (IIRGD), 1-8 digits + check character (`12.345.678-2`) | check character verified (SSP-SP form's `checaRG`: weights 2-9 from the right, sum % 11, 10 → `X`); all zeros refused | none | SSP-SP Atestado de Antecedentes Criminais form and `aac.js` |
 | `Document\BR\Jurisdiction` | The 27 federative units (enum, ISO 3166-2:BR) | n/a | n/a | ISO 3166-2:BR |
+| `Document\BR\IdentityCardNumber`, `Document\BR\IdentityCardNumberFactory` | Interface of the one covered RG class and its factory | n/a | n/a | the SSP-SP form above |
 
-Names: `Name\<CC>\FamilyName`, `GivenName` and `PersonName` for DE, FR, IT, ES, NL, CH, GB and TR, like the RU and AU
-ones. Spain's `PersonName` has two surnames (`first`, optional `second`); in the Dutch one the prefixes (`van der`) are
-part of the family name; the Swiss, Dutch, British, US and Canadian ones accept a person without a given name. The
-US one is `Name\US\PersonName($family, ?$given, ?$middle, ?$suffix)` (`given` null for a one-word name), the suffix a
-`Name\US\NameSuffix` (the AAMVA list `JR`, `SR`, `1ST`/`I` … `9TH`/`IX`), written last among the secondary
-identifiers of the ICAO form, ordinals as Roman numerals (`SMITH<<JOHN<MICHAEL<III`). The Canadian one is
+Names: `Name\<CC>\FamilyName`, `GivenName` and `PersonName` for DE, FR, IT, ES, NL, CH, GB, TR, US, CA, MX and BR, like
+the RU and AU ones. Spain's `PersonName` has two surnames (`first`, optional `second`); in the Dutch one the prefixes
+(`van der`) are part of the family name; the Swiss, Dutch, British, US and Canadian ones accept a person without a
+given name. The US one is `Name\US\PersonName($family, ?$given, ?$middle, ?$suffix)` (`given` null for a one-word
+name), the suffix a `Name\US\NameSuffix` (the AAMVA list `JR`, `SR`, `1ST`/`I` … `9TH`/`IX`), written last among the
+secondary identifiers of the ICAO form, ordinals as Roman numerals (`SMITH<<JOHN<MICHAEL<III`). The Canadian one is
 `Name\CA\PersonName($family, ?$given)`, letters of the Latin script (English and French names). The Mexican one is
-`Name\MX\PersonName(?$first, ?$second, $given)`: two surnames, one, or none (RENAPO records persons without
-surnames; then the given names are the only ICAO identifier, `JUAN`). The Brazilian one is
-`Name\BR\PersonName($family, $given)`: both required (CNJ Código Nacional de Normas art. 515-B), each part holding
-several words with particles in the case given (`da Silva`, `Maria da Conceição`).
+`Name\MX\PersonName(?$first, ?$second, $given)`: two surnames, one, or none (RENAPO records persons without surnames;
+then the given names are the only ICAO identifier, `JUAN`). The Brazilian one is `Name\BR\PersonName($family, $given)`:
+both required (CNJ Código Nacional de Normas art. 515-B), each part holding several words with particles in the case
+given (`da Silva`, `Maria da Conceição`).
 
 Contracts: `Contract\Maskable` (every number above), `Contract\Subdivision` and `Contract\IssuedBySubdivision` (AU,
 US, CA, MX and BR jurisdictions, AU licences, US DL/ID numbers, CA licence and health card numbers, MX licence numbers,
@@ -249,12 +254,12 @@ want both in one string). The RG of a CIN is its CPF: use `Document\BR\Cpf`. Old
 A national name part (`Name\RU\FamilyName`, `GivenName`, `Patronymic`, and `FamilyName`, `GivenName` of `Name\AU`,
 `Name\DE`, `Name\FR`, `Name\IT`, `Name\ES`, `Name\NL`, `Name\CH`, `Name\GB`, `Name\TR`, `Name\US`, `Name\CA`,
 `Name\MX`, plus `Name\US\MiddleName`) is NFC-normalised, trimmed, has inner whitespace runs collapsed to one space, and
-keeps its letter case. Limits: 100 characters per part. Russian parts accept only the 33 Russian letters; a Cyrillic name typed with
-Latin look-alikes (Latin `a`, `o`, `e`, `c`) is refused. A compatibility character (its NFKC form differs: fullwidth
-`Ｓｍｉｔｈ`, `ª`, the ligature `ﬁ`) is refused in every country, because it would be a second stored spelling of the same
-name; the ones an ICAO table lists itself (`Ĳ`, `Ŀ`) are kept. Messages say "(N characters)" for an empty or too long
-part, "(compatibility character)", or "(invalid character)" for a letter or separator that is not allowed where it
-stands.
+keeps its letter case. Limits: 100 characters per part. Russian parts accept only the 33 Russian letters; a Cyrillic
+name typed with Latin look-alikes (Latin `a`, `o`, `e`, `c`) is refused. A compatibility character (its NFKC form
+differs: fullwidth `Ｓｍｉｔｈ`, `ª`, the ligature `ﬁ`) is refused in every country, because it would be a second stored
+spelling of the same name; the ones an ICAO table lists itself (`Ĳ`, `Ŀ`) are kept. Messages say "(N characters)" for
+an empty or too long part, "(compatibility character)", or "(invalid character)" for a letter or separator that is not
+allowed where it stands.
 
 ```php
 use MSSTC4PHP\ValueObject\Documents\Icao\PersonName as IcaoPersonName;
@@ -424,8 +429,8 @@ supported there** unless the application builds its own mapper; the string class
 
 Collected from the source notes; each is a deliberate omission with its reason in `docs/sources/`.
 
-- **DE:** Führerschein number (FeV composition without length or check digit); provisional passports and
-  identity cards (`docs/sources/DE.md`).
+- **DE:** Führerschein number (FeV composition without length or check digit); provisional passports and identity cards
+  (`docs/sources/DE.md`).
 - **FR:** the identity card issued since August 2021 (no official format); the pre-1975 driving licence form
   (`docs/sources/FR.md`).
 - **IT:** carta d'identità elettronica number and patente number (no reachable official format); the eleven-digit
@@ -440,33 +445,34 @@ Collected from the source notes; each is a deliberate omission with its reason i
 - **TR:** sürücü belgesi number (a running sequence per province, no format), the identity card serial number
   (`docs/sources/TR.md`).
 - **US:** a middle name or suffix beside a one-word name (no source defines it), the IRM's open list of "never issued"
-  SSN examples (not refused), ATIN and IRSN; the DL/ID numbers of AK, AR, CA, DC, DE, GA, LA, MN, MO, MT, NC, NH, NV,
-  OH, OR, SC, SD, TN, UT, VA and WV (no official format published), the ID cards of CT, HI, IN, KY, ME, NJ, NM, OK and
-  RI (numbering not stated), the Maryland customer ID, and the decoding of name or birth data in IL, WA, FL and MI
-  numbers (`docs/sources/US.md`).
-- **CA:** the SIN check digit (the CRA names a "Mod 10" formula but no official text gives the algorithm), the
-  province meaning of a SIN's first digit, the CRA individual and temporary tax numbers, the passport print form of a
-  one-word name, special, diplomatic, temporary and emergency passport numbers (only the general format is
-  published). Provincial documents: the driver's licence numbers of MB, NB, NL, NT, NU, PE and YT (their authorities
-  name the number without a format; `fromNumberIn()` throws "(format not covered)"); the photo ID card numbers of AB,
-  BC (BCID), ON (Photo Card) and QC; the encoded data of the ON and QC licence numbers (not defined in text) and the
-  NS birth date (two-digit year); SK validation numbers, ICBC client numbers and the ON Driver Identification Number;
-  the Manitoba six-character family registration number; prior health number formats (AB 11, MB 6, NS 11 numerics);
-  the QC temporary NAM; the QC "chiffre valideur" and every health check digit other than BC and ON (no algorithm
-  published); whether an ON version code is the current card's (`docs/sources/CA.md`).
+  SSN examples (not refused), ATIN and IRSN; the DL/ID numbers of the 21 jurisdictions AK, AR, CA, DC, DE, GA, LA, MN,
+  MO, MT, NC, NH, NV, OH, OR, SC, SD, TN, UT, VA and WV (no official format published), the ID cards of CT, HI, IN, KY,
+  ME, NJ, NM, OK and RI (numbering not stated), the Maryland customer ID, and the decoding of name or birth data in IL,
+  WA, FL and MI numbers (`docs/sources/US.md`).
+- **CA:** the SIN check digit (the CRA names a "Mod 10" formula but no official text gives the algorithm), the province
+  meaning of a SIN's first digit, the CRA individual and temporary tax numbers, the passport print form of a one-word
+  name, special, diplomatic, temporary and emergency passport numbers (only the general format is published).
+  Provincial documents: the driver's licence numbers of the 7 jurisdictions MB, NB, NL, NT, NU, PE and YT (their
+  authorities name the number without a format; `fromNumberIn()` throws "(format not covered)"); the photo ID card
+  numbers of AB, BC (BCID), ON (Photo Card) and QC; the encoded data of the ON and QC licence numbers (not defined in
+  text) and the NS birth date (two-digit year); SK validation numbers, ICBC client numbers and the ON Driver
+  Identification Number; the Manitoba six-character family registration number; prior health number formats (AB 11, MB
+  6, NS 11 numerics); the QC temporary NAM; the QC "chiffre valideur" and every health check digit other than BC and ON
+  (no algorithm published); whether an ON version code is the current card's (`docs/sources/CA.md`).
 - **MX:** the passport number (the 2021 e-passport agreement gives only the booklet number `N` + 8 digits; older
   passports have no published format), the RFC of a legal person, the CURP, RFC, NSS and elector-key check characters
   (no algorithm published), the RENAPO state catalogue and "palabras inconvenientes" list (not published with the
   Reglas: any two letters are accepted, substituted forms too), the INE sex and state code lists of the elector key,
-  the fields of the NSS, other INE card numbers (CIC, OCR). State driving licences of 31 entities (all but MX-MEX): the
-  state laws (NL, JAL, TAB, GUA, CDMX) name the number without a format; the issuer's pages of BCN, CMX, MIC, NLE, PUE
-  and YUC could not be read on 2026-11-16 UTC and are to be re-checked (`docs/sources/MX.md`).
-- **BR:** the check digits of the título de eleitor and the CNH registration number (the TSE and CONTRAN name
-  "módulo 11" without the weights, and no government text found gives them), the CNH número do espelho and formulário
-  Renach, passport formats other than the Polícia Federal's two letters and six digits, the masking rule of the CPF
-  (plan default used), a person with no surname (the CNJ code requires one). The RG of 26 units (all but BR-SP): their
+  the fields of the NSS, other INE card numbers (CIC, OCR). State driving licences of 31 of 32 entities (all but
+  MX-MEX): the state laws (NL, JAL, TAB, GUA, CDMX) name the number without a format; the issuer's pages of BCN, CMX,
+  MIC, NLE, PUE and YUC could not be read on 2026-11-16 UTC and are to be re-checked (`docs/sources/MX.md`).
+- **BR:** the check digits of the título de eleitor and the CNH registration number (the TSE and CONTRAN name "módulo
+  11" without the weights, and no government text found gives them), the CNH número do espelho and formulário Renach,
+  passport formats other than the Polícia Federal's two letters and six digits, the masking rule of the CPF (plan
+  default used), a person with no surname (the CNJ code requires one). The RG of 26 of 27 units (all but BR-SP): their
   online forms limit the field at most (BA: eight digits with an optional control digit and no algorithm); the forms of
-  BA, CE, MG, PE, RJ, RN and RS could not be read live on 2026-11-16 UTC and are to be re-checked (`docs/sources/BR.md`).
+  BA, CE, MG, PE, RJ, RN and RS could not be read live on 2026-11-16 UTC and are to be re-checked
+  (`docs/sources/BR.md`).
 - **No region value object for RU**: no field encodes a region with a published mapping to ISO 3166-2:RU (`RU.md`).
 - **RU driving licences of the 1999 form** (Cyrillic series): expired by 2026 (`RU.md`).
 - **RU old-form OMS policies** (series and number) and AU **11-digit Medicare individual numbers**.
@@ -476,16 +482,28 @@ Collected from the source notes; each is a deliberate omission with its reason i
 
 ## Limits to know about
 
-- **Format only, check digit not verified:** INN, TFN, Medicare card number, CA SIN, the CA health card numbers
-  other than BC and ON, the MX CURP, RFC, NSS and clave de elector, and the BR título de eleitor and CNH registration
-  number. No official algorithm is
-  published (FNS says only "по алгоритму, определенному ФНС"; the ATO gives the TFN algorithm to registered developers
-  only; the ADHA appendix is not reachable; the CRA names a "Mod 10" formula for the SIN without giving it), so a
-  mistyped check digit is accepted. Only checksums quoted from an official source are verified: SNILS, OMS policy, DE
-  pension insurance number, IT codice fiscale, ES DNI and NIE, NL BSN, CH AHV number, GB NHS and H&C numbers, BC and
-  ON health card numbers, BR CPF, NIS and CNS.
+- **Format only, check digit not verified:** INN, TFN, Medicare card number, CA SIN, the CA health card numbers other
+  than BC and ON, the MX CURP, RFC, NSS and clave de elector, and the BR título de eleitor and CNH registration number.
+  No official algorithm is published (FNS says only "по алгоритму, определенному ФНС"; the ATO gives the TFN algorithm
+  to registered developers only; the ADHA appendix is not reachable; the CRA names a "Mod 10" formula for the SIN
+  without giving it; the TSE and CONTRAN name "módulo 11" without weights), so a mistyped check digit is accepted. Only
+  checksums quoted from an official source are verified: SNILS, OMS policy, DE pension insurance number, IT codice
+  fiscale, ES DNI and NIE, NL BSN, CH AHV number, GB NHS and H&C numbers, BC and ON health card numbers, BR CPF, NIS,
+  CNS and the SP RG. Any government body's own publication counts as official (the ANS algorithms for the NIS and CNS);
+  another body's intake policy does not (repeated-digit CPFs are accepted).
 - **MX clave de elector letters are `A-Z` only** (positions 1-6): INE says only "primeras letras", so whether a key
   can hold `Ñ` there is unknown; such a key would be refused (`docs/sources/MX.md`).
+- **Americas, shapes that look alike:** a bare BC or SK licence number is always ambiguous in the factory (1-8 digits,
+  stored zero-padded to 8: `347631` and `00347631` are one number); a twelve-digit MX licence of another state and an
+  RG of another state are reported as MX-MEX and BR-SP, because only those formats are published; US `123456789` fits
+  11 states. Pass the issuer to `fromNumberIn()`. A jurisdiction without a published format throws
+  "(format not covered)".
+- **ICAO punctuation (MX):** the Mexican name parts accept `/` and `.` (`D/AMICO`, `MA. GUADALUPE`) as RENAPO records
+  them, and the ICAO form omits them (`DAMICO`, `MA<GUADALUPE`), as Doc 9303 Part 3 §4.6 prescribes; no other country
+  accepts them. A Mexican name with no surname has the given names as its primary identifier.
+- **Unverified spots in the American sources:** the MX clave de elector letters are `A-Z` only, the US SSN accepts the
+  IRM's "never issued" examples, a US passport book accepts any letter (a card number parses as a book number), and the
+  hosts listed as "re-check" in "Not covered" could not be read on 2026-11-16 UTC.
 - **Not verified against the official PDF:** the 16-digit length of the OMS policy and the FFOMS Order 79 text it is
   checked against (www.ffoms.gov.ru is unreachable from here, the text is quoted from a copy), and the 2 + 7 split of
   the international passport number (no text read states it; `RU.md`).

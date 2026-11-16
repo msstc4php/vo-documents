@@ -6,10 +6,10 @@
 
 - Document numbers, each with `formatted()`, `masked()` and a checksum where an algorithm exists: Russia (`Snils`,
   `Inn`, `InternalPassportNumber`, `PassportIssuingUnitCode`, `InternationalPassportNumber`, `DriverLicenceNumber`,
-  `DriverLicenceCategory`, `OmsPolicyNumber`) and Australia (`TaxFileNumber`, `MedicareCardNumber`, a licence number per
-  state or territory, `Jurisdiction`, `DriverLicenceNumberFactory`).
-- `Icao\PersonName` (ICAO Doc 9303 Latin name, `mrzField()` truncation) and `Icao\Transliterator` with the multinational
-  Latin and Cyrillic tables.
+  `DriverLicenceCategory`, `OmsPolicyNumber`) and Australia (`TaxFileNumber`, `MedicareCardNumber`, a licence number
+  per state or territory, `Jurisdiction`, `DriverLicenceNumberFactory`).
+- `Icao\PersonName` (ICAO Doc 9303 Latin name, `mrzField()` truncation) and `Icao\Transliterator` with the
+  multinational Latin and Cyrillic tables.
 - National names `Name\RU\*` and `Name\AU\*`: name parts, `PersonName` with a derived Latin form and an optional Latin
   override, payload codecs, `Codecs::all()`.
 - Exceptions per family: `InvalidDocumentNumberException`, `InvalidPersonNameException`,
@@ -20,14 +20,22 @@
   codice fiscale, passport; ES DNI, NIE, social security number; NL BSN, identity document number; CH AHV number,
   identity document number, driving licence; GB NINO, passport, DVLA and DVA licences, NHS, H&C and CHI numbers; TR
   T.C. Kimlik No, passport. Source notes `docs/sources/{DE,FR,IT,ES,NL,CH,GB,TR}.md`.
-- `Name\Latin\AbstractLatinNamePart` and internal bases shared by the Latin-script countries
-  (`LatinPersonNameBuilder`, `AbstractLatinPersonName`, `AbstractFamilyGivenPersonName`,
-  `AbstractFamilyGivenPersonNameCodec`); `Name\AU\*` moved onto them with the same class names, constructors and
-  methods. The public `family`/`given` properties of the family + given names are now declared on the base and typed
-  as the abstract part (`AbstractNamePart`) at runtime; static analysers see the country's classes through
-  `@extends`.
-- `Contract\HasSex` is implemented by `Nir`, `FiscalCode`, the DVLA licence number and `ChiNumber`.
-- Source notes in `docs/sources/` (RU, AU, ICAO, DE, FR, IT, ES, NL, CH, GB, TR).
+- Americas (plan 3): names (`Name\<CC>\FamilyName`, `GivenName`, `PersonName`, codecs in `Codecs::all()`; also
+  `Name\US\MiddleName` and `Name\US\NameSuffix`) and documents for the United States, Canada, Mexico and Brazil. US:
+  SSN, ITIN, passport book and card, Medicare beneficiary identifier, DL/ID numbers of 30 states with
+  `DlIdNumberFactory`. CA: SIN, passport, driver's licences of 6 provinces and health cards of all 13 with
+  `DriverLicenceNumberFactory` and `HealthCardNumberFactory`. MX: CURP, clave de elector, RFC, NSS and the Estado de
+  México licence with `DriverLicenceNumberFactory`. BR: CPF, título de eleitor, NIS, CNS, CNH, passport and the São
+  Paulo RG with `IdentityCardNumberFactory`. Each country has a `Jurisdiction` enum (ISO 3166-2: 51, 13, 32 and 27
+  cases). Source notes `docs/sources/{US,CA,MX,BR}.md`.
+- `Name\Latin\AbstractLatinNamePart` and internal bases shared by the Latin-script countries (`LatinPersonNameBuilder`,
+  `AbstractLatinPersonName`, `AbstractFamilyGivenPersonName`, `AbstractFamilyGivenPersonNameCodec`); `Name\AU\*` moved
+  onto them with the same class names, constructors and methods. The public `family`/`given` properties of the family +
+  given names are now declared on the base and typed as the abstract part (`AbstractNamePart`) at runtime; static
+  analysers see the country's classes through `@extends`.
+- `Contract\HasSex` is implemented by `Nir`, `FiscalCode`, the DVLA licence number, `ChiNumber`, the Québec NAM and the
+  Mexican CURP. `Contract\HasBirthDate` is implemented by the CURP only (its 17th character gives the century).
+- Source notes in `docs/sources/` (RU, AU, ICAO, DE, FR, IT, ES, NL, CH, GB, TR, US, CA, MX, BR).
 
 ### Notes
 
@@ -40,18 +48,29 @@
 - Name parts are limited to 100 characters, `Icao\PersonName` to 255.
 - A Latin letter outside ICAO table 6.A is spelled as its base letter (`Nguyễn` → `NGUYEN`, `Ș` → `S`); compatibility
   characters (fullwidth letters, `ª`, `ﬁ`) are refused in name parts, except those an ICAO table lists (`Ĳ`, `Ŀ`).
-- Owner's rule: a checksum is verified only when its algorithm is quoted from an official source. Verified: DE
-  pension insurance number, IT codice fiscale, ES DNI and NIE, NL BSN, CH AHV number, GB NHS and H&C numbers. Format
-  only: DE Steuer-ID, FR NIR key, ES social security number and pre-2008 NIE letters, GB CHI check digit and DVLA
-  check characters, TR T.C. Kimlik No, and the other identity, passport and licence numbers.
-- Latin override policy per country: `TransliterationVariant` (AU, DE, FR, IT, ES, NL, CH, TR) or `AnyIcaoSpelling`
-  (RU, GB).
+- Owner's rule: a checksum is verified only when its algorithm is quoted from an official source. Verified: DE pension
+  insurance number, IT codice fiscale, ES DNI and NIE, NL BSN, CH AHV number, GB NHS and H&C numbers. Format only: DE
+  Steuer-ID, FR NIR key, ES social security number and pre-2008 NIE letters, GB CHI check digit and DVLA check
+  characters, TR T.C. Kimlik No, and the other identity, passport and licence numbers.
+- Latin override policy per country: `TransliterationVariant` (AU, DE, FR, IT, ES, NL, CH, TR, US, MX) or
+  `AnyIcaoSpelling` (RU, GB, CA, BR).
 - Not covered: see README "Not covered" for the full list with reasons (among them DE Führerschein, FR 2021 identity
-  card, IT CIE and patente, ES passport, NL rijbewijs, TR sürücü belgesi; the ES driving licence is the DNI or NIE).
-- RU and GB (`AnyIcaoSpelling`) accept an override when the name has no derived form; the transliteration variant cap
-  is per ICAO word; FR old identity cards accept the Corsican `2A`/`2B` place codes.
+  card, IT CIE and patente, ES passport, NL rijbewijs, TR sürücü belgesi, 21 US DL/ID jurisdictions, 7 CA licences, 31
+  MX state licences, the MX passport, 26 BR RG units; the ES driving licence is the DNI or NIE).
+- RU, GB and CA (`AnyIcaoSpelling`) accept an override when the name has no derived form; the transliteration variant
+  cap is per ICAO word; FR old identity cards accept the Corsican `2A`/`2B` place codes.
 - Name limits: FR names use the 2014 civil-status circular's letters; NL refuses `ĳ`; TR refuses `Q`, `W`, `X`, hyphens
   and apostrophes.
+- `Sex::Unspecified` exists for the CURP's `X` (RENAPO, non-binary persons); no other document returns it.
+- Mexican name parts accept `/` and `.` as RENAPO records them and the ICAO form omits them (Doc 9303 Part 3 §4.6); no
+  other country accepts them.
+- Americas decisions: US SSN refuses only the SSA rules (the IRM's open list of "never issued" numbers is not applied);
+  BC and SK licence numbers are stored zero-padded to 8 digits and are always ambiguous for `fromNumber()`; the Ontario
+  health version code is kept outside `value()`; the CPF accepts repeated digits; checksums of the BC and ON health
+  cards, the BR CPF, NIS, CNS and SP RG are verified, those of the CURP, RFC, NSS, SIN, título de eleitor and CNH are
+  not (no published algorithm). An official source is any government body's own publication; uncovered jurisdictions
+  and their reasons are in README "Not covered" (`fromNumberIn()` throws "(format not covered)").
+- Name classes use `\p{sc=Latin}` and `\p{sc=Cyrillic}` (Script property): requires `lib-pcre >=10.40`.
 - Requires `msstc4php/vo-base ^1.1.1`.
 
 ### Compatibility policy
