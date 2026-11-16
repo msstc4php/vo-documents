@@ -211,37 +211,60 @@ issued before it (still valid until expiry) have no published format.
 ## State driving licences (Task 6b)
 
 The licencia de conducir of each of the 32 federal entities, in ISO 3166-2:MX order. All sources were read on
-2026-11-16 between 09:30 and 11:10 UTC. **Result: no entity is covered (0/32).** No state, and no federal text,
-publishes the length, character set or layout of its licence number, so `Document\MX\Jurisdiction`, a
-`DriverLicenceNumber` interface, the per-state classes and the factory are not created (plan decision "Namespaces"
-names them "only for the states the research finds published"; with none, the enum would have no user).
+2026-11-16 (UTC); "IA" is an unmodified Internet Archive capture (`id_` form) cited with its UTC timestamp. **Result:
+one entity is covered (MX-MEX), 31 are not.** Basis for the code: the Task 6 "Files" line builds the `Jurisdiction`,
+interface, classes and factory "for state licences if any state is covered", and the controller's Task 6b ruling
+accepts the Edomex validator's field rule as the authority's own publication; once one state is covered, the plan's
+decision "Namespaces" applies and the enum lists all 32 entities regardless. Classes: `Document\MX\Jurisdiction`
+(32 cases), `Document\MX\DriverLicenceNumber`, `Document\MX\DriverLicence\MexDriverLicenceNumber`, factory
+`Document\MX\DriverLicenceNumberFactory` (pattern of `Document\CA\DriverLicence\*`).
 
 ### Sources
 
 | Ref | Source | Publisher | Where read |
 |---|---|---|---|
+| MEX-VAL | "Validación de licencias", with the button "Validar licencia de conducir" linking to MEX-VAL2 | Secretaría de Movilidad del Estado de México | <https://smovilidad.edomex.gob.mx/validacion_de_licencias>; IA 2026-01-17 19:54:54 of the same page (then linking to MEX-VAL3) |
+| MEX-VAL2 | "Valida la autenticidad de la Licencia de Conducir del Estado de México", field "Número de Licencia" | linked from MEX-VAL (host `dev-emx-validador-699226709879.northamerica-south1.run.app`) | <https://dev-emx-validador-699226709879.northamerica-south1.run.app/> |
+| MEX-VAL3 | "Validación de Licencias para Conducir" (the earlier validator) | linked from MEX-VAL in January 2026 | IA 2023-10-28 21:38:15 of <http://187.237.233.54/ValidadorLicencias?AspxAutoDetectCookieSupport=1> |
 | LGMSV | Ley General de Movilidad y Seguridad Vial (DOF 17-05-2022), art. 29 | Congreso de la Unión | <https://dof.gob.mx/nota_detalle.php?codigo=5652187&fecha=17%2F05%2F2022&print=true> |
-| CMX-RLM | Reglamento de la Ley de Movilidad de la Ciudad de México (GOCDMX 15-09-2017, última reforma GOCDMX 10-10-2025) | Gobierno de la Ciudad de México; consolidated copy published by PAOT (a CDMX public body) | <https://paot.org.mx/centro/reglamentos/df/pdf/2025/RGTO_LEY_MOVILIDAD_10_10_2025.pdf> |
+| AGU-LV | Ley de Vialidad del Estado de Aguascalientes | Congreso del Estado; copy on the Calvillo municipal site | <https://www.calvillo.gob.mx/LEYES/14%20LEY%20DE%20VIALIDAD%20DEL%20ESTADO%20DE%20AGUASCALIENTES.pdf> |
+| CMX-RLM | Reglamento de la Ley de Movilidad de la Ciudad de México (GOCDMX 15-09-2017, última reforma GOCDMX 10-10-2025) | Gobierno de la Ciudad de México; consolidated copy by PAOT (a CDMX public body) | <https://paot.org.mx/centro/reglamentos/df/pdf/2025/RGTO_LEY_MOVILIDAD_10_10_2025.pdf> |
+| CMX-VAL | "SEMOVI · Validación de Licencia y Tarjetas de Circulación" (result page of a QR scan; no input field) | SEMOVI | IA 2026-10-05 19:15:56 of <https://app.semovi.cdmx.gob.mx/licencias/a/validadar.php> |
 | GUA-RLM | Reglamento de la Ley de Movilidad del Estado de Guanajuato y sus Municipios, Decreto Gubernativo 175 (POGEG 22-11-2016), art. 306 | Gobierno del Estado de Guanajuato; copy on the León municipal site | <https://leon.gob.mx/movilidad/adjunto.php?a=773> |
 | JAL-LMT | Ley de Movilidad y Transporte del Estado de Jalisco (Decreto 24451/LX/13), art. 58 | Congreso del Estado de Jalisco | <https://transparencia.info.jalisco.gob.mx/sites/default/files/Ley%20de%20Movilidad%20y%20Transporte%20del%20Estado%20de%20Jalisco_2.pdf> |
-| NLE-LRL | Ley que Regula la Expedición de Licencias para Conducir del Estado de Nuevo León (Decreto 282, POE 30-12-2005; última reforma integrada Decreto 443, POE 148-III, 24-11-2023), art. 18 | Congreso del Estado de Nuevo León ("Compilación Legislativa"); copy on the Galeana municipal site (`hcnl.gob.mx` failed the TLS handshake) | <https://galeana.gob.mx/wp-content/uploads/2025/11/51_Ley_Licencias_de_Conducir.pdf> |
+| JAL-ML | "Mi Licencia" portal (no licence-number field) | Gobierno de Jalisco | <https://milicencia.jalisco.gob.mx/> |
+| NLE-LRL | Ley que Regula la Expedición de Licencias para Conducir del Estado de Nuevo León (Decreto 282, POE 30-12-2005; última reforma integrada Decreto 443, POE 148-III, 24-11-2023), art. 18 | Congreso del Estado de Nuevo León ("Compilación Legislativa"); copy on the Galeana municipal site | <https://galeana.gob.mx/wp-content/uploads/2025/11/51_Ley_Licencias_de_Conducir.pdf> |
 | SLP-SIPEL | "Enlace SIPEL — Licencia de Conducir" (renewal form) | Secretaría de Finanzas de San Luis Potosí | <https://enlacesipel.slp.gob.mx/LicenciasConductor> |
 | SLP-VAL | "Valida tu licencia" (CURP + licence number form) | Gobierno de San Luis Potosí | <https://validatulicencia.slp.gob.mx/> |
 | TAB-LGTV | Ley General de Tránsito y Vialidad del Estado de Tabasco (última reforma Decreto 265, POE 8733 "E", 16-05-2026), art. 21 | Congreso del Estado de Tabasco | <https://congresotabasco.gob.mx/wp-content/uploads/2026/05/Ley-General-de-Transito-y-Vialidad-del-Estado-de-Tabasco.pdf> |
-| MEX-VAL | "Validación de licencias" | Secretaría de Movilidad del Estado de México | <https://smovilidad.edomex.gob.mx/validacion_de_licencias> |
 
-Reachability: `semovi.cdmx.gob.mx` and its apps, `appsextssl.ebajacalifornia.gob.mx`, `hcnl.gob.mx`, `icvnl.gob.mx`,
-`michoacan.gob.mx`, `tramites.yucatan.gob.mx`, `ventanilla.puebla.gob.mx` and `diputados.gob.mx` did not answer
-(connection reset, TLS failure or timeout, also through WebFetch), and the Internet Archive was "Temporarily Offline"
-for the whole session, so no capture of them could be read. Searched without an official format (web search restricted
-to each state's `gob.mx` domain and by name, plus the state's transit or mobility law where found): all 32 entities.
-Secondary only (never a rule, never cited in code): vendor and insurer guides (Kavak, Ahorra Seguros), news sites,
-Justia copies, Wikipedia. Kavak's "en Sonora, el folio tiene 14 dígitos" cites no official text; a search-index
-snippet of a Baja California verification page shows a sample number, but the page could not be read and a sample is
-not a rule.
+Reachability on 2026-11-16 (UTC): `semovi.cdmx.gob.mx`, `appsextssl.ebajacalifornia.gob.mx`, `hcnl.gob.mx` (TLS
+failure), `icvnl.gob.mx`, `michoacan.gob.mx`, `tramites.yucatan.gob.mx`, `ventanilla.puebla.gob.mx` and
+`diputados.gob.mx` did not answer (connection reset, TLS failure or timeout, also through WebFetch), on a first try and
+again on a retry later the same day. The Internet Archive was offline at the first attempt and answered later; its CDX
+index has no capture of the `semovi.cdmx.gob.mx` licence pages, the Baja California verifier, `icvnl.gob.mx`,
+`ventanilla.puebla.gob.mx` or Michoacán licence pages (only CMX-VAL and SEMOVI press releases). Rows whose issuer's
+pages could not be read say so ("re-check"). Searched without an official format: web search restricted to each
+state's `gob.mx` domain (named in the row) and by state name. Secondary only (never a rule, never cited in code):
+vendor and insurer guides (Kavak, Ahorra Seguros), news sites, Justia copies, Wikipedia. Kavak's "en Sonora, el folio
+tiene 14 dígitos" cites no official text; a search-index snippet of a Baja California verification page shows a sample
+number, but the page could not be read and a sample is not a rule.
 
-**What the official texts say.** The laws and regulations that list a licence's contents name the number and stop
-there (verbatim):
+**Estado de México (verbatim).** MEX-VAL2, the number field: `placeholder="12 dígitos" maxlength="12"
+data-val-length="El Número de Licencia es de 12 dígitos" data-val-length-max="12" data-val-length-min="12"
+data-val-regex="El Número de Licencia debe contener solo números." data-val-regex-pattern="^\d{12}$"
+id="NumLicencia"`; the second field is the issue date, `type="date" … min="2000-01-01"` ("La Fecha de Emisión es
+obligatoria."). MEX-VAL3: "2. Ingrese en la casilla los DOCE números de su licencia (frente de su plástico) y oprima
+el botón "Consultar"", field `id="Identifiyer" maxlength="12"`.
+
+Caveats, recorded as the controller's ruling asks: MEX-VAL2 is served from a `dev-` host on Google Cloud Run, not from
+`edomex.gob.mx`; it counts as the authority's publication because the Secretaría's own page links it as its licence
+validator, and the earlier validator (MEX-VAL3, linked the same way) states the same twelve digits. The date field's
+`min="2000-01-01"` means the validator only takes licences issued from 2000. No source describes an older number or
+says one remains in circulation, so no other format is accepted; if one surfaces, add it with its quote.
+
+**What the other official texts say.** The laws and regulations that list a licence's contents name the number and
+stop there (verbatim):
 
 - LGMSV art. 29: the federal and state databases contain "II. Licencias de conducir, incluyendo el tipo de licencia y
   seguros registrados por vehículo"; no number format, no national licence register with a layout.
@@ -257,53 +280,76 @@ there (verbatim):
   domicilio, número de licencia que lo autoriza a conducir este tipo de vehículos").
 - SLP-SIPEL: the "número de licencia" field carries the hint "No debe contener guiones, espacios, ni caracteres
   especiales"; SLP-VAL: "Ingresa el número de licencia". Neither gives a length or character set.
+- AGU-LV: no clause on the licence number.
 
-### Per entity
+### State driving licences — per entity
 
 | ISO | Source | Quoted format | Normalised shape | Encoded data | Official sample | Verdict |
 |---|---|---|---|---|---|---|
-| MX-AGU | Ley de Movilidad del Estado de Aguascalientes (searched) | none | — | — | — | not covered: no published format |
-| MX-BCN | Ley que Regula los Servicios de Control Vehicular (searched); verification page unreachable | none | — | — | none read (an index snippet only) | not covered: no published format; a sample is not a rule |
-| MX-BCS | state portal (searched) | none | — | — | — | not covered: no published format |
-| MX-CAM | state portal (searched) | none | — | — | — | not covered: no published format |
-| MX-CHH | state portal (searched) | none | — | — | — | not covered: no published format |
-| MX-CHP | state portal (searched) | none | — | — | — | not covered: no published format |
-| MX-CMX | CMX-RLM; SEMOVI pages unreachable | number named, no format | — | — | — | not covered: no published format |
-| MX-COA | state portal, RETYS (searched) | none | — | — | — | not covered: no published format |
-| MX-COL | state portal (searched) | none | — | — | — | not covered: no published format |
-| MX-DUR | state portal (searched) | none | — | — | — | not covered: no published format |
-| MX-GRO | state portal (searched) | none | — | — | — | not covered: no published format |
-| MX-GUA | GUA-RLM art. 306 | number not described | — | — | — | not covered: no published format |
-| MX-HID | state portal (searched) | none | — | — | — | not covered: no published format |
-| MX-JAL | JAL-LMT art. 58 | "El número de registro de dicha licencia" | — | — | — | not covered: no published format |
-| MX-MEX | MEX-VAL | none (no number field described) | — | — | — | not covered: no published format |
-| MX-MIC | state portal unreachable (searched) | none | — | — | — | not covered: no published format |
-| MX-MOR | state portal (searched) | none | — | — | — | not covered: no published format |
-| MX-NAY | state portal (searched) | none | — | — | — | not covered: no published format |
-| MX-NLE | NLE-LRL art. 18 | "b) Número de licencia" | — | — | — | not covered: no published format |
-| MX-OAX | state portal (searched) | none | — | — | — | not covered: no published format |
-| MX-PUE | Ventanilla Digital FAQ unreachable (searched) | none | — | — | — | not covered: no published format |
-| MX-QUE | SSC and CEMER pages (searched) | none | — | — | — | not covered: no published format |
-| MX-ROO | IMOVEQROO pages (searched) | none | — | — | — | not covered: no published format |
-| MX-SIN | state portal (searched) | none | — | — | — | not covered: no published format |
+| MX-AGU | AGU-LV; `aguascalientes.gob.mx` (searched) | none | — | — | — | not covered: no published format |
+| MX-BCN | `appsextssl.ebajacalifornia.gob.mx/Verificacion/Licencias` (unreachable, no IA capture); `ebajacalifornia.gob.mx` (searched) | none read | — | — | none read (an index snippet only) | not covered: issuer's pages unreachable on 2026-11-16 UTC, re-check |
+| MX-BCS | `bcs.gob.mx` (searched) | none | — | — | — | not covered: no published format |
+| MX-CAM | `campeche.gob.mx` (searched) | none | — | — | — | not covered: no published format |
+| MX-CHH | `chihuahua.gob.mx` (searched) | none | — | — | — | not covered: no published format |
+| MX-CHP | `chiapas.gob.mx` (searched) | none | — | — | — | not covered: no published format |
+| MX-CMX | CMX-RLM; CMX-VAL; `semovi.cdmx.gob.mx` licence pages (unreachable, no IA capture) | number named, no format | — | — | — | not covered: issuer's pages unreachable on 2026-11-16 UTC, re-check |
+| MX-COA | `coahuila.gob.mx` (searched) | none | — | — | — | not covered: no published format |
+| MX-COL | `col.gob.mx` (searched) | none | — | — | — | not covered: no published format |
+| MX-DUR | `durango.gob.mx` (searched) | none | — | — | — | not covered: no published format |
+| MX-GRO | `guerrero.gob.mx` (searched) | none | — | — | — | not covered: no published format |
+| MX-GUA | GUA-RLM art. 306; `guanajuato.gob.mx` (searched) | number not described | — | — | — | not covered: no published format |
+| MX-HID | `hidalgo.gob.mx` (searched) | none | — | — | — | not covered: no published format |
+| MX-JAL | JAL-LMT art. 58; JAL-ML | "El número de registro de dicha licencia" | — | — | — | not covered: no published format |
+| MX-MEX | MEX-VAL, MEX-VAL2, MEX-VAL3 | "El Número de Licencia es de 12 dígitos", "debe contener solo números", `^\d{12}$`; "los DOCE números de su licencia" | `[0-9]{12}` | none (format only) | none | covered |
+| MX-MIC | `michoacan.gob.mx/tramites/licencias/` (unreachable, no IA capture) | none read | — | — | — | not covered: issuer's pages unreachable on 2026-11-16 UTC, re-check |
+| MX-MOR | `morelos.gob.mx` (searched) | none | — | — | — | not covered: no published format |
+| MX-NAY | `nayarit.gob.mx` (searched) | none | — | — | — | not covered: no published format |
+| MX-NLE | NLE-LRL art. 18; `icvnl.gob.mx` (Instituto de Control Vehicular, unreachable, no IA capture) | "b) Número de licencia" | — | — | — | not covered: issuer's pages unreachable on 2026-11-16 UTC, re-check |
+| MX-OAX | `oaxaca.gob.mx` (searched) | none | — | — | — | not covered: no published format |
+| MX-PUE | `ventanilla.puebla.gob.mx` licence-digital FAQ (unreachable, no IA capture) | none read | — | — | — | not covered: issuer's pages unreachable on 2026-11-16 UTC, re-check |
+| MX-QUE | `queretaro.gob.mx` (searched; CEMER projects) | none | — | — | — | not covered: no published format |
+| MX-ROO | `qroo.gob.mx` (searched) | none | — | — | — | not covered: no published format |
+| MX-SIN | `sinaloa.gob.mx` (searched) | none | — | — | — | not covered: no published format |
 | MX-SLP | SLP-SIPEL, SLP-VAL | "No debe contener guiones, espacios, ni caracteres especiales" | — | — | — | not covered: no length or character set |
-| MX-SON | state portal (searched); "14 dígitos" from a vendor guide only | none | — | — | — | not covered: no official format |
+| MX-SON | `sonora.gob.mx` (searched); "14 dígitos" from a vendor guide only | none | — | — | — | not covered: no official format |
 | MX-TAB | TAB-LGTV art. 21 | "IV. Número de identificación del Titular" | — | — | — | not covered: no published format |
-| MX-TAM | Secretaría de Finanzas requirement and fee sheets (searched) | none | — | — | — | not covered: no published format |
-| MX-TLA | state portal (searched) | none | — | — | — | not covered: no published format |
-| MX-VER | state portal (searched) | none | — | — | — | not covered: no published format |
-| MX-YUC | Reglamento de Tránsito (only a Justia copy found; RETyS page unreachable) | number named, no format (secondary copy) | — | — | — | not covered: no published format |
-| MX-ZAC | state portal (searched) | none | — | — | — | not covered: no published format |
+| MX-TAM | `finanzas.tamaulipas.gob.mx` requirement and fee sheets (searched) | none | — | — | — | not covered: no published format |
+| MX-TLA | `tlaxcala.gob.mx` (searched) | none | — | — | — | not covered: no published format |
+| MX-VER | `veracruz.gob.mx` (searched) | none | — | — | — | not covered: no published format |
+| MX-YUC | `tramites.yucatan.gob.mx` (unreachable); Reglamento de Tránsito seen only on Justia (not official) | none read | — | — | — | not covered: no official source read, re-check |
+| MX-ZAC | `zacatecas.gob.mx` (searched) | none | — | — | — | not covered: no published format |
 
-### Overlap and worked examples
+Rulings: separators of `Internal\Digits::SEPARATORS` are removed, as in US and CA (the Edomex field itself takes only
+digits); leading zeros are kept; no check digit and no encoding (none quoted). `masked()` keeps the last four digits
+(plan default: the number has more than eight characters). No `formatted()`: no display form is quoted.
 
-With no entity covered there is no overlap to resolve and no factory: the overlap set is empty and there is nothing to
-route. The check script (`mx_state_licences.py`, Task 6b scratchpad) verifies that this table has 32 rows in ISO
-3166-2:MX order, that every verdict is "not covered", and that each verbatim quote above occurs in the downloaded
-source text.
+### State driving licences — overlap (the factory's test oracle)
 
-A future task that finds a published format adds the enum (all 32 cases, plan decision), the interface, the class and
-the factory in one step, following `Document\CA\DriverLicence\*`.
+Only one entity is covered, so no shape overlaps another and `fromNumber()` never throws
+`AmbiguousJurisdictionException` today. A licence of one of the 31 uncovered entities that happens to have twelve
+digits is reported as MX-MEX by `fromNumber()` (the factory can only match published formats); a caller that knows
+the issuer uses `fromNumberIn()`, which throws "(format not covered)" for the 31.
+
+| Length after normalisation | Shapes | Matching entities |
+|---|---|---|
+| 12 | `[0-9]{12}` | MX-MEX |
+| any other | — | none |
+
+Worked examples (`jurisdictionsMatching()`, then `fromNumber()`):
+
+| Input | Matching | `fromNumber()` |
+|---|---|---|
+| `` | none | "Invalid Mexican driver's licence number (0 characters)." |
+| `123456789012` | MX-MEX | `MexDriverLicenceNumber` `123456789012` |
+| `1234 5678 9012` | MX-MEX | `MexDriverLicenceNumber` `123456789012` |
+| `000000000001` | MX-MEX | `MexDriverLicenceNumber` `000000000001` |
+| `12345678901` | none | "Invalid Mexican driver's licence number (11 characters)." |
+| `1234567890123` | none | "Invalid Mexican driver's licence number (13 characters)." |
+| `12345678901A` | none | "Invalid Mexican driver's licence number (fits no jurisdiction)." |
+
+The check script (`mx_state_licences.py`, Task 6b scratchpad) verifies the 32 rows in ISO 3166-2:MX order, the
+covered set, the worked examples against the shapes of the per-entity table, and each verbatim quote above against the
+downloaded source.
 
 ## Not covered
 
@@ -311,5 +357,5 @@ the factory in one step, following `Document\CA\DriverLicence\*`.
 - RFC of a legal person (12 characters, `t_RFC_PM`): the package covers natural persons.
 - CURP check digit, elector-key homoclave, RFC homoclave check character, NSS check digit: no algorithm published.
 - INE credential numbers other than the clave de elector (CIC, OCR, número de emisión): not researched in this task.
-- State driving licence numbers of all 32 entities (above): the state laws name the number without a format; no
-  `Document\MX\Jurisdiction` or licence classes exist.
+- State driving licence numbers of 31 entities (all but MX-MEX, above): the state laws name the number without a
+  format; for BCN, CMX, MIC, NLE, PUE and YUC the issuer's pages could not be read on 2026-11-16 UTC (re-check).
