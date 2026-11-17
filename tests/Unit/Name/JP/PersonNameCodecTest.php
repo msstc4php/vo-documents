@@ -35,6 +35,7 @@ use MSSTC4PHP\ValueObject\Documents\Name\JP\GivenNameReading;
 use MSSTC4PHP\ValueObject\Documents\Name\JP\PassportHepburn;
 use MSSTC4PHP\ValueObject\Documents\Name\JP\PersonName;
 use MSSTC4PHP\ValueObject\Documents\Name\JP\PersonNameCodec;
+use MSSTC4PHP\ValueObject\Documents\Name\KR\PersonNameCodec as KrPersonNameCodec;
 use MSSTC4PHP\ValueObject\Documents\Name\LatinForm;
 use MSSTC4PHP\ValueObject\Documents\Name\LatinOverridePolicy;
 use MSSTC4PHP\ValueObject\Documents\Name\MX\PersonNameCodec as MxPersonNameCodec;
@@ -67,6 +68,7 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(MxPersonNameCodec::class)]
 #[UsesClass(BrPersonNameCodec::class)]
 #[UsesClass(CnPersonNameCodec::class)]
+#[UsesClass(KrPersonNameCodec::class)]
 #[UsesClass(PersonName::class)]
 #[UsesClass(PassportHepburn::class)]
 #[UsesClass(FamilyName::class)]
