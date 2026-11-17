@@ -27,6 +27,6 @@ abstract class AbstractMexicanNamePart extends AbstractLatinNamePart
     #[Override]
     protected function word(): string
     {
-        return '[' . $this->letters() . ']+(?:\.[' . $this->letters() . ']+)*\.?';
+        return $this->wordWithAbbreviationDots();
     }
 }

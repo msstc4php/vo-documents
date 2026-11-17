@@ -21,4 +21,15 @@ abstract class AbstractLatinNamePart extends AbstractNamePart
     {
         return '\p{sc=Latin}';
     }
+
+    /**
+     * A word that may carry abbreviation full stops: `Ma.`, `St.Clair`, `M.A.`. A subclass returns it from
+     * {@see word()} where the country's records keep abbreviations and initials.
+     *
+     * @return non-empty-string
+     */
+    protected function wordWithAbbreviationDots(): string
+    {
+        return '[' . $this->letters() . ']+(?:\.[' . $this->letters() . ']+)*\.?';
+    }
 }

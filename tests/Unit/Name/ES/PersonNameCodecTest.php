@@ -27,6 +27,7 @@ use MSSTC4PHP\ValueObject\Documents\Name\ES\PersonName;
 use MSSTC4PHP\ValueObject\Documents\Name\ES\PersonNameCodec;
 use MSSTC4PHP\ValueObject\Documents\Name\FR\PersonNameCodec as FrPersonNameCodec;
 use MSSTC4PHP\ValueObject\Documents\Name\GB\PersonNameCodec as GbPersonNameCodec;
+use MSSTC4PHP\ValueObject\Documents\Name\ID\PersonNameCodec as IdPersonNameCodec;
 use MSSTC4PHP\ValueObject\Documents\Name\IdentifierSpellings;
 use MSSTC4PHP\ValueObject\Documents\Name\IN\Devanagari\PersonNameCodec as InDevanagariPersonNameCodec;
 use MSSTC4PHP\ValueObject\Documents\Name\IN\PersonNameCodec as InPersonNameCodec;
@@ -61,6 +62,7 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(KrPersonNameCodec::class)]
 #[UsesClass(InPersonNameCodec::class)]
 #[UsesClass(InDevanagariPersonNameCodec::class)]
+#[UsesClass(IdPersonNameCodec::class)]
 #[UsesClass(CaPersonNameCodec::class)]
 #[UsesClass(RuPersonNameCodec::class)]
 #[UsesClass(AuPersonNameCodec::class)]
