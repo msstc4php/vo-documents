@@ -84,14 +84,14 @@ apellidos a cualquiera de las lenguas oficiales correspondiente al origen o domi
   tolerable representar la ela geminada amb dues eles separades per un punt volat de l'amplada d'un espai tipogràfic,
   d'aquesta manera: L·L, l·l. En canvi, és totalment inadmissible la substitució del punt volat per un punt baix (L.L,
   l.l) o per un guió (L-L, l-l)." This agrees with the shape accepted (U+00B7 between two `l`, no `.` or `-`) and
-  names `ŀ`/`Ŀ` as the other, preferred spelling, which the fold below keeps valid. Secondary only (never a rule):
-  Softcatalà and press reports (Avui 2004, Ara) say the computerised Registro Civil has taken `l·l` and rejected `Ŀ`.
+  names `ŀ`/`Ŀ` as the other, preferred spelling, which the fold below keeps valid.
 - **`ŀ` and `Ŀ`** (U+0140, U+013F) are folded to their NFKC forms `l·` and `L·` before validation, so `Marceŀlí` and
   `Marcel·lí` are one stored value (`Marcel·lí`) and equal. This follows the package's compatibility-character rule
   (two spellings of one name must not give two values): elsewhere the rule refuses such characters, but table 6.A
-  lists `Ŀ`, so the other countries keep accepting it as typed (no `·` is allowed there to fold it to; NL table 5.2 lists `ŀ`
-  as a letter, and folding it would give a name the NL rules refuse). The fold therefore stays in ES (task 10 ruling); in ES, where
-  `l·` is valid, the fold gives the one canonical spelling. The Latin form is unchanged (`Geŀla` → `GELLA`).
+  lists `Ŀ`, so the other countries keep accepting it as typed (no `·` is allowed there to fold it to; NL table 5.2
+  lists `ŀ` as a letter, and folding it would give a name the NL rules refuse). The fold therefore stays in ES (task
+  10 ruling); in ES, where `l·` is valid, the fold gives the one canonical spelling. The Latin form is unchanged
+  (`Geŀla` → `GELLA`).
 - **Derived Latin:** the primary identifier is both surnames joined by a space (plan decision), the given name the
   secondary identifier, through ICAO Doc 9303 Part 3 table 6.A (`ICAO.md`): `García López, María José` →
   `GARCIA<LOPEZ<<MARIA<JOSE`; `Ñ` → `N` (table default; `NXX` is a variant), `Ü` → `UE` (table default; `U` and

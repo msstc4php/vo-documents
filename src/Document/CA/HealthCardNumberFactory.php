@@ -34,6 +34,9 @@ use MSSTC4PHP\ValueObject\Documents\Internal\SubdivisionResolver;
  */
 final class HealthCardNumberFactory
 {
+    private const string HINT = 'Invalid Canadian health card number (fits no jurisdiction; '
+        . 'an Ontario card with a version code: use OnHealthCardNumber::fromCard()).';
+
     /**
      * @throws AmbiguousJurisdictionException<Jurisdiction> when several jurisdictions match, listed in enum order
      * @throws InvalidDocumentNumberException when none matches: "(fits no jurisdiction)" if the length fits a
@@ -46,7 +49,11 @@ final class HealthCardNumberFactory
         try {
             return self::resolver()->resolve($number);
         } catch (InvalidDocumentNumberException $exception) {
-            throw self::carriesOntarioVersionCode($number) ? new InvalidDocumentNumberException('Invalid Canadian health card number (fits no jurisdiction; an Ontario card with a version code: use OnHealthCardNumber::fromCard()).', previous: $exception) : $exception;
+            if (self::carriesOntarioVersionCode($number)) {
+                throw new InvalidDocumentNumberException(self::HINT, $exception->getCode(), previous: $exception);
+            }
+
+            throw $exception;
         }
     }
 

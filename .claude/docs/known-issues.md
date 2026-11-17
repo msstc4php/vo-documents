@@ -175,7 +175,8 @@
   The fold stays in ES and is not moved to `AbstractNamePart` (task 10 of plan 4): the only other wave-1 source that lists
   `ŀ`/`Ŀ` is NL table 5.2, as letters, and `·` is not valid in NL, so folding there would turn a valid name into a
   refused one. No registry text on `l·l` exists in our sources; acceptance rests on the never-refuse rule (ES.md).
-  `HealthCardNumberFactory::fromNumber()` points to `OnHealthCardNumber::fromCard()` for an Ontario card with a version code.
+- **CA health card factory:** `HealthCardNumberFactory::fromNumber()` points to
+  `OnHealthCardNumber::fromCard()` in its no-match message for an Ontario card with a version code (no input echoed).
 - Escaped equivalent mutants in `Document\ES\*`: the `(int)` cast in `ControlLetter::of()` (a numeric string divides
   the same), and the `substr()` length / unwrap in
   `Dni`/`Nie` (an `(int)` cast stops at the trailing check letter).
