@@ -140,7 +140,7 @@ All dates UTC. Sources read 2026-11-17 (10:09-10:15 UTC).
 | 基礎年金番号 | 日本年金機構, 基礎年金番号とは何ですか。 (updated 2023-04-28) | <https://www.nenkin.go.jp/section/faq/seidozenpan/kisoban/kisonenkinbango/20140807-02.html> |
 | 在留カード番号 | 厚生労働省 島根労働局, 外国人雇用状況の届出様式の記入要領 | <https://jsite.mhlw.go.jp/shimane-roudoukyoku/content/contents/001640228.pdf> |
 | Passport number | 外務省, 旅券への別名併記の記載方法変更 (sample `AB1234567`); 神奈川県 パスポートの読みかた等 | Internet Archive copy <https://web.archive.org/web/2025/https://www.mofa.go.jp/mofaj/files/100130952.pdf>; <https://www.pref.kanagawa.jp/docs/h6d/passport/aboutpass.html> |
-| 運転免許証の暗証番号 | 奈良県警察 | <https://www.police.pref.nara.jp/0000006927.html> |
+| 運転免許証の番号 | 警察庁交通局運転免許課長, 警察庁丁運発第76号 (令和7年3月10日) | <https://www.npa.go.jp/laws/notification/menkyo20250310_76.pdf> |
 
 Hosts that failed (2026-11-17): `www.mofa.go.jp` (live pages: Access Denied; the Internet Archive copies read),
 `www.moj.go.jp` and `lapse-immi.moj.go.jp` (the Immigration Services Agency, 403 from CloudFront on every page tried),
@@ -185,16 +185,18 @@ gives one description for the number field. No check rule and no meaning of the 
 renewal (MOFA 2021-09-14, "更新する前に所持していたパスポートと同じ番号を引き継ぐことはできません"), which is why it is no
 person identifier. Mask: last 4.
 
-### Driving licence number (運転免許証番号) — NOT covered
+### Driving licence number (運転免許証番号) — covered, check digit not verified: `Document\JP\DrivingLicenceNumber`
 
-The 12-digit layout (commission code, year, serial, check digit, reissue count) appears only in explainers and blogs,
-which also disagree on the position of the check digit and the reissue count. No government text read gives the length
-or the layout: 道路交通法施行規則 (e-Gov, all 335M50000002060 text searched for 免許証番号, 十二桁, 公安委員会コード, 検査) has
-no format; 奈良県警察 says only that the IC card PIN 1 is taken from "運転免許証の番号のうち5桁目から8桁目". The NPA notice
-"運転免許証の番号の形式及び内容について" named by a search engine could not be found. Under the owner's rule neither the
-length, the commission-code accessor nor the check digit is published, so the class is left out; adding it needs an
-official copy of that notice. (Hokkaido has five commissions, so the code would be a string accessor, not an ISO
-3166-2 code.)
+警察庁丁運発第76号 (令和7年3月10日, 警察庁交通局運転免許課長), 「運転免許証の番号等の形式及び内容について（通達）」,
+<https://www.npa.go.jp/laws/notification/menkyo20250310_76.pdf>, fetched with `curl` and read with `pdftotext` on
+2026-11-17 (UTC). It applies from 令和7年3月24日 and abolishes 「運転免許証の番号の形式及び内容について」 (昭和56年9月10日付け
+警察庁丁運発第105号). Section 1 (verbatim): "免許証の番号及び…免許情報記録の番号の形式はいずれも12桁の数字とし、その内容は次のとおりとする。"
+- (1) 公安委員会コード: "交付公安委員会又は記録公安委員会を表示する２桁の数字で、…丁運発第112号…別添２業務コード表１都道府県（方面）公安委員会名コードによるものとする。" The code table is in that other notice and was not found, so the code is a string and is not mapped (Hokkaido has five commissions: no ISO 3166-2 map).
+- (2) 年別記号: "交付年又は記録年…を表示する２桁の数字で、交付年等に該当する西暦の下２桁とする。" Exposed as the two digits, no century.
+- (3) 交付等番号: "交付年等ごとの一連番号を表示する６桁の数字とする。"
+- (4) チェックデジット: "公安委員会コード、年別記号及び交付等番号に基づいて、「モジュラス11」の計算方式により算出した１桁の数字とする。" Only the name of the method is given, no weights: the check digit is **not verified** (explainer pages disagree and are not a source).
+- (5) 再交付記号又は再記録記号: the 12th digit, "０" for a new licence. Section 2: it is raised by 1 per reissue "（…「10」となる場合は、再交付記号をリセットし「１」とした上で…）", so 1-9 after the first reissue.
+Section 2(1): a renewed licence keeps the number of the latest new licence (with the raised 12th digit), so a number issued under the 1981 notice keeps its shape and a plain 12-digit check is safe. The マイナ免許証's 免許情報記録の番号 has the same layout (12th digit = 再記録記号) and is the same value object. The notice has no example number (the test numbers are made up) and no display form. Mask: last 4.
 
 ### Other residence and identity documents — NOT covered
 

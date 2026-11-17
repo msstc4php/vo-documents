@@ -27,7 +27,10 @@ final class MyNumber extends AbstractStringValueObject implements Maskable
 {
     private const string DOCUMENT = 'My Number';
 
-    /** Q(n) for the 11 leading digits, read from the left (n = 11 down to 1). */
+    /**
+     * Q(n) for n = 11 down to 1. The ordinance counts n from the least significant digit, while
+     * Checksum::weightedMod pairs weights with digits from the left, so the order is reversed here.
+     */
     private const array WEIGHTS = [6, 5, 4, 3, 2, 7, 6, 5, 4, 3, 2];
 
     #[Override]

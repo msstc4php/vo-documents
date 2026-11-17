@@ -34,6 +34,7 @@ final class BasicPensionNumberTest extends TestCase
         yield 'digits only' => ['1234567890', '1234567890'];
         yield 'four and six' => ['1234-567890', '1234567890'];
         yield 'spaces and NBSP' => ["1234 567890\u{00A0}", '1234567890'];
+        yield 'ideographic space' => ["1234\u{3000}567890", '1234567890'];
         yield 'leading zeros' => ['0000000001', '0000000001'];
         yield 'fullwidth digits' => [
             "\u{FF11}\u{FF12}\u{FF13}\u{FF14}\u{FF15}\u{FF16}\u{FF17}\u{FF18}\u{FF19}\u{FF10}",

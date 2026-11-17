@@ -35,6 +35,7 @@ final class PassportNumberTest extends TestCase
         yield 'MOFA sample' => ['AB1234567', 'AB1234567'];
         yield 'lower case' => ['ab1234567', 'AB1234567'];
         yield 'separators' => ['AB 123-4567', 'AB1234567'];
+        yield 'NBSP and ideographic space' => ["AB\u{00A0}123\u{3000}4567", 'AB1234567'];
         yield 'fullwidth' => ["\u{FF21}\u{FF22}\u{FF11}\u{FF12}\u{FF13}\u{FF14}\u{FF15}\u{FF16}\u{FF17}", 'AB1234567'];
         yield 'other letters' => ['TZ0000000', 'TZ0000000'];
     }
