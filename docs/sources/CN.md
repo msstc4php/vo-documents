@@ -11,14 +11,15 @@ All dates UTC. Sources read 2026-11-17.
 | 《公安机关电子普通护照签发量即将破亿 新号段证件预计于4月启用》 (2017-04-07) | 公安部 website, republished by 国家互联网信息办公室 | <https://www.cac.gov.cn/2017-04/07/c_1120766993.htm> |
 | 《电子往来港澳通行证号码编制规则调整》 (2025-10-15, "来源：国家移民管理局") | NIA, republished by 福建省公安厅 | <https://gat.fujian.gov.cn/ztzl/cryjfwwj/flfg_28281/201812/t20181205_4693182.htm> |
 | "台胞证与回乡证的编码规则", NIA citizen exit-entry department's reply of 2021-09-23 | NIA | <https://www.nia.gov.cn/Enquiry/publish/showQuestion.jsp?MZ=5tIXYbRpaLKgbVSmyF9JoA%3D%3D> |
-| 《居民身份证法》 (2003, amended by the decision of the NPC Standing Committee of 2011-10-29, 主席令第五十一号), Art. 23 | 全国人民代表大会常务委员会 | <http://www.npc.gov.cn/zgrdw/huiyi/cwh/1123/2011-10/31/content_1678469_6.htm>; only the search tool's excerpt was read (see Reachability) |
+| 《居民身份证法》 (2003, amended by the decision of the NPC Standing Committee of 2011-10-29, 主席令第五十一号), Art. 23 para. 2 | 全国人民代表大会常务委员会; text read on government reprints | <https://www.longling.gov.cn/info/11834/2365289.htm> (Longling County government) and <http://sft.jiangsu.gov.cn/art/2011/11/24/art_71924_8102502.html> (Jiangsu Department of Justice), both read 2026-11-17 |
 | ICAO Doc 9303 Part 3, 8th ed. (2021), §4.6 | ICAO | see `ICAO.md` |
 
 Reachability: `zjw.beijing.gov.cn`, `www.gov.cn`, `www.nia.gov.cn` and `www.cac.gov.cn` answer WebFetch (the NIA and
 GB PDFs are saved locally and read with `pdftotext` and as images; `curl` from the sandbox is refused by `www.nia.gov.cn`
 and `www.npc.gov.cn`: 403). `www.npc.gov.cn` fails WebFetch with an SSL handshake error and its Internet Archive copy
-is refused by the fetch tool ("unable to fetch from web.archive.org"), so the text of Art. 23 below is the search
-tool's quotation of the page, not a page read by this task. `www.mfa.gov.cn` (page of 公安部's 2012 announcement)
+is refused by the fetch tool ("unable to fetch from web.archive.org"); `flk.npc.gov.cn` gives no link to the law
+(2026-11-17); `www.shaanxi.gov.cn` and `ga.sz.gov.cn` closed the socket. Art. 23 was therefore read on the two
+government reprints listed above, not on npc.gov.cn. `www.mfa.gov.cn` (page of 公安部's 2012 announcement)
 returns "page deleted"; `www.gov.cn/jrzg/2012-05/31/content_2149327.htm` returns 404; `www.hmo.gov.cn` has no such
 notice. Secondary only (never a rule, never cited in code): Wikipedia, ifeng.com and China Daily articles on the name
 dot, ID generator and validator sites.
@@ -44,8 +45,8 @@ dot, ID generator and validator sites.
 - **Lower-case `x`:** the standard writes `X`; a lower-case `x` is the same character typed without Shift, so it is
   stored as `X` (the package upper-cases every number). Fullwidth digits and `Ｘ`/`ｘ` fold through `Internal\Digits`.
 - **15-digit number:** the 1989 standard's number of the first-generation card is not part of GB 11643-1999. 《居民身份证法》
-  Art. 23 (amended 2011-10-29): "依照《中华人民共和国居民身份证条例》领取的居民身份证，自２０１３年１月１日起停止使用。" So it is refused
-  by length (the message carries the character count, not the input).
+  Art. 23 para. 2 (amended 2011-10-29), verbatim on both reprints: "依照《中华人民共和国居民身份证条例》领取的居民身份证，自2013年1月1日起停止使用。依照本法在2012年1月1日以前领取的居民身份证，在其有效期内，继续有效。" (the Jiangsu copy writes the dates in fullwidth digits) So it is refused
+  by length (the message carries the character count, not the input); the refusal rests on the 18-character layout of GB 11643-1999 §5.1 either way.
 - **HK/MO/TW resident permit (国办发〔2018〕81号, Art. 3):** "公民身份号码由公安机关按照公民身份号码国家标准编制。香港居民公民身份号码地址码
   使用810000，澳门居民公民身份号码地址码使用820000，台湾居民公民身份号码地址码使用830000。" The permit's number is a GB 11643
   number, so `CitizenIdentityNumber` takes it and `administrativeDivisionCode()` returns `810000`/`820000`/`830000`. The
@@ -73,14 +74,14 @@ check algorithm is published, and the two-digit year has no century, so the date
 
 Mask: no official rule; last four characters.
 
-## Passport number (`PassportNumber`)
+## Ordinary passport number (`OrdinaryPassportNumber`)
 
 NIA 《出入境证件简明手册》 (verbatim, via WebFetch): "2017年4月以前签发的电子普通护照号码由“E”+8位阿拉伯数字组成。"; "第一位仍是前缀字母“E”，第二位
 改为顺序使用英文字母（“I”、“O”除外），第三位起7位阿拉伯数字，护照号码总位数仍为9位。"; "电子普通护照启用前签发的旧版普通护照，号码为“G”+8位阿拉伯数字。"
 公安部's notice of 2017-04-07 (cac.gov.cn): "证件号码中前缀字母E保持不变，第二位改为顺序使用英文字母（I、O除外），第三位起仍然为阿拉伯数字，
 总位数仍为9位。新号段电子普通护照的防伪特征没有变化，起始号码为第EA0000001号。" Accepted: `E` + 8 digits; `E` + a letter other than `I`,
-`O` + 7 digits; `G` + 8 digits. Not covered: passports of other types (official, diplomatic, for public affairs) and
-Hong Kong or Macao SAR passports (no format published in the sources read); no check character is published.
+`O` + 7 digits; `G` + 8 digits. No check character is published. The class is named for the ordinary
+(普通) passport only; the other kinds are listed under "Not covered".
 Mask: no official rule; last four characters.
 
 ## Exit-entry permits (`ExitEntryPermitToHongKongMacauNumber`, `ExitEntryPermitToTaiwanNumber`)
@@ -100,7 +101,7 @@ Mask: no official rule; last four characters.
 |---|---|
 | 港澳居民来往内地通行证 (回乡证, `H`/`M` + 8 digits; non-Chinese holders `HA`/`MA`, 9 characters) and 台湾居民来往大陆通行证 (台胞证, 8 digits) | Formats are quoted (NIA reply of 2021-09-23, 简明手册), but they are not in the plan's candidate list; add them in a later iteration if wanted. The `HA`/`MA` shape beyond "9 characters" is not published. |
 | First-generation 15-digit citizen number | No longer valid since 2013-01-01 (Art. 23 above); refused by length. |
-| Passport series other than the ordinary `E`/`G` series | No published format. |
+| Official (公务), diplomatic (外交) and public-affairs (因公) passports, Hong Kong and Macao SAR passports, and the series of passports other than the ordinary `E`/`G` | No format published in the sources read; a number of these kinds would be refused by `OrdinaryPassportNumber`, hence its name. |
 | Check digit of the 15-character permanent residence number | Not published. |
 | Driving licence | The licence number is the holder's citizen identity number (plan decision): use `CitizenIdentityNumber`. |
 | Hukou, social credit code, military ID | Outside the plan. |
@@ -115,8 +116,9 @@ Mask: no official rule; last four characters.
   doubled. The dot is not specified by any official text found: a Xinjiang government press conference of 2016-06 (ifeng.com
   and China Daily reports, secondary) names the inconsistent encoding of the dot in the systems. The package follows the
   plan's decision: U+00B7 is stored, the katakana middle dot U+30FB and the bullet U+2022 fold to it before validation.
-  No source says how to split such a name into family and given parts; a person without a family/given division is
-  given whole to either part.
+  Such a name has no family/given split in the ID card's single 姓名 field, so `PersonName` takes a nullable given
+  name: the whole name (`阿沛·阿旺晋美`, a Tibetan name) is stored in `FamilyName` with `given` null, and `full()` is
+  the family part alone. Payload `{family, given, latin}` with `given` null for it (the key stays required).
 - **Latin form:** required, `Icao\PersonName`, never derived: a passport's pinyin is the holder's choice (Cantonese,
   Wade-Giles and Hokkien spellings are common). It is checked only for being a valid ICAO personal name (Doc 9303 Part
   3 §4.6). Payload `{family, given, latin}`.

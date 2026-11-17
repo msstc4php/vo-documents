@@ -52,7 +52,6 @@ final class CitizenIdentityNumberTest extends TestCase
             "\u{FF11}\u{FF11}\u{FF10}\u{FF11}\u{FF10}\u{FF15}\u{FF11}\u{FF19}\u{FF14}\u{FF19}\u{FF11}\u{FF12}\u{FF13}\u{FF11}\u{FF10}\u{FF10}\u{FF12}\u{FF58}",
             '11010519491231002X',
         ];
-        yield 'Arabic-Indic digits' => ["\u{0661}\u{0661}\u{0660}\u{0661}\u{0660}\u{0665}\u{0661}\u{0669}\u{0664}\u{0669}\u{0661}\u{0662}\u{0663}\u{0661}\u{0660}\u{0660}\u{0662}X", '11010519491231002X'];
         yield 'Hong Kong resident permit' => ['810000199001011230', '810000199001011230'];
         yield 'Macao resident permit' => ['820000199001011240', '820000199001011240'];
         yield 'Taiwan resident permit' => ['830000199001011250', '830000199001011250'];

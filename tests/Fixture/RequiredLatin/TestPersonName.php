@@ -13,7 +13,7 @@ use Override;
  */
 final readonly class TestPersonName extends AbstractFamilyGivenPersonName
 {
-    public function __construct(TestFamily $family, TestGiven $given, IcaoPersonName $latin)
+    public function __construct(TestFamily $family, ?TestGiven $given, IcaoPersonName $latin)
     {
         parent::__construct($family, $given, $latin);
     }

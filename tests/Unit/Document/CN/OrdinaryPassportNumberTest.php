@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MSSTC4PHP\ValueObject\Documents\Tests\Unit\Document\CN;
 
-use MSSTC4PHP\ValueObject\Documents\Document\CN\PassportNumber;
+use MSSTC4PHP\ValueObject\Documents\Document\CN\OrdinaryPassportNumber;
 use MSSTC4PHP\ValueObject\Documents\Internal\Digits;
 use MSSTC4PHP\ValueObject\Documents\Internal\Mask;
 use MSSTC4PHP\ValueObject\Documents\Internal\NumberShapes;
@@ -18,12 +18,12 @@ use PHPUnit\Framework\TestCase;
 /**
  * Expectations follow docs/sources/CN.md "Passport number".
  */
-#[CoversClass(PassportNumber::class)]
+#[CoversClass(OrdinaryPassportNumber::class)]
 #[UsesClass(NumberShapes::class)]
 #[UsesClass(Digits::class)]
 #[UsesClass(Text::class)]
 #[UsesClass(Mask::class)]
-final class PassportNumberTest extends TestCase
+final class OrdinaryPassportNumberTest extends TestCase
 {
     use RefusesWithoutEchoingInput;
 
@@ -47,7 +47,7 @@ final class PassportNumberTest extends TestCase
     #[DataProvider('validNumbers')]
     public function testAccepts(string $input, string $expected): void
     {
-        $number = PassportNumber::from($input);
+        $number = OrdinaryPassportNumber::from($input);
 
         self::assertSame($expected, $number->value);
         self::assertSame($expected, (string) $number);
@@ -56,7 +56,7 @@ final class PassportNumberTest extends TestCase
 
     public function testMasksAllButTheLastFour(): void
     {
-        self::assertSame('*****0001', PassportNumber::from('EA0000001')->masked());
+        self::assertSame('*****0001', OrdinaryPassportNumber::from('EA0000001')->masked());
     }
 
     /**
@@ -64,7 +64,7 @@ final class PassportNumberTest extends TestCase
      */
     public static function invalidNumbers(): iterable
     {
-        $character = 'Invalid Chinese passport number (invalid character).';
+        $character = 'Invalid Chinese ordinary passport number (invalid character).';
 
         yield 'letter I in the second place' => ['EI1234567', $character];
         yield 'letter O in the second place' => ['EO1234567', $character];
@@ -75,14 +75,14 @@ final class PassportNumberTest extends TestCase
         yield 'digit first' => ['112345678', $character];
         yield 'G with a letter second' => ['GA1234567', $character];
         yield 'punctuation' => ['E1234567.', $character];
-        yield 'eight characters' => ['E1234567', 'Invalid Chinese passport number (8 characters).'];
-        yield 'ten characters' => ['EA00000011', 'Invalid Chinese passport number (10 characters).'];
-        yield 'far too long' => [\str_repeat('E', 41), 'Invalid Chinese passport number (too long).'];
+        yield 'eight characters' => ['E1234567', 'Invalid Chinese ordinary passport number (8 characters).'];
+        yield 'ten characters' => ['EA00000011', 'Invalid Chinese ordinary passport number (10 characters).'];
+        yield 'far too long' => [\str_repeat('E', 41), 'Invalid Chinese ordinary passport number (too long).'];
     }
 
     #[DataProvider('invalidNumbers')]
     public function testRefusesWithoutEchoingTheInput(string $input, string $message): void
     {
-        self::assertRefusedWithoutEcho(static fn (string $value): PassportNumber => PassportNumber::from($value), $input, $message);
+        self::assertRefusedWithoutEcho(static fn (string $value): OrdinaryPassportNumber => OrdinaryPassportNumber::from($value), $input, $message);
     }
 }

@@ -7,6 +7,7 @@ namespace MSSTC4PHP\ValueObject\Documents\Tests\Unit\Name\RequiredLatin;
 use LogicException;
 use MSSTC4PHP\ValueObject\Documents\Exception\InvalidPersonNameException;
 use MSSTC4PHP\ValueObject\Documents\Icao\PersonName as IcaoPersonName;
+use MSSTC4PHP\ValueObject\Documents\Internal\Optional;
 use MSSTC4PHP\ValueObject\Documents\Internal\PayloadFields;
 use MSSTC4PHP\ValueObject\Documents\Internal\Text;
 use MSSTC4PHP\ValueObject\Documents\Internal\UnicodeText;
@@ -28,6 +29,7 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(AbstractFamilyGivenPersonNameCodec::class)]
 #[UsesClass(AbstractNamePart::class)]
 #[UsesClass(IcaoPersonName::class)]
+#[UsesClass(Optional::class)]
 #[UsesClass(PayloadFields::class)]
 #[UsesClass(Text::class)]
 #[UsesClass(UnicodeText::class)]
@@ -35,12 +37,34 @@ final class RequiredLatinPersonNameTest extends TestCase
 {
     use RefusesNameWithoutEchoingInput;
 
-    private const string SHAPE = 'Expected a test person name payload with string "family", "given" and "latin", '
-        . 'and no other keys.';
+    private const string SHAPE = 'Expected a test person name payload with string "family", string or null "given", '
+        . 'string "latin", and no other keys.';
 
     public function testFullJoinsFamilyAndGivenWithTheNationalSeparator(): void
     {
         self::assertSame('Zhang/Wei', $this->person()->full());
+    }
+
+    public function testFullIsTheFamilyAloneWithoutAGivenName(): void
+    {
+        self::assertSame('Zhang', $this->wholeName()->full());
+        self::assertSame(['family' => 'Zhang', 'given' => null, 'latin' => 'ZHANG<<WEI'], $this->wholeName()->jsonSerialize());
+    }
+
+    public function testEqualityHandlesAMissingGivenName(): void
+    {
+        self::assertTrue($this->wholeName()->equals($this->wholeName()));
+        self::assertFalse($this->wholeName()->equals($this->person()));
+        self::assertFalse($this->person()->equals($this->wholeName()));
+    }
+
+    public function testCodecRoundTripWithoutAGivenName(): void
+    {
+        $codec = new TestPersonNameCodec();
+        $payload = $codec->encode($this->wholeName());
+
+        self::assertSame(['family' => 'Zhang', 'given' => null, 'latin' => 'ZHANG<<WEI'], $payload);
+        self::assertTrue($codec->decode($payload)->equals($this->wholeName()));
     }
 
     public function testLatinIsTheGivenFormNotADerivedOne(): void
@@ -97,6 +121,7 @@ final class RequiredLatinPersonNameTest extends TestCase
         yield 'latin null' => [['family' => 'Zhang', 'given' => 'Wei', 'latin' => null]];
         yield 'latin int' => [['family' => 'Zhang', 'given' => 'Wei', 'latin' => 1]];
         yield 'given missing' => [['family' => 'Zhang', 'latin' => 'ZHANG<<WEI']];
+        yield 'given int' => [['family' => 'Zhang', 'given' => 1, 'latin' => 'ZHANG<<WEI']];
         yield 'family int' => [['family' => 1, 'given' => 'Wei', 'latin' => 'ZHANG<<WEI']];
         yield 'unknown key' => [['family' => 'Zhang', 'given' => 'Wei', 'latin' => 'ZHANG<<WEI', 'x' => 'y']];
     }
@@ -125,6 +150,11 @@ final class RequiredLatinPersonNameTest extends TestCase
             'Invalid ICAO personal name.',
             InvalidPersonNameException::class,
         );
+    }
+
+    private function wholeName(): TestPersonName
+    {
+        return new TestPersonName(TestFamily::from('Zhang'), null, IcaoPersonName::from('ZHANG<<WEI'));
     }
 
     private function person(string $latin = 'ZHANG<<WEI'): TestPersonName

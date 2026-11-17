@@ -14,7 +14,7 @@ use MSSTC4PHP\ValueObject\Payload\PayloadCodec;
 use Override;
 
 /**
- * {family: string, given: string, latin: string}, all three required; latin is the `Icao\PersonName` string. Other
+ * {family: string, given: string|null, latin: string}, all three keys required (given may be null); latin is the `Icao\PersonName` string. Other
  * keys are refused.
  *
  * @internal
@@ -28,7 +28,7 @@ abstract readonly class AbstractFamilyGivenPersonNameCodec implements PayloadCod
     private const array KEYS = ['family', 'given', 'latin'];
 
     /**
-     * @return array{family: string, given: string, latin: string}
+     * @return array{family: string, given: string|null, latin: string}
      */
     #[Override]
     final public function encode(ValueObject $value): array
@@ -54,9 +54,13 @@ abstract readonly class AbstractFamilyGivenPersonNameCodec implements PayloadCod
     {
         PayloadFields::assertOnlyKeys($payload, self::KEYS, $this->shape());
 
+        if (!\array_key_exists('given', $payload)) {
+            throw new InvalidPayloadException($this->shape());
+        }
+
         return $this->create(
             PayloadFields::string($payload, 'family', $this->shape()),
-            PayloadFields::string($payload, 'given', $this->shape()),
+            PayloadFields::nullableString($payload, 'given', $this->shape()),
             IcaoPersonName::from(PayloadFields::string($payload, 'latin', $this->shape())),
         );
     }
@@ -71,5 +75,5 @@ abstract readonly class AbstractFamilyGivenPersonNameCodec implements PayloadCod
      *
      * @throws InvalidPersonNameException
      */
-    abstract protected function create(string $family, string $given, IcaoPersonName $latin): AbstractFamilyGivenPersonName;
+    abstract protected function create(string $family, ?string $given, IcaoPersonName $latin): AbstractFamilyGivenPersonName;
 }

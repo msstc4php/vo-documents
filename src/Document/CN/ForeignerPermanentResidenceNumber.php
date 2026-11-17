@@ -50,7 +50,7 @@ final class ForeignerPermanentResidenceNumber extends AbstractStringValueObject 
     #[Override]
     public function birthDate(): DateTimeImmutable
     {
-        return Gb11643::birthDate($this->value, 6);
+        return Gb11643::birthDate(Text::nonEmpty($this->value), 6);
     }
 
     #[Override]

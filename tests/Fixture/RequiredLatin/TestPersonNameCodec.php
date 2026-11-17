@@ -22,12 +22,12 @@ final readonly class TestPersonNameCodec extends AbstractFamilyGivenPersonNameCo
     #[Override]
     protected function shape(): string
     {
-        return 'Expected a test person name payload with string "family", "given" and "latin", and no other keys.';
+        return 'Expected a test person name payload with string "family", string or null "given", string "latin", and no other keys.';
     }
 
     #[Override]
-    protected function create(string $family, string $given, IcaoPersonName $latin): TestPersonName
+    protected function create(string $family, ?string $given, IcaoPersonName $latin): TestPersonName
     {
-        return new TestPersonName(TestFamily::from($family), TestGiven::from($given), $latin);
+        return new TestPersonName(TestFamily::from($family), $given === null ? null : TestGiven::from($given), $latin);
     }
 }

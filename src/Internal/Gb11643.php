@@ -65,7 +65,7 @@ final class Gb11643
     }
 
     /**
-     * @param string $number a number {@see assertBirthDate()} accepted
+     * @param non-empty-string $number a number {@see assertBirthDate()} accepted
      */
     public static function birthDate(string $number, int $offset): DateTimeImmutable
     {

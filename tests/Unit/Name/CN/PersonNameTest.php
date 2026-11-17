@@ -10,6 +10,7 @@ use MSSTC4PHP\ValueObject\Documents\Icao\PersonName as IcaoPersonName;
 use MSSTC4PHP\ValueObject\Documents\Icao\Table\Cyrillic;
 use MSSTC4PHP\ValueObject\Documents\Icao\Table\LatinMultinational;
 use MSSTC4PHP\ValueObject\Documents\Icao\Transliterator;
+use MSSTC4PHP\ValueObject\Documents\Internal\Optional;
 use MSSTC4PHP\ValueObject\Documents\Internal\PayloadFields;
 use MSSTC4PHP\ValueObject\Documents\Internal\Text;
 use MSSTC4PHP\ValueObject\Documents\Internal\UnicodeText;
@@ -37,6 +38,7 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(GivenName::class)]
 #[UsesClass(AbstractNamePart::class)]
 #[UsesClass(IcaoPersonName::class)]
+#[UsesClass(Optional::class)]
 #[UsesClass(PayloadFields::class)]
 #[UsesClass(Text::class)]
 #[UsesClass(UnicodeText::class)]
@@ -47,8 +49,8 @@ final class PersonNameTest extends TestCase
 {
     use RefusesNameWithoutEchoingInput;
 
-    private const string SHAPE = 'Expected a Chinese person name payload with string "family", "given" and "latin", '
-        . 'and no other keys.';
+    private const string SHAPE = 'Expected a Chinese person name payload with string "family", string or null "given", '
+        . 'string "latin", and no other keys.';
 
     public function testFullWritesFamilyAndGivenTogether(): void
     {
@@ -61,21 +63,43 @@ final class PersonNameTest extends TestCase
         self::assertSame('ZHANG<<WEI', $this->person()->latin()->value);
     }
 
-    public function testMinorityNameWithEachFoldedDot(): void
+    public function testMinorityNameIsStoredWholeInTheFamilyPartWithEachFoldedDot(): void
     {
         foreach (["\u{00B7}", "\u{30FB}", "\u{2022}"] as $dot) {
             $person = new PersonName(
                 FamilyName::from('阿沛' . $dot . '阿旺晋美'),
-                GivenName::from('晋美'),
+                null,
                 IcaoPersonName::from('NGAPOI<<NGAWANG<JIGME'),
             );
 
-            self::assertSame("阿沛\u{00B7}阿旺晋美晋美", $person->full());
+            self::assertSame("阿沛\u{00B7}阿旺晋美", $person->full());
+            self::assertNull($person->given);
             self::assertSame(
-                ['family' => "阿沛\u{00B7}阿旺晋美", 'given' => '晋美', 'latin' => 'NGAPOI<<NGAWANG<JIGME'],
+                ['family' => "阿沛\u{00B7}阿旺晋美", 'given' => null, 'latin' => 'NGAPOI<<NGAWANG<JIGME'],
                 $person->jsonSerialize(),
             );
         }
+    }
+
+    public function testWholeNameRoundTripsThroughTheCodec(): void
+    {
+        $codec = new PersonNameCodec();
+        $person = new PersonName(FamilyName::from('阿沛·阿旺晋美'), null, IcaoPersonName::from('NGAPOI<<NGAWANG<JIGME'));
+        $payload = $codec->encode($person);
+
+        self::assertSame(['family' => "阿沛\u{00B7}阿旺晋美", 'given' => null, 'latin' => 'NGAPOI<<NGAWANG<JIGME'], $payload);
+        self::assertTrue($codec->decode($payload)->equals($person));
+    }
+
+    public function testAWholeNameAndASplitNameAreNotEqual(): void
+    {
+        $latin = IcaoPersonName::from('ZHANG<<WEI');
+
+        self::assertFalse(new PersonName(FamilyName::from('张'), null, $latin)->equals($this->person()));
+        self::assertFalse($this->person()->equals(new PersonName(FamilyName::from('张'), null, $latin)));
+        self::assertTrue(
+            new PersonName(FamilyName::from('张'), null, $latin)->equals(new PersonName(FamilyName::from('张'), null, $latin)),
+        );
     }
 
     public function testEqualityIncludesTheLatinForm(): void
@@ -108,7 +132,8 @@ final class PersonNameTest extends TestCase
     {
         yield 'latin missing' => [['family' => '张', 'given' => '伟']];
         yield 'latin null' => [['family' => '张', 'given' => '伟', 'latin' => null]];
-        yield 'given missing' => [['family' => '张', 'latin' => 'ZHANG<<WEI']];
+        yield 'given key missing' => [['family' => '张', 'latin' => 'ZHANG<<WEI']];
+        yield 'given int' => [['family' => '张', 'given' => 1, 'latin' => 'ZHANG<<WEI']];
         yield 'family int' => [['family' => 1, 'given' => '伟', 'latin' => 'ZHANG<<WEI']];
         yield 'unknown key' => [['family' => '张', 'given' => '伟', 'latin' => 'ZHANG<<WEI', 'x' => 'y']];
     }

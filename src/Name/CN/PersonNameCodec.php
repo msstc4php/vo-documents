@@ -22,12 +22,12 @@ final readonly class PersonNameCodec extends AbstractFamilyGivenPersonNameCodec
     #[Override]
     protected function shape(): string
     {
-        return 'Expected a Chinese person name payload with string "family", "given" and "latin", and no other keys.';
+        return 'Expected a Chinese person name payload with string "family", string or null "given", string "latin", and no other keys.';
     }
 
     #[Override]
-    protected function create(string $family, string $given, IcaoPersonName $latin): PersonName
+    protected function create(string $family, ?string $given, IcaoPersonName $latin): PersonName
     {
-        return new PersonName(FamilyName::from($family), GivenName::from($given), $latin);
+        return new PersonName(FamilyName::from($family), $given === null ? null : GivenName::from($given), $latin);
     }
 }

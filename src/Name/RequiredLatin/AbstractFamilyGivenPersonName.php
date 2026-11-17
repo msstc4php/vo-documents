@@ -6,6 +6,7 @@ namespace MSSTC4PHP\ValueObject\Documents\Name\RequiredLatin;
 
 use MSSTC4PHP\ValueObject\Contract\ValueObject;
 use MSSTC4PHP\ValueObject\Documents\Icao\PersonName as IcaoPersonName;
+use MSSTC4PHP\ValueObject\Documents\Internal\Optional;
 use MSSTC4PHP\ValueObject\Documents\Internal\Text;
 use MSSTC4PHP\ValueObject\Documents\Name\AbstractNamePart;
 use MSSTC4PHP\ValueObject\Documents\Name\PersonName;
@@ -19,7 +20,8 @@ use Override;
  * @internal
  *
  * @template-covariant TFamily of AbstractNamePart the country's family-name part
- * @template-covariant TGiven of AbstractNamePart the country's given-name part
+ * @template-covariant TGiven of AbstractNamePart the country's given-name part, null for a name stored whole in the
+ *                                                 family part
  */
 abstract readonly class AbstractFamilyGivenPersonName implements PersonName
 {
@@ -29,7 +31,7 @@ abstract readonly class AbstractFamilyGivenPersonName implements PersonName
      */
     protected function __construct(
         public AbstractNamePart $family,
-        public AbstractNamePart $given,
+        public ?AbstractNamePart $given,
         private IcaoPersonName $latin,
     ) {
     }
@@ -43,6 +45,10 @@ abstract readonly class AbstractFamilyGivenPersonName implements PersonName
     #[Override]
     final public function full(): string
     {
+        if (!$this->given instanceof AbstractNamePart) {
+            return Text::nonEmpty($this->family->value);
+        }
+
         return Text::nonEmpty($this->family->value . $this->nationalSeparator() . $this->given->value);
     }
 
@@ -51,19 +57,19 @@ abstract readonly class AbstractFamilyGivenPersonName implements PersonName
     {
         return $other instanceof static
             && $this->family->equals($other->family)
-            && $this->given->equals($other->given)
+            && Optional::equal($this->given, $other->given)
             && $this->latin->equals($other->latin);
     }
 
     /**
-     * @return array{family: string, given: string, latin: string}
+     * @return array{family: string, given: string|null, latin: string}
      */
     #[Override]
     final public function jsonSerialize(): array
     {
         return [
             'family' => $this->family->value,
-            'given' => $this->given->value,
+            'given' => $this->given?->value,
             'latin' => $this->latin->value,
         ];
     }
