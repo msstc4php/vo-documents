@@ -14,7 +14,8 @@ use Override;
 
 /**
  * The ten digits shared by the Saudi national ID number and the iqama number, told apart by the first digit. No check
- * digit is published, so none is checked. `masked()` keeps the last four digits (no official masking rule).
+ * digit is published, so none is checked. ZATCA publishes the first-digit rules (BR-KSA-F-10/F-11) as warnings; this
+ * class enforces them as a refusal. `masked()` keeps the last four digits (no official masking rule).
  *
  * @internal
  */

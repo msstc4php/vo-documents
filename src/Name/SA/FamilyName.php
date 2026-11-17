@@ -7,8 +7,7 @@ namespace MSSTC4PHP\ValueObject\Documents\Name\SA;
 use Override;
 
 /**
- * The family name in Arabic (`آل سعود`, `القحطاني`); `آل` may be a separate
- * word.
+ * The family name in Arabic (`آل سعود`, `القحطاني`); `آل` may be a separate word.
  * See {@see AbstractArabicNamePart} and docs/sources/SA.md "Names".
  */
 final class FamilyName extends AbstractArabicNamePart

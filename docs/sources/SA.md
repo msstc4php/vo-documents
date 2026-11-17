@@ -18,8 +18,8 @@ almaal.org, ajsrp.com, ksaexpats.com, qoyod.com, SAP notes, GitHub validator iss
 
 ## Names
 
-No agency text on the characters or the number of parts of a recorded name was readable. The Civil Status Law
-executive regulations were reported (secondary only: Okaz, Ajel) to require on the ID card "الاسم رباعي" (first, father's,
+No agency text on the characters or the number of parts of a recorded name was readable. The Civil Status Law executive
+regulations were reported (secondary only: Okaz, Ajel) to require on the ID card "الاسم رباعي" (first, father's,
 grandfather's and family name, Art. 146 as amended) and to allow a family name with `بن` or `آل`; this applies to new
 registrations and could not refuse a recorded name in any case, so no part count is enforced.
 
@@ -47,29 +47,31 @@ registrations and could not refuse a recorded name in any case, so no part count
 
 ## National ID and iqama (`Document\SA\NationalIdentityNumber`, `Document\SA\IqamaNumber`)
 
-ZATCA announcement (SDK v3.4.4, posted by the community moderator "Ibrahem Daoud", in the Announcements category of ZATCA's
-community; the host is `zatca1.discourse.group`, not `zatca.gov.sa`, so it is treated as ZATCA's own publication on its
-developer forum, not as a gazette; the owner may reclassify it): "BR-KSA-F-10 (Seller/Buyer ID – Scheme ID = “NAT”)
-Trigger: Warning if (BT-29)/(BT-46) value violates: Not exactly 10 digits in length. Contains non-numeric characters.
-Does not begin with the digit ‘1’." and "BR-KSA-F-11 (Seller/Buyer ID – Scheme ID = “IQA”) … Does not begin with the digit
-‘2’." The standard v1.2 (BR-KSA-14) lists the schemes "National ID with "NAT" as schemeID" and "Iqama Number with
-"IQA" as schemeID" and requires only alphanumerics; the digit rules exist only in the announcement. ZATCA reports them as
-warnings.
+ZATCA announcement (SDK v3.4.4, posted by "idaoud", Ibrahem Daoud, flagged `"staff": true, "moderator": true` in the
+topic JSON read 2026-11-17, in the Announcements category of ZATCA's community; the host is `zatca1.discourse.group`,
+not `zatca.gov.sa`, so it is treated as ZATCA's own publication on its developer forum, not as a gazette; the controller
+ruled it counts): "BR-KSA-F-10 (Seller/Buyer ID – Scheme ID = “NAT”) Trigger: Warning if (BT-29)/(BT-46) value violates:
+Not exactly 10 digits in length. Contains non-numeric characters. Does not begin with the digit ‘1’." and "BR-KSA-F-11
+(Seller/Buyer ID – Scheme ID = “IQA”) … Does not begin with the digit ‘2’." The standard v1.2 (BR-KSA-14) lists the
+schemes "National ID with "NAT" as schemeID" and "Iqama Number with "IQA" as schemeID" and requires only alphanumerics;
+the digit rules exist only in the announcement. ZATCA reports them as warnings; this package refuses instead. The
+primary source, the Schematron of SDK v3.4.4, was not reached: `sandbox.zatca.gov.sa/` answers 200 to `curl` with no
+links, guessed zip paths answer 520, and WebFetch gets 403 (the sandbox was not bypassed).
 
 - **Two classes**, because the rule quoted names both: `NationalIdentityNumber` (10 digits, first digit 1) and
   `IqamaNumber` (10 digits, first digit 2). A number of the other kind is refused with "invalid first digit".
 - **Enforced:** ten digits after removing space, hyphen, NBSP and the ideographic space; fullwidth, Arabic-Indic
   (U+0660-0669) and Extended Arabic-Indic (U+06F0-06F9) digits fold to ASCII (`١٠١٢٣٤٥٦٧٨` is `1012345678`).
-- **Check digit: not enforced.** No government text quotes one; the Luhn claim comes from GitHub issues and validator sites
-  only, and Microsoft Purview lists "Checksum: No".
+- **Check digit: not enforced.** No government text quotes one; the Luhn claim comes from GitHub issues and validator
+  sites only, and Microsoft Purview lists "Checksum: No".
 - **Display form:** none quoted, so no `formatted()`. `masked()` keeps the last four digits: `******5678`.
 - **Driving licence:** carries the identity number; there is no class for it (use `NationalIdentityNumber` or
   `IqamaNumber`).
 
 ## Not covered
 
-- **Border number (رقم الحدود):** only blogs (noblecoreksa.com, ksaexpats.com: ten digits, "usually" starting with 3 or 4)
-  and a news item on the Jawazat service; no government text gives its format. Format-only would be a ten-digit
+- **Border number (رقم الحدود):** only blogs (noblecoreksa.com, ksaexpats.com: ten digits, "usually" starting with 3 or
+  4) and a news item on the Jawazat service; no government text gives its format. Format-only would be a ten-digit
   string with no rule, so no class.
 - **Passport number:** the Passports Directorate (Jawazat) publishes no format that was found; searches returned only
   third-party pages. Not covered.

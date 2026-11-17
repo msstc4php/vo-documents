@@ -17,7 +17,9 @@ use Override;
  */
 abstract class AbstractArabicNamePart extends AbstractNamePart
 {
-    private const string LETTER = '(?:(?=\p{Lo})\p{sc=Arabic})';
+    private const string SCRIPT = '\p{sc=Arabic}';
+
+    private const string LETTER = '(?:(?=\p{Lo})' . self::SCRIPT . ')';
 
     private const string MARKS = '[\x{064B}-\x{0652}\x{0670}]*';
 
@@ -32,7 +34,7 @@ abstract class AbstractArabicNamePart extends AbstractNamePart
     #[Override]
     protected function letters(): string
     {
-        return '\p{sc=Arabic}';
+        return self::SCRIPT;
     }
 
     #[Override]
