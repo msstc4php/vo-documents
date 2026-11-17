@@ -299,12 +299,12 @@ HealthCardNumberFactory::fromNumber('123456789');                      // Ambigu
 
 Both factories work like the AU and US ones. When `HealthCardNumberFactory::fromNumber()` finds no match and the input
 is an Ontario card with a version code, its message points to `OnHealthCardNumber::fromCard()` (nothing of the input is
-echoed). BC and SK licence numbers share every shape (1-8 digits, stored padded to
-8), so a bare BC or SK number is always ambiguous: pass the issuer. All 13 health card formats are published (Ontario's
-reciprocal-billing table, checked against each province's own text where one exists). The ON version code is part of
-the card, not of the health number: two cards of one person have the same number and are equal, and they differ in
-the `OnHealthCardVersionCode`. Store the two in their own columns. `OnHealthCardNumber::from()` and the factories refuse
-a number followed by its version code instead of dropping the code: split the printed card with `fromCard()`.
+echoed). BC and SK licence numbers share every shape (1-8 digits, stored padded to 8), so a bare BC or SK number is
+always ambiguous: pass the issuer. All 13 health card formats are published (Ontario's reciprocal-billing table, checked
+against each province's own text where one exists). The ON version code is part of the card, not of the health number:
+two cards of one person have the same number and are equal, and they differ in the `OnHealthCardVersionCode`. Store the
+two in their own columns. `OnHealthCardNumber::from()` and the factories refuse a number followed by its version code
+instead of dropping the code: split the printed card with `fromCard()`.
 
 ### Mexican state driving licences
 
@@ -452,8 +452,7 @@ it as unsupported (a configuration error, not a 500 on request input). The inter
 
 Document numbers and name parts are strings and need nothing. The composite names (`Name\<CC>\PersonName` of every
 country: RU, AU, DE, FR, IT, ES, NL, CH, GB, TR, US, CA, MX, BR, CN, JP, KR, IN, ID, SA, and the Devanagari one of IN:
-21 codecs) are read through a payload codec, so the mapper that the
-bridge uses must be built with `Codecs::all()`:
+21 codecs) are read through a payload codec, so the mapper that the bridge uses must be built with `Codecs::all()`:
 
 ```php
 use MSSTC4PHP\ValueObject\Documents\Codecs;

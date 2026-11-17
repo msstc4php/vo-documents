@@ -107,7 +107,7 @@
 - **A document number that is another document's number gets no class** (CN and SA driving licence, ID SIM since
   2024): README and the source note say which class to use.
 - **Regions and codes are plain strings** (`administrativeDivisionCode()`, `regionCode()`,
-  `publicSafetyCommissionCode()`, `nationalityCode()`) because the source codes do not map one to one to ISO 3166-2 (Hokkaido has five commissions,
-  KoROAD names are not ISO). No `Jurisdiction` enum for Asia.
+  `publicSafetyCommissionCode()`, `nationalityCode()`) because the source codes do not map one to one to ISO 3166-2
+  (Hokkaido has five commissions, KoROAD names are not ISO). No `Jurisdiction` enum for Asia.
 - **Line length is 120 characters in `src/` and `tests/`** (the rule of the style commit of plan 4). A URL in an `@see`
   cannot be wrapped and is exempt; a long `\u{...}` string is split with `.` concatenation.

@@ -48,12 +48,9 @@ final class DrivingLicenceNumber extends AbstractStringValueObject implements Ma
             return Text::nonEmpty(\substr($this->value, 0, 2));
         }
 
-        return self::REGIONS[\mb_substr(
-            $this->value,
-            0,
-            2,
-            'UTF-8',
-        )] ?? throw new LogicException('Region name validated by parse().');
+        $region = \mb_substr($this->value, 0, 2, 'UTF-8');
+
+        return self::REGIONS[$region] ?? throw new LogicException('Region name validated by parse().');
     }
 
     /**

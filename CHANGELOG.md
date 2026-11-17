@@ -28,7 +28,7 @@
   México licence with `DriverLicenceNumberFactory`. BR: CPF, título de eleitor, NIS, CNS, CNH, passport and the São
   Paulo RG with `IdentityCardNumberFactory`. Each country has a `Jurisdiction` enum (ISO 3166-2: 51, 13, 32 and 27
   cases). Source notes `docs/sources/{US,CA,MX,BR}.md`.
-- - Asia and Saudi Arabia (plan 4): names (`Name\<CC>`, codecs in `Codecs::all()`, 21 in all) and documents for China,
+- Asia and Saudi Arabia (plan 4): names (`Name\<CC>`, codecs in `Codecs::all()`, 21 in all) and documents for China,
   Japan, South Korea, India, Indonesia and Saudi Arabia. CN: citizen identity number, 2023 and legacy foreigner
   permanent residence numbers, ordinary passport, Hong Kong/Macao and Taiwan exit-entry permits. JP: My Number, basic
   pension number, residence card, passport, driving licence. KR: resident and foreigner registration numbers,
@@ -52,7 +52,7 @@
   analysers see the country's classes through `@extends`.
 - `Contract\HasSex` is implemented by `Nir`, `FiscalCode`, the DVLA licence number, `ChiNumber`, the Québec NAM and the
   Mexican CURP. `Contract\HasBirthDate` is implemented by the CURP only (its 17th character gives the century).
-- - Source notes in `docs/sources/` (RU, AU, ICAO, DE, FR, IT, ES, NL, CH, GB, TR, US, CA, MX, BR, CN, JP, KR, IN, ID,
+- Source notes in `docs/sources/` (RU, AU, ICAO, DE, FR, IT, ES, NL, CH, GB, TR, US, CA, MX, BR, CN, JP, KR, IN, ID,
   SA).
 
 ### Notes
@@ -95,7 +95,7 @@
   and their reasons are in README "Not covered" (`fromNumberIn()` throws "(format not covered)").
 - With one covered unit (MX licences, BR RG), `fromNumber()` assigns any fitting number to that unit; callers that
   know the issuer must use `fromNumberIn()`.
-- - Asian decisions: checksums verified are the CN citizen identity and 2023 permanent residence numbers (ISO 7064 MOD
+- Asian decisions: checksums verified are the CN citizen identity and 2023 permanent residence numbers (ISO 7064 MOD
   11-2), the JP My Number and the IN Aadhaar (Verhoeff); everything else is format only (JP driving licence check digit:
   the notice gives no weights; KR numbers carry random digits since 2020-10). The Aadhaar Verhoeff rests on UIDAI's 2010
   paper, which recommends it (no first-digit rule is enforced); the SA national ID and iqama first digits (1 and 2) rest
@@ -103,7 +103,7 @@
   and an ID NIK with an impossible date are refused. The CN and SA driving licence numbers are the identity numbers (no
   class); the ID SIM is the NIK. JP passports derive `井上` as `INOE` (a long vowel); the override `INOUE` fixes it.
   README "Not covered" now lists all 20 countries.
-- - Name classes use `\p{sc=Latin}`, `\p{sc=Cyrillic}`, `\p{sc=Han}`, `\p{sc=Hangul}`, `\p{sc=Arabic}` and
+- Name classes use `\p{sc=Latin}`, `\p{sc=Cyrillic}`, `\p{sc=Han}`, `\p{sc=Hangul}`, `\p{sc=Arabic}` and
   `\p{sc=Devanagari}` (Script property): requires `lib-pcre >=10.40`.
 - Requires `msstc4php/vo-base ^1.1.1`.
 
