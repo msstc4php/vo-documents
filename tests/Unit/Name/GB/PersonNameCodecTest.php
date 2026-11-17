@@ -29,6 +29,8 @@ use MSSTC4PHP\ValueObject\Documents\Name\GB\FamilyName;
 use MSSTC4PHP\ValueObject\Documents\Name\GB\GivenName;
 use MSSTC4PHP\ValueObject\Documents\Name\GB\PersonName;
 use MSSTC4PHP\ValueObject\Documents\Name\GB\PersonNameCodec;
+use MSSTC4PHP\ValueObject\Documents\Name\IN\Devanagari\PersonNameCodec as InDevanagariPersonNameCodec;
+use MSSTC4PHP\ValueObject\Documents\Name\IN\PersonNameCodec as InPersonNameCodec;
 use MSSTC4PHP\ValueObject\Documents\Name\IT\PersonNameCodec as ItPersonNameCodec;
 use MSSTC4PHP\ValueObject\Documents\Name\JP\PersonNameCodec as JpPersonNameCodec;
 use MSSTC4PHP\ValueObject\Documents\Name\KR\PersonNameCodec as KrPersonNameCodec;
@@ -62,6 +64,8 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(CnPersonNameCodec::class)]
 #[UsesClass(JpPersonNameCodec::class)]
 #[UsesClass(KrPersonNameCodec::class)]
+#[UsesClass(InPersonNameCodec::class)]
+#[UsesClass(InDevanagariPersonNameCodec::class)]
 #[UsesClass(CaPersonNameCodec::class)]
 #[UsesClass(RuPersonNameCodec::class)]
 #[UsesClass(AuPersonNameCodec::class)]

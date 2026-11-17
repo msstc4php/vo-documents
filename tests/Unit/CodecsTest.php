@@ -25,6 +25,10 @@ use MSSTC4PHP\ValueObject\Documents\Name\FR\PersonName as FrPersonName;
 use MSSTC4PHP\ValueObject\Documents\Name\FR\PersonNameCodec as FrPersonNameCodec;
 use MSSTC4PHP\ValueObject\Documents\Name\GB\PersonName as GbPersonName;
 use MSSTC4PHP\ValueObject\Documents\Name\GB\PersonNameCodec as GbPersonNameCodec;
+use MSSTC4PHP\ValueObject\Documents\Name\IN\Devanagari\PersonName as InDevanagariPersonName;
+use MSSTC4PHP\ValueObject\Documents\Name\IN\Devanagari\PersonNameCodec as InDevanagariPersonNameCodec;
+use MSSTC4PHP\ValueObject\Documents\Name\IN\PersonName as InPersonName;
+use MSSTC4PHP\ValueObject\Documents\Name\IN\PersonNameCodec as InPersonNameCodec;
 use MSSTC4PHP\ValueObject\Documents\Name\IT\PersonName as ItPersonName;
 use MSSTC4PHP\ValueObject\Documents\Name\IT\PersonNameCodec as ItPersonNameCodec;
 use MSSTC4PHP\ValueObject\Documents\Name\JP\PersonName as JpPersonName;
@@ -65,6 +69,8 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(CnPersonNameCodec::class)]
 #[UsesClass(JpPersonNameCodec::class)]
 #[UsesClass(KrPersonNameCodec::class)]
+#[UsesClass(InPersonNameCodec::class)]
+#[UsesClass(InDevanagariPersonNameCodec::class)]
 final class CodecsTest extends TestCase
 {
     public function testListsEveryCodecOfThePackage(): void
@@ -88,6 +94,8 @@ final class CodecsTest extends TestCase
                 CnPersonName::class,
                 JpPersonName::class,
                 KrPersonName::class,
+                InPersonName::class,
+                InDevanagariPersonName::class,
             ],
             \array_map(static fn (PayloadCodec $codec): string => $codec->valueObjectClass(), Codecs::all()),
         );
@@ -116,6 +124,8 @@ final class CodecsTest extends TestCase
         self::assertTrue($mapper->isComposite(CnPersonName::class));
         self::assertTrue($mapper->isComposite(JpPersonName::class));
         self::assertTrue($mapper->isComposite(KrPersonName::class));
+        self::assertTrue($mapper->isComposite(InPersonName::class));
+        self::assertTrue($mapper->isComposite(InDevanagariPersonName::class));
     }
 
     /**

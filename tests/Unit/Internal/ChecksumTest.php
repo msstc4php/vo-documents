@@ -24,6 +24,26 @@ final class ChecksumTest extends TestCase
         self::assertFalse(Checksum::luhn('79927398710'));
     }
 
+    public function testVerhoeffAcceptsAValidNumberWithItsCheckDigit(): void
+    {
+        self::assertTrue(Checksum::verhoeff('2363'));
+        self::assertTrue(Checksum::verhoeff('123451'));
+        self::assertTrue(Checksum::verhoeff('0'));
+    }
+
+    public function testVerhoeffRejectsASingleDigitErrorAndAnAdjacentTransposition(): void
+    {
+        self::assertFalse(Checksum::verhoeff('2364'));
+        self::assertFalse(Checksum::verhoeff('123541'));
+        self::assertFalse(Checksum::verhoeff('1'));
+    }
+
+    public function testVerhoeffUsesEveryRowOfThePermutationTable(): void
+    {
+        self::assertTrue(Checksum::verhoeff('12345678901234569'));
+        self::assertTrue(Checksum::verhoeff('84736430954837284567892'));
+    }
+
     public function testWeightedModSumsDigitTimesWeight(): void
     {
         self::assertSame(95, Checksum::weightedMod('112233445', [9, 8, 7, 6, 5, 4, 3, 2, 1], 101));
@@ -47,6 +67,8 @@ final class ChecksumTest extends TestCase
         yield 'luhn space' => [static fn (): bool => Checksum::luhn('12 3')];
         yield 'luhn trailing newline' => [static fn (): bool => Checksum::luhn("123\n")];
         yield 'mod11-2 X' => [static fn (): string => Checksum::iso7064Mod11Dash2('12X')];
+        yield 'verhoeff letters' => [static fn (): bool => Checksum::verhoeff('12a4')];
+        yield 'verhoeff empty' => [static fn (): bool => Checksum::verhoeff('')];
         yield 'luhn empty' => [static fn (): bool => Checksum::luhn('')];
         yield 'weightedMod empty' => [static fn (): int => Checksum::weightedMod('', [], 11)];
         yield 'mod11-2 empty' => [static fn (): string => Checksum::iso7064Mod11Dash2('')];
