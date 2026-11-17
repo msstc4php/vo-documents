@@ -87,6 +87,12 @@ final class NamePartsTest extends TestCase
         ];
         yield 'taa marbuta' => ['فاطمة', 'فاطمة'];
         yield 'alef maksura' => ['موسى', 'موسى'];
+        yield 'Persian kaf stored as the Arabic kaf' => ["\u{06A9}ريم", "\u{0643}ريم"];
+        yield 'Persian yeh stored as the Arabic yeh' => ["\u{06CC}وسف", "\u{064A}وسف"];
+        yield 'Persian kaf and yeh with harakat' => [
+            "\u{06A9}\u{064E}\u{0631}\u{06CC}\u{0645}",
+            "\u{0643}\u{064E}\u{0631}\u{064A}\u{0645}",
+        ];
     }
 
     #[DataProvider('validNames')]
@@ -108,6 +114,11 @@ final class NamePartsTest extends TestCase
         self::assertTrue(GivenName::from("\u{0645}\u{0640}\u{062D}\u{0645}\u{062F}")->equals(GivenName::from('محمد')));
     }
 
+    public function testPersianAndArabicKafAndYehAreOneValue(): void
+    {
+        self::assertTrue(GivenName::from("\u{06A9}\u{0631}\u{06CC}\u{0645}")->equals(GivenName::from('كريم')));
+    }
+
     public function testTatweelBetweenALetterAndItsHarakatIsRemoved(): void
     {
         self::assertSame(
@@ -127,7 +138,7 @@ final class NamePartsTest extends TestCase
         yield 'empty' => ['', 'Invalid Saudi Arabian given name (0 characters).'];
         yield 'blank' => [" \u{00A0}\t", 'Invalid Saudi Arabian given name (0 characters).'];
         yield 'only tatweel' => ["\u{0640}\u{0640}", 'Invalid Saudi Arabian given name (0 characters).'];
-        yield 'too long' => [\str_repeat('ع', 101), 'Invalid Saudi Arabian given name (101 characters).'];
+        yield 'too long' => [\str_repeat('ع', 101), 'Invalid Saudi Arabian given name (too long).'];
         yield 'Latin' => ['Mohammed', $character];
         yield 'Arabic and Latin in one name' => ['محمد Ali', $character];
         yield 'Latin letter inside an Arabic word' => ['محaمد', $character];

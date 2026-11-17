@@ -35,6 +35,8 @@ final class ExitEntryPermitToTaiwanNumberTest extends TestCase
         yield 'L and 8 digits' => ['L12345678', 'L12345678'];
         yield 'T and 8 digits (older permit)' => ['T12345678', 'T12345678'];
         yield 'lower case and separators' => ['l 12-345 678', 'L12345678'];
+        yield 'fullwidth letter and digits' => ["\u{FF2C}\u{FF11}\u{FF12}３４５６７８", 'L12345678'];
+        yield 'fullwidth lower-case letter and fullwidth hyphen' => ["\u{FF4C}1234\u{FF0D}5678", 'L12345678'];
     }
 
     #[DataProvider('validNumbers')]

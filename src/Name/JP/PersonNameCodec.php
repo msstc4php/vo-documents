@@ -4,10 +4,8 @@ declare(strict_types=1);
 
 namespace MSSTC4PHP\ValueObject\Documents\Name\JP;
 
-use LogicException;
 use MSSTC4PHP\ValueObject\Contract\ValueObject;
 use MSSTC4PHP\ValueObject\Documents\Exception\InvalidPersonNameException;
-use MSSTC4PHP\ValueObject\Documents\Icao\PersonName as IcaoPersonName;
 use MSSTC4PHP\ValueObject\Documents\Internal\PayloadFields;
 use MSSTC4PHP\ValueObject\Exception\InvalidPayloadException;
 use MSSTC4PHP\ValueObject\Payload\PayloadCodec;
@@ -40,11 +38,7 @@ final readonly class PersonNameCodec implements PayloadCodec
     #[Override]
     public function encode(ValueObject $value): array
     {
-        if (!$value instanceof PersonName) {
-            $message = \sprintf('%s encodes %s, %s given.', self::class, PersonName::class, $value::class);
-
-            throw new LogicException($message);
-        }
+        $value = PayloadFields::encodable($value, PersonName::class, self::class);
 
         return [
             'family' => $value->family->value,
@@ -63,14 +57,13 @@ final readonly class PersonNameCodec implements PayloadCodec
     public function decode(array $payload): PersonName
     {
         PayloadFields::assertOnlyKeys($payload, self::KEYS, self::SHAPE);
-        $latin = PayloadFields::nullableString($payload, 'latin', self::SHAPE);
 
         return new PersonName(
             FamilyName::from(PayloadFields::string($payload, 'family', self::SHAPE)),
             GivenName::from(PayloadFields::string($payload, 'given', self::SHAPE)),
             FamilyNameReading::from(PayloadFields::string($payload, 'familyReading', self::SHAPE)),
             GivenNameReading::from(PayloadFields::string($payload, 'givenReading', self::SHAPE)),
-            $latin === null ? null : IcaoPersonName::from($latin),
+            PayloadFields::latinOverride($payload, self::SHAPE),
         );
     }
 }

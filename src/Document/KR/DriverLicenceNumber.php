@@ -23,7 +23,8 @@ use Override;
  * {@see regionCode()} gives the region number in both (the name through KoROAD's table: 서울 11 … 울산 26, 광주 24). It is
  * a string, not an ISO 3166-2 code, and the number of a new licence is not checked against the table because the
  * offices are renumbered over time. The meaning of the other groups and of the last two digits is not quoted, so they
- * have no accessor and no rule. `masked()` keeps the last four digits (no official masking rule).
+ * have no accessor and no rule. `masked()` keeps the last four digits (no official masking rule) of the 12-digit form,
+ * for the earlier form too (`********3361`), so a masked value does not tell the region or the form.
  *
  * @see https://www.koroad.or.kr/kp_web/licNewsView.do?board_code=PRBBS_080&board_num=101697 도로교통공단 면허소식 2014-07-14
  * @see docs/sources/KR.md "Driving licence number"
@@ -74,7 +75,11 @@ final class DriverLicenceNumber extends AbstractStringValueObject implements Mas
     #[Override]
     public function masked(): string
     {
-        return Mask::keepLastDigits(Text::nonEmpty($this->value), 4);
+        $digits = $this->isNumbered()
+            ? $this->value
+            : $this->regionCode() . \str_replace('-', '', \mb_substr($this->value, 3, null, 'UTF-8'));
+
+        return Mask::keepLastDigits(Text::nonEmpty($digits), 4);
     }
 
     #[Override]
@@ -82,7 +87,7 @@ final class DriverLicenceNumber extends AbstractStringValueObject implements Mas
     {
         $composed = Normalizer::normalize($value, Normalizer::FORM_C);
         $stripped = Digits::strip(\is_string($composed) ? $composed : $value);
-        if (\preg_match('/^(\D{2})([0-9]{10})$/u', $stripped, $parts) === 1 && isset(self::REGIONS[$parts[1]])) {
+        if (\preg_match('/^(\D{2})([0-9]{10})$/uD', $stripped, $parts) === 1 && isset(self::REGIONS[$parts[1]])) {
             return \sprintf(
                 '%s %s-%s-%s',
                 $parts[1],

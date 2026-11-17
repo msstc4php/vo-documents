@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MSSTC4PHP\ValueObject\Documents\Document\IN;
 
+use LogicException;
 use MSSTC4PHP\ValueObject\Documents\Contract\Maskable;
 use MSSTC4PHP\ValueObject\Documents\Exception\InvalidDocumentNumberException;
 use MSSTC4PHP\ValueObject\Documents\Internal\Mask;
@@ -29,7 +30,8 @@ final class PermanentAccountNumber extends AbstractStringValueObject implements 
 
     public function holderType(): PanHolderType
     {
-        return PanHolderType::from($this->value[3]);
+        return PanHolderType::tryFrom($this->value[3])
+            ?? throw new LogicException('Holder type letter validated by parse().');
     }
 
     #[Override]

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MSSTC4PHP\ValueObject\Documents\Tests\Unit\Document\IN;
 
+use LogicException;
 use MSSTC4PHP\ValueObject\Documents\Document\IN\PanHolderType;
 use MSSTC4PHP\ValueObject\Documents\Document\IN\PermanentAccountNumber;
 use MSSTC4PHP\ValueObject\Documents\Internal\Digits;
@@ -70,6 +71,18 @@ final class PermanentAccountNumberTest extends TestCase
             ['P', 'C', 'H', 'A', 'B', 'G', 'J', 'L', 'F', 'T'],
             \array_map(static fn (PanHolderType $type): string => $type->value, PanHolderType::cases()),
         );
+    }
+
+    public function testATamperedHolderLetterIsNotEchoed(): void
+    {
+        $serialized = \serialize(PermanentAccountNumber::from('BLGPS1234D'));
+        $tampered = \unserialize(\str_replace('BLGPS1234D', 'BLGES1234D', $serialized));
+        self::assertInstanceOf(PermanentAccountNumber::class, $tampered);
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Holder type letter validated by parse().');
+
+        $tampered->holderType();
     }
 
     public function testMasksAllButTheLastFour(): void

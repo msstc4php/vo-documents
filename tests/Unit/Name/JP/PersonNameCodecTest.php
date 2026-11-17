@@ -6,7 +6,6 @@ namespace MSSTC4PHP\ValueObject\Documents\Tests\Unit\Name\JP;
 
 use LogicException;
 use MSSTC4PHP\ValueObject\Documents\Codecs;
-use MSSTC4PHP\ValueObject\Documents\Exception\InvalidPersonNameException;
 use MSSTC4PHP\ValueObject\Documents\Icao\PersonName as IcaoPersonName;
 use MSSTC4PHP\ValueObject\Documents\Icao\Table\Cyrillic;
 use MSSTC4PHP\ValueObject\Documents\Icao\Table\LatinMultinational;
@@ -175,7 +174,7 @@ final class PersonNameCodecTest extends TestCase
     {
         self::assertNameRefusedWithoutEcho(
             static fn (): PersonName => new PersonNameCodec()->decode($payload),
-            '',
+            self::payloadProbe($payload),
             self::SHAPE,
             InvalidPayloadException::class,
         );
@@ -185,18 +184,26 @@ final class PersonNameCodecTest extends TestCase
     {
         self::assertNameRefusedWithoutEcho(
             static fn (): PersonName => new PersonNameCodec()->decode(self::japaneseName()->jsonSerialize()),
-            '',
+            self::payloadProbe(self::japaneseName()->jsonSerialize()),
             self::SHAPE,
             InvalidPayloadException::class,
         );
     }
 
-    public function testDecodeRefusesAnInvalidReading(): void
+    public function testDecodeRefusesAnInvalidReadingWithoutEchoingIt(): void
     {
-        $this->expectException(InvalidPersonNameException::class);
+        $payload = [
+            'family' => '大野',
+            'given' => '翔',
+            'familyReading' => '大野',
+            'givenReading' => 'しょう',
+            'latin' => null,
+        ];
 
-        new PersonNameCodec()->decode(
-            ['family' => '大野', 'given' => '翔', 'familyReading' => '大野', 'givenReading' => 'しょう', 'latin' => null],
+        self::assertNameRefusedWithoutEcho(
+            static fn (): PersonName => new PersonNameCodec()->decode($payload),
+            self::payloadProbe($payload),
+            'Invalid Japanese family name reading (invalid character).',
         );
     }
 
@@ -204,7 +211,7 @@ final class PersonNameCodecTest extends TestCase
     {
         self::assertNameRefusedWithoutEcho(
             static fn (): array => new PersonNameCodec()->encode(GivenName::from('翔')),
-            '',
+            '翔',
             PersonNameCodec::class . ' encodes ' . PersonName::class . ', ' . GivenName::class . ' given.',
             LogicException::class,
         );

@@ -18,6 +18,10 @@ final class Gb11643
 {
     private const int LENGTH = 18;
 
+    private const int CHECK_INDEX = 17;
+
+    private const int BIRTH_DATE_OFFSET = 6;
+
     /**
      * @param non-empty-string $document the document's name in the exception message
      *
@@ -28,7 +32,7 @@ final class Gb11643
     public static function normalize(string $input, string $document): string
     {
         $number = new NumberFormat('0-9X', self::LENGTH, self::LENGTH)->parse($input, $document);
-        if (\strspn($number, '0123456789', 0, 17) !== 17) {
+        if (\strspn($number, '0123456789', 0, self::CHECK_INDEX) !== self::CHECK_INDEX) {
             throw new InvalidDocumentNumberException(\sprintf('Invalid %s (invalid character).', $document));
         }
 
@@ -39,14 +43,12 @@ final class Gb11643
      * @param non-empty-string $number a normalised 18-character number
      * @param non-empty-string $document the document's name in the exception message
      *
-     * @throws InvalidDocumentNumberException when the date at `$offset` is not a calendar date
+     * @throws InvalidDocumentNumberException when the birth date is not a calendar date
      */
-    public static function assertBirthDate(string $number, int $offset, string $document): void
+    public static function assertBirthDate(string $number, string $document): void
     {
-        $year = (int) \substr($number, $offset, 4);
-        $month = (int) \substr($number, $offset + 4, 2);
-        $day = (int) \substr($number, $offset + 6, 2);
-        if (!\checkdate($month, $day, $year)) {
+        [$year, $month, $day] = self::birthDateParts($number);
+        if (!\checkdate((int) $month, (int) $day, (int) $year)) {
             throw new InvalidDocumentNumberException(\sprintf('Invalid %s (invalid birth date).', $document));
         }
     }
@@ -59,7 +61,7 @@ final class Gb11643
      */
     public static function assertCheckCharacter(string $number, string $document): void
     {
-        if (Checksum::iso7064Mod11Dash2(\substr($number, 0, 17)) !== $number[17]) {
+        if (Checksum::iso7064Mod11Dash2(\substr($number, 0, self::CHECK_INDEX)) !== $number[self::CHECK_INDEX]) {
             throw new InvalidDocumentNumberException(\sprintf('Invalid %s checksum.', $document));
         }
     }
@@ -67,16 +69,20 @@ final class Gb11643
     /**
      * @param non-empty-string $number a number {@see assertBirthDate()} accepted
      */
-    public static function birthDate(string $number, int $offset): DateTimeImmutable
+    public static function birthDate(string $number): DateTimeImmutable
     {
-        return new DateTimeImmutable(
-            \sprintf(
-                '%s-%s-%s',
-                \substr($number, $offset, 4),
-                \substr($number, $offset + 4, 2),
-                \substr($number, $offset + 6, 2),
-            ),
-            new DateTimeZone('UTC'),
-        );
+        return new DateTimeImmutable(\implode('-', self::birthDateParts($number)), new DateTimeZone('UTC'));
+    }
+
+    /**
+     * @return array{string, string, string} year, month and day as written
+     */
+    private static function birthDateParts(string $number): array
+    {
+        return [
+            \substr($number, self::BIRTH_DATE_OFFSET, 4),
+            \substr($number, self::BIRTH_DATE_OFFSET + 4, 2),
+            \substr($number, self::BIRTH_DATE_OFFSET + 6, 2),
+        ];
     }
 }

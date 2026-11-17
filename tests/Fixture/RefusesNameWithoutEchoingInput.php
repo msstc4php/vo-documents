@@ -13,7 +13,8 @@ trait RefusesNameWithoutEchoingInput
 {
     /**
      * Asserts that `$create()` throws `$exception` with exactly `$expectedMessage`, and that the message holds no word
-     * of three or more letters of `$input` (as typed or upper-cased), so no name part is echoed.
+     * of three or more letters of `$input` (as typed or upper-cased) and no non-ASCII letter of it at all, so no name
+     * part is echoed, however short (`张`, `민준`).
      *
      * @param Closure(): mixed $create
      * @param class-string<Throwable> $exception
@@ -35,9 +36,24 @@ trait RefusesNameWithoutEchoingInput
                 Assert::assertStringNotContainsString(\mb_strtoupper($word, 'UTF-8'), $thrown->getMessage());
             }
 
+            \preg_match_all('/(?![\x00-\x7F])\p{L}/u', $input, $letters);
+            foreach ($letters[0] as $letter) {
+                Assert::assertStringNotContainsString($letter, $thrown->getMessage());
+            }
+
             return;
         }
 
         Assert::fail(\sprintf('Expected %s.', $exception));
+    }
+
+    /**
+     * The string fields of a payload, as the probe of {@see assertNameRefusedWithoutEcho()}.
+     *
+     * @param array<array-key, mixed> $payload
+     */
+    private static function payloadProbe(array $payload): string
+    {
+        return \implode(' ', \array_filter($payload, \is_string(...)));
     }
 }

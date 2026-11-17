@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace MSSTC4PHP\ValueObject\Documents\Tests\Unit\Name\IN\Devanagari;
 
 use LogicException;
-use MSSTC4PHP\ValueObject\Documents\Exception\InvalidPersonNameException;
 use MSSTC4PHP\ValueObject\Documents\Icao\PersonName as IcaoPersonName;
 use MSSTC4PHP\ValueObject\Documents\Icao\Table\Cyrillic;
 use MSSTC4PHP\ValueObject\Documents\Icao\Table\LatinMultinational;
@@ -167,32 +166,46 @@ final class PersonNameTest extends TestCase
     {
         self::assertNameRefusedWithoutEcho(
             static fn (): PersonName => new PersonNameCodec()->decode($payload),
-            'JAIN',
+            self::payloadProbe($payload),
             self::SHAPE,
             InvalidPayloadException::class,
         );
     }
 
     /**
-     * @return iterable<string, array{array{given: string, surname: string, latin: string}}>
+     * @return iterable<string, array{array{given: string, surname: string, latin: string}, string}>
      */
     public static function scriptMixing(): iterable
     {
-        yield 'Latin given' => [['given' => 'Rajesh', 'surname' => 'जैन', 'latin' => 'JAIN<<RAJESH']];
-        yield 'Latin surname' => [['given' => 'राजेश', 'surname' => 'Jain', 'latin' => 'JAIN<<RAJESH']];
-        yield 'Devanagari as the Latin form' => [['given' => 'राजेश', 'surname' => 'जैन', 'latin' => 'जैन']];
-        yield 'Han among Devanagari' => [['given' => 'राजेश', 'surname' => '金', 'latin' => 'JAIN<<RAJESH']];
+        yield 'Latin given' => [
+            ['given' => 'Rajesh', 'surname' => 'जैन', 'latin' => 'JAIN<<RAJESH'],
+            'Invalid Indian Devanagari given name (invalid character).',
+        ];
+        yield 'Latin surname' => [
+            ['given' => 'राजेश', 'surname' => 'Jain', 'latin' => 'JAIN<<RAJESH'],
+            'Invalid Indian Devanagari surname (invalid character).',
+        ];
+        yield 'Devanagari as the Latin form' => [
+            ['given' => 'राजेश', 'surname' => 'जैन', 'latin' => 'जैन'],
+            'Invalid ICAO personal name.',
+        ];
+        yield 'Han among Devanagari' => [
+            ['given' => 'राजेश', 'surname' => '金', 'latin' => 'JAIN<<RAJESH'],
+            'Invalid Indian Devanagari surname (invalid character).',
+        ];
     }
 
     /**
      * @param array{given: string, surname: string, latin: string} $payload
      */
     #[DataProvider('scriptMixing')]
-    public function testDecodeRefusesAnotherScript(array $payload): void
+    public function testDecodeRefusesAnotherScriptWithoutEchoingIt(array $payload, string $message): void
     {
-        $this->expectException(InvalidPersonNameException::class);
-
-        new PersonNameCodec()->decode($payload);
+        self::assertNameRefusedWithoutEcho(
+            static fn (): PersonName => new PersonNameCodec()->decode($payload),
+            self::payloadProbe($payload),
+            $message,
+        );
     }
 
     private function person(string $latin = 'JAIN<<PIYUSH<KUMAR'): PersonName

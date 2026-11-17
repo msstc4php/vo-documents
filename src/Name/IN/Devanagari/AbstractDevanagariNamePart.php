@@ -12,12 +12,15 @@ use Override;
  * Script=Devanagari) joined by a space or a hyphen, each word starting with a letter (a lone virama, nukta or vowel
  * sign is refused). The Devanagari digits U+0966-096F and the abbreviation sign U+0970 are not name characters (the
  * danda U+0964/0965 is Script=Common and outside the class). The zero-width joiner and non-joiner U+200D, U+200C
- * (Script=Inherited) are allowed, one at a time, only between two letters of a word, where they select a conjunct form.
+ * (Script=Inherited) are allowed, one at a time, only right after the virama U+094D and before a letter, where they
+ * select the half or explicit-virama form; anywhere else they would store a second value for the same visible name.
  * See docs/sources/IN.md "Names".
  */
 abstract class AbstractDevanagariNamePart extends AbstractNamePart
 {
     private const string LETTER = '(?:(?![\p{Nd}\p{P}])\p{sc=Devanagari})';
+
+    private const string JOINER = '(?:(?<=\x{094D})[\x{200C}\x{200D}](?=\p{L}))';
 
     #[Override]
     protected function letters(): string
@@ -34,6 +37,6 @@ abstract class AbstractDevanagariNamePart extends AbstractNamePart
     #[Override]
     protected function word(): string
     {
-        return '(?=\p{L})' . self::LETTER . '(?:[\x{200C}\x{200D}]?' . self::LETTER . ')*';
+        return '(?=\p{L})' . self::LETTER . '(?:' . self::JOINER . '?' . self::LETTER . ')*';
     }
 }

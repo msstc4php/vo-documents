@@ -40,6 +40,8 @@ final class ExitEntryPermitToHongKongMacauNumberTest extends TestCase
         yield 'letter P, after O' => ['CP1234567', 'CP1234567'];
         yield 'letter Z' => ['CZ1234567', 'CZ1234567'];
         yield 'lower case and separators' => ['c 12-345 678', 'C12345678'];
+        yield 'fullwidth letters and digits' => ["\u{FF23}\u{FF21}\u{FF10}０００００１", 'CA0000001'];
+        yield 'fullwidth lower-case letter and ideographic space' => ["\u{FF43}1234\u{3000}5678", 'C12345678'];
     }
 
     #[DataProvider('validNumbers')]

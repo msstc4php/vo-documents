@@ -50,7 +50,7 @@ final class ForeignerPermanentResidenceNumber extends AbstractStringValueObject 
     #[Override]
     public function birthDate(): DateTimeImmutable
     {
-        return Gb11643::birthDate(Text::nonEmpty($this->value), 6);
+        return Gb11643::birthDate(Text::nonEmpty($this->value));
     }
 
     #[Override]
@@ -67,7 +67,7 @@ final class ForeignerPermanentResidenceNumber extends AbstractStringValueObject 
             throw new InvalidDocumentNumberException(\sprintf('Invalid %s (invalid character).', self::DOCUMENT));
         }
 
-        Gb11643::assertBirthDate($number, 6, self::DOCUMENT);
+        Gb11643::assertBirthDate($number, self::DOCUMENT);
         Gb11643::assertCheckCharacter($number, self::DOCUMENT);
 
         return $number;

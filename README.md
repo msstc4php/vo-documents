@@ -47,8 +47,10 @@ checksum."); **it never contains the input or any part of it**.
 
 A number typed on a CJK or Arabic keyboard reads as the ASCII one: every document number folds fullwidth digits and
 letters (`１２３`, `Ｘ`; letters are upper-cased) and Arabic-Indic digits (U+0660-0669, U+06F0-06F9) to ASCII, and
-strips the ideographic space U+3000 with the other separators (space, hyphen, tab, NBSP, U+2007, U+202F). Devanagari
-digits are not folded. Names do not fold: a compatibility character in a name is refused.
+strips the ideographic space U+3000 with the other separators (space, hyphen, tab, NBSP, U+2007, U+202F, the CJK hyphen
+look-alikes U+FF0D, U+FF70, U+30FC, U+2010, U+2011, U+2212, and the invisible bidi marks U+200E, U+200F, U+061C,
+U+202A-202E and U+2066-2069 that a number picks up when pasted from right-to-left text). Devanagari digits are not
+folded. Names do not fold: a compatibility character in a name is refused.
 
 `__toString()` and `jsonSerialize()` return the full canonical value. Masking is an explicit, separate call,
 `masked()` (interface `Contract\Maskable`). No masking rule is official unless the class says so; the default keeps the
@@ -151,13 +153,13 @@ official algorithm is published. A number with the right shape is accepted, neve
 | `Document\KR\ResidentRegistrationNumber` | 주민등록번호, 13 digits | birth date must exist in the century of the 7th digit; no check digit verified (random digits since 2020-10) | `HasBirthDate`, `HasSex` | 주민등록법 시행규칙 Art. 2; 국가기록원; 행정안전부 |
 | `Document\KR\ForeignerRegistrationNumber` | 외국인등록번호, 13 digits (7th digit 5-8) | birth date must exist; no check digit | `HasBirthDate`, `HasSex` (법무부: 5 and 7 man, 6 and 8 woman) | 출입국관리법 시행규칙 별표 2; 법무부 release of 2023-03-28 |
 | `Document\KR\MultipleEntryPassportNumber` | Multiple-entry (복수) `M` series: `M` + 8 digits, or `M` + 3 digits + letter + 4 digits (from 2021-12-21) | format only | none | 외교부 여권안내 |
-| `Document\KR\DriverLicenceNumber` | 운전면허번호: 12 digits (from 2014-07-02) or the region name + 10 digits | region name checked against KoROAD's table; no check digit | `regionCode()` (string, not ISO), `formatted()` | 도로교통공단 (KoROAD) |
+| `Document\KR\DriverLicenceNumber` | 운전면허번호: 12 digits (from 2014-07-02) or the region name + 10 digits | region name checked against KoROAD's table; no check digit; both forms masked as 12 digits, `********3361` | `regionCode()` (string, not ISO), `formatted()` | 도로교통공단 (KoROAD) |
 | `Document\IN\AadhaarNumber` | Aadhaar, 12 digits | Verhoeff check digit (UIDAI's own paper *recommends* it); no first-digit rule | none; `masked()` is UIDAI's `XXXX XXXX 1234` | UIDAI "A UID Numbering Scheme" (2010) |
 | `Document\IN\PermanentAccountNumber` | PAN, 10 characters (`BLGPS1234D`) | layout of the Income Tax Department tutorial (`0000` refused); the check letter is not verified | `holderType()` (`PanHolderType`, the 4th character) | Income Tax Department |
 | `Document\IN\PassportNumber` | Passport, 8 characters | length and ASCII letters and digits only | none | MEA passport data page structure |
 | `Document\IN\AbhaNumber` | ABHA number, 14 digits | format only | none | PIB explainer, Ministry of Health and Family Welfare |
 | `Document\ID\NationalIdentityNumber` | NIK, 16 digits (also the driving licence number since July 2024) | birth date must exist (a woman's day plus 40); 29 February when the two-digit year is divisible by four | `HasSex`, `regionCode()` (string, not ISO), `birthDay()`, `birthMonth()`, `birthYearDigits()` | Ditjen Dukcapil |
-| `Document\ID\TaxpayerNumber` | NPWP, 15 digits (`99.999.999.9-999.999`) or 16 digits; all zeros refused | format only | `isFifteenDigits()`, `formatted()` (15 digits) | DJP PENG-6/PJ.09/2024; PMK 112/2022 |
+| `Document\ID\TaxpayerNumber` | NPWP, 15 digits (`99.999.999.9-999.999`) or 16 digits; all zeros refused; a 15-digit number and its `0`-prefixed 16-digit form are two values, not `equals()` | format only | `isFifteenDigits()`, `formatted()` (15 digits) | DJP PENG-6/PJ.09/2024; PMK 112/2022 |
 | `Document\ID\FamilyCardNumber` | Nomor Kartu Keluarga, 16 digits | format only | none | Ditjen Dukcapil |
 | `Document\SA\NationalIdentityNumber` | National ID number, 10 digits starting with 1; **also the driving licence number** | first digit 1 (ZATCA BR-KSA-F-10, a warning there, a refusal here); no check digit | none | ZATCA SDK v3.4.4 announcement |
 | `Document\SA\IqamaNumber` | Iqama number, 10 digits starting with 2; **also the driving licence number** | first digit 2 (ZATCA BR-KSA-F-11); no check digit | none | ZATCA SDK v3.4.4 announcement |
@@ -227,19 +229,23 @@ $jp = new JP\PersonName(
   `Name\IN\Devanagari\PersonName` takes `(given, ?surname, latin)`. None of them checks the Latin form against the
   national one beyond being a valid ICAO name; equality includes the Latin form.
 - **India in Latin letters** is `Name\IN\PersonName(given, ?surname, ?latin)`, separate from the Devanagari one (the
-  Passport Seva form: a person with no surname writes the whole name in the given part, ICAO `RAJESH<KUMAR`; derived
-  `JAIN<<PIYUSH<KUMAR`; policy `TransliterationVariant`).
+  Passport Seva form: a person with no surname writes the whole name in the given part, ICAO `RAJESH<KUMAR`, the Doc
+  9303 single-name rule, although Passport Seva prints such a passport with a blank surname, `P<IND<<RAJESH<KUMAR`,
+  which cannot be stored; derived `JAIN<<PIYUSH<KUMAR`; policy `TransliterationVariant`).
 - **Japan** takes the 氏名 and the 振り仮名 of each part and derives the passport spelling by MOFA's Hepburn table
   (`ん` is M before B, M and P; `っ` doubles the consonant; the long vowel `ー`, `おう`/`うう` and `おお` are omitted:
   `さとう` is `SATO`). Kana cannot tell a long vowel from a morpheme boundary, so `井上` (いのうえ) is derived `INOE`
   while the passport says `INOUE`: give that as the override. MOFA lets a passport carry another spelling (`ITOH`,
-  `OHNO`) on request, so the policy is `AnyIcaoSpelling`; a reading that starts with a small kana, `ん`, `っ` or `ー`
-  has no spelling and needs the override too.
+  `OHNO`) on request, so the policy is `AnyIcaoSpelling`; a reading that starts with a small kana, `ん` or `っ` has no
+  spelling and needs the override too. The iteration marks `ゝゞヽヾ` repeat the kana before them (`いすゞ` is `ISUZU`). A
+  name part or reading cannot start with `ー` or an iteration mark.
 - **Scripts.** Name parts are checked with `\p{sc=Han}`, `\p{sc=Hangul}`, `\p{sc=Arabic}`, `\p{sc=Devanagari}` and the
-  like; the characters of a name that are Script=Common or Inherited are listed explicitly: `ー` U+30FC and `〆` U+3006
-  (JP), `·` U+00B7 (CN, KR; U+30FB and U+2022 are stored as U+00B7), the Arabic harakat U+064B-0652 and U+0670 (the
-  tatweel U+0640 is removed), the Devanagari ZWJ and ZWNJ between two letters. Hanja, Uyghur, Tibetan and Mongolian
-  script names are not covered.
+  like, letters only (`\p{Lo}` for Han and Hangul: radicals, Hangzhou numerals and the Hangul tone marks are refused; CN
+  lists `〇` and JP `々` explicitly); the characters of a name that are Script=Common or Inherited are listed explicitly:
+  `ー` U+30FC and `〆` U+3006 (JP), `·` U+00B7 (CN, KR; U+30FB and U+2022 are stored as U+00B7), the Arabic harakat
+  U+064B-0652 and U+0670 (the tatweel U+0640 is removed; the Persian kaf U+06A9 and yeh U+06CC are stored as U+0643 and
+  U+064A), the Devanagari ZWJ and ZWNJ right after a virama. Hanja, Uyghur, Tibetan and Mongolian script names are not
+  covered.
 
 ### AU driving licences and the jurisdiction factory
 
@@ -353,9 +359,9 @@ NFC-normalised, trimmed, has inner whitespace runs collapsed to one space, and
 keeps its letter case. Limits: 100 characters per part. Russian parts accept only the 33 Russian letters; a Cyrillic
 name typed with Latin look-alikes (Latin `a`, `o`, `e`, `c`) is refused. A compatibility character (its NFKC form
 differs: fullwidth `Ｓｍｉｔｈ`, `ª`, the ligature `ﬁ`) is refused in every country, because it would be a second stored
-spelling of the same name; the ones an ICAO table lists itself (`Ĳ`, `Ŀ`) are kept. Messages say "(N characters)" for
-an empty or too long part, "(compatibility character)", or "(invalid character)" for a letter or separator that is not
-allowed where it stands.
+spelling of the same name; the ones an ICAO table lists itself (`Ĳ`, `Ŀ`) are kept. Messages say "(0 characters)" for
+an empty part, "(too long)" for one over 100 characters, "(compatibility character)", or "(invalid character)" for a
+letter or separator that is not allowed where it stands.
 
 ```php
 use MSSTC4PHP\ValueObject\Documents\Icao\PersonName as IcaoPersonName;

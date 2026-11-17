@@ -58,6 +58,9 @@ final class NamePartsTest extends TestCase
         yield 'combining voiced mark composed by NFC' => ["か\u{3099}", 'が'];
         yield 'combining semi-voiced mark composed by NFC' => ["ハ\u{309A}", 'パ'];
         yield 'trimmed' => [' 佐藤 ', '佐藤'];
+        yield 'hiragana iteration mark after a kana' => ["いす\u{309E}", "いす\u{309E}"];
+        yield 'katakana iteration mark after a kana' => ["ス\u{30FD}キ", "ス\u{30FD}キ"];
+        yield 'long-vowel mark after kanji' => ['山ー', '山ー'];
     }
 
     #[DataProvider('validNames')]
@@ -76,7 +79,7 @@ final class NamePartsTest extends TestCase
         $compatibility = 'Invalid Japanese family name (compatibility character).';
 
         yield 'empty' => ['', 'Invalid Japanese family name (0 characters).'];
-        yield 'too long' => [\str_repeat('佐', 101), 'Invalid Japanese family name (101 characters).'];
+        yield 'too long' => [\str_repeat('佐', 101), 'Invalid Japanese family name (too long).'];
         yield 'Latin' => ['Sato', $characters];
         yield 'Latin among kanji' => ['佐a', $characters];
         yield 'space' => ['佐 藤', $characters];
@@ -85,6 +88,16 @@ final class NamePartsTest extends TestCase
         yield 'leftover combining mark' => ["ア\u{3099}", $characters];
         yield 'hangul' => ['김', $characters];
         yield 'digit' => ['佐1', $characters];
+        yield 'long-vowel marks only' => ['ーー', $characters];
+        yield 'starts with ー' => ['ーナ', $characters];
+        yield 'starts with 々' => ['々木', $characters];
+        yield 'iteration mark only' => ["\u{309D}", $characters];
+        yield 'starts with ゞ' => ["\u{309E}す", $characters];
+        yield 'starts with ヽ' => ["\u{30FD}キ", $characters];
+        yield 'starts with ヾ' => ["\u{30FE}キ", $characters];
+        yield 'CJK radicals supplement (So)' => ["\u{2EC4}", $characters];
+        yield 'Hangzhou numeral (Nl)' => ["佐\u{3021}", $characters];
+        yield 'vertical iteration mark 〻 (Lm)' => ["佐\u{303B}", $characters];
         yield 'halfwidth katakana' => ['ｻｸﾗ', $compatibility];
         yield 'spacing voiced mark' => ["カ\u{309B}", $compatibility];
         yield 'fullwidth Latin' => ['Ｓａｔｏ', $compatibility];
@@ -119,6 +132,8 @@ final class NamePartsTest extends TestCase
         yield 'starts with っ' => ['ッカ', 'ッカ'];
         yield 'ヰ' => ['ヰ', 'ヰ'];
         yield 'composed by NFC' => ["さと\u{3099}う", 'さどう'];
+        yield 'iteration mark after a kana' => ["いす\u{309E}", "いす\u{309E}"];
+        yield 'long-vowel mark after a kana' => ['ナー', 'ナー'];
     }
 
     #[DataProvider('validReadings')]
@@ -136,11 +151,18 @@ final class NamePartsTest extends TestCase
         $characters = 'Invalid Japanese family name reading (invalid character).';
 
         yield 'empty' => ['', 'Invalid Japanese family name reading (0 characters).'];
-        yield 'too long' => [\str_repeat('さ', 101), 'Invalid Japanese family name reading (101 characters).'];
+        yield 'too long' => [\str_repeat('さ', 101), 'Invalid Japanese family name reading (too long).'];
         yield 'kanji' => ['佐藤', $characters];
         yield 'iteration mark 々' => ['さ々', $characters];
         yield '〆' => ['しめ〆', $characters];
         yield 'Latin' => ['sato', $characters];
+        yield 'long-vowel mark only' => ['ー', $characters];
+        yield 'long-vowel marks only' => ['ーー', $characters];
+        yield 'starts with ー' => ['ーナ', $characters];
+        yield 'starts with ゝ' => ["\u{309D}さ", $characters];
+        yield 'starts with ゞ' => ["\u{309E}", $characters];
+        yield 'starts with ヽ' => ["\u{30FD}サ", $characters];
+        yield 'starts with ヾ' => ["\u{30FE}サ", $characters];
         yield 'space' => ['さ とう', $characters];
         yield 'katakana middle dot' => ["マリア\u{30FB}テレサ", $characters];
         yield 'halfwidth katakana' => ['ｻﾄｳ', 'Invalid Japanese family name reading (compatibility character).'];

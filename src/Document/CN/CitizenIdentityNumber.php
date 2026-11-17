@@ -23,7 +23,10 @@ use Override;
  * `x` is stored as `X`). The 15-digit number of the first-generation card is refused by length: the NPC Standing
  * Committee's 2011 amendment of the Resident Identity Card Law stopped its use from 2013-01-01. The address code is
  * not checked against GB/T 2260. The standard writes the number "不留空格", so there is no display form; `masked()`
- * keeps the last four characters (no official masking rule): `**************002X`.
+ * keeps the last four characters (no official masking rule): `**************002X`; they include the last digit of the
+ * sequence code, so a masked number still tells the sex. A 2023 permanent-residence number (first digit 9) has the
+ * same layout and is accepted here too; no rule tells them apart, so use {@see ForeignerPermanentResidenceNumber} for
+ * one.
  *
  * @see http://zjw.beijing.gov.cn/Portals/0/zhuanti/fazhan/%E8%BA%AB%E4%BB%BD%E8%AF%81GB11643-1999.pdf GB 11643-1999
  *      §5.1-5.2, Annex A and B
@@ -33,6 +36,8 @@ use Override;
  */
 final class CitizenIdentityNumber extends AbstractStringValueObject implements HasBirthDate, HasSex, Maskable
 {
+    private const int SEQUENCE_LAST_DIGIT_INDEX = 16;
+
     private const string DOCUMENT = 'Chinese citizen identity number';
 
     /**
@@ -47,13 +52,15 @@ final class CitizenIdentityNumber extends AbstractStringValueObject implements H
     #[Override]
     public function birthDate(): DateTimeImmutable
     {
-        return Gb11643::birthDate(Text::nonEmpty($this->value), 6);
+        return Gb11643::birthDate(Text::nonEmpty($this->value));
     }
 
     #[Override]
     public function sex(): Sex
     {
-        return \in_array($this->value[16], ['1', '3', '5', '7', '9'], true) ? Sex::Male : Sex::Female;
+        return \in_array($this->value[self::SEQUENCE_LAST_DIGIT_INDEX], ['1', '3', '5', '7', '9'], true)
+            ? Sex::Male
+            : Sex::Female;
     }
 
     #[Override]
@@ -66,7 +73,7 @@ final class CitizenIdentityNumber extends AbstractStringValueObject implements H
     protected function parse(string $value): string
     {
         $number = Gb11643::normalize($value, self::DOCUMENT);
-        Gb11643::assertBirthDate($number, 6, self::DOCUMENT);
+        Gb11643::assertBirthDate($number, self::DOCUMENT);
         Gb11643::assertCheckCharacter($number, self::DOCUMENT);
 
         return $number;

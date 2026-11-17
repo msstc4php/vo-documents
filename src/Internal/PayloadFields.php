@@ -4,11 +4,15 @@ declare(strict_types=1);
 
 namespace MSSTC4PHP\ValueObject\Documents\Internal;
 
+use LogicException;
+use MSSTC4PHP\ValueObject\Contract\ValueObject;
+use MSSTC4PHP\ValueObject\Documents\Exception\InvalidPersonNameException;
+use MSSTC4PHP\ValueObject\Documents\Icao\PersonName as IcaoPersonName;
 use MSSTC4PHP\ValueObject\Exception\InvalidPayloadException;
 
 /**
- * Validation shared by the payload codecs of national names: a closed key set and string fields, every failure
- * reported with the codec's one shape message.
+ * Validation shared by the payload codecs of national names: the encoded class, a closed key set, string fields and
+ * the ICAO `latin` field, every payload failure reported with the codec's one shape message.
  *
  * @internal
  */
@@ -60,5 +64,54 @@ final class PayloadFields
         }
 
         return $value;
+    }
+
+    /**
+     * @template TValue of ValueObject
+     *
+     * @param class-string<TValue> $class the class the codec encodes
+     * @param class-string $codec
+     *
+     * @return TValue
+     *
+     * @throws LogicException when `$value` is of another class
+     */
+    public static function encodable(ValueObject $value, string $class, string $codec): ValueObject
+    {
+        if (!$value instanceof $class) {
+            throw new LogicException(\sprintf('%s encodes %s, %s given.', $codec, $class, $value::class));
+        }
+
+        return $value;
+    }
+
+    /**
+     * The required `latin` field: the `Icao\PersonName` string of the passport.
+     *
+     * @param array<array-key, mixed> $payload
+     * @param non-empty-string $shape
+     *
+     * @throws InvalidPayloadException when the field is missing or not a string
+     * @throws InvalidPersonNameException when it is not a valid ICAO personal name
+     */
+    public static function latin(array $payload, string $shape): IcaoPersonName
+    {
+        return IcaoPersonName::from(self::string($payload, 'latin', $shape));
+    }
+
+    /**
+     * The optional `latin` field of a name that derives its Latin form: only an override is stored.
+     *
+     * @param array<array-key, mixed> $payload
+     * @param non-empty-string $shape
+     *
+     * @throws InvalidPayloadException when the field is neither missing, null nor a string
+     * @throws InvalidPersonNameException when it is not a valid ICAO personal name
+     */
+    public static function latinOverride(array $payload, string $shape): ?IcaoPersonName
+    {
+        $latin = self::nullableString($payload, 'latin', $shape);
+
+        return $latin === null ? null : IcaoPersonName::from($latin);
     }
 }

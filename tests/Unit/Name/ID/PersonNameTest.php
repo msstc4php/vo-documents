@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace MSSTC4PHP\ValueObject\Documents\Tests\Unit\Name\ID;
 
 use LogicException;
-use MSSTC4PHP\ValueObject\Documents\Exception\InvalidPersonNameException;
 use MSSTC4PHP\ValueObject\Documents\Icao\PersonName as IcaoPersonName;
 use MSSTC4PHP\ValueObject\Documents\Icao\Table\Cyrillic;
 use MSSTC4PHP\ValueObject\Documents\Icao\Table\LatinMultinational;
@@ -116,31 +115,42 @@ final class PersonNameTest extends TestCase
     {
         self::assertNameRefusedWithoutEcho(
             static fn (): PersonName => new PersonNameCodec()->decode($payload),
-            'SANTOSO',
+            self::payloadProbe($payload),
             self::SHAPE,
             InvalidPayloadException::class,
         );
     }
 
     /**
-     * @return iterable<string, array{array{name: string, latin: string}}>
+     * @return iterable<string, array{array{name: string, latin: string}, string}>
      */
     public static function scriptMixing(): iterable
     {
-        yield 'Arabic name' => [['name' => 'محمد', 'latin' => 'MUHAMMAD']];
-        yield 'Cyrillic name' => [['name' => 'Иван', 'latin' => 'IVAN']];
-        yield 'Arabic as the Latin form' => [['name' => 'Budi Santoso', 'latin' => 'محمد']];
+        yield 'Arabic name' => [
+            ['name' => 'محمد', 'latin' => 'MUHAMMAD'],
+            'Invalid Indonesian full name (invalid character).',
+        ];
+        yield 'Cyrillic name' => [
+            ['name' => 'Иван', 'latin' => 'IVAN'],
+            'Invalid Indonesian full name (invalid character).',
+        ];
+        yield 'Arabic as the Latin form' => [
+            ['name' => 'Budi Santoso', 'latin' => 'محمد'],
+            'Invalid ICAO personal name.',
+        ];
     }
 
     /**
      * @param array{name: string, latin: string} $payload
      */
     #[DataProvider('scriptMixing')]
-    public function testDecodeRefusesAnotherScript(array $payload): void
+    public function testDecodeRefusesAnotherScriptWithoutEchoingIt(array $payload, string $message): void
     {
-        $this->expectException(InvalidPersonNameException::class);
-
-        new PersonNameCodec()->decode($payload);
+        self::assertNameRefusedWithoutEcho(
+            static fn (): PersonName => new PersonNameCodec()->decode($payload),
+            self::payloadProbe($payload),
+            $message,
+        );
     }
 
     private function person(string $latin = 'NURHALIZA<<SITI'): PersonName

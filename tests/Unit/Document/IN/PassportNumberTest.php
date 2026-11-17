@@ -50,9 +50,9 @@ final class PassportNumberTest extends TestCase
         self::assertSame($expected, $number->jsonSerialize());
     }
 
-    public function testMasksAllButTheLastFour(): void
+    public function testMasksAllButTheLastThree(): void
     {
-        self::assertSame('****2002', PassportNumber::from('J1232002')->masked());
+        self::assertSame('*****002', PassportNumber::from('J1232002')->masked());
     }
 
     /**

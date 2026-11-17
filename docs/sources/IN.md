@@ -37,14 +37,19 @@ word".
   binds a new application, and a still-valid name is never refused; a full stop is not a name character here, as in the
   package's Latin default).
 - **Latin (ICAO) form:** derived `SURNAME<<GIVEN`; a person with no surname has the given name as the only identifier
-  (`RAJESH<KUMAR`), the Doc 9303 rule for a single name (as `Name\MX`). The booklet quotes no MEA rule that lets a
-  passport keep another spelling, so the override policy is `TransliterationVariant` (another ICAO table spelling only).
+  (`RAJESH<KUMAR`), the Doc 9303 rule for a single name (as `Name\MX`). Passport Seva prints such a passport with a
+  blank surname (`P<IND<<RAJESH<KUMAR`); the package keeps the ICAO primary identifier (owner's ruling on code review
+  CR-009) and cannot store the blank-surname form, as an `Icao\PersonName` needs a primary identifier. The booklet
+  quotes no MEA rule that lets a passport keep another spelling, so the override policy is `TransliterationVariant`
+  (another ICAO table spelling only).
 - **Devanagari:** the booklet is a Latin-script form; no official text read restricts a Devanagari name (Aadhaar prints
   a name in the regional language, with no rule found for the script). `Name\IN\Devanagari\PersonName` takes the Latin
   form as mandatory (the passport spelling is a personal choice, the plan decision): parts of `\p{sc=Devanagari}` words;
   the virama (U+094D) and nukta (U+093C) are Script=Devanagari but may not start a word (each word starts with a letter,
-  `\p{L}`); U+200C and U+200D (Script=Inherited, so listed explicitly) are allowed only between two letters of a word.
-  The Devanagari digits (U+0966-096F, Nd), the abbreviation sign U+0970 (Po) are not name characters; the danda
+  `\p{L}`); U+200C and U+200D (Script=Inherited, so listed explicitly) are allowed only right after the virama U+094D
+  and before a letter (`क्‌ष`), where they select the half or explicit-virama form; anywhere else (after a consonant or
+  a vowel sign, before the virama) they would store a second value for one visible name and are refused (code review
+  CR-008). The Devanagari digits (U+0966-096F, Nd), the abbreviation sign U+0970 (Po) are not name characters; the danda
   U+0964/0965 is Script=Common and so outside the class. NFC decomposes the precomposed nukta letters (`क़` U+0958 →
   U+0915 U+093C) so both spellings store one value.
 
@@ -91,7 +96,8 @@ MEA tender corrigendum 4.4 (data page): "Passport Number - CHAR(8)"; the specime
 `J1234002` and an old number `B5007771`. The structure inside the 8 characters (one letter and seven digits in both
 specimens, as every source repeats) is not stated as a rule, so only the length of 8 and the ASCII letters and digits
 are enforced. The field is the same for every booklet, so the class covers any series; the numbers of diplomatic and
-official passports are not shown to differ. No check character is published. Mask: last 4.
+official passports are not shown to differ. No check character is published. Mask: last 3 (no rule; the package
+keeps 3 of a number of 8 characters or fewer).
 Passport Seva's file number (`DL1070012356714` in the specimen) is not the passport number and is not covered.
 
 ## ABHA number (`Document\IN\AbhaNumber`)

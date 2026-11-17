@@ -54,7 +54,9 @@ and validator sites.
   a GB 11643 number, so `CitizenIdentityNumber` takes it and `administrativeDivisionCode()` returns
   `810000`/`820000`/`830000`. The rule "an address code starting 81, 82 or 83 must be exactly 810000, 820000, 830000" is
   not stated in either text and is not enforced.
-- **Mask:** no official rule; last four characters (`**************002X`).
+- **Mask:** no official rule; last four characters (`**************002X`). The last four include position 17, the
+  last digit of the sequence code, so a masked number still tells the sex by its parity (code review CR-023: the
+  package's default mask rule is kept, as no CN masking rule is quoted).
 
 ## Foreigner's permanent residence card (`ForeignerPermanentResidenceNumber`, `LegacyForeignerPermanentResidenceNumber`)
 
@@ -111,9 +113,13 @@ Mask: no official rule; last four characters.
 
 ## Names (`Name\CN\*`)
 
-- **Parts:** `FamilyName` and `GivenName`, letters `\p{sc=Han}` (plan decision; `々` and `〇` have Script=Han). NFC folds
-  the CJK compatibility ideographs (`\u{F900}` → `豈`); a character whose NFKC form differs after NFC (fullwidth Latin,
-  Kangxi radicals) is refused by `AbstractNamePart`. `full()` writes family and given together with no separator.
+- **Parts:** `FamilyName` and `GivenName`, letters `\p{sc=Han}` that are `\p{Lo}` (plan decision, tightened by code
+  review CR-007). Script=Han also holds non-letters, refused as such: CJK radicals supplement `⻄` U+2EC4 (So, looks like
+  `西`), the Hangzhou numerals `〡`-`〩` U+3021-3029 (Nl), the iteration marks `々` U+3005 and `〻` U+303B (Lm). `〇` U+3007
+  (Script=Han, Nl) is accepted explicitly: it occurs as a character in Chinese names (controller's ruling on the code
+  review). NFC folds the CJK compatibility ideographs (`\u{F900}` → `豈`); a character whose NFKC form differs after NFC
+  (fullwidth Latin, Kangxi radicals) is refused by `AbstractNamePart`. `full()` writes family and given together with no
+  separator.
 - **Minority-nationality names:** the middle dot `·` U+00B7 (`阿沛·阿旺晋美`) between Han words, never leading, trailing or
   doubled. The dot is not specified by any official text found: a Xinjiang government press conference of 2016-06
   (ifeng.com and China Daily reports, secondary) names the inconsistent encoding of the dot in the systems. The package

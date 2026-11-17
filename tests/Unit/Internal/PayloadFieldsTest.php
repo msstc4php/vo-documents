@@ -4,12 +4,21 @@ declare(strict_types=1);
 
 namespace MSSTC4PHP\ValueObject\Documents\Tests\Unit\Internal;
 
+use LogicException;
+use MSSTC4PHP\ValueObject\Documents\Exception\InvalidPersonNameException;
+use MSSTC4PHP\ValueObject\Documents\Icao\PersonName as IcaoPersonName;
 use MSSTC4PHP\ValueObject\Documents\Internal\PayloadFields;
+use MSSTC4PHP\ValueObject\Documents\Internal\UnicodeText;
+use MSSTC4PHP\ValueObject\Documents\Name\CN\FamilyName;
 use MSSTC4PHP\ValueObject\Exception\InvalidPayloadException;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(PayloadFields::class)]
+#[UsesClass(IcaoPersonName::class)]
+#[UsesClass(UnicodeText::class)]
 final class PayloadFieldsTest extends TestCase
 {
     public function testAcceptsKnownKeysAndReadsStrings(): void
@@ -54,5 +63,71 @@ final class PayloadFieldsTest extends TestCase
         $this->expectExceptionMessage('Shape.');
 
         PayloadFields::nullableString(['a' => 1], 'a', 'Shape.');
+    }
+
+    public function testEncodableReturnsAnInstanceOfTheClass(): void
+    {
+        $name = IcaoPersonName::from('ZHANG<<WEI');
+
+        self::assertSame($name, PayloadFields::encodable($name, IcaoPersonName::class, self::class));
+    }
+
+    public function testEncodableRefusesAnotherClassNamingBothClasses(): void
+    {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage(
+            self::class . ' encodes ' . FamilyName::class . ', ' . IcaoPersonName::class . ' given.',
+        );
+
+        PayloadFields::encodable(IcaoPersonName::from('ZHANG<<WEI'), FamilyName::class, self::class);
+    }
+
+    public function testReadsTheRequiredLatinForm(): void
+    {
+        self::assertSame('ZHANG<<WEI', PayloadFields::latin(['latin' => 'ZHANG<<WEI'], 'Shape.')->value);
+    }
+
+    /**
+     * @return iterable<string, array{array<string, int|null>}>
+     */
+    public static function missingLatinForms(): iterable
+    {
+        yield 'missing' => [[]];
+        yield 'null' => [['latin' => null]];
+        yield 'int' => [['latin' => 1]];
+    }
+
+    /**
+     * @param array<string, int|null> $payload
+     */
+    #[DataProvider('missingLatinForms')]
+    public function testRefusesAMissingOrNonStringLatinForm(array $payload): void
+    {
+        $this->expectException(InvalidPayloadException::class);
+        $this->expectExceptionMessage('Shape.');
+
+        PayloadFields::latin($payload, 'Shape.');
+    }
+
+    public function testRefusesAnInvalidLatinForm(): void
+    {
+        $this->expectException(InvalidPersonNameException::class);
+
+        PayloadFields::latin(['latin' => '张伟'], 'Shape.');
+    }
+
+    public function testReadsAnOptionalLatinOverride(): void
+    {
+        self::assertSame('ZHANG<<WEI', PayloadFields::latinOverride(['latin' => 'ZHANG<<WEI'], 'Shape.')?->value);
+        self::assertNull(PayloadFields::latinOverride(['latin' => null], 'Shape.'));
+        self::assertNull(PayloadFields::latinOverride([], 'Shape.'));
+    }
+
+    public function testRefusesANonStringLatinOverride(): void
+    {
+        $this->expectException(InvalidPayloadException::class);
+        $this->expectExceptionMessage('Shape.');
+
+        PayloadFields::latinOverride(['latin' => 1], 'Shape.');
     }
 }

@@ -28,6 +28,12 @@ abstract class AbstractNamePart extends AbstractStringValueObject
      */
     public const int MAX_LENGTH = 100;
 
+    /**
+     * Raw input above this many bytes is refused before it is normalised. It is far above anything that normalises to
+     * MAX_LENGTH characters (100 characters of up to 4 bytes, each with combining marks, and padding whitespace).
+     */
+    private const int MAX_INPUT_BYTES = 10_000;
+
     private const array APOSTROPHES = ["\u{2019}", "\u{02BC}"];
 
     /**
@@ -59,6 +65,10 @@ abstract class AbstractNamePart extends AbstractStringValueObject
     #[Override]
     protected function parse(string $value): string
     {
+        if (\strlen($value) > self::MAX_INPUT_BYTES) {
+            throw $this->tooLong();
+        }
+
         $separators = $this->innerSeparators();
         $normalized = UnicodeText::normalizeName(
             \str_contains($separators, "'") ? \str_replace(self::APOSTROPHES, "'", $value) : $value,
@@ -69,8 +79,12 @@ abstract class AbstractNamePart extends AbstractStringValueObject
             : '/^' . $word . '(?:[' . \preg_quote($separators, '/') . ']' . $word . ')*$/u';
 
         $length = \mb_strlen($normalized, 'UTF-8');
-        if ($length === 0 || $length > self::MAX_LENGTH) {
-            throw new InvalidPersonNameException(\sprintf('Invalid %s (%d characters).', $this->label(), $length));
+        if ($length > self::MAX_LENGTH) {
+            throw $this->tooLong();
+        }
+
+        if ($length === 0) {
+            throw new InvalidPersonNameException(\sprintf('Invalid %s (0 characters).', $this->label()));
         }
 
         if ($this->hasCompatibilityCharacter($normalized)) {
@@ -82,6 +96,11 @@ abstract class AbstractNamePart extends AbstractStringValueObject
         }
 
         return $normalized;
+    }
+
+    private function tooLong(): InvalidPersonNameException
+    {
+        return new InvalidPersonNameException(\sprintf('Invalid %s (too long).', $this->label()));
     }
 
     private function hasCompatibilityCharacter(string $normalized): bool

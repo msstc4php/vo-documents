@@ -267,6 +267,33 @@ final class PassportHepburnTest extends TestCase
     }
 
     /**
+     * @return iterable<string, array{non-empty-string, non-empty-string}>
+     */
+    public static function iterationMarks(): iterable
+    {
+        yield 'ゞ, いすゞ' => ["いす\u{309E}", 'ISUZU'];
+        yield 'ヾ, katakana' => ["イス\u{30FE}", 'ISUZU'];
+        yield 'ゝ' => ["さ\u{309D}き", 'SASAKI'];
+        yield 'ヽ, katakana' => ["ス\u{30FD}キ", 'SUSUKI'];
+        yield 'ゝ after a voiced kana repeats it unvoiced' => ["ぶ\u{309D}", 'BUFU'];
+        yield 'ゝ after a semi-voiced kana repeats it unvoiced' => ["ぱ\u{309D}", 'PAHA'];
+        yield 'ゞ after a voiced kana' => ["ぶ\u{309E}", 'BUBU'];
+        yield 'ゞ after a semi-voiced kana' => ["ぱ\u{309E}", 'PABA'];
+        yield 'two marks in a row' => ["さ\u{309D}\u{309D}", 'SASASA'];
+        yield 'mark then a long vowel' => ["こ\u{309D}ー", 'KOKO'];
+    }
+
+    /**
+     * @param non-empty-string $reading
+     * @param non-empty-string $latin
+     */
+    #[DataProvider('iterationMarks')]
+    public function testIterationMarkRepeatsTheKanaBefore(string $reading, string $latin): void
+    {
+        self::assertSame($latin, $this->latin($reading));
+    }
+
+    /**
      * @return iterable<string, array{non-empty-string}>
      */
     public static function readingsWithoutLatinForm(): iterable
@@ -276,7 +303,14 @@ final class PassportHepburnTest extends TestCase
         yield 'starts with っ' => ['ッカ'];
         yield 'starts with a small kana' => ['ャマ'];
         yield 'starts with a small vowel' => ['ァイ'];
-        yield 'starts with ー' => ['ーナ'];
+        yield 'starts with ん, hiragana' => ['んが'];
+        yield 'starts with っ, hiragana' => ['っか'];
+        yield 'starts with a small kana, hiragana' => ['ゃま'];
+        yield 'っ at the end, hiragana' => ['あっ'];
+        yield 'っ before a vowel, hiragana' => ['あっあ'];
+        yield 'small kana after an unlisted kana, hiragana' => ['かゃ'];
+        yield 'voiced repeat of a kana with no voiced form' => ["あ\u{309E}"];
+        yield 'voiced repeat of a kana with no voiced form, katakana' => ["ア\u{30FE}"];
         yield 'っ at the end' => ['アッ'];
         yield 'っ before a vowel' => ['アッア'];
         yield 'っ before ん' => ['アッン'];
@@ -287,8 +321,6 @@ final class PassportHepburnTest extends TestCase
         yield 'small ゎ' => ['アヮ'];
         yield 'small ゕ' => ["ア\u{3095}"];
         yield 'ヷ' => ["ア\u{30F7}"];
-        yield 'iteration mark ゝ' => ["ス\u{309D}キ"];
-        yield 'iteration mark ヽ' => ["ス\u{30FD}キ"];
         yield 'Ainu small katakana' => ["ア\u{31F0}"];
         yield 'hentaigana' => ["ア\u{1B002}"];
     }

@@ -60,6 +60,11 @@ final class AbstractNamePartTest extends TestCase
         self::assertFalse(LatinNamePart::isValid($longest . 'a'));
     }
 
+    public function testPaddingUpToTheRawByteLimitIsNormalisedAway(): void
+    {
+        self::assertSame('a', LatinNamePart::from('a' . \str_repeat(' ', 9_999))->value);
+    }
+
     public function testTheLimitCountsCharactersNotBytes(): void
     {
         self::assertTrue(FamilyName::isValid('И' . \str_repeat('в', AbstractNamePart::MAX_LENGTH - 1)));
@@ -71,7 +76,9 @@ final class AbstractNamePartTest extends TestCase
      */
     public static function refusals(): iterable
     {
-        yield 'too long' => [\str_repeat('a', AbstractNamePart::MAX_LENGTH + 1), 'Invalid test name (101 characters).'];
+        yield 'too long' => [\str_repeat('a', AbstractNamePart::MAX_LENGTH + 1), 'Invalid test name (too long).'];
+        yield 'far too long' => [\str_repeat('a', 10_000_000), 'Invalid test name (too long).'];
+        yield 'over the raw byte limit' => ['a' . \str_repeat(' ', 10_000), 'Invalid test name (too long).'];
         yield 'empty' => ['  ', 'Invalid test name (0 characters).'];
         yield 'invalid character at the right length' => ['abc1', 'Invalid test name (invalid character).'];
         yield 'separator at the end' => ['abc/', 'Invalid test name (invalid character).'];

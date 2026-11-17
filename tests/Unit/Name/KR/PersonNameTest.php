@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace MSSTC4PHP\ValueObject\Documents\Tests\Unit\Name\KR;
 
 use LogicException;
-use MSSTC4PHP\ValueObject\Documents\Exception\InvalidPersonNameException;
 use MSSTC4PHP\ValueObject\Documents\Icao\PersonName as IcaoPersonName;
 use MSSTC4PHP\ValueObject\Documents\Icao\Table\Cyrillic;
 use MSSTC4PHP\ValueObject\Documents\Icao\Table\LatinMultinational;
@@ -104,6 +103,28 @@ final class PersonNameTest extends TestCase
         self::assertSame(PersonName::class, $codec->valueObjectClass());
     }
 
+    /**
+     * @return iterable<string, array{array<string, string|null>}>
+     */
+    public static function wholeNamePayloads(): iterable
+    {
+        yield 'given null' => [['family' => '김', 'given' => null, 'latin' => 'KIM<<MINJUN']];
+        yield 'given missing' => [['family' => '김', 'latin' => 'KIM<<MINJUN']];
+    }
+
+    /**
+     * @param array<string, string|null> $payload
+     */
+    #[DataProvider('wholeNamePayloads')]
+    public function testDecodeReadsANullOrMissingGivenAsAWholeName(array $payload): void
+    {
+        $person = new PersonNameCodec()->decode($payload);
+
+        self::assertNull($person->given);
+        self::assertSame('김', $person->full());
+        self::assertSame('KIM<<MINJUN', $person->latin()->value);
+    }
+
     public function testCodecRefusesAnotherClass(): void
     {
         $this->expectException(LogicException::class);
@@ -121,6 +142,10 @@ final class PersonNameTest extends TestCase
         yield 'given int' => [['family' => '김', 'given' => 1, 'latin' => 'KIM<<MINJUN']];
         yield 'family int' => [['family' => 1, 'given' => '민준', 'latin' => 'KIM<<MINJUN']];
         yield 'unknown key' => [['family' => '김', 'given' => '민준', 'latin' => 'KIM<<MINJUN', 'x' => 'y']];
+        yield 'family missing' => [['given' => '민준', 'latin' => 'KIM<<MINJUN']];
+        yield 'family null' => [['family' => null, 'given' => '민준', 'latin' => 'KIM<<MINJUN']];
+        yield 'latin int' => [['family' => '김', 'given' => '민준', 'latin' => 1]];
+        yield 'empty payload' => [[]];
     }
 
     /**
@@ -131,33 +156,50 @@ final class PersonNameTest extends TestCase
     {
         self::assertNameRefusedWithoutEcho(
             static fn (): PersonName => new PersonNameCodec()->decode($payload),
-            'KIM<<MINJUN',
+            self::payloadProbe($payload),
             self::SHAPE,
             InvalidPayloadException::class,
         );
     }
 
     /**
-     * @return iterable<string, array{array{family: string, given: string, latin: string}}>
+     * @return iterable<string, array{array{family: string, given: string, latin: string}, string}>
      */
     public static function scriptMixing(): iterable
     {
-        yield 'Latin family' => [['family' => 'Kim', 'given' => '민준', 'latin' => 'KIM<<MINJUN']];
-        yield 'Latin given' => [['family' => '김', 'given' => 'Minjun', 'latin' => 'KIM<<MINJUN']];
-        yield 'Han family' => [['family' => '金', 'given' => '민준', 'latin' => 'KIM<<MINJUN']];
-        yield 'Han among Hangul' => [['family' => '김', 'given' => '民준', 'latin' => 'KIM<<MINJUN']];
-        yield 'Hangul as the Latin form' => [['family' => '김', 'given' => '민준', 'latin' => '김민준']];
+        yield 'Latin family' => [
+            ['family' => 'Kim', 'given' => '민준', 'latin' => 'KIM<<MINJUN'],
+            'Invalid Korean family name (invalid character).',
+        ];
+        yield 'Latin given' => [
+            ['family' => '김', 'given' => 'Minjun', 'latin' => 'KIM<<MINJUN'],
+            'Invalid Korean given name (invalid character).',
+        ];
+        yield 'Han family' => [
+            ['family' => '金', 'given' => '민준', 'latin' => 'KIM<<MINJUN'],
+            'Invalid Korean family name (invalid character).',
+        ];
+        yield 'Han among Hangul' => [
+            ['family' => '김', 'given' => '民준', 'latin' => 'KIM<<MINJUN'],
+            'Invalid Korean given name (invalid character).',
+        ];
+        yield 'Hangul as the Latin form' => [
+            ['family' => '김', 'given' => '민준', 'latin' => '김민준'],
+            'Invalid ICAO personal name.',
+        ];
     }
 
     /**
      * @param array{family: string, given: string, latin: string} $payload
      */
     #[DataProvider('scriptMixing')]
-    public function testDecodeRefusesAnotherScript(array $payload): void
+    public function testDecodeRefusesAnotherScriptWithoutEchoingIt(array $payload, string $message): void
     {
-        $this->expectException(InvalidPersonNameException::class);
-
-        new PersonNameCodec()->decode($payload);
+        self::assertNameRefusedWithoutEcho(
+            static fn (): PersonName => new PersonNameCodec()->decode($payload),
+            self::payloadProbe($payload),
+            $message,
+        );
     }
 
     private function person(string $latin = 'KIM<<MIN<JUN'): PersonName

@@ -22,17 +22,19 @@ rule: prefectural passport pages (Yamanashi, Fukuoka, Kanagawa) that repeat the 
 "戸籍法第五十条第二項の常用平易な文字は、次に掲げるものとする。 一 常用漢字表（平成二十二年内閣告示第二号）に掲げる漢字（括弧書きが添えられているものについては、括弧の外のものに限る。） 二 別表第三に掲げる漢字 三
 片仮名又は平仮名（変体仮名を除く。）" 法務省, 子の名に使える漢字: "常用漢字表と人名用漢字表に掲げられた漢字は，いずれも子の名に使用することができます。"
 
-These rules bind a *new* given name at birth registration; family names and names registered earlier use any kanji
-of the 戸籍 (old forms, variant characters). A still-valid name is never refused, so the package does not enforce
-the 常用漢字/人名用漢字 lists nor the exclusion of 変体仮名: the letters are `\p{sc=Han}`, `\p{sc=Hiragana}`,
-`\p{sc=Katakana}`, the long-vowel mark `ー` U+30FC and `〆` U+3006 (both Script=Common, listed explicitly). The Art. 60
-list binds only a new given name, and real surnames contain `〆` (`〆木`), so it is accepted in every name part (not in
-a reading: 別表第二 has no `〆`, and it has no Hepburn spelling). `々` U+3005 has Script=Han and is reached through
-`\p{sc=Han}` (`佐々木`). No separator: the 姓 and the 名 are separate fields, and a part has no
-space, hyphen or dot. The katakana middle dot `・` U+30FB (Script=Common) is no letter of any of the texts and is
-refused. Combining voicing marks U+3099/U+309A (Script=Inherited) are composed by NFC with the kana before them
-(`か` + U+3099 → `が`); one left over after NFC (`ア` + U+3099 has no composed form) is refused. Halfwidth katakana
-(`ｻｸﾗ`) and the spacing marks `゛` `゜` are compatibility characters and are refused like fullwidth Latin.
+These rules bind a *new* given name at birth registration; family names and names registered earlier use any kanji of
+the 戸籍 (old forms, variant characters). A still-valid name is never refused, so the package does not enforce the
+常用漢字/人名用漢字 lists nor the exclusion of 変体仮名: the letters are `\p{sc=Han}`, `\p{sc=Hiragana}`, `\p{sc=Katakana}`, the
+long-vowel mark `ー` U+30FC and `〆` U+3006 (both Script=Common, listed explicitly). The Art. 60 list binds only a new
+given name, and real surnames contain `〆` (`〆木`), so it is accepted in every name part (not in a reading: 別表第二 has no
+`〆`, and it has no Hepburn spelling). Han characters must be letters (`\p{Lo}`); `々` U+3005 (Script=Han, Lm) is listed
+explicitly (`佐々木`), while a radical (`⻄` U+2EC4), a Hangzhou numeral (`〡` U+3021) and `〻` are refused. A part starts
+with a letter: not with `ー` or an iteration mark `々ゝゞヽヾ`, which extend or repeat the character before (code review
+CR-006/CR-007; no name is written that way). No separator: the 姓 and the 名 are separate fields, and a part has no space,
+hyphen or dot. The katakana middle dot `・` U+30FB (Script=Common) is no letter of any of the texts and is refused.
+Combining voicing marks U+3099/U+309A (Script=Inherited) are composed by NFC with the kana before them (`か` + U+3099 →
+`が`); one left over after NFC (`ア` + U+3099 has no composed form) is refused. Halfwidth katakana (`ｻｸﾗ`) and the spacing
+marks `゛` `゜` are compatibility characters and are refused like fullwidth Latin.
 
 ### 2. Readings (振り仮名)
 
@@ -44,8 +46,9 @@ the small ァ ィ ゥ ェ ォ ャ ュ ョ ヮ ッ (no ヰ, ヱ); "二 記号" �
 
 The 戸籍 writes the reading in katakana; passport applications and older records also give it in hiragana, so a
 reading is hiragana or katakana (also mixed) plus `ー`, stored as given. The 別表第二 set is a rule for a new record and
-is not enforced (a reading with `ヰ` stays valid). A reading is validated by character set only: one that starts with a
-small kana, `ん` or `っ` is accepted, but has no Hepburn spelling (§3), so its name needs a Latin override.
+is not enforced (a reading with `ヰ` stays valid). A reading starts with a kana letter, not with `ー` or an iteration
+mark (so `ー` alone is refused). Otherwise it is validated by character set only: one that starts with a small kana,
+`ん` or `っ` is accepted, but has no Hepburn spelling (§3), so its name needs a Latin override.
 
 ### 3. Passport Latin form: MOFA Hepburn (`Name\JP\PassportHepburn`)
 
@@ -91,7 +94,10 @@ The Latin form is derived from the readings, family `<<` given, katakana folded 
 The reference rows are used too (without them ファ would have no spelling). The ヴ rows have two spellings; the
 derived form takes the kana-by-kana one, BUA/BUI/BUE/BUO, which MOFA's own example lists first ("ヴィヴィアン BUIBUIAN 又は
 BIBIAN"); BA/BI/BE/BO are accepted as an override (§4). Designer's call. A kana or a small kana outside these rows
-(`ゎ`/`ヮ`, `ゕ`, `ヷ`, the iteration marks `ゝ` `ヽ`, a small kana not after the listed kana) has no spelling.
+(`ゎ`/`ヮ`, `ゕ`, `ヷ`, a small kana not after the listed kana) has no spelling. The iteration marks are expanded before
+the derivation (code review CR-028; the stored reading keeps them): `ゝ`/`ヽ` repeat the kana before without its
+voicing mark, `ゞ`/`ヾ` with the voiced mark (`いすゞ` → ISUZU, `さゝき` → SASAKI); `ゞ` after a kana with no voiced
+form (`あゞ`) has no spelling.
 
 **注意事項** (verbatim):
 
@@ -110,19 +116,18 @@ BIBIAN"); BA/BI/BE/BO are accepted as an override (§4). Designer's call. A kana
   - "末尾が「オオ」音で、フリガナが「オ」の場合（「OO」と表記します。） 例：妹尾（セノオ）SENOO、高藤（タカトオ）TAKATOO、横尾（ヨコオ）YOKOO"
   - "末尾が「オウ」音で、フリガナが「ウ」の場合（「OU」とは表記しません。） 例：伊藤（イトウ）ITO、高藤（タカトウ）TAKATO、御園生（ミソノウ）MISONO"
   - "「ヴ」のつく氏名例 例：ヴィヴィアン（ヴィヴィアン）BUIBUIAN 又はBIBIAN、 ヴォードレール（ヴォードレール）BUODORERU 又はBODORERU"
-
   → `う` after a syllable ending in O or U is omitted; `お` after a syllable ending in O is omitted, except as the last
-  kana of the reading (SENOO). `ー` after a syllable is omitted; a leading `ー` has no spelling. Other vowel pairs
-  (`ああ`, `いい`, `えい`, `うお`) are kept: the rule names only O and U.
+  kana of the reading (SENOO). `ー` after a syllable is omitted; a leading `ー` is refused by the reading itself. Other
+  vowel pairs (`ああ`, `いい`, `えい`, `うお`) are kept: the rule names only O and U.
 
 **Limitation:** kana cannot tell a long vowel from a morpheme boundary. A non-long-vowel おう/うう/おお across a
 morpheme boundary, e.g. 井上 いのうえ INOUE, 大内 おおうち OUCHI, is derived as a long vowel (INOE, OCHI) and needs the
 Latin override (accepted under §4). The derivation is kept: the spec requires a derived form, and the reading alone
 does not carry the boundary.
 
-Every example above is a test case. The rules for the start of a reading are the package's (MOFA quotes none): a
-reading that starts with a small kana, `ん`, `っ` or `ー` has no Hepburn form. Such a name, or one whose Latin form is
-too long, is refused without a Latin override with "(no Latin form)" or "(Latin form too long)".
+Every example above is a test case. The rules for the start of a reading are the package's (MOFA quotes none): a reading
+that starts with a small kana, `ん` or `っ` has no Hepburn form (a leading `ー` is not a valid reading). Such a name, or
+one whose Latin form is too long, is refused without a Latin override with "(no Latin form)" or "(Latin form too long)".
 
 ### 4. Override policy: `AnyIcaoSpelling`
 

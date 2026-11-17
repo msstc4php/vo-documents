@@ -5,15 +5,17 @@ declare(strict_types=1);
 namespace MSSTC4PHP\ValueObject\Documents\Name\JP;
 
 use MSSTC4PHP\ValueObject\Documents\Exception\InvalidPersonNameException;
+use Normalizer;
 
 /**
  * The passport spelling of a reading by MOFA's ヘボン式ローマ字綴方表 and its 撥音, 促音 and 長音 rules: `ん` is M before
  * B, M and P; `っ` doubles the next consonant, T before CH; `ー` is omitted, `う` after O or U and `お` after O are
- * omitted, except a final `お` (SENOO). Katakana is folded to hiragana for the derivation only. A reading that starts
- * with a small kana, `ん`, `っ` or `ー`, or has a kana outside the table, has no spelling. `っ` before Y or W (YYA,
- * WWA) follows the general "子音を重ねて" rule; MOFA gives no example. Kana cannot tell a long vowel from a morpheme
- * boundary: a non-long-vowel おう/うう/おお across a morpheme boundary, e.g. 井上 INOUE, 大内 OUCHI, is derived as a long
- * vowel (INOE, OCHI) and needs the Latin override. See docs/sources/JP.md §3.
+ * omitted, except a final `お` (SENOO). The iteration marks `ゝゞヽヾ` repeat the kana before them. Katakana is folded
+ * to hiragana for the derivation only. A reading that starts with a small kana, `ん` or `っ`, or has a kana outside
+ * the table, has no spelling. `っ` before Y or W (YYA, WWA) follows the general "子音を重ねて" rule; MOFA gives no
+ * example. Kana cannot tell a long vowel from a morpheme boundary: a non-long-vowel おう/うう/おお across a morpheme
+ * boundary, e.g. 井上 INOUE, 大内 OUCHI, is derived as a long vowel (INOE, OCHI) and needs the Latin override. See
+ * docs/sources/JP.md §3.
  *
  * @see https://www.ezairyu.mofa.go.jp/passport/hebon.html ヘボン式ローマ字綴方表 (外務省)
  *
@@ -28,6 +30,16 @@ final readonly class PassportHepburn
     private const string MORAIC_N = 'ん';
 
     private const string SOKUON = 'っ';
+
+    /** Iteration mark => the sound mark the repeated kana takes. */
+    private const array ITERATION_MARKS = ['ゝ' => '', 'ゞ' => "\u{3099}"];
+
+    /** The combining voiced and semi-voiced sound marks, NFD of `が` and `ぱ`. */
+    private const array SOUND_MARKS = ["\u{3099}", "\u{309A}"];
+
+    private const string VOWELS = 'AIUEO';
+
+    private const array BILABIALS = ['B', 'M', 'P'];
 
     /**
      * The table rows and its "※参考" rows; the ゔ rows take the kana-by-kana spelling (BUA, not BA).
@@ -88,7 +100,9 @@ final readonly class PassportHepburn
      */
     private function units(string $reading): array
     {
-        $kana = \mb_str_split(\str_replace('ヴ', "\u{3094}", \mb_convert_kana($reading, 'c', 'UTF-8')), 1, 'UTF-8');
+        $kana = $this->expandIterationMarks(
+            \mb_str_split(\str_replace('ヴ', "\u{3094}", \mb_convert_kana($reading, 'c', 'UTF-8')), 1, 'UTF-8'),
+        );
         $units = [];
         for ($index = 0, $count = \count($kana); $index < $count; $index++) {
             $pair = $kana[$index] . ($kana[$index + 1] ?? '');
@@ -104,6 +118,34 @@ final readonly class PassportHepburn
     }
 
     /**
+     * `ゝ` repeats the kana before it without the voicing mark, `ゞ` with it (`いすゞ` is `いすず`); katakana `ヽヾ` are
+     * already folded to them.
+     *
+     * @param list<string> $kana
+     *
+     * @return list<string>
+     */
+    private function expandIterationMarks(array $kana): array
+    {
+        foreach ($kana as $index => $character) {
+            if (isset(self::ITERATION_MARKS[$character])) {
+                $previous = $this->normalized($kana[$index - 1] ?? '', Normalizer::FORM_D);
+                $repeated = \str_replace(self::SOUND_MARKS, '', $previous) . self::ITERATION_MARKS[$character];
+                $kana[$index] = $this->normalized($repeated, Normalizer::FORM_C);
+            }
+        }
+
+        return $kana;
+    }
+
+    private function normalized(string $kana, int $form): string
+    {
+        $normalized = Normalizer::normalize($kana, $form);
+
+        return \is_string($normalized) ? $normalized : $kana;
+    }
+
+    /**
      * @param string $written the Latin form of the kana before this one, ending with its last letter
      *
      * @throws InvalidPersonNameException
@@ -114,7 +156,7 @@ final readonly class PassportHepburn
 
         return match (true) {
             $unit === self::LONG_VOWEL_MARK => '',
-            $unit === self::MORAIC_N => \in_array($nextLatin[0] ?? '', ['B', 'M', 'P'], true) ? 'M' : 'N',
+            $unit === self::MORAIC_N => \in_array($nextLatin[0] ?? '', self::BILABIALS, true) ? 'M' : 'N',
             $unit === self::SOKUON => $this->geminate($nextLatin),
             $unit === 'う' && \in_array(\substr($written, -1), ['O', 'U'], true) => '',
             $unit === 'お' && !$final && \str_ends_with($written, 'O') => '',
@@ -123,8 +165,6 @@ final readonly class PassportHepburn
     }
 
     /**
-     * Y and W are doubled too (YYA, WWA): the general "子音を重ねて" rule, MOFA gives no example.
-     *
      * @throws InvalidPersonNameException when no consonant follows
      */
     private function geminate(string $nextLatin): string
@@ -133,7 +173,10 @@ final readonly class PassportHepburn
             return 'T';
         }
 
-        return $nextLatin === '' || \str_contains('AIUEO', $nextLatin[0])
-            ? throw new InvalidPersonNameException(self::NO_FORM) : $nextLatin[0];
+        if ($nextLatin === '' || \str_contains(self::VOWELS, $nextLatin[0])) {
+            throw new InvalidPersonNameException(self::NO_FORM);
+        }
+
+        return $nextLatin[0];
     }
 }

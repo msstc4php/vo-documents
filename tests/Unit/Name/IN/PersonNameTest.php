@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace MSSTC4PHP\ValueObject\Documents\Tests\Unit\Name\IN;
 
 use LogicException;
-use MSSTC4PHP\ValueObject\Documents\Exception\InvalidPersonNameException;
 use MSSTC4PHP\ValueObject\Documents\Icao\PersonName as IcaoPersonName;
 use MSSTC4PHP\ValueObject\Documents\Icao\Table\Cyrillic;
 use MSSTC4PHP\ValueObject\Documents\Icao\Table\LatinMultinational;
@@ -210,11 +209,13 @@ final class PersonNameTest extends TestCase
         self::assertSame(202, \strlen(new PersonName(GivenName::from($part), Surname::from($part))->latin()->value));
     }
 
-    public function testDevanagariPartsAreRefused(): void
+    public function testDevanagariPartsAreRefusedWithoutEchoingThem(): void
     {
-        $this->expectException(InvalidPersonNameException::class);
-
-        new PersonName(GivenName::from('राजेश'));
+        self::assertNameRefusedWithoutEcho(
+            static fn (): PersonName => new PersonName(GivenName::from('राजेश')),
+            'राजेश',
+            'Invalid Indian given name (invalid character).',
+        );
     }
 
     public function testCodecRoundTrip(): void
@@ -268,7 +269,7 @@ final class PersonNameTest extends TestCase
     {
         self::assertNameRefusedWithoutEcho(
             static fn (): PersonName => new PersonNameCodec()->decode($payload),
-            '',
+            self::payloadProbe($payload),
             self::SHAPE,
             InvalidPayloadException::class,
         );
@@ -278,7 +279,7 @@ final class PersonNameTest extends TestCase
     {
         self::assertNameRefusedWithoutEcho(
             static fn (): PersonName => new PersonNameCodec()->decode(['given' => 'Rajesh', 'surname' => 'Раджеш']),
-            '',
+            'Rajesh Раджеш',
             'Invalid Indian surname (invalid character).',
         );
     }
@@ -287,7 +288,7 @@ final class PersonNameTest extends TestCase
     {
         self::assertNameRefusedWithoutEcho(
             static fn (): array => new PersonNameCodec()->encode(DevanagariGivenName::from('राजेश')),
-            '',
+            'राजेश',
             PersonNameCodec::class . ' encodes ' . PersonName::class . ', ' . DevanagariGivenName::class . ' given.',
             LogicException::class,
         );

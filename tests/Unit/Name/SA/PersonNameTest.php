@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace MSSTC4PHP\ValueObject\Documents\Tests\Unit\Name\SA;
 
 use LogicException;
-use MSSTC4PHP\ValueObject\Documents\Exception\InvalidPersonNameException;
 use MSSTC4PHP\ValueObject\Documents\Icao\PersonName as IcaoPersonName;
 use MSSTC4PHP\ValueObject\Documents\Icao\Table\Cyrillic;
 use MSSTC4PHP\ValueObject\Documents\Icao\Table\LatinMultinational;
@@ -246,34 +245,51 @@ final class PersonNameTest extends TestCase
     {
         self::assertNameRefusedWithoutEcho(
             static fn (): PersonName => new PersonNameCodec()->decode($payload),
-            'SAUD',
+            self::payloadProbe($payload),
             self::SHAPE,
             InvalidPayloadException::class,
         );
     }
 
     /**
-     * @return iterable<string, array{array<string, string>}>
+     * @return iterable<string, array{array<string, string>, string}>
      */
     public static function scriptMixing(): iterable
     {
-        yield 'Latin given' => [['given' => 'Mohammed', 'family' => 'سعود', 'latin' => 'SAUD<<MOHAMMED']];
-        yield 'Latin father' => [['given' => 'محمد', 'father' => 'Abdullah', 'latin' => 'SAUD<<MOHAMMED']];
-        yield 'Latin grandfather' => [['given' => 'محمد', 'grandfather' => 'Saad', 'latin' => 'SAUD<<MOHAMMED']];
-        yield 'Latin family' => [['given' => 'محمد', 'family' => 'Saud', 'latin' => 'SAUD<<MOHAMMED']];
-        yield 'Arabic as the Latin form' => [['given' => 'محمد', 'latin' => 'محمد']];
-        yield 'Han among Arabic' => [['given' => 'محمد', 'family' => '金', 'latin' => 'SAUD<<MOHAMMED']];
+        yield 'Latin given' => [
+            ['given' => 'Mohammed', 'family' => 'سعود', 'latin' => 'SAUD<<MOHAMMED'],
+            'Invalid Saudi Arabian given name (invalid character).',
+        ];
+        yield 'Latin father' => [
+            ['given' => 'محمد', 'father' => 'Abdullah', 'latin' => 'SAUD<<MOHAMMED'],
+            'Invalid Saudi Arabian father name (invalid character).',
+        ];
+        yield 'Latin grandfather' => [
+            ['given' => 'محمد', 'grandfather' => 'Saad', 'latin' => 'SAUD<<MOHAMMED'],
+            'Invalid Saudi Arabian grandfather name (invalid character).',
+        ];
+        yield 'Latin family' => [
+            ['given' => 'محمد', 'family' => 'Rashid', 'latin' => 'RASHID<<MOHAMMED'],
+            'Invalid Saudi Arabian family name (invalid character).',
+        ];
+        yield 'Arabic as the Latin form' => [['given' => 'محمد', 'latin' => 'محمد'], 'Invalid ICAO personal name.'];
+        yield 'Han among Arabic' => [
+            ['given' => 'محمد', 'family' => '金', 'latin' => 'SAUD<<MOHAMMED'],
+            'Invalid Saudi Arabian family name (invalid character).',
+        ];
     }
 
     /**
      * @param array<string, string> $payload
      */
     #[DataProvider('scriptMixing')]
-    public function testDecodeRefusesAnotherScript(array $payload): void
+    public function testDecodeRefusesAnotherScriptWithoutEchoingIt(array $payload, string $message): void
     {
-        $this->expectException(InvalidPersonNameException::class);
-
-        new PersonNameCodec()->decode($payload);
+        self::assertNameRefusedWithoutEcho(
+            static fn (): PersonName => new PersonNameCodec()->decode($payload),
+            self::payloadProbe($payload),
+            $message,
+        );
     }
 
     private function person(string $latin = 'AL<SAUD<<MOHAMMED'): PersonName

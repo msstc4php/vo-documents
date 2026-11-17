@@ -20,13 +20,17 @@ final class KoreanRegistrationNumber
 {
     private const int LENGTH = 13;
 
-    private const int SEVENTH = 6;
+    private const int MONTH_OFFSET = 2;
 
-    /** First year of the century that each value of the seventh digit stands for. */
-    private const array CENTURY = [
-        '1' => 1900, '2' => 1900, '5' => 1900, '6' => 1900,
-        '3' => 2000, '4' => 2000, '7' => 2000, '8' => 2000,
-        '9' => 1800, '0' => 1800,
+    private const int DAY_OFFSET = 4;
+
+    private const int SEVENTH_DIGIT_INDEX = 6;
+
+    /** Seventh digit => the first year of the birth century and the sex. */
+    private const array SEVENTH_DIGIT = [
+        '9' => [1800, Sex::Male], '0' => [1800, Sex::Female],
+        '1' => [1900, Sex::Male], '2' => [1900, Sex::Female], '5' => [1900, Sex::Male], '6' => [1900, Sex::Female],
+        '3' => [2000, Sex::Male], '4' => [2000, Sex::Female], '7' => [2000, Sex::Male], '8' => [2000, Sex::Female],
     ];
 
     /**
@@ -41,11 +45,11 @@ final class KoreanRegistrationNumber
     public static function normalize(string $input, string $document, string $sevenths): string
     {
         $number = Digits::exactly($input, self::LENGTH, $document);
-        if (!\str_contains($sevenths, $number[self::SEVENTH])) {
+        if (!\str_contains($sevenths, $number[self::SEVENTH_DIGIT_INDEX])) {
             throw new InvalidDocumentNumberException(\sprintf('Invalid %s (invalid character).', $document));
         }
 
-        if (!\checkdate((int) \substr($number, 2, 2), (int) \substr($number, 4, 2), self::year($number))) {
+        if (!\checkdate(self::month($number), self::day($number), self::year($number))) {
             throw new InvalidDocumentNumberException(\sprintf('Invalid %s (invalid birth date).', $document));
         }
 
@@ -58,12 +62,7 @@ final class KoreanRegistrationNumber
     public static function birthDate(string $number): DateTimeImmutable
     {
         return new DateTimeImmutable(
-            \sprintf(
-                '%04d-%s-%s',
-                self::year($number),
-                \substr($number, 2, 2),
-                \substr($number, 4, 2),
-            ),
+            \sprintf('%04d-%02d-%02d', self::year($number), self::month($number), self::day($number)),
             new DateTimeZone('UTC'),
         );
     }
@@ -73,11 +72,21 @@ final class KoreanRegistrationNumber
      */
     public static function sex(string $number): Sex
     {
-        return \in_array($number[self::SEVENTH], ['1', '3', '5', '7', '9'], true) ? Sex::Male : Sex::Female;
+        return self::SEVENTH_DIGIT[$number[self::SEVENTH_DIGIT_INDEX]][1];
     }
 
     private static function year(string $number): int
     {
-        return self::CENTURY[$number[self::SEVENTH]] + (int) \substr($number, 0, 2);
+        return self::SEVENTH_DIGIT[$number[self::SEVENTH_DIGIT_INDEX]][0] + (int) \substr($number, 0, 2);
+    }
+
+    private static function month(string $number): int
+    {
+        return (int) \substr($number, self::MONTH_OFFSET, 2);
+    }
+
+    private static function day(string $number): int
+    {
+        return (int) \substr($number, self::DAY_OFFSET, 2);
     }
 }

@@ -9,14 +9,22 @@ use MSSTC4PHP\ValueObject\Documents\Icao\PersonName as IcaoPersonName;
 use MSSTC4PHP\ValueObject\Documents\Internal\Optional;
 use MSSTC4PHP\ValueObject\Documents\Internal\Text;
 use MSSTC4PHP\ValueObject\Documents\Name\PersonName as NationalPersonName;
+use MSSTC4PHP\ValueObject\Documents\Name\RequiredLatin\AbstractRequiredLatinPersonName;
 use Override;
 
 /**
  * A Saudi name in Arabic, as written in the civil register: the given name, then the father's, the grandfather's and
  * the family name, each optional beyond the given name (a recorded name may have fewer parts, and no rule is enforced
- * on them). The Latin form of the passport is mandatory and never derived: the passport spelling is a personal
- * choice. It is not checked against the Arabic name beyond being a valid ICAO personal name. Equality includes the
- * Latin form. See docs/sources/SA.md "Names".
+ * on them), with the mandatory Latin form of the passport, as in {@see AbstractRequiredLatinPersonName}. See
+ * docs/sources/SA.md "Names".
+ *
+ * @phpstan-type SaPersonNameShape array{
+ *     given: string,
+ *     father: string|null,
+ *     grandfather: string|null,
+ *     family: string|null,
+ *     latin: string,
+ * }
  */
 final readonly class PersonName implements NationalPersonName
 {
@@ -63,13 +71,7 @@ final readonly class PersonName implements NationalPersonName
     }
 
     /**
-     * @return array{
-     *     given: string,
-     *     father: string|null,
-     *     grandfather: string|null,
-     *     family: string|null,
-     *     latin: string,
-     * }
+     * @return SaPersonNameShape
      */
     #[Override]
     public function jsonSerialize(): array

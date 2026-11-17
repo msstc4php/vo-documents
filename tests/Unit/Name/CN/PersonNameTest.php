@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace MSSTC4PHP\ValueObject\Documents\Tests\Unit\Name\CN;
 
 use LogicException;
-use MSSTC4PHP\ValueObject\Documents\Exception\InvalidPersonNameException;
 use MSSTC4PHP\ValueObject\Documents\Icao\PersonName as IcaoPersonName;
 use MSSTC4PHP\ValueObject\Documents\Icao\Table\Cyrillic;
 use MSSTC4PHP\ValueObject\Documents\Icao\Table\LatinMultinational;
@@ -63,22 +62,31 @@ final class PersonNameTest extends TestCase
         self::assertSame('ZHANG<<WEI', $this->person()->latin()->value);
     }
 
-    public function testMinorityNameIsStoredWholeInTheFamilyPartWithEachFoldedDot(): void
+    /**
+     * @return iterable<string, array{string}>
+     */
+    public static function middleDots(): iterable
     {
-        foreach (["\u{00B7}", "\u{30FB}", "\u{2022}"] as $dot) {
-            $person = new PersonName(
-                FamilyName::from('阿沛' . $dot . '阿旺晋美'),
-                null,
-                IcaoPersonName::from('NGAPOI<<NGAWANG<JIGME'),
-            );
+        yield 'middle dot U+00B7' => ["\u{00B7}"];
+        yield 'katakana middle dot U+30FB' => ["\u{30FB}"];
+        yield 'bullet U+2022' => ["\u{2022}"];
+    }
 
-            self::assertSame("阿沛\u{00B7}阿旺晋美", $person->full());
-            self::assertNull($person->given);
-            self::assertSame(
-                ['family' => "阿沛\u{00B7}阿旺晋美", 'given' => null, 'latin' => 'NGAPOI<<NGAWANG<JIGME'],
-                $person->jsonSerialize(),
-            );
-        }
+    #[DataProvider('middleDots')]
+    public function testMinorityNameIsStoredWholeInTheFamilyPartWithEachFoldedDot(string $dot): void
+    {
+        $person = new PersonName(
+            FamilyName::from('阿沛' . $dot . '阿旺晋美'),
+            null,
+            IcaoPersonName::from('NGAPOI<<NGAWANG<JIGME'),
+        );
+
+        self::assertSame("阿沛\u{00B7}阿旺晋美", $person->full());
+        self::assertNull($person->given);
+        self::assertSame(
+            ['family' => "阿沛\u{00B7}阿旺晋美", 'given' => null, 'latin' => 'NGAPOI<<NGAWANG<JIGME'],
+            $person->jsonSerialize(),
+        );
     }
 
     public function testWholeNameRoundTripsThroughTheCodec(): void
@@ -122,6 +130,28 @@ final class PersonNameTest extends TestCase
         self::assertSame(PersonName::class, $codec->valueObjectClass());
     }
 
+    /**
+     * @return iterable<string, array{array<string, string|null>}>
+     */
+    public static function wholeNamePayloads(): iterable
+    {
+        yield 'given null' => [['family' => '张', 'given' => null, 'latin' => 'ZHANG<<WEI']];
+        yield 'given missing' => [['family' => '张', 'latin' => 'ZHANG<<WEI']];
+    }
+
+    /**
+     * @param array<string, string|null> $payload
+     */
+    #[DataProvider('wholeNamePayloads')]
+    public function testDecodeReadsANullOrMissingGivenAsAWholeName(array $payload): void
+    {
+        $person = new PersonNameCodec()->decode($payload);
+
+        self::assertNull($person->given);
+        self::assertSame('张', $person->full());
+        self::assertSame('ZHANG<<WEI', $person->latin()->value);
+    }
+
     public function testCodecRefusesAnotherClass(): void
     {
         $this->expectException(LogicException::class);
@@ -139,6 +169,10 @@ final class PersonNameTest extends TestCase
         yield 'given int' => [['family' => '张', 'given' => 1, 'latin' => 'ZHANG<<WEI']];
         yield 'family int' => [['family' => 1, 'given' => '伟', 'latin' => 'ZHANG<<WEI']];
         yield 'unknown key' => [['family' => '张', 'given' => '伟', 'latin' => 'ZHANG<<WEI', 'x' => 'y']];
+        yield 'family missing' => [['given' => '伟', 'latin' => 'ZHANG<<WEI']];
+        yield 'family null' => [['family' => null, 'given' => '伟', 'latin' => 'ZHANG<<WEI']];
+        yield 'latin int' => [['family' => '张', 'given' => '伟', 'latin' => 1]];
+        yield 'empty payload' => [[]];
     }
 
     /**
@@ -149,32 +183,46 @@ final class PersonNameTest extends TestCase
     {
         self::assertNameRefusedWithoutEcho(
             static fn (): PersonName => new PersonNameCodec()->decode($payload),
-            'Zhang',
+            self::payloadProbe($payload),
             self::SHAPE,
             InvalidPayloadException::class,
         );
     }
 
     /**
-     * @return iterable<string, array{array{family: string, given: string, latin: string}}>
+     * @return iterable<string, array{array{family: string, given: string, latin: string}, string}>
      */
     public static function scriptMixing(): iterable
     {
-        yield 'Latin family' => [['family' => 'Zhang', 'given' => '伟', 'latin' => 'ZHANG<<WEI']];
-        yield 'Latin given' => [['family' => '张', 'given' => 'Wei', 'latin' => 'ZHANG<<WEI']];
-        yield 'Latin among Han' => [['family' => '张', 'given' => '伟a', 'latin' => 'ZHANG<<WEI']];
-        yield 'Han as the Latin form' => [['family' => '张', 'given' => '伟', 'latin' => '张伟']];
+        yield 'Latin family' => [
+            ['family' => 'Zhang', 'given' => '伟', 'latin' => 'ZHANG<<WEI'],
+            'Invalid Chinese family name (invalid character).',
+        ];
+        yield 'Latin given' => [
+            ['family' => '张', 'given' => 'Wei', 'latin' => 'ZHANG<<WEI'],
+            'Invalid Chinese given name (invalid character).',
+        ];
+        yield 'Latin among Han' => [
+            ['family' => '张', 'given' => '伟a', 'latin' => 'ZHANG<<WEI'],
+            'Invalid Chinese given name (invalid character).',
+        ];
+        yield 'Han as the Latin form' => [
+            ['family' => '张', 'given' => '伟', 'latin' => '张伟'],
+            'Invalid ICAO personal name.',
+        ];
     }
 
     /**
      * @param array{family: string, given: string, latin: string} $payload
      */
     #[DataProvider('scriptMixing')]
-    public function testDecodeRefusesAnotherScriptWithoutEchoingIt(array $payload): void
+    public function testDecodeRefusesAnotherScriptWithoutEchoingIt(array $payload, string $message): void
     {
-        $this->expectException(InvalidPersonNameException::class);
-
-        new PersonNameCodec()->decode($payload);
+        self::assertNameRefusedWithoutEcho(
+            static fn (): PersonName => new PersonNameCodec()->decode($payload),
+            self::payloadProbe($payload),
+            $message,
+        );
     }
 
     private function person(string $latin = 'ZHANG<<WEI'): PersonName

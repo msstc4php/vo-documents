@@ -89,7 +89,7 @@ final class NamePartsTest extends TestCase
     public static function invalidNames(): iterable
     {
         yield 'empty' => ['', '0 characters'];
-        yield 'too long' => [\str_repeat("\u{0905}", 101), '101 characters'];
+        yield 'too long' => [\str_repeat("\u{0905}", 101), 'too long'];
         yield 'Latin' => ['Rajesh', 'invalid character'];
         yield 'Latin among Devanagari' => ["राजे\u{0073}", 'invalid character'];
         yield 'Cyrillic' => ['Раджеш', 'invalid character'];
@@ -105,6 +105,16 @@ final class NamePartsTest extends TestCase
         yield 'zero-width non-joiner next to a space' => ["राज\u{200C} ेश", 'invalid character'];
         yield 'zero-width joiner after a hyphen' => ["राज-\u{200D}ेश", 'invalid character'];
         yield 'two joiners in a row' => ["क\u{200D}\u{200C}ष", 'invalid character'];
+        yield 'two joiners after a virama' => ["क\u{094D}\u{200D}\u{200C}ष", 'invalid character'];
+        yield 'zero-width non-joiner after a consonant' => ["क\u{200C}मल", 'invalid character'];
+        yield 'zero-width joiner after a consonant' => ["क\u{200D}मल", 'invalid character'];
+        yield 'zero-width non-joiner after a vowel sign' => ["कि\u{200C}मल", 'invalid character'];
+        yield 'zero-width joiner before a virama' => ["क\u{200D}\u{094D}ष", 'invalid character'];
+        yield 'zero-width joiner after a virama before a vowel sign' => [
+            "क\u{094D}\u{200D}\u{093F}",
+            'invalid character',
+        ];
+        yield 'zero-width non-joiner after a final virama' => ["क\u{094D}\u{200C}", 'invalid character'];
         yield 'zero-width space' => ["राज\u{200B}ेश", 'invalid character'];
         yield 'lone virama' => ["\u{094D}", 'invalid character'];
         yield 'lone nukta' => ["\u{093C}", 'invalid character'];

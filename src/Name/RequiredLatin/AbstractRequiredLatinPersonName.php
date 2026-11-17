@@ -9,15 +9,22 @@ use MSSTC4PHP\ValueObject\Documents\Icao\PersonName as IcaoPersonName;
 use MSSTC4PHP\ValueObject\Documents\Internal\Optional;
 use MSSTC4PHP\ValueObject\Documents\Internal\Text;
 use MSSTC4PHP\ValueObject\Documents\Name\AbstractNamePart;
+use MSSTC4PHP\ValueObject\Documents\Name\LatinOverridePolicy;
 use MSSTC4PHP\ValueObject\Documents\Name\PersonName;
 use Override;
 
 /**
  * A family name and a given name in the national script together with the Latin form the passport shows. The Latin
  * form is mandatory and never derived: the passport spelling is a personal choice, and it is not checked against the
- * national form beyond being a valid ICAO personal name. Equality includes the Latin form.
+ * national form beyond being a valid ICAO personal name. The CN, KR, ID, SA and Devanagari IN names follow this rule.
+ *
+ * Equality includes the Latin form, compared as stored: `KIM<<MIN-JUN` and `KIM<<MIN<JUN` are two values. The
+ * hyphen/filler equivalence of {@see LatinOverridePolicy} only decides whether an override of a derived form is kept;
+ * here nothing is derived, so the passport's own spelling is kept exactly.
  *
  * @internal
+ *
+ * @phpstan-type RequiredLatinPayloadShape array{family: string, given: string|null, latin: string}
  *
  * @template-covariant TFamily of AbstractNamePart the country's family-name part
  * @template-covariant TGiven of AbstractNamePart the country's given-name part, null for a name stored whole in the
@@ -62,7 +69,7 @@ abstract readonly class AbstractRequiredLatinPersonName implements PersonName
     }
 
     /**
-     * @return array{family: string, given: string|null, latin: string}
+     * @return RequiredLatinPayloadShape
      */
     #[Override]
     final public function jsonSerialize(): array

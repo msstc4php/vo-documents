@@ -484,6 +484,16 @@ script classes use `\p{sc=Latin}` / `\p{sc=Cyrillic}` (Script property only); `c
 - **Source hosts:** `www.ezairyu.mofa.go.jp` (JP) answers 403 to WebFetch but reads with `curl`, `www.moj.go.jp` and
   the Immigration Services Agency answer 403 on every page, `j-lis.go.jp` serves an HTML error instead of the PDF (use
   the Internet Archive copy); the details and dates are in the source notes.
+- **Equivalent mutants left by the code review of plan 4.** Removing the `D` flag of the KR licence regex is not
+  detectable (`Digits::strip()` removes a trailing `\n` first); the flag stays (CR-026, defence in depth).
+- **Enum `from()` echoes its input.** A backed enum's `ValueError` contains the value, and vo-base does not re-run
+  `parse()` on unserialize, so accessors use `tryFrom() ?? throw new LogicException(<fixed text>)` (PAN
+  `holderType()`, KR `regionCode()`); a tampered serialized value then fails without echo.
+- **JP iteration marks.** `PassportHepburn` expands `ゝゞヽヾ` from the kana before (NFD, strip U+3099/309A, append
+  the voiced mark for `ゞ`, NFC); `mb_convert_kana('c')` already folds `ヽヾ` to `ゝゞ`. The stored reading keeps the
+  marks, so `いすゞ` and `いすず` readings are two values with one Latin form.
+- **IN mononym (owner's ruling CR-009).** `RAJESH<KUMAR` is derived as the primary identifier (Doc 9303); Passport
+  Seva prints the blank-surname form `P<IND<<RAJESH<KUMAR`, which `Icao\PersonName` cannot hold. Surfaced to the owner.
 - **ES `ŀ` stays in ES.** The `l·l` fold (`ŀ` → `l·`) is not moved to `AbstractNamePart`: NL table 5.2 lists `ŀ` as a
   letter and `·` is invalid there, so folding there would refuse a valid name.
 - **`HealthCardNumberFactory::fromNumber()`** points to `OnHealthCardNumber::fromCard()` in its no-match message for an

@@ -92,16 +92,27 @@
 
 - **Digit folding is package-wide for numbers, never for names.** `Internal\Digits::fold()` runs before every number
   parse: fullwidth digits and letters (letters upper-cased) and Arabic-Indic digits (U+0660-0669, U+06F0-06F9) become
-  ASCII, and U+3000 is a separator. Devanagari digits are not folded (an Aadhaar typed in them is refused). A name part
+  ASCII, and U+3000, the CJK hyphen look-alikes and the bidi marks (U+200E, U+200F, U+061C, U+202A-202E,
+  U+2066-2069) are separators. Devanagari digits are not folded (an Aadhaar typed in them is refused). A name part
   refuses a compatibility character instead (it would be a second stored spelling).
 - **Script classes use `\p{sc=...}` only** (`Han`, `Hangul`, `Arabic`, `Devanagari`, `Latin`, `Cyrillic`). Characters of
   a name that are Script=Common or Inherited are listed one by one, never through a wider class: `ー` U+30FC and `〆`
-  U+3006 (JP), `·` U+00B7 (CN, KR), the harakat U+064B-0652 and U+0670 (SA), the Devanagari ZWJ/ZWNJ (IN). The
-  tatweel U+0640 is removed, U+30FB and U+2022 are stored as U+00B7.
+  U+3006 (JP), `·` U+00B7 (CN, KR), the harakat U+064B-0652 and U+0670 (SA), the Devanagari ZWJ/ZWNJ (IN, only right
+  after the virama U+094D). The tatweel U+0640 is removed, U+30FB and U+2022 are stored as U+00B7 (CN and KR), the
+  Persian kaf/yeh U+06A9/U+06CC as U+0643/U+064A (SA).
+- **Name characters are letters, and every word starts with a letter** (code review of plan 4). A script class is
+  intersected with a general category in `word()`: `(?=\p{Lo})\p{sc=Han}` (CN adds `〇` U+3007, JP adds `々`), Hangul
+  `\p{Lo}` (tone marks refused), `(?=\p{L})` for kana. A leading `ー` or iteration mark is refused in JP parts and
+  readings. Rule of thumb: no two stored values for one visible name, no non-letter (radical, numeral, tone mark) as a
+  name.
 - **Mandatory Latin name** (CN, KR, ID, SA, IN-Devanagari): the passport spelling is a personal choice, so the Latin
   `Icao\PersonName` is a required constructor argument and a required codec key, never derived; nothing compares it with
   the national form. `Name\RequiredLatin\AbstractRequiredLatinPersonName` (CN, KR) takes a nullable `given`: a name with
-  no family/given split is stored whole in `family`. ID, SA and IN-Devanagari have their own layouts. JP is the one
+  no family/given split is stored whole in `family`. ID, SA and IN-Devanagari have their own layouts but share the codec
+  helpers `PayloadFields::encodable()` (encode guard), `latin()` (required ICAO field) and `latinOverride()` (JP, IN).
+  The payload shape of each value class is a `@phpstan-type …Shape` imported by its codec. Equality compares the Latin
+  form as stored (`KIM<<MIN-JUN` ≠ `KIM<<MIN<JUN`); the hyphen/filler equivalence of `LatinOverridePolicy` applies only
+  to overrides of a derived form. JP is the one
   that derives (MOFA Hepburn) and so takes an optional override.
 - **A class name claims only what it covers:** `OrdinaryPassportNumber` (CN `E`/`G`) and KR
   `MultipleEntryPassportNumber` (`M` series) refuse the other series; the KR resident class refuses foreigner digits
@@ -111,5 +122,9 @@
 - **Regions and codes are plain strings** (`administrativeDivisionCode()`, `regionCode()`,
   `publicSafetyCommissionCode()`, `nationalityCode()`) because the source codes do not map one to one to ISO 3166-2
   (Hokkaido has five commissions, KoROAD names are not ISO). No `Jurisdiction` enum for Asia.
+- **Masks keep 3 characters of a value of 8 or fewer** (IN passport `*****002`), 4 otherwise; KR licences mask both
+  forms as the 12-digit number (`********3361`). The CN mask keeps the sex digit (owner's ruling, CR-023).
+- **Name length messages** say "(0 characters)" or "(too long)" (above `MAX_LENGTH`); a raw input over 10 000 bytes is
+  refused before NFC so a huge string is never normalised.
 - **Line length is 120 characters in `src/` and `tests/`** (the rule of the style commit of plan 4). A URL in an `@see`
   cannot be wrapped and is exempt; a long `\u{...}` string is split with `.` concatenation.

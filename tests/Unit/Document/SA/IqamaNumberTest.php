@@ -44,6 +44,9 @@ final class IqamaNumberTest extends TestCase
         yield 'Arabic-Indic digits' => ['٢٠١٢٣٤٥٦٧٨', '2012345678'];
         yield 'Extended Arabic-Indic digits' => ['۲۰۱۲۳۴۵۶۷۸', '2012345678'];
         yield 'mixed digit systems' => ["\u{0662}\u{0660}12\u{FF13}\u{0664}\u{FF15}678", '2012345678'];
+        yield 'pasted with a right-to-left mark' => ["\u{200F}٢٠١٢٣٤٥٦٧٨", '2012345678'];
+        yield 'wrapped in bidi isolates' => ["\u{2067}٢٠١٢٣٤٥٦٧٨\u{2069}", '2012345678'];
+        yield 'Arabic letter mark between groups' => ["2012\u{061C}3456\u{200E}78", '2012345678'];
         yield 'zeros after the first digit' => ['2000000000', '2000000000'];
     }
 

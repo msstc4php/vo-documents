@@ -45,6 +45,23 @@ final class DigitsTest extends TestCase
         self::assertSame('1234', Digits::strip('12' . $separator . '34'));
     }
 
+    /**
+     * @return iterable<string, array{string}>
+     */
+    public static function bidiMarks(): iterable
+    {
+        $marks = [0x200E, 0x200F, 0x061C, 0x202A, 0x202B, 0x202C, 0x202D, 0x202E, 0x2066, 0x2067, 0x2068, 0x2069];
+        foreach ($marks as $code) {
+            yield \sprintf('U+%04X', $code) => [\mb_chr($code, 'UTF-8')];
+        }
+    }
+
+    #[DataProvider('bidiMarks')]
+    public function testStripRemovesEveryBidiMark(string $mark): void
+    {
+        self::assertSame('1234', Digits::strip($mark . '12' . $mark . '34' . $mark));
+    }
+
     public function testStripKeepsLettersAndHonoursCustomSeparators(): void
     {
         self::assertSame('1a-2', Digits::strip('1a-2.', '.'));

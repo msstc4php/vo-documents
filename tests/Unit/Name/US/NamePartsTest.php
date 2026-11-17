@@ -79,7 +79,7 @@ final class NamePartsTest extends TestCase
         yield 'hyphen with spaces' => ['Mary - Ann', 'Invalid American given name (invalid character).'];
         yield 'fullwidth' => ["\u{FF2A}ohn", 'Invalid American given name (compatibility character).'];
         yield 'empty' => ['  ', 'Invalid American given name (0 characters).'];
-        yield 'too long' => [\str_repeat('a', 101), 'Invalid American given name (101 characters).'];
+        yield 'too long' => [\str_repeat('a', 101), 'Invalid American given name (too long).'];
     }
 
     #[DataProvider('invalidGivenNames')]

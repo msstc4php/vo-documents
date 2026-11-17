@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace MSSTC4PHP\ValueObject\Documents\Name\RequiredLatin;
 
-use LogicException;
 use MSSTC4PHP\ValueObject\Contract\ValueObject;
 use MSSTC4PHP\ValueObject\Documents\Exception\InvalidPersonNameException;
 use MSSTC4PHP\ValueObject\Documents\Icao\PersonName as IcaoPersonName;
@@ -19,6 +18,8 @@ use Override;
  *
  * @internal
  *
+ * @phpstan-import-type RequiredLatinPayloadShape from AbstractRequiredLatinPersonName
+ *
  * @template TName of AbstractRequiredLatinPersonName the country's composite name
  *
  * @implements PayloadCodec<TName>
@@ -28,19 +29,12 @@ abstract readonly class AbstractRequiredLatinPersonNameCodec implements PayloadC
     private const array KEYS = ['family', 'given', 'latin'];
 
     /**
-     * @return array{family: string, given: string|null, latin: string}
+     * @return RequiredLatinPayloadShape
      */
     #[Override]
     final public function encode(ValueObject $value): array
     {
-        $class = $this->valueObjectClass();
-        if (!$value instanceof $class) {
-            $message = \sprintf('%s encodes %s, %s given.', static::class, $class, $value::class);
-
-            throw new LogicException($message);
-        }
-
-        return $value->jsonSerialize();
+        return PayloadFields::encodable($value, $this->valueObjectClass(), static::class)->jsonSerialize();
     }
 
     /**
@@ -57,7 +51,7 @@ abstract readonly class AbstractRequiredLatinPersonNameCodec implements PayloadC
         return $this->create(
             PayloadFields::string($payload, 'family', $this->shape()),
             PayloadFields::nullableString($payload, 'given', $this->shape()),
-            IcaoPersonName::from(PayloadFields::string($payload, 'latin', $this->shape())),
+            PayloadFields::latin($payload, $this->shape()),
         );
     }
 

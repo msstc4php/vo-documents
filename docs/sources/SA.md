@@ -31,6 +31,8 @@ registrations and could not refuse a recorded name in any case, so no part count
   compose) are refused.
 - **Tatweel U+0640** (Script=Common, general category Lm) is removed during normalisation: it is typographic, and two
   stored values would denote one name. A name made of tatweel only is empty and refused.
+- **Persian kaf U+06A9 and Farsi yeh U+06CC** (typed by a Persian keyboard layout) are stored as the Arabic kaf U+0643
+  and yeh U+064A (code review CR-020), so `کريم` and `كريم` are one value.
 - **NFC:** `ا` + U+0653/0654/0655 compose to `آ`/`أ`/`إ`, `و` + U+0654 to `ؤ`, `ي` + U+0654 to `ئ`: one stored value.
   NFC also orders the marks of a letter by combining class (fatha U+064E before shadda U+0651), so both typings of
   `مَّ` are one value.

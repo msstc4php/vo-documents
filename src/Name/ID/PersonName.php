@@ -8,13 +8,15 @@ use MSSTC4PHP\ValueObject\Contract\ValueObject;
 use MSSTC4PHP\ValueObject\Documents\Icao\PersonName as IcaoPersonName;
 use MSSTC4PHP\ValueObject\Documents\Internal\Text;
 use MSSTC4PHP\ValueObject\Documents\Name\PersonName as NationalPersonName;
+use MSSTC4PHP\ValueObject\Documents\Name\RequiredLatin\AbstractRequiredLatinPersonName;
 use Override;
 
 /**
  * An Indonesian name as Dukcapil records it, one "Nama Lengkap", with the Latin form of the passport, which is
- * mandatory: no Imigrasi rule for splitting a name into the primary and secondary identifier was found, so none is
- * guessed and the form is never derived. It is not checked against the recorded name beyond being a valid ICAO
- * personal name. Equality includes the Latin form. See docs/sources/ID.md "Names".
+ * mandatory, as in {@see AbstractRequiredLatinPersonName}: no Imigrasi rule for splitting a name into the primary and
+ * secondary identifier was found, so none is guessed. See docs/sources/ID.md "Names".
+ *
+ * @phpstan-type IdPersonNameShape array{name: string, latin: string}
  */
 final readonly class PersonName implements NationalPersonName
 {
@@ -46,7 +48,7 @@ final readonly class PersonName implements NationalPersonName
     }
 
     /**
-     * @return array{name: string, latin: string}
+     * @return IdPersonNameShape
      */
     #[Override]
     public function jsonSerialize(): array

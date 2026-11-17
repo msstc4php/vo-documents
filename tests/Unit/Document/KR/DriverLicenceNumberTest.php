@@ -108,9 +108,20 @@ final class DriverLicenceNumberTest extends TestCase
         self::assertFalse($number->equals(DriverLicenceNumber::from('119525593361')));
     }
 
-    public function testEarlierFormMasksAllButTheLastFourDigits(): void
+    /**
+     * @return iterable<string, array{string}>
+     */
+    public static function bothForms(): iterable
     {
-        self::assertSame('서울 **-****33-61', DriverLicenceNumber::from('서울 95-255933-61')->masked());
+        yield 'earlier form' => ['서울 95-255933-61'];
+        yield 'earlier form of another region' => ['울산 95-255933-61'];
+        yield 'numbered form' => ['11-95-255933-61'];
+    }
+
+    #[DataProvider('bothForms')]
+    public function testBothFormsMaskTheSameWay(string $input): void
+    {
+        self::assertSame('********3361', DriverLicenceNumber::from($input)->masked());
     }
 
     public function testMasksAllButTheLastFour(): void

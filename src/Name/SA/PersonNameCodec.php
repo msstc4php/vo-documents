@@ -4,10 +4,8 @@ declare(strict_types=1);
 
 namespace MSSTC4PHP\ValueObject\Documents\Name\SA;
 
-use LogicException;
 use MSSTC4PHP\ValueObject\Contract\ValueObject;
 use MSSTC4PHP\ValueObject\Documents\Exception\InvalidPersonNameException;
-use MSSTC4PHP\ValueObject\Documents\Icao\PersonName as IcaoPersonName;
 use MSSTC4PHP\ValueObject\Documents\Internal\PayloadFields;
 use MSSTC4PHP\ValueObject\Exception\InvalidPayloadException;
 use MSSTC4PHP\ValueObject\Payload\PayloadCodec;
@@ -17,6 +15,8 @@ use Override;
  * {given: string, father: string|null, grandfather: string|null, family: string|null, latin: string}; "latin" is the
  * `Icao\PersonName` string and required, a missing "father", "grandfather" or "family" reads as null. Other keys are
  * refused.
+ *
+ * @phpstan-import-type SaPersonNameShape from PersonName
  *
  * @implements PayloadCodec<PersonName>
  */
@@ -34,24 +34,12 @@ final readonly class PersonNameCodec implements PayloadCodec
     }
 
     /**
-     * @return array{
-     *     given: string,
-     *     father: string|null,
-     *     grandfather: string|null,
-     *     family: string|null,
-     *     latin: string,
-     * }
+     * @return SaPersonNameShape
      */
     #[Override]
     public function encode(ValueObject $value): array
     {
-        if (!$value instanceof PersonName) {
-            $message = \sprintf('%s encodes %s, %s given.', self::class, PersonName::class, $value::class);
-
-            throw new LogicException($message);
-        }
-
-        return $value->jsonSerialize();
+        return PayloadFields::encodable($value, PersonName::class, self::class)->jsonSerialize();
     }
 
     /**
@@ -71,7 +59,7 @@ final readonly class PersonNameCodec implements PayloadCodec
             $father === null ? null : FatherName::from($father),
             $grandfather === null ? null : GrandfatherName::from($grandfather),
             $family === null ? null : FamilyName::from($family),
-            IcaoPersonName::from(PayloadFields::string($payload, 'latin', self::SHAPE)),
+            PayloadFields::latin($payload, self::SHAPE),
         );
     }
 }

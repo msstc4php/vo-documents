@@ -30,7 +30,9 @@ rules (인명용 한자); a Hanja outside it is recorded in Hangul. 생활법령
 "이름자가 5자(성은 제외)를 초과하면 출생신고가 수리되지 않습니다", with exceptions for a child of a foreign father or mother and for "a name a
 foreigner used abroad before naturalization, nationality acquisition, or restoration".
 
-- **Letters:** `\p{sc=Hangul}`. Hanja names are not covered (the 인명용 한자 list is a table of the rules, and a name is
+- **Letters:** `\p{sc=Hangul}` letters (`\p{Lo}`), so the tone marks U+302E/U+302F (Script=Hangul, Mc) are refused
+  (code review CR-005). Between words of a foreign name the katakana middle dot U+30FB and the bullet U+2022 are stored
+  as `·` U+00B7, as in CN (CR-021). Hanja names are not covered (the 인명용 한자 list is a table of the rules, and a name is
   recorded in Hangul when a character is outside it). No rule found on 한글 자모 standing alone or on spelling.
 - **Standalone jamo (decision, not quoted):** a compatibility jamo (`ㄱ` U+3131, `ㅏ` U+314F, halfwidth U+FFA1) has NFKC ≠
   NFC and is refused as a compatibility character like fullwidth Latin; a conjoining jamo that NFC leaves uncomposed
@@ -111,7 +113,8 @@ is NFC-composed). The 16 names are those of KoROAD's table above and the table m
 test centre) is not applied. `formatted()` of the earlier form is the stored form: the example prints it that way. A
 number of the earlier form and its 12-digit successor are two values (the region name and the number of the same office
 are not equated: the other digits are the same but the package does not assume the licence was reissued). Mask: last 4
-digits (`서울 **-****33-61`).
+digits of the 12-digit form, for both forms (`********3361`; code review CR-022), so a masked value tells neither the
+region nor the form.
 
 ## Not covered
 

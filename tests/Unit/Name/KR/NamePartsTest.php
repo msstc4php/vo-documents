@@ -46,6 +46,8 @@ final class NamePartsTest extends TestCase
         yield 'decomposed 김' => ["\u{1100}\u{1175}\u{11B7}", '김'];
         yield 'foreign name written in Hangul, with a space' => ['마이클  존슨', '마이클 존슨'];
         yield 'foreign name, middle dot' => ["사라\u{00B7}알리", "사라\u{00B7}알리"];
+        yield 'foreign name, katakana middle dot U+30FB' => ["사라\u{30FB}알리", "사라\u{00B7}알리"];
+        yield 'foreign name, bullet U+2022' => ["사라\u{2022}알리", "사라\u{00B7}알리"];
         yield 'foreign name, hyphen' => ['장-피에르', '장-피에르'];
         yield 'surrounding spaces' => ['  김 ', '김'];
     }
@@ -65,7 +67,7 @@ final class NamePartsTest extends TestCase
         $characters = 'Invalid Korean family name (invalid character).';
 
         yield 'empty' => ['', 'Invalid Korean family name (0 characters).'];
-        yield 'too long' => [\str_repeat('김', 101), 'Invalid Korean family name (101 characters).'];
+        yield 'too long' => [\str_repeat('김', 101), 'Invalid Korean family name (too long).'];
         yield 'Latin' => ['Kim', $characters];
         yield 'Latin among Hangul' => ['김a', $characters];
         yield 'Hanja' => ['金', $characters];
@@ -82,7 +84,11 @@ final class NamePartsTest extends TestCase
         yield 'leading dot' => ["\u{00B7}김", $characters];
         yield 'trailing dot' => ["김\u{00B7}", $characters];
         yield 'doubled dot' => ["김\u{00B7}\u{00B7}민", $characters];
-        yield 'katakana middle dot' => ["김\u{30FB}민", $characters];
+        yield 'tone marks only' => ["\u{302E}\u{302E}", $characters];
+        yield 'tone mark after a syllable' => ["김\u{302E}", $characters];
+        yield 'second tone mark' => ["김\u{302F}", $characters];
+        yield 'leading katakana middle dot' => ["\u{30FB}김", $characters];
+        yield 'bullet next to a middle dot' => ["김\u{2022}\u{00B7}민", $characters];
         yield 'compatibility jamo ㄱ U+3131' => ["\u{3131}", 'Invalid Korean family name (compatibility character).'];
         yield 'compatibility jamo ㅏ U+314F' => ["김\u{314F}", 'Invalid Korean family name (compatibility character).'];
         yield 'halfwidth Hangul' => ["\u{FFA1}", 'Invalid Korean family name (compatibility character).'];

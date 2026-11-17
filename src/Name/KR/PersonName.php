@@ -9,12 +9,11 @@ use MSSTC4PHP\ValueObject\Documents\Name\RequiredLatin\AbstractRequiredLatinPers
 use Override;
 
 /**
- * A Korean name in Hangul (`김민준`: family, then given, written together) with the Latin form of the passport, which
- * is mandatory: the romanisation on a passport is the holder's choice (Kim, Gim) and is never derived. It is not
- * checked against the Hangul name. A name with no family/given split (a foreigner's name kept after naturalisation) is
- * stored whole in the family part with a null given name. `full()` joins family and given with no space, also for a
- * naturalised multi-word name split into the two (존슨 + 마이클 gives 존슨마이클); such a name can be stored whole in the
- * family part instead. See docs/sources/KR.md "Names".
+ * A Korean name in Hangul (`김민준`: family, then given, written together) with the mandatory Latin form of the passport
+ * ({@see AbstractRequiredLatinPersonName}; Kim, Gim). A name with no family/given split (a foreigner's name kept after
+ * naturalisation) is stored whole in the family part with a null given name. `full()` joins family and given with no
+ * space, also for a naturalised multi-word name split into the two (존슨 + 마이클 gives 존슨마이클); such a name can be stored
+ * whole in the family part instead. See docs/sources/KR.md "Names".
  *
  * @extends AbstractRequiredLatinPersonName<FamilyName, GivenName>
  */

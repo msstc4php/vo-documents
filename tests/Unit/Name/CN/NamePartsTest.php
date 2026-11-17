@@ -42,7 +42,8 @@ final class NamePartsTest extends TestCase
         yield 'two characters' => ['欧阳', '欧阳'];
         yield 'traditional' => ['張', '張'];
         yield 'rare character' => ["\u{20000}", "\u{20000}"];
-        yield 'iteration mark' => ['々', '々'];
+        yield 'ideographic number zero 〇 U+3007 (Nl)' => ["王\u{3007}", "王\u{3007}"];
+        yield '〇 alone' => ["\u{3007}", "\u{3007}"];
         yield 'minority name, U+00B7' => ["阿沛\u{00B7}阿旺晋美", "阿沛\u{00B7}阿旺晋美"];
         yield 'minority name, katakana middle dot U+30FB' => ["阿沛\u{30FB}阿旺晋美", "阿沛\u{00B7}阿旺晋美"];
         yield 'minority name, bullet U+2022' => ["阿沛\u{2022}阿旺晋美", "阿沛\u{00B7}阿旺晋美"];
@@ -66,7 +67,7 @@ final class NamePartsTest extends TestCase
 
         yield 'empty' => ['', 'Invalid Chinese family name (0 characters).'];
         yield 'blank' => ['  ', 'Invalid Chinese family name (0 characters).'];
-        yield 'too long' => [\str_repeat('张', 101), 'Invalid Chinese family name (101 characters).'];
+        yield 'too long' => [\str_repeat('张', 101), 'Invalid Chinese family name (too long).'];
         yield 'Latin letters' => ['Zhang', $characters];
         yield 'Latin among Han' => ['张a', $characters];
         yield 'hiragana' => ['さくら', $characters];
@@ -85,6 +86,10 @@ final class NamePartsTest extends TestCase
         yield 'ASCII full stop for the dot' => ['阿沛.阿旺', $characters];
         yield 'Arabic comma for the dot' => ["阿沛\u{060C}阿旺", $characters];
         yield 'fullwidth Latin' => ["\u{FF21}\u{FF22}", 'Invalid Chinese family name (compatibility character).'];
+        yield 'iteration mark (Lm)' => ['张々', $characters];
+        yield 'CJK radicals supplement (So)' => ["\u{2EC4}", $characters];
+        yield 'Hangzhou numeral (Nl)' => ["\u{3021}", $characters];
+        yield 'vertical ideographic iteration mark (Lm)' => ["张\u{303B}", $characters];
         yield 'CJK radical (Script=Han, NFKC differs)' => [
             "\u{2F00}",
             'Invalid Chinese family name (compatibility character).',

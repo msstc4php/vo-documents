@@ -9,13 +9,15 @@ use MSSTC4PHP\ValueObject\Documents\Icao\PersonName as IcaoPersonName;
 use MSSTC4PHP\ValueObject\Documents\Internal\Optional;
 use MSSTC4PHP\ValueObject\Documents\Name\IN\IndianFullName;
 use MSSTC4PHP\ValueObject\Documents\Name\PersonName as NationalPersonName;
+use MSSTC4PHP\ValueObject\Documents\Name\RequiredLatin\AbstractRequiredLatinPersonName;
 use Override;
 
 /**
- * An Indian name in Devanagari, given name first with an optional surname, and the Latin form of the passport, which is
- * mandatory: the passport spelling is a personal choice and is never derived. It is not checked against the
- * Devanagari name. A person who uses no surname has a null surname and the whole name in the given part. Equality
- * includes the Latin form. See docs/sources/IN.md "Names".
+ * An Indian name in Devanagari, given name first with an optional surname, and the mandatory Latin form of the
+ * passport, as in {@see AbstractRequiredLatinPersonName}. A person who uses no surname has a null surname and the
+ * whole name in the given part. See docs/sources/IN.md "Names".
+ *
+ * @phpstan-type InDevanagariPersonNameShape array{given: string, surname: string|null, latin: string}
  */
 final readonly class PersonName implements NationalPersonName
 {
@@ -51,7 +53,7 @@ final readonly class PersonName implements NationalPersonName
     }
 
     /**
-     * @return array{given: string, surname: string|null, latin: string}
+     * @return InDevanagariPersonNameShape
      */
     #[Override]
     public function jsonSerialize(): array
