@@ -83,7 +83,10 @@ final class SocialInsuranceNumberTest extends TestCase
         yield 'eight digits' => ['123 456 78', 'Invalid Canadian Social Insurance Number (8 characters).'];
         yield 'ten digits' => ['123 456 7890', 'Invalid Canadian Social Insurance Number (10 characters).'];
         yield 'letter' => ['123 456 78O', 'Invalid Canadian Social Insurance Number (invalid character).'];
-        yield 'non-ASCII digit' => ["12345678\u{0969}", 'Invalid Canadian Social Insurance Number (invalid character).'];
+        yield 'non-ASCII digit' => [
+            "12345678\u{0969}",
+            'Invalid Canadian Social Insurance Number (invalid character).',
+        ];
         yield 'empty' => ['', 'Invalid Canadian Social Insurance Number (0 characters).'];
         yield 'far too long' => [\str_repeat('1', 50), 'Invalid Canadian Social Insurance Number (too long).'];
     }

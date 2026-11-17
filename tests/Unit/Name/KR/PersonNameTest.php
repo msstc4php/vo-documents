@@ -69,7 +69,10 @@ final class PersonNameTest extends TestCase
 
         self::assertSame('마이클 존슨', $person->full());
         self::assertNull($person->given);
-        self::assertSame(['family' => '마이클 존슨', 'given' => null, 'latin' => 'JOHNSON<<MICHAEL'], $person->jsonSerialize());
+        self::assertSame(
+            ['family' => '마이클 존슨', 'given' => null, 'latin' => 'JOHNSON<<MICHAEL'],
+            $person->jsonSerialize(),
+        );
     }
 
     public function testWholeNameRoundTripsThroughTheCodec(): void

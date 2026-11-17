@@ -111,7 +111,10 @@ final class PersonNameTest extends TestCase
 
         self::assertSame('Rajesh Kumar', $name->full());
         self::assertNull($name->surname);
-        self::assertSame(['given' => 'Rajesh Kumar', 'surname' => null, 'effectiveLatin' => 'RAJESH<KUMAR'], $name->jsonSerialize());
+        self::assertSame(
+            ['given' => 'Rajesh Kumar', 'surname' => null, 'effectiveLatin' => 'RAJESH<KUMAR'],
+            $name->jsonSerialize(),
+        );
     }
 
     /**
@@ -129,8 +132,12 @@ final class PersonNameTest extends TestCase
      * @param non-empty-string $latin
      */
     #[DataProvider('acceptedOverrides')]
-    public function testAcceptsAnotherIcaoSpelling(string $given, ?string $surname, string $latin, ?string $stored): void
-    {
+    public function testAcceptsAnotherIcaoSpelling(
+        string $given,
+        ?string $surname,
+        string $latin,
+        ?string $stored,
+    ): void {
         $name = new PersonName(
             GivenName::from($given),
             $surname === null ? null : Surname::from($surname),
@@ -172,7 +179,11 @@ final class PersonNameTest extends TestCase
     public function testEqualityComparesPartsAndOverride(): void
     {
         $derived = new PersonName(GivenName::from('Jürgen'), Surname::from('Müller'));
-        $override = new PersonName(GivenName::from('Jürgen'), Surname::from('Müller'), IcaoPersonName::from('MULLER<<JURGEN'));
+        $override = new PersonName(
+            GivenName::from('Jürgen'),
+            Surname::from('Müller'),
+            IcaoPersonName::from('MULLER<<JURGEN'),
+        );
 
         self::assertTrue($derived->equals(new PersonName(GivenName::from('Jürgen'), Surname::from('Müller'))));
         self::assertFalse($derived->equals($override));
@@ -209,7 +220,11 @@ final class PersonNameTest extends TestCase
     public function testCodecRoundTrip(): void
     {
         $codec = new PersonNameCodec();
-        $name = new PersonName(GivenName::from('Jürgen'), Surname::from('Müller'), IcaoPersonName::from('MULLER<<JURGEN'));
+        $name = new PersonName(
+            GivenName::from('Jürgen'),
+            Surname::from('Müller'),
+            IcaoPersonName::from('MULLER<<JURGEN'),
+        );
 
         $payload = $codec->encode($name);
 

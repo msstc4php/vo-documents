@@ -216,8 +216,12 @@ final class PersonNameTest extends TestCase
         self::assertFalse($name->equals(self::japaneseName('佐藤', '太朗', 'サトウ', 'タロウ')));
         self::assertFalse($name->equals(self::japaneseName('佐藤', '太郎', 'さとう', 'タロウ')));
         self::assertFalse($name->equals(self::japaneseName('佐藤', '太郎', 'サトウ', 'たろう')));
-        self::assertFalse($name->equals(self::japaneseName('佐藤', '太郎', 'サトウ', 'タロウ', IcaoPersonName::from('SATOH<<TARO'))));
-        self::assertFalse($name->equals(new RussianPersonName(RussianFamilyName::from('Сато'), RussianGivenName::from('Таро'))));
+        self::assertFalse(
+            $name->equals(self::japaneseName('佐藤', '太郎', 'サトウ', 'タロウ', IcaoPersonName::from('SATOH<<TARO'))),
+        );
+        self::assertFalse(
+            $name->equals(new RussianPersonName(RussianFamilyName::from('Сато'), RussianGivenName::from('Таро'))),
+        );
     }
 
     public function testJsonViewHasTheEffectiveLatinForm(): void

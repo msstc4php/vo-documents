@@ -80,14 +80,20 @@ final class NamePartsTest extends TestCase
         yield 'Arabic' => ['محمد', 'Invalid Spanish given name (invalid character).'];
         yield 'Greek' => ['Ιωσήφ', 'Invalid Spanish given name (invalid character).'];
         yield 'digit' => ['José2', 'Invalid Spanish given name (invalid character).'];
-        yield 'middle dot between other letters' => ["Joa\u{00B7}na", 'Invalid Spanish given name (invalid character).'];
+        yield 'middle dot between other letters' => [
+            "Joa\u{00B7}na",
+            'Invalid Spanish given name (invalid character).',
+        ];
         yield 'middle dot after l only' => ["Marcel\u{00B7}a", 'Invalid Spanish given name (invalid character).'];
         yield 'middle dot before l only' => ["Mare\u{00B7}la", 'Invalid Spanish given name (invalid character).'];
         yield 'leading middle dot' => ["\u{00B7}llum", 'Invalid Spanish given name (invalid character).'];
         yield 'trailing middle dot' => ["Marcel\u{00B7}", 'Invalid Spanish given name (invalid character).'];
         yield 'two middle dots' => ["Marcel\u{00B7}\u{00B7}lí", 'Invalid Spanish given name (invalid character).'];
         yield 'middle dot next to a space' => ["Marcel \u{00B7}lí", 'Invalid Spanish given name (invalid character).'];
-        yield 'l with middle dot before another letter' => ["Ge\u{0140}a", 'Invalid Spanish given name (invalid character).'];
+        yield 'l with middle dot before another letter' => [
+            "Ge\u{0140}a",
+            'Invalid Spanish given name (invalid character).',
+        ];
         yield 'fullwidth' => ["\u{FF2A}osé", 'Invalid Spanish given name (compatibility character).'];
         yield 'ordinal indicator' => ["Mar\u{00AA}", 'Invalid Spanish given name (compatibility character).'];
         yield 'empty' => ['  ', 'Invalid Spanish given name (0 characters).'];

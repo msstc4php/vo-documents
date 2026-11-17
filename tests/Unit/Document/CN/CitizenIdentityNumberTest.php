@@ -45,11 +45,13 @@ final class CitizenIdentityNumberTest extends TestCase
         yield 'spaces, hyphens, NBSP' => ["110105 1949-1231\u{00A0}002X", '11010519491231002X'];
         yield 'ideographic space' => ["110105\u{3000}19491231002X", '11010519491231002X'];
         yield 'fullwidth digits and letter' => [
-            "\u{FF11}\u{FF11}\u{FF10}\u{FF11}\u{FF10}\u{FF15}\u{FF11}\u{FF19}\u{FF14}\u{FF19}\u{FF11}\u{FF12}\u{FF13}\u{FF11}\u{FF10}\u{FF10}\u{FF12}\u{FF38}",
+            "\u{FF11}\u{FF11}\u{FF10}\u{FF11}\u{FF10}\u{FF15}\u{FF11}\u{FF19}\u{FF14}\u{FF19}\u{FF11}\u{FF12}" .
+                "\u{FF13}\u{FF11}\u{FF10}\u{FF10}\u{FF12}\u{FF38}",
             '11010519491231002X',
         ];
         yield 'fullwidth lower-case x' => [
-            "\u{FF11}\u{FF11}\u{FF10}\u{FF11}\u{FF10}\u{FF15}\u{FF11}\u{FF19}\u{FF14}\u{FF19}\u{FF11}\u{FF12}\u{FF13}\u{FF11}\u{FF10}\u{FF10}\u{FF12}\u{FF58}",
+            "\u{FF11}\u{FF11}\u{FF10}\u{FF11}\u{FF10}\u{FF15}\u{FF11}\u{FF19}\u{FF14}\u{FF19}\u{FF11}\u{FF12}" .
+                "\u{FF13}\u{FF11}\u{FF10}\u{FF10}\u{FF12}\u{FF58}",
             '11010519491231002X',
         ];
         yield 'Hong Kong resident permit' => ['810000199001011230', '810000199001011230'];
@@ -75,8 +77,18 @@ final class CitizenIdentityNumberTest extends TestCase
      */
     public static function fields(): iterable
     {
-        yield 'GB 11643 A1: woman born 1949-12-31, Beijing Chaoyang' => ['11010519491231002X', '1949-12-31', Sex::Female, '110105'];
-        yield 'GB 11643 A2: man born 1880-01-01, Guangdong Chaoyang' => ['440524188001010014', '1880-01-01', Sex::Male, '440524'];
+        yield 'GB 11643 A1: woman born 1949-12-31, Beijing Chaoyang' => [
+            '11010519491231002X',
+            '1949-12-31',
+            Sex::Female,
+            '110105',
+        ];
+        yield 'GB 11643 A2: man born 1880-01-01, Guangdong Chaoyang' => [
+            '440524188001010014',
+            '1880-01-01',
+            Sex::Male,
+            '440524',
+        ];
         yield 'sequence 123: odd, a man; Hong Kong' => ['810000199001011230', '1990-01-01', Sex::Male, '810000'];
         yield 'sequence 124: even, a woman; Macao' => ['820000199001011240', '1990-01-01', Sex::Female, '820000'];
         yield 'sequence 125: odd; Taiwan' => ['830000199001011250', '1990-01-01', Sex::Male, '830000'];
@@ -109,7 +121,10 @@ final class CitizenIdentityNumberTest extends TestCase
         $date = 'Invalid Chinese citizen identity number (invalid birth date).';
         $checksum = 'Invalid Chinese citizen identity number checksum.';
 
-        yield 'first-generation number of 15 digits (invalid since 2013-01-01)' => ['110105491231002', 'Invalid Chinese citizen identity number (15 characters).'];
+        yield 'first-generation number of 15 digits (invalid since 2013-01-01)' => [
+            '110105491231002',
+            'Invalid Chinese citizen identity number (15 characters).',
+        ];
         yield 'too short' => ['11010519491231002', 'Invalid Chinese citizen identity number (17 characters).'];
         yield 'too long' => ['11010519491231002X0', 'Invalid Chinese citizen identity number (19 characters).'];
         yield 'far too long' => [\str_repeat('1', 41), 'Invalid Chinese citizen identity number (too long).'];

@@ -33,7 +33,11 @@ final class AbhaNumberTest extends TestCase
         yield 'plain' => ['91123456789012', '91123456789012'];
         yield 'hyphen groups 2-4-4-4' => ['91-1234-5678-9012', '91123456789012'];
         yield 'spaces and NBSP' => ["91 1234\u{00A0}5678 9012", '91123456789012'];
-        yield 'fullwidth' => ["\u{FF19}\u{FF11}\u{FF11}\u{FF12}\u{FF13}\u{FF14}\u{FF15}\u{FF16}\u{FF17}\u{FF18}\u{FF19}\u{FF10}\u{FF11}\u{FF12}", '91123456789012'];
+        yield 'fullwidth' => [
+            "\u{FF19}\u{FF11}\u{FF11}\u{FF12}\u{FF13}\u{FF14}\u{FF15}\u{FF16}\u{FF17}\u{FF18}\u{FF19}\u{FF10}" .
+                "\u{FF11}\u{FF12}",
+            '91123456789012',
+        ];
         yield 'leading zero' => ['00123456789012', '00123456789012'];
     }
 
@@ -65,12 +69,20 @@ final class AbhaNumberTest extends TestCase
         yield 'far too long' => [\str_repeat('9', 41), $name . ' (too long).'];
         yield 'letter' => ['9112345678901A', $name . ' (invalid character).'];
         yield 'ABHA address' => ['name@abdm', $name . ' (9 characters).'];
-        yield 'Devanagari digits' => ["\u{096F}\u{0967}\u{0967}\u{0968}\u{0969}\u{096A}\u{096B}\u{096C}\u{096D}\u{096E}\u{096F}\u{0966}\u{0967}\u{0968}", $name . ' (invalid character).'];
+        yield 'Devanagari digits' => [
+            "\u{096F}\u{0967}\u{0967}\u{0968}\u{0969}\u{096A}\u{096B}\u{096C}\u{096D}\u{096E}\u{096F}\u{0966}" .
+                "\u{0967}\u{0968}",
+            $name . ' (invalid character).',
+        ];
     }
 
     #[DataProvider('invalidNumbers')]
     public function testRefusesWithoutEchoingTheInput(string $input, string $message): void
     {
-        self::assertRefusedWithoutEcho(static fn (string $value): AbhaNumber => AbhaNumber::from($value), $input, $message);
+        self::assertRefusedWithoutEcho(
+            static fn (string $value): AbhaNumber => AbhaNumber::from($value),
+            $input,
+            $message,
+        );
     }
 }

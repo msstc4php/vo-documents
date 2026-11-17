@@ -16,8 +16,8 @@ use Override;
 /**
  * {given: string, surname: string|null, latin: string|null}; latin holds only an override, the derived form is never
  * stored; a missing "surname" or "latin" key reads as null. Other keys are refused, so the
- * {@see PersonName::jsonSerialize()} view (which has `effectiveLatin`) is never read as a payload that silently drops an
- * override.
+ * {@see PersonName::jsonSerialize()} view (which has `effectiveLatin`) is never read as a payload that silently drops
+ * an override.
  *
  * @implements PayloadCodec<PersonName>
  */

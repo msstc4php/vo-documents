@@ -12,15 +12,15 @@ All dates UTC. Sources read 2026-11-17.
 | 子の名に使える漢字 | 法務省 民事局 | <https://www.moj.go.jp/MINJI/minji86.html> |
 
 Reachability (2026-11-17): WebFetch of `www.ezairyu.mofa.go.jp` returns 403 and WebFetch refuses `web.archive.org`;
-`curl` from the sandbox reads both (the live page and the archived copy give the same table). `www.moj.go.jp/content/001413974.pdf`
-(a 振り仮名 leaflet named by a search engine) returns 404. Secondary only, never a rule: prefectural passport pages
-(Yamanashi, Fukuoka, Kanagawa) that repeat the MOFA rules.
+`curl` from the sandbox reads both (the live page and the archived copy give the same table).
+`www.moj.go.jp/content/001413974.pdf` (a 振り仮名 leaflet named by a search engine) returns 404. Secondary only, never a
+rule: prefectural passport pages (Yamanashi, Fukuoka, Kanagawa) that repeat the MOFA rules.
 
 ### 1. Characters of the national form
 
-戸籍法 Art. 50 (verbatim): "子の名には、常用平易な文字を用いなければならない。 常用平易な文字の範囲は、法務省令でこれを定める。"
-戸籍法施行規則 Art. 60 (verbatim): "戸籍法第五十条第二項の常用平易な文字は、次に掲げるものとする。 一 常用漢字表（平成二十二年内閣告示第二号）に掲げる漢字（括弧書きが添えられているものについては、括弧の外のものに限る。） 二 別表第三に掲げる漢字 三 片仮名又は平仮名（変体仮名を除く。）"
-法務省, 子の名に使える漢字: "常用漢字表と人名用漢字表に掲げられた漢字は，いずれも子の名に使用することができます。"
+戸籍法 Art. 50 (verbatim): "子の名には、常用平易な文字を用いなければならない。 常用平易な文字の範囲は、法務省令でこれを定める。" 戸籍法施行規則 Art. 60 (verbatim):
+"戸籍法第五十条第二項の常用平易な文字は、次に掲げるものとする。 一 常用漢字表（平成二十二年内閣告示第二号）に掲げる漢字（括弧書きが添えられているものについては、括弧の外のものに限る。） 二 別表第三に掲げる漢字 三
+片仮名又は平仮名（変体仮名を除く。）" 法務省, 子の名に使える漢字: "常用漢字表と人名用漢字表に掲げられた漢字は，いずれも子の名に使用することができます。"
 
 These rules bind a *new* given name at birth registration; family names and names registered earlier use any kanji
 of the 戸籍 (old forms, variant characters). A still-valid name is never refused, so the package does not enforce
@@ -36,9 +36,11 @@ refused. Combining voicing marks U+3099/U+309A (Script=Inherited) are composed b
 
 ### 2. Readings (振り仮名)
 
-戸籍法 Art. 13 (as amended; the 振り仮名 is recorded since 2025-05-26): "戸籍には、本籍のほか、戸籍内の各人について、次に掲げる事項を記載しなければならない。 一 氏名 二 氏名の振り仮名（氏に用いられる文字の読み方を示す文字（以下「氏の振り仮名」という。）及び名に用いられる文字の読み方を示す文字（以下「名の振り仮名」という。）をいう。以下同じ。）…" and "氏名の振り仮名に用いることができる仮名及び記号の範囲は、法務省令で定める。"
-戸籍法施行規則 Art. 30-2: "戸籍法第十三条第三項の法務省令で定める氏名の振り仮名に用いることができる仮名及び記号の範囲は、別表第二に掲げるものとする。"
-別表第二 (figures): "一 片仮名のうち次に掲げるもの" — ア to ン, ガ to ポ, ヴ, the small ァ ィ ゥ ェ ォ ャ ュ ョ ヮ ッ (no ヰ, ヱ); "二 記号" — "ー（長音記号）".
+戸籍法 Art. 13 (as amended; the 振り仮名 is recorded since 2025-05-26): "戸籍には、本籍のほか、戸籍内の各人について、次に掲げる事項を記載しなければならない。 一 氏名 二
+氏名の振り仮名（氏に用いられる文字の読み方を示す文字（以下「氏の振り仮名」という。）及び名に用いられる文字の読み方を示す文字（以下「名の振り仮名」という。）をいう。以下同じ。）…" and
+"氏名の振り仮名に用いることができる仮名及び記号の範囲は、法務省令で定める。" 戸籍法施行規則 Art. 30-2:
+"戸籍法第十三条第三項の法務省令で定める氏名の振り仮名に用いることができる仮名及び記号の範囲は、別表第二に掲げるものとする。" 別表第二 (figures): "一 片仮名のうち次に掲げるもの" — ア to ン, ガ to ポ, ヴ,
+the small ァ ィ ゥ ェ ォ ャ ュ ョ ヮ ッ (no ヰ, ヱ); "二 記号" — "ー（長音記号）".
 
 The 戸籍 writes the reading in katakana; passport applications and older records also give it in hiragana, so a
 reading is hiragana or katakana (also mixed) plus `ー`, stored as given. The 別表第二 set is a rule for a new record and
@@ -82,8 +84,9 @@ The Latin form is derived from the readings, family `<<` given, katakana folded 
 | ビャ BYA | | ビュ BYU | | ビョ BYO |
 | ピャ PYA | | ピュ PYU | | ピョ PYO |
 
-"※参考": シェ SHIE, チェ CHIE, ティ TEI, ニィ NII, ニェ NIE, ファ FUA, フィ FUI, フェ FUE, フォ FUO, ジェ JIE, ディ DEI, デュ DEYU,
-ウィ UI, ウェ UE, ウォ UO, ヴァ BA, ヴィ BI, ヴ BU, ヴェ BE, ヴォ BO, and again ヴァ BUA, ヴィ BUI, ヴェ BUE, ヴォ BUO; "※注意 「ヴァ:VA」「ヴィ:VI」「ヴ:VU」「ヴェ:VE」「ヴォ:VO」は使用不可".
+"※参考": シェ SHIE, チェ CHIE, ティ TEI, ニィ NII, ニェ NIE, ファ FUA, フィ FUI, フェ FUE, フォ FUO, ジェ JIE, ディ DEI, デュ DEYU, ウィ UI, ウェ UE,
+ウォ UO, ヴァ BA, ヴィ BI, ヴ BU, ヴェ BE, ヴォ BO, and again ヴァ BUA, ヴィ BUI, ヴェ BUE, ヴォ BUO; "※注意
+「ヴァ:VA」「ヴィ:VI」「ヴ:VU」「ヴェ:VE」「ヴォ:VO」は使用不可".
 
 The reference rows are used too (without them ファ would have no spelling). The ヴ rows have two spellings; the
 derived form takes the kana-by-kana one, BUA/BUI/BUE/BUO, which MOFA's own example lists first ("ヴィヴィアン BUIBUIAN 又は
@@ -92,12 +95,12 @@ BIBIAN"); BA/BI/BE/BO are accepted as an override (§4). Designer's call. A kana
 
 **注意事項** (verbatim):
 
-- "撥音：B、M、Pの前の「ん」は、NではなくMで表記します。 例：難波（ナンバ）NAMBA、本間（ホンマ）HOMMA、三瓶（サンペイ）SAMPEI"
-  → `ん` is N, M before a syllable whose Latin form starts with B, M or P (also `ゔ` BU).
-- "促音：子音を重ねて表記します。 例：服部（ハットリ）HATTORI、吉川（キッカワ）KIKKAWA ただし、チ（CHI）、チャ（CHA）、チュ（CHU）、チョ（CHO）音の前には「T」を表記します。 例：発地（ホッチ）HOTCHI、八丁（ハッチョウ）HATCHO"
-  → `っ` doubles the first consonant of the next syllable, T before CH. Before a vowel, `ん`, `っ`, `ー` or at the end
-  it has no spelling. Before Y or W (`っや` YYA, `っわ` WWA) the package applies the general "子音を重ねて" rule; MOFA
-  gives no example for them.
+- "撥音：B、M、Pの前の「ん」は、NではなくMで表記します。 例：難波（ナンバ）NAMBA、本間（ホンマ）HOMMA、三瓶（サンペイ）SAMPEI" → `ん` is N, M before a syllable whose Latin
+  form starts with B, M or P (also `ゔ` BU).
+- "促音：子音を重ねて表記します。 例：服部（ハットリ）HATTORI、吉川（キッカワ）KIKKAWA ただし、チ（CHI）、チャ（CHA）、チュ（CHU）、チョ（CHO）音の前には「T」を表記します。
+  例：発地（ホッチ）HOTCHI、八丁（ハッチョウ）HATCHO" → `っ` doubles the first consonant of the next syllable, T before CH. Before a vowel,
+  `ん`, `っ`, `ー` or at the end it has no spelling. Before Y or W (`っや` YYA, `っわ` WWA) the package applies the general
+  "子音を重ねて" rule; MOFA gives no example for them.
 - "長音：OやUは記入しません。" with the cases:
   - "「―」を省略する場合 例：ニーナ（ニーナ）NINA、シーナ（シーナ）SHINA、サリー（サリー）SARI" → `ー` is omitted.
   - "「イ」を省略しない場合 例：新菜（ニイナ）NIINA、しいな（シイナ）SHIINA、さりい（サリイ）SARII" → `い` is kept.
@@ -123,7 +126,10 @@ too long, is refused without a Latin override with "(no Latin form)" or "(Latin 
 
 ### 4. Override policy: `AnyIcaoSpelling`
 
-【ヘボン式によらないローマ字氏名表記】 (verbatim): "国際結婚や両親のいずれかが外国人、又は二重国籍等により、外国式の名前をヘボン式ローマ字以外の表記で記載することを希望する場合には、その綴りが実際に使用されていることを示す書類（出生証明書、婚姻証明書、配偶者や父母の外国旅券等）の提出をお願いしています。 上記以外でヘボン式によらないローマ字表記（長音「OH」表記等）を希望するには、予めご相談ください。 例：伊藤（イトウ）ITOH、大野（オオノ）OHNO パスポートを一度取得された後の表記の変更については、原則変更できません。"
+【ヘボン式によらないローマ字氏名表記】 (verbatim):
+"国際結婚や両親のいずれかが外国人、又は二重国籍等により、外国式の名前をヘボン式ローマ字以外の表記で記載することを希望する場合には、その綴りが実際に使用されていることを示す書類（出生証明書、婚姻証明書、配偶者や父母の外国旅券等）
+の提出をお願いしています。
+上記以外でヘボン式によらないローマ字表記（長音「OH」表記等）を希望するには、予めご相談ください。 例：伊藤（イトウ）ITOH、大野（オオノ）OHNO パスポートを一度取得された後の表記の変更については、原則変更できません。"
 
 A passport may carry a spelling outside the table (a foreign spelling on documents, or OH and others after
 consultation), so any valid ICAO name is kept as the override (`AnyIcaoSpelling`), as for RU. Nothing checks it
@@ -158,8 +164,8 @@ last of the 11 digits, sum, divide by 11, "11より余りを引いた値がチ�
 
 Implemented: 12 digits, the check digit as above. Neither the ordinance nor J-LIS publishes an example number; the test
 vectors are computed by hand from the formula (`12345678901` -> sum 212, remainder 3, check 8, so `123456789018`; the
-remainders 0, 1, 2 and 10 each have a case). No display form is quoted, so no `formatted()`; the 4-4-4 grouping printed on
-the card is accepted as separators only. Mask: last 4 (no rule). The 法人番号 is a different number, not covered.
+remainders 0, 1, 2 and 10 each have a case). No display form is quoted, so no `formatted()`; the 4-4-4 grouping printed
+on the card is accepted as separators only. Mask: last 4 (no rule). The 法人番号 is a different number, not covered.
 
 ### Basic Pension Number (基礎年金番号) — covered, format only: `Document\JP\BasicPensionNumber`
 
@@ -169,10 +175,10 @@ accessor, no `formatted()`. Mask: last 4.
 
 ### Residence card number (在留カード番号) — covered, format only: `Document\JP\ResidenceCardNumber`
 
-厚生労働省 島根労働局 (government form instructions, verbatim): "在留カードの右上に記載されている12桁（英字２桁ｰ数字８桁ｰ英字２桁）の番号を記入してください。"
-Two letters, eight digits, two letters; the hyphens are separators and are dropped. The Immigration Services Agency
-pages (`moj.go.jp`) returned 403, so the letters' meaning and any check rule could not be read there; a trade page says
-the agency publishes no numbering rule and another claims a checksum without a source, so none is enforced. Mask: last 4.
+厚生労働省 島根労働局 (government form instructions, verbatim): "在留カードの右上に記載されている12桁（英字２桁ｰ数字８桁ｰ英字２桁）の番号を記入してください。" Two letters,
+eight digits, two letters; the hyphens are separators and are dropped. The Immigration Services Agency pages
+(`moj.go.jp`) returned 403, so the letters' meaning and any check rule could not be read there; a trade page says the
+agency publishes no numbering rule and another claims a checksum without a source, so none is enforced. Mask: last 4.
 Letters are `A-Z` only (no `I`/`O` exclusion is published; two commercial pages warn of confusing `O` with `0`, which is
 a typing tip, not a rule).
 
@@ -189,14 +195,20 @@ person identifier. Mask: last 4.
 
 警察庁丁運発第76号 (令和7年3月10日, 警察庁交通局運転免許課長), 「運転免許証の番号等の形式及び内容について（通達）」,
 <https://www.npa.go.jp/laws/notification/menkyo20250310_76.pdf>, fetched with `curl` and read with `pdftotext` on
-2026-11-17 (UTC). It applies from 令和7年3月24日 and abolishes 「運転免許証の番号の形式及び内容について」 (昭和56年9月10日付け
-警察庁丁運発第105号). Section 1 (verbatim): "免許証の番号及び…免許情報記録の番号の形式はいずれも12桁の数字とし、その内容は次のとおりとする。"
-- (1) 公安委員会コード: "交付公安委員会又は記録公安委員会を表示する２桁の数字で、…丁運発第112号…別添２業務コード表１都道府県（方面）公安委員会名コードによるものとする。" The code table is in that other notice and was not found, so the code is a string and is not mapped (Hokkaido has five commissions: no ISO 3166-2 map).
+2026-11-17 (UTC). It applies from 令和7年3月24日 and abolishes 「運転免許証の番号の形式及び内容について」 (昭和56年9月10日付け警察庁丁運発第105号). Section 1
+(verbatim): "免許証の番号及び…免許情報記録の番号の形式はいずれも12桁の数字とし、その内容は次のとおりとする。"
+- (1) 公安委員会コード: "交付公安委員会又は記録公安委員会を表示する２桁の数字で、…丁運発第112号…別添２業務コード表１都道府県（方面）公安委員会名コードによるものとする。" The code table is in that
+  other notice and was not found, so the code is a string and is not mapped (Hokkaido has five commissions: no ISO
+  3166-2 map).
 - (2) 年別記号: "交付年又は記録年…を表示する２桁の数字で、交付年等に該当する西暦の下２桁とする。" Exposed as the two digits, no century.
 - (3) 交付等番号: "交付年等ごとの一連番号を表示する６桁の数字とする。"
-- (4) チェックデジット: "公安委員会コード、年別記号及び交付等番号に基づいて、「モジュラス11」の計算方式により算出した１桁の数字とする。" Only the name of the method is given, no weights: the check digit is **not verified** (explainer pages disagree and are not a source).
-- (5) 再交付記号又は再記録記号: the 12th digit, "０" for a new licence. Section 2: it is raised by 1 per reissue "（…「10」となる場合は、再交付記号をリセットし「１」とした上で…）", so 1-9 after the first reissue.
-Section 2(1): a renewed licence keeps the number of the latest new licence (with the raised 12th digit), so a number issued under the 1981 notice keeps its shape and a plain 12-digit check is safe. The マイナ免許証's 免許情報記録の番号 has the same layout (12th digit = 再記録記号) and is the same value object. The notice has no example number (the test numbers are made up) and no display form. Mask: last 4.
+- (4) チェックデジット: "公安委員会コード、年別記号及び交付等番号に基づいて、「モジュラス11」の計算方式により算出した１桁の数字とする。" Only the name of the method is given, no
+  weights: the check digit is **not verified** (explainer pages disagree and are not a source).
+- (5) 再交付記号又は再記録記号: the 12th digit, "０" for a new licence. Section 2: it is raised by 1 per reissue
+  "（…「10」となる場合は、再交付記号をリセットし「１」とした上で…）", so 1-9 after the first reissue. Section 2(1): a renewed licence keeps the number
+  of the latest new licence (with the raised 12th digit), so a number issued under the 1981 notice keeps its shape and a
+  plain 12-digit check is safe. The マイナ免許証's 免許情報記録の番号 has the same layout (12th digit = 再記録記号) and is the same value
+  object. The notice has no example number (the test numbers are made up) and no display form. Mask: last 4.
 
 ### Other residence and identity documents — NOT covered
 

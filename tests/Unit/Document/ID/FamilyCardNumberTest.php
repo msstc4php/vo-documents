@@ -35,7 +35,8 @@ final class FamilyCardNumberTest extends TestCase
         yield 'hyphens' => ['317101-010123-0001', '3171010101230001'];
         yield 'NBSP' => ["317101\u{00A0}010123\u{00A0}0001", '3171010101230001'];
         yield 'fullwidth digits' => [
-            "\u{FF13}\u{FF11}\u{FF17}\u{FF11}\u{FF10}\u{FF11}\u{FF10}\u{FF11}\u{FF10}\u{FF11}\u{FF12}\u{FF13}\u{FF10}\u{FF10}\u{FF10}\u{FF11}",
+            "\u{FF13}\u{FF11}\u{FF17}\u{FF11}\u{FF10}\u{FF11}\u{FF10}\u{FF11}\u{FF10}\u{FF11}\u{FF12}\u{FF13}" .
+                "\u{FF10}\u{FF10}\u{FF10}\u{FF11}",
             '3171010101230001',
         ];
         yield 'no date rule is applied (not quoted by Dukcapil)' => ['3171019999990001', '3171019999990001'];

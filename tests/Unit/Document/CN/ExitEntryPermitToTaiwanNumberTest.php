@@ -70,6 +70,10 @@ final class ExitEntryPermitToTaiwanNumberTest extends TestCase
     #[DataProvider('invalidNumbers')]
     public function testRefusesWithoutEchoingTheInput(string $input, string $message): void
     {
-        self::assertRefusedWithoutEcho(static fn (string $value): ExitEntryPermitToTaiwanNumber => ExitEntryPermitToTaiwanNumber::from($value), $input, $message);
+        self::assertRefusedWithoutEcho(
+            static fn (string $value): ExitEntryPermitToTaiwanNumber => ExitEntryPermitToTaiwanNumber::from($value),
+            $input,
+            $message,
+        );
     }
 }

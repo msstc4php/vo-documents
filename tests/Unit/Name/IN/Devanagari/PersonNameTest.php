@@ -70,7 +70,10 @@ final class PersonNameTest extends TestCase
 
         self::assertSame('राजेश कुमार', $name->full());
         self::assertNull($name->surname);
-        self::assertSame(['given' => 'राजेश कुमार', 'surname' => null, 'latin' => 'RAJESH<KUMAR'], $name->jsonSerialize());
+        self::assertSame(
+            ['given' => 'राजेश कुमार', 'surname' => null, 'latin' => 'RAJESH<KUMAR'],
+            $name->jsonSerialize(),
+        );
     }
 
     public function testEqualityIncludesTheLatinFormAndTheSplit(): void
@@ -78,16 +81,36 @@ final class PersonNameTest extends TestCase
         self::assertTrue($this->person()->equals($this->person()));
         self::assertFalse($this->person()->equals($this->person('JAYN<<PIYUSH<KUMAR')));
         self::assertFalse(
-            new PersonName(GivenName::from('पीयूष कुमार'), null, IcaoPersonName::from('JAIN<<PIYUSH<KUMAR'))->equals($this->person()),
+            new PersonName(
+                GivenName::from('पीयूष कुमार'),
+                null,
+                IcaoPersonName::from('JAIN<<PIYUSH<KUMAR'),
+            )->equals($this->person()),
         );
-        self::assertFalse($this->person()->equals(new PersonName(GivenName::from('पीयूष'), Surname::from('जैन'), IcaoPersonName::from('JAIN<<PIYUSH<KUMAR'))));
+        self::assertFalse(
+            $this->person()->equals(
+                new PersonName(
+                    GivenName::from('पीयूष'),
+                    Surname::from('जैन'),
+                    IcaoPersonName::from('JAIN<<PIYUSH<KUMAR'),
+                ),
+            ),
+        );
         self::assertFalse($this->person()->equals(GivenName::from('राजेश')));
     }
 
     public function testBothSpellingsOfANuktaNameAreOneValue(): void
     {
-        $precomposed = new PersonName(GivenName::from("\u{0958}\u{0941}\u{0930}\u{0948}\u{0936}\u{0940}"), null, IcaoPersonName::from('QURAISHI'));
-        $decomposed = new PersonName(GivenName::from("\u{0915}\u{093C}\u{0941}\u{0930}\u{0948}\u{0936}\u{0940}"), null, IcaoPersonName::from('QURAISHI'));
+        $precomposed = new PersonName(
+            GivenName::from("\u{0958}\u{0941}\u{0930}\u{0948}\u{0936}\u{0940}"),
+            null,
+            IcaoPersonName::from('QURAISHI'),
+        );
+        $decomposed = new PersonName(
+            GivenName::from("\u{0915}\u{093C}\u{0941}\u{0930}\u{0948}\u{0936}\u{0940}"),
+            null,
+            IcaoPersonName::from('QURAISHI'),
+        );
 
         self::assertTrue($precomposed->equals($decomposed));
         self::assertSame($precomposed->given->value, $decomposed->given->value);

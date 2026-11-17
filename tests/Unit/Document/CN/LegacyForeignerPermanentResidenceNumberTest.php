@@ -68,13 +68,23 @@ final class LegacyForeignerPermanentResidenceNumberTest extends TestCase
         yield 'four letters and 11 digits' => ['KAZA10090123105', $character];
         yield 'digits only' => ['123110090123105', $character];
         yield 'letter among the digits' => ['KAZ11009012310A', $character];
-        yield 'fourteen characters' => ['KAZ11009012310', 'Invalid Chinese legacy permanent residence card number (14 characters).'];
-        yield 'sixteen characters' => ['KAZ1100901231051', 'Invalid Chinese legacy permanent residence card number (16 characters).'];
+        yield 'fourteen characters' => [
+            'KAZ11009012310',
+            'Invalid Chinese legacy permanent residence card number (14 characters).',
+        ];
+        yield 'sixteen characters' => [
+            'KAZ1100901231051',
+            'Invalid Chinese legacy permanent residence card number (16 characters).',
+        ];
     }
 
     #[DataProvider('invalidNumbers')]
     public function testRefusesWithoutEchoingTheInput(string $input, string $message): void
     {
-        self::assertRefusedWithoutEcho(static fn (string $value): LegacyForeignerPermanentResidenceNumber => LegacyForeignerPermanentResidenceNumber::from($value), $input, $message);
+        self::assertRefusedWithoutEcho(
+            LegacyForeignerPermanentResidenceNumber::from(...),
+            $input,
+            $message,
+        );
     }
 }

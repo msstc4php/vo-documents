@@ -14,47 +14,49 @@ All dates UTC. Sources read 2026-11-17.
 | 《居民身份证法》 (2003, amended by the decision of the NPC Standing Committee of 2011-10-29, 主席令第五十一号), Art. 23 para. 2 | 全国人民代表大会常务委员会; text read on government reprints | <https://www.longling.gov.cn/info/11834/2365289.htm> (Longling County government) and <http://sft.jiangsu.gov.cn/art/2011/11/24/art_71924_8102502.html> (Jiangsu Department of Justice), both read 2026-11-17 |
 | ICAO Doc 9303 Part 3, 8th ed. (2021), §4.6 | ICAO | see `ICAO.md` |
 
-Reachability: `zjw.beijing.gov.cn`, `www.gov.cn`, `www.nia.gov.cn` and `www.cac.gov.cn` answer WebFetch (the NIA and
-GB PDFs are saved locally and read with `pdftotext` and as images; `curl` from the sandbox is refused by `www.nia.gov.cn`
-and `www.npc.gov.cn`: 403). `www.npc.gov.cn` fails WebFetch with an SSL handshake error and its Internet Archive copy
-is refused by the fetch tool ("unable to fetch from web.archive.org"); `flk.npc.gov.cn` gives no link to the law
+Reachability: `zjw.beijing.gov.cn`, `www.gov.cn`, `www.nia.gov.cn` and `www.cac.gov.cn` answer WebFetch (the NIA and GB
+PDFs are saved locally and read with `pdftotext` and as images; `curl` from the sandbox is refused by `www.nia.gov.cn`
+and `www.npc.gov.cn`: 403). `www.npc.gov.cn` fails WebFetch with an SSL handshake error and its Internet Archive copy is
+refused by the fetch tool ("unable to fetch from web.archive.org"); `flk.npc.gov.cn` gives no link to the law
 (2026-11-17); `www.shaanxi.gov.cn` and `ga.sz.gov.cn` closed the socket. Art. 23 was therefore read on the two
-government reprints listed above, not on npc.gov.cn. `www.mfa.gov.cn` (page of 公安部's 2012 announcement)
-returns "page deleted"; `www.gov.cn/jrzg/2012-05/31/content_2149327.htm` returns 404; `www.hmo.gov.cn` has no such
-notice. Secondary only (never a rule, never cited in code): Wikipedia, ifeng.com and China Daily articles on the name
-dot, ID generator and validator sites.
+government reprints listed above, not on npc.gov.cn. `www.mfa.gov.cn` (page of 公安部's 2012 announcement) returns "page
+deleted"; `www.gov.cn/jrzg/2012-05/31/content_2149327.htm` returns 404; `www.hmo.gov.cn` has no such notice. Secondary
+only (never a rule, never cited in code): Wikipedia, ifeng.com and China Daily articles on the name dot, ID generator
+and validator sites.
 
 ## Citizen identity number (`Document\CN\CitizenIdentityNumber`)
 
 **GB 11643-1999, §5.1** (verbatim): "公民身份号码是特征组合码，由十七位数字本体码和一位数字校验码组成。排列顺序从左至右依次为：六位数字
 地址码，八位数字出生日期码，三位数字顺序码和一位数字校验码。"
 
-- **5.1.1 地址码:** "表示编码对象常住户口所在县（市、旗、区）的行政区划代码，按GB/T 2260的规定执行。" The GB/T 2260 list is not part of
-  this text: the address code is read, not checked (`administrativeDivisionCode()`).
-- **5.1.2 出生日期码:** "表示编码对象出生的年、月、日，按GB/T 7408的规定执行。年、月、日代码之间不用分隔符。例：某人出生日期为1966年10月26日，
-  其出生日期码为19661026。" Four-digit year, so the date is a calendar date (`checkdate`): 1900-02-29 is refused,
-  2000-02-29 accepted. Annex A2 is of a man born 1880-01-01 (`440524188001010014`): no lower bound on the year.
+- **5.1.1 地址码:** "表示编码对象常住户口所在县（市、旗、区）的行政区划代码，按GB/T 2260的规定执行。" The GB/T 2260 list is not part of this text: the address
+  code is read, not checked (`administrativeDivisionCode()`).
+- **5.1.2 出生日期码:** "表示编码对象出生的年、月、日，按GB/T 7408的规定执行。年、月、日代码之间不用分隔符。例：某人出生日期为1966年10月26日，其出生日期码为19661026。" Four-digit
+  year, so the date is a calendar date (`checkdate`): 1900-02-29 is refused, 2000-02-29 accepted. Annex A2 is of a man
+  born 1880-01-01 (`440524188001010014`): no lower bound on the year.
 - **5.1.3 顺序码:** "…顺序码的奇数分配给男性，偶数分配给女性。" `sex()`: the last digit of the three, odd = `Sex::Male`.
-- **5.1.4 校验码:** "校验码采用ISO 7064:1983，MOD 11-2校验码系统。" 5.1.4.1: Σ(aᵢ×Wᵢ) ≡ 1 (mod 11), i from the right, "Wᵢ＝2^(i-1)
-  (mod 11)", table 1 weights for i = 18…1: 7 9 10 5 8 4 2 1 6 3 7 9 10 5 8 4 2 1. 5.1.4.2: "aᵢ…取值范围是0≤a₁≤10；当a₁值等于10时，
-  用罗马数字符X表示", table 2 (Σ mod 11 → check): 0→1, 1→0, 2→X, 3→9, 4→8, 5→7, 6→6, 7→5, 8→4, 9→3, 10→2. This is what
-  `Checksum::iso7064Mod11Dash2` computes (its test has `11010519491231002` → `X`).
+- **5.1.4 校验码:** "校验码采用ISO 7064:1983，MOD 11-2校验码系统。" 5.1.4.1: Σ(aᵢ×Wᵢ) ≡ 1 (mod 11), i from the right, "Wᵢ＝2^(i-1) (mod
+  11)", table 1 weights for i = 18…1: 7 9 10 5 8 4 2 1 6 3 7 9 10 5 8 4 2 1. 5.1.4.2:
+  "aᵢ…取值范围是0≤a₁≤10；当a₁值等于10时，用罗马数字符X表示", table 2 (Σ mod 11 → check): 0→1, 1→0, 2→X, 3→9, 4→8, 5→7, 6→6, 7→5, 8→4, 9→3,
+  10→2. This is what `Checksum::iso7064Mod11Dash2` computes (its test has `11010519491231002` → `X`).
 - **5.2:** "公民身份号码的各特征码依次连接，不留空格" — no display form, so no `formatted()`.
 - **Annex A examples:** A1 `11010519491231002X` (a woman, Beijing Chaoyang, 1949-12-31); A2 `440524188001010014` (a man,
   Guangdong, 1880-01-01). Annex B1 computes the check of `11010519491231002`.
 - **Lower-case `x`:** the standard writes `X`; a lower-case `x` is the same character typed without Shift, so it is
   stored as `X` (the package upper-cases every number). Fullwidth digits and `Ｘ`/`ｘ` fold through `Internal\Digits`.
 - **15-digit number:** the 1989 standard's number of the first-generation card is not part of GB 11643-1999. 《居民身份证法》
-  Art. 23 para. 2 (amended 2011-10-29), verbatim on both reprints: "依照《中华人民共和国居民身份证条例》领取的居民身份证，自2013年1月1日起停止使用。依照本法在2012年1月1日以前领取的居民身份证，在其有效期内，继续有效。" (the Jiangsu copy writes the dates in fullwidth digits) So it is refused
-  by length (the message carries the character count, not the input); the refusal rests on the 18-character layout of GB 11643-1999 §5.1 either way.
-- **HK/MO/TW resident permit (国办发〔2018〕81号, Art. 3):** "公民身份号码由公安机关按照公民身份号码国家标准编制。香港居民公民身份号码地址码
-  使用810000，澳门居民公民身份号码地址码使用820000，台湾居民公民身份号码地址码使用830000。" The permit's number is a GB 11643
-  number, so `CitizenIdentityNumber` takes it and `administrativeDivisionCode()` returns `810000`/`820000`/`830000`. The
-  rule "an address code starting 81, 82 or 83 must be exactly 810000, 820000, 830000" is not stated in either text and
-  is not enforced.
+  Art. 23 para. 2 (amended 2011-10-29), verbatim on both reprints:
+  "依照《中华人民共和国居民身份证条例》领取的居民身份证，自2013年1月1日起停止使用。依照本法在2012年1月1日以前领取的居民身份证，在其有效期内，继续有效。" (the Jiangsu copy writes the dates
+  in fullwidth digits) So it is refused by length (the message carries the character count, not the input); the refusal
+  rests on the 18-character layout of GB 11643-1999 §5.1 either way.
+- **HK/MO/TW resident permit (国办发〔2018〕81号, Art. 3):**
+  "公民身份号码由公安机关按照公民身份号码国家标准编制。香港居民公民身份号码地址码使用810000，澳门居民公民身份号码地址码使用820000，台湾居民公民身份号码地址码使用830000。" The permit's number is
+  a GB 11643 number, so `CitizenIdentityNumber` takes it and `administrativeDivisionCode()` returns
+  `810000`/`820000`/`830000`. The rule "an address code starting 81, 82 or 83 must be exactly 810000, 820000, 830000" is
+  not stated in either text and is not enforced.
 - **Mask:** no official rule; last four characters (`**************002X`).
 
-## Foreigner's permanent residence ID card (`ForeignerPermanentResidenceNumber`, `LegacyForeignerPermanentResidenceNumber`)
+## Foreigner's permanent residence card (`ForeignerPermanentResidenceNumber`, `LegacyForeignerPermanentResidenceNumber`)
 
 **NIA annex 2, §二 item 2** (verbatim): "新版永居证参照居民身份证“公民身份号码”国家标准，在证件号码构成与表现形式方面作了调整，由15位（3位拉丁
 字母+12位数字）调整为18位（17位数字+1位校验位），原号码构成中，代表国家和地区的3位拉丁字母代码转为数字代码。" Item 3: "新版永居证号码首位设置为
@@ -86,13 +88,13 @@ Mask: no official rule; last four characters.
 
 ## Exit-entry permits (`ExitEntryPermitToHongKongMacauNumber`, `ExitEntryPermitToTaiwanNumber`)
 
-- **往来港澳通行证 (the mainland resident's "港澳通行证"):** NIA, 2025-10-15: "2014版往来港澳通行证（电子往来港澳通行证）于2014年5月上线启用，
-  证件号码由前缀字母C和8位阿拉伯数字组成…现有号段资源使用完毕后，电子往来港澳通行证号码编制规则将进行适当调整，其中前缀字母C保持不变，第二位改为
-  顺序使用英文字母（I、O除外），第三位起仍然为阿拉伯数字，总位数仍为9位。新号段证件起始号码为第CA0000001号。" The 简明手册 says the same for
-  permits before 2018-12-03. Accepted: `C` + 8 digits and `C` + a letter other than `I`, `O` + 7 digits (the new range has
-  not started; accepting it now avoids refusing a valid number when it does).
-- **往来台湾通行证 (the "台湾通行证"):** 简明手册: "它的通行证号码编码规则是由前缀字母“L”+8位阿拉伯数字组成。"; the older permit: "…由前缀字母“T”+8位
-  阿拉伯数字组成。" Accepted: `L` or `T` + 8 digits.
+- **往来港澳通行证 (the mainland resident's "港澳通行证"):** NIA, 2025-10-15:
+  "2014版往来港澳通行证（电子往来港澳通行证）于2014年5月上线启用，证件号码由前缀字母C和8位阿拉伯数字组成…现有号段资源使用完毕后，电子往来港澳通行证号码编制规则将进行适当调整，其中前缀字母C保持不变，
+  第二位改为顺序使用英文字母（I、O除外），第三位起仍然为阿拉伯数字，总位数仍为9位。新号段证件起始号码为第CA0000001号。"
+  The 简明手册 says the same for permits before 2018-12-03. Accepted: `C` + 8 digits and `C` + a letter other than `I`, `O`
+  + 7 digits (the new range has not started; accepting it now avoids refusing a valid number when it does).
+- **往来台湾通行证 (the "台湾通行证"):** 简明手册: "它的通行证号码编码规则是由前缀字母“L”+8位阿拉伯数字组成。"; the older permit: "…由前缀字母“T”+8位阿拉伯数字组成。" Accepted:
+  `L` or `T` + 8 digits.
 - No check character is published for either. Mask: no official rule; last four characters.
 
 ## Not covered
@@ -113,12 +115,12 @@ Mask: no official rule; last four characters.
   the CJK compatibility ideographs (`\u{F900}` → `豈`); a character whose NFKC form differs after NFC (fullwidth Latin,
   Kangxi radicals) is refused by `AbstractNamePart`. `full()` writes family and given together with no separator.
 - **Minority-nationality names:** the middle dot `·` U+00B7 (`阿沛·阿旺晋美`) between Han words, never leading, trailing or
-  doubled. The dot is not specified by any official text found: a Xinjiang government press conference of 2016-06 (ifeng.com
-  and China Daily reports, secondary) names the inconsistent encoding of the dot in the systems. The package follows the
-  plan's decision: U+00B7 is stored, the katakana middle dot U+30FB and the bullet U+2022 fold to it before validation.
-  Such a name has no family/given split in the ID card's single 姓名 field, so `PersonName` takes a nullable given
-  name: the whole name (`阿沛·阿旺晋美`, a Tibetan name) is stored in `FamilyName` with `given` null, and `full()` is
+  doubled. The dot is not specified by any official text found: a Xinjiang government press conference of 2016-06
+  (ifeng.com and China Daily reports, secondary) names the inconsistent encoding of the dot in the systems. The package
+  follows the plan's decision: U+00B7 is stored, the katakana middle dot U+30FB and the bullet U+2022 fold to it before
+  validation. Such a name has no family/given split in the ID card's single 姓名 field, so `PersonName` takes a nullable
+  given name: the whole name (`阿沛·阿旺晋美`, a Tibetan name) is stored in `FamilyName` with `given` null, and `full()` is
   the family part alone. Payload `{family, given, latin}` with `given` null for it (the key stays required).
 - **Latin form:** required, `Icao\PersonName`, never derived: a passport's pinyin is the holder's choice (Cantonese,
-  Wade-Giles and Hokkien spellings are common). It is checked only for being a valid ICAO personal name (Doc 9303 Part
-  3 §4.6). Payload `{family, given, latin}`.
+  Wade-Giles and Hokkien spellings are common). It is checked only for being a valid ICAO personal name (Doc 9303 Part 3
+  §4.6). Payload `{family, given, latin}`.

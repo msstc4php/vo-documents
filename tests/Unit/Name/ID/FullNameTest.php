@@ -76,7 +76,10 @@ final class FullNameTest extends TestCase
         yield 'Cyrillic' => ['Иван', $character];
         yield 'Han' => ['王', $character];
         yield 'emoji' => ["Budi \u{1F600}", $character];
-        yield 'compatibility character, fullwidth' => ['Ｂｕｄｉ', 'Invalid Indonesian full name (compatibility character).'];
+        yield 'compatibility character, fullwidth' => [
+            'Ｂｕｄｉ',
+            'Invalid Indonesian full name (compatibility character).',
+        ];
         yield 'empty' => ['   ', 'Invalid Indonesian full name (0 characters).'];
         yield 'over the length cap' => [
             \str_repeat('a', 101),

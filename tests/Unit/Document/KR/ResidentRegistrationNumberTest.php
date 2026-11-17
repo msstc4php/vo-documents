@@ -42,7 +42,10 @@ final class ResidentRegistrationNumberTest extends TestCase
             "\u{FF19}\u{FF10}\u{FF10}\u{FF11}\u{FF10}\u{FF11}\u{FF11}\u{FF12}\u{FF13}\u{FF14}\u{FF15}\u{FF16}\u{FF17}",
             '9001011234567',
         ];
-        yield 'Arabic-Indic digits' => ["\u{0669}\u{0660}\u{0660}\u{0661}\u{0660}\u{0661}\u{0661}\u{0662}\u{0663}\u{0664}\u{0665}\u{0666}\u{0667}", '9001011234567'];
+        yield 'Arabic-Indic digits' => [
+            "\u{0669}\u{0660}\u{0660}\u{0661}\u{0660}\u{0661}\u{0661}\u{0662}\u{0663}\u{0664}\u{0665}\u{0666}\u{0667}",
+            '9001011234567',
+        ];
         yield 'issued after 2020-10, random digits, no check digit' => ['2112153000000', '2112153000000'];
         yield 'issued after 2020-10, all random digits equal' => ['2112154999999', '2112154999999'];
         yield 'old number with a wrong check digit is accepted' => ['9001011234560', '9001011234560'];
@@ -117,6 +120,10 @@ final class ResidentRegistrationNumberTest extends TestCase
     #[DataProvider('invalidNumbers')]
     public function testRefusesWithoutEchoingTheInput(string $input, string $message): void
     {
-        self::assertRefusedWithoutEcho(static fn (string $value): ResidentRegistrationNumber => ResidentRegistrationNumber::from($value), $input, $message);
+        self::assertRefusedWithoutEcho(
+            static fn (string $value): ResidentRegistrationNumber => ResidentRegistrationNumber::from($value),
+            $input,
+            $message,
+        );
     }
 }

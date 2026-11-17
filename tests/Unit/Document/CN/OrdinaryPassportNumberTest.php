@@ -83,6 +83,10 @@ final class OrdinaryPassportNumberTest extends TestCase
     #[DataProvider('invalidNumbers')]
     public function testRefusesWithoutEchoingTheInput(string $input, string $message): void
     {
-        self::assertRefusedWithoutEcho(static fn (string $value): OrdinaryPassportNumber => OrdinaryPassportNumber::from($value), $input, $message);
+        self::assertRefusedWithoutEcho(
+            static fn (string $value): OrdinaryPassportNumber => OrdinaryPassportNumber::from($value),
+            $input,
+            $message,
+        );
     }
 }

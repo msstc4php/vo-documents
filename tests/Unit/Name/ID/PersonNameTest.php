@@ -71,7 +71,9 @@ final class PersonNameTest extends TestCase
     {
         self::assertTrue($this->person()->equals($this->person()));
         self::assertFalse($this->person()->equals($this->person('SITI<NURHALIZA')));
-        self::assertFalse($this->person()->equals(new PersonName(FullName::from('Siti'), IcaoPersonName::from('NURHALIZA<<SITI'))));
+        self::assertFalse(
+            $this->person()->equals(new PersonName(FullName::from('Siti'), IcaoPersonName::from('NURHALIZA<<SITI'))),
+        );
         self::assertFalse($this->person()->equals(FullName::from('Siti Nurhaliza')));
     }
 

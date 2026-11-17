@@ -63,7 +63,10 @@ final class NisTest extends TestCase
      */
     public static function invalidNumbers(): iterable
     {
-        yield "ten digits, the eSocial manual's rejected sample" => ['1800474420', 'Invalid Brazilian NIS (10 characters).'];
+        yield "ten digits, the eSocial manual's rejected sample" => [
+            '1800474420',
+            'Invalid Brazilian NIS (10 characters).',
+        ];
         yield 'wrong check digit' => ['11816788890', 'Invalid Brazilian NIS checksum.'];
         yield 'base digit changed' => ['11816788983', 'Invalid Brazilian NIS checksum.'];
         yield 'remainder 1 written as 10 minus one' => ['10000000139', 'Invalid Brazilian NIS checksum.'];

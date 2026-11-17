@@ -34,7 +34,10 @@ final class DrivingLicenceNumberTest extends TestCase
         yield 'compact' => ['119525593361', '119525593361'];
         yield 'KoROAD display form' => ['11-95-255933-61', '119525593361'];
         yield 'spaces and NBSP' => ["11 95\u{00A0}255933 61", '119525593361'];
-        yield 'fullwidth' => ["\u{FF11}\u{FF11}\u{FF19}\u{FF15}\u{FF12}\u{FF15}\u{FF15}\u{FF19}\u{FF13}\u{FF13}\u{FF16}\u{FF11}", '119525593361'];
+        yield 'fullwidth' => [
+            "\u{FF11}\u{FF11}\u{FF19}\u{FF15}\u{FF12}\u{FF15}\u{FF15}\u{FF19}\u{FF13}\u{FF13}\u{FF16}\u{FF11}",
+            '119525593361',
+        ];
         yield 'a code the notice does not list' => ['289525593361', '289525593361'];
     }
 
@@ -141,6 +144,10 @@ final class DrivingLicenceNumberTest extends TestCase
     #[DataProvider('invalidNumbers')]
     public function testRefusesWithoutEchoingTheInput(string $input, string $message): void
     {
-        self::assertRefusedWithoutEcho(static fn (string $value): DrivingLicenceNumber => DrivingLicenceNumber::from($value), $input, $message);
+        self::assertRefusedWithoutEcho(
+            static fn (string $value): DrivingLicenceNumber => DrivingLicenceNumber::from($value),
+            $input,
+            $message,
+        );
     }
 }

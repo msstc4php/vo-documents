@@ -110,6 +110,8 @@ final class DriverLicenceNumbersTest extends TestCase
 
     public function testEqualsTheSameNumberWithSeparators(): void
     {
-        self::assertTrue(MexDriverLicenceNumber::from('1234 5678 9012')->equals(MexDriverLicenceNumber::from('123456789012')));
+        self::assertTrue(
+            MexDriverLicenceNumber::from('1234 5678 9012')->equals(MexDriverLicenceNumber::from('123456789012')),
+        );
     }
 }

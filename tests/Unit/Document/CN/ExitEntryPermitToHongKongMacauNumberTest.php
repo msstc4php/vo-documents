@@ -71,13 +71,23 @@ final class ExitEntryPermitToHongKongMacauNumberTest extends TestCase
         yield 'H prefix (the other direction)' => ['H12345678', $character];
         yield 'digit first' => ['112345678', $character];
         yield 'punctuation' => ['C1234567.', $character];
-        yield 'eight characters' => ['C1234567', 'Invalid Chinese Hong Kong and Macao exit-entry permit number (8 characters).'];
-        yield 'ten characters' => ['CA00000011', 'Invalid Chinese Hong Kong and Macao exit-entry permit number (10 characters).'];
+        yield 'eight characters' => [
+            'C1234567',
+            'Invalid Chinese Hong Kong and Macao exit-entry permit number (8 characters).',
+        ];
+        yield 'ten characters' => [
+            'CA00000011',
+            'Invalid Chinese Hong Kong and Macao exit-entry permit number (10 characters).',
+        ];
     }
 
     #[DataProvider('invalidNumbers')]
     public function testRefusesWithoutEchoingTheInput(string $input, string $message): void
     {
-        self::assertRefusedWithoutEcho(static fn (string $value): ExitEntryPermitToHongKongMacauNumber => ExitEntryPermitToHongKongMacauNumber::from($value), $input, $message);
+        self::assertRefusedWithoutEcho(
+            ExitEntryPermitToHongKongMacauNumber::from(...),
+            $input,
+            $message,
+        );
     }
 }

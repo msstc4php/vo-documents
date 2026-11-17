@@ -70,7 +70,12 @@ final class Gb11643
     public static function birthDate(string $number, int $offset): DateTimeImmutable
     {
         return new DateTimeImmutable(
-            \sprintf('%s-%s-%s', \substr($number, $offset, 4), \substr($number, $offset + 4, 2), \substr($number, $offset + 6, 2)),
+            \sprintf(
+                '%s-%s-%s',
+                \substr($number, $offset, 4),
+                \substr($number, $offset + 4, 2),
+                \substr($number, $offset + 6, 2),
+            ),
             new DateTimeZone('UTC'),
         );
     }

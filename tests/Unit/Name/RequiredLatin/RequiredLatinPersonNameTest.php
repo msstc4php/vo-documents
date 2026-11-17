@@ -48,7 +48,10 @@ final class RequiredLatinPersonNameTest extends TestCase
     public function testFullIsTheFamilyAloneWithoutAGivenName(): void
     {
         self::assertSame('Zhang', $this->wholeName()->full());
-        self::assertSame(['family' => 'Zhang', 'given' => null, 'latin' => 'ZHANG<<WEI'], $this->wholeName()->jsonSerialize());
+        self::assertSame(
+            ['family' => 'Zhang', 'given' => null, 'latin' => 'ZHANG<<WEI'],
+            $this->wholeName()->jsonSerialize(),
+        );
     }
 
     public function testEqualityHandlesAMissingGivenName(): void

@@ -65,7 +65,9 @@ final class SpIdentityCardNumber extends AbstractIdentityCardNumber
     public static function fromNumberAndCheckCharacter(string $number, ?string $checkCharacter): self
     {
         if (\strspn($number, self::NUMBER_FIELD_CHARACTERS) !== \strlen($number)) {
-            throw new InvalidDocumentNumberException(\sprintf('Invalid %s (number field: digits and dots only).', self::FORM_FIELDS));
+            $message = \sprintf('Invalid %s (number field: digits and dots only).', self::FORM_FIELDS);
+
+            throw new InvalidDocumentNumberException($message);
         }
 
         $digits = self::numberField()->parse(\str_replace('.', '', $number), self::FORM_FIELDS);

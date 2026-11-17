@@ -58,7 +58,10 @@ final class ForeignerRegistrationNumberTest extends TestCase
         self::assertSame('8505055123456', ForeignerRegistrationNumber::from("850505\u{00A0}5123456")->value);
         self::assertSame(
             '8505055123456',
-            ForeignerRegistrationNumber::from("\u{FF18}\u{FF15}\u{FF10}\u{FF15}\u{FF10}\u{FF15}\u{FF15}\u{FF11}\u{FF12}\u{FF13}\u{FF14}\u{FF15}\u{FF16}")->value,
+            ForeignerRegistrationNumber::from(
+                "\u{FF18}\u{FF15}\u{FF10}\u{FF15}\u{FF10}\u{FF15}\u{FF15}\u{FF11}\u{FF12}" .
+                "\u{FF13}\u{FF14}\u{FF15}\u{FF16}",
+            )->value,
         );
     }
 
@@ -89,6 +92,10 @@ final class ForeignerRegistrationNumberTest extends TestCase
     #[DataProvider('invalidNumbers')]
     public function testRefusesWithoutEchoingTheInput(string $input, string $message): void
     {
-        self::assertRefusedWithoutEcho(static fn (string $value): ForeignerRegistrationNumber => ForeignerRegistrationNumber::from($value), $input, $message);
+        self::assertRefusedWithoutEcho(
+            static fn (string $value): ForeignerRegistrationNumber => ForeignerRegistrationNumber::from($value),
+            $input,
+            $message,
+        );
     }
 }

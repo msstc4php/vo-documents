@@ -223,11 +223,23 @@ final class IdentityCardNumbersTest extends TestCase
         yield 'pasted several times' => [\str_repeat('12.345.678.', 6), null, $document . ' (too long).'];
         yield 'letter in the number' => ['1234567A', null, $document . ' (number field: digits and dots only).'];
         yield 'X in the number' => ['1234567X', '2', $document . ' (number field: digits and dots only).'];
-        yield 'hyphen and check digit in the number' => ['1234567-2', null, $document . ' (number field: digits and dots only).'];
-        yield 'printed form in the number' => ['1.234.567-2', null, $document . ' (number field: digits and dots only).'];
+        yield 'hyphen and check digit in the number' => [
+            '1234567-2',
+            null,
+            $document . ' (number field: digits and dots only).',
+        ];
+        yield 'printed form in the number' => [
+            '1.234.567-2',
+            null,
+            $document . ' (number field: digits and dots only).',
+        ];
         yield 'check X in the number' => ['24.681.357-X', null, $document . ' (number field: digits and dots only).'];
         yield 'space in the number' => ['1234 567', null, $document . ' (number field: digits and dots only).'];
-        yield 'pasted with spaces' => [\str_repeat('12.345.678 ', 6), null, $document . ' (number field: digits and dots only).'];
+        yield 'pasted with spaces' => [
+            \str_repeat('12.345.678 ', 6),
+            null,
+            $document . ' (number field: digits and dots only).',
+        ];
         yield 'two check characters' => ['1234567', '22', $document . ' (invalid character).'];
         yield 'letter other than X as check' => ['1234567', 'A', $document . ' (invalid character).'];
         yield 'dot as check' => ['123456', '.', $document . ' (invalid character).'];

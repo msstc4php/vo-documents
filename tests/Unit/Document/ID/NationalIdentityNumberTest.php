@@ -40,10 +40,15 @@ final class NationalIdentityNumberTest extends TestCase
         yield 'hyphens' => ['317101-150598-0001', '3171011505980001'];
         yield 'NBSP and ideographic space' => ["317101\u{00A0}150598\u{3000}0001", '3171011505980001'];
         yield 'fullwidth digits' => [
-            "\u{FF13}\u{FF11}\u{FF17}\u{FF11}\u{FF10}\u{FF11}\u{FF11}\u{FF15}\u{FF10}\u{FF15}\u{FF19}\u{FF18}\u{FF10}\u{FF10}\u{FF10}\u{FF11}",
+            "\u{FF13}\u{FF11}\u{FF17}\u{FF11}\u{FF10}\u{FF11}\u{FF11}\u{FF15}\u{FF10}\u{FF15}\u{FF19}\u{FF18}" .
+                "\u{FF10}\u{FF10}\u{FF10}\u{FF11}",
             '3171011505980001',
         ];
-        yield 'Arabic-Indic digits' => ["\u{0663}\u{0661}\u{0667}\u{0661}\u{0660}\u{0661}\u{0661}\u{0665}\u{0660}\u{0665}\u{0669}\u{0668}\u{0660}\u{0660}\u{0660}\u{0661}", '3171011505980001'];
+        yield 'Arabic-Indic digits' => [
+            "\u{0663}\u{0661}\u{0667}\u{0661}\u{0660}\u{0661}\u{0661}\u{0665}\u{0660}\u{0665}\u{0669}\u{0668}" .
+                "\u{0660}\u{0660}\u{0660}\u{0661}",
+            '3171011505980001',
+        ];
         yield '29 February 1996 of a man' => ['3171012902960001', '3171012902960001'];
         yield '29 February 1996 of a woman (day 69)' => ['3171016902960001', '3171016902960001'];
         yield '29 February with year 00 (2000)' => ['3171012902000001', '3171012902000001'];
@@ -76,8 +81,14 @@ final class NationalIdentityNumberTest extends TestCase
     }
 
     #[DataProvider('fields')]
-    public function testReadsTheFields(string $input, Sex $sex, int $day, int $month, string $year, string $region): void
-    {
+    public function testReadsTheFields(
+        string $input,
+        Sex $sex,
+        int $day,
+        int $month,
+        string $year,
+        string $region,
+    ): void {
         $number = NationalIdentityNumber::from($input);
 
         self::assertSame($sex, $number->sex());
@@ -105,7 +116,10 @@ final class NationalIdentityNumberTest extends TestCase
         yield '17 digits' => ['31710115059800011', 'Invalid Indonesian national identity number (17 characters).'];
         yield 'far too long' => [\str_repeat('1', 41), 'Invalid Indonesian national identity number (too long).'];
         yield 'letter' => ['317101150598000X', $character];
-        yield 'full stop is no separator' => ['3171.0115.0598.0001', 'Invalid Indonesian national identity number (19 characters).'];
+        yield 'full stop is no separator' => [
+            '3171.0115.0598.0001',
+            'Invalid Indonesian national identity number (19 characters).',
+        ];
         yield '30 February of a woman: day 70' => ['3171017002980001', $date];
         yield '30 February of a man' => ['3171013002980001', $date];
         yield '29 February 1997' => ['3171012902970001', $date];

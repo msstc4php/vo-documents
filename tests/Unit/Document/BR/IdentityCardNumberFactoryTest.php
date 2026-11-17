@@ -104,7 +104,10 @@ final class IdentityCardNumberFactoryTest extends TestCase
         yield 'zeros only' => ['0-0', $noJurisdiction];
         yield 'one character' => ['2', 'Invalid Brazilian identity card number (1 characters).'];
         yield 'ten digits' => ['1234567890', 'Invalid Brazilian identity card number (10 characters).'];
-        yield 'ten characters with dots' => ['1.234.567.890', 'Invalid Brazilian identity card number (10 characters).'];
+        yield 'ten characters with dots' => [
+            '1.234.567.890',
+            'Invalid Brazilian identity card number (10 characters).',
+        ];
         yield 'letter as check' => ['12345678A', $noJurisdiction];
         yield 'pasted several times' => [
             \str_repeat('12.345.678-2 ', 5),

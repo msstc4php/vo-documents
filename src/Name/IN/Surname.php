@@ -8,8 +8,8 @@ use MSSTC4PHP\ValueObject\Documents\Name\Latin\AbstractLatinNamePart;
 use Override;
 
 /**
- * The surname in Latin letters, of one or two words (`Jain`, `Roy Choudhary`, `Das Gupta`: "Surname could have two words").
- * See docs/sources/IN.md "Names".
+ * The surname in Latin letters, of one or two words (`Jain`, `Roy Choudhary`, `Das Gupta`: "Surname could have two
+ * words"). See docs/sources/IN.md "Names".
  *
  * @see https://www.passportindia.gov.in/AppOnlineProject/pdf/ApplicationformInstructionBooklet-V3.0.pdf Column 2.1
  */

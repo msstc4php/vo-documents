@@ -86,7 +86,13 @@ final class NationalIdentityNumber extends AbstractStringValueObject implements 
     {
         $digits = Digits::exactly($value, 16, self::DOCUMENT);
 
-        if (!TwoDigitYearDate::exists($this->dayOf($digits), (int) \substr($digits, 8, 2), (int) \substr($digits, 10, 2))) {
+        $birthDateExists = TwoDigitYearDate::exists(
+            $this->dayOf($digits),
+            (int) \substr($digits, 8, 2),
+            (int) \substr($digits, 10, 2),
+        );
+
+        if (!$birthDateExists) {
             throw new InvalidDocumentNumberException(\sprintf('Invalid %s (invalid birth date).', self::DOCUMENT));
         }
 

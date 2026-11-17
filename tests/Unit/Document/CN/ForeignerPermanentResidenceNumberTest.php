@@ -40,7 +40,8 @@ final class ForeignerPermanentResidenceNumberTest extends TestCase
         yield 'NIA example' => ['932682198501010017', '932682198501010017'];
         yield 'separators' => ['9 32682-19850101 0017', '932682198501010017'];
         yield 'fullwidth digits' => [
-            "\u{FF19}\u{FF13}\u{FF12}\u{FF16}\u{FF18}\u{FF12}\u{FF11}\u{FF19}\u{FF18}\u{FF15}\u{FF10}\u{FF11}\u{FF10}\u{FF11}\u{FF10}\u{FF10}\u{FF11}\u{FF17}",
+            "\u{FF19}\u{FF13}\u{FF12}\u{FF16}\u{FF18}\u{FF12}\u{FF11}\u{FF19}\u{FF18}\u{FF15}\u{FF10}\u{FF11}" .
+                "\u{FF10}\u{FF11}\u{FF10}\u{FF10}\u{FF11}\u{FF17}",
             '932682198501010017',
         ];
         yield '29 February 1980' => ['932682198002290018', '932682198002290018'];
@@ -94,7 +95,9 @@ final class ForeignerPermanentResidenceNumberTest extends TestCase
     public function testRefusesWithoutEchoingTheInput(string $input, string $message): void
     {
         self::assertRefusedWithoutEcho(
-            static fn (string $value): ForeignerPermanentResidenceNumber => ForeignerPermanentResidenceNumber::from($value),
+            static fn (string $value): ForeignerPermanentResidenceNumber => ForeignerPermanentResidenceNumber::from(
+                $value,
+            ),
             $input,
             $message,
         );

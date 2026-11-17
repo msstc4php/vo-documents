@@ -40,14 +40,32 @@ final class NamePartsTest extends TestCase
     {
         yield 'one word' => ['राजेश', 'राजेश'];
         yield 'two words, spaces collapsed' => ['  पीयूष   कुमार ', 'पीयूष कुमार'];
-        yield 'conjunct with virama' => ["\u{0915}\u{094D}\u{0937}\u{093F}\u{0924}\u{093F}\u{091C}", "\u{0915}\u{094D}\u{0937}\u{093F}\u{0924}\u{093F}\u{091C}"];
-        yield 'nukta spelt as base and sign' => ["\u{0915}\u{093C}\u{0941}\u{0930}\u{0948}\u{0936}\u{0940}", "\u{0915}\u{093C}\u{0941}\u{0930}\u{0948}\u{0936}\u{0940}"];
-        yield 'precomposed nukta letter is decomposed by NFC' => ["\u{0958}\u{0941}\u{0930}\u{0948}\u{0936}\u{0940}", "\u{0915}\u{093C}\u{0941}\u{0930}\u{0948}\u{0936}\u{0940}"];
-        yield 'zero-width joiner after virama' => ["\u{0915}\u{094D}\u{200D}\u{0937}", "\u{0915}\u{094D}\u{200D}\u{0937}"];
-        yield 'zero-width non-joiner after virama' => ["\u{0915}\u{094D}\u{200C}\u{0937}", "\u{0915}\u{094D}\u{200C}\u{0937}"];
+        yield 'conjunct with virama' => [
+            "\u{0915}\u{094D}\u{0937}\u{093F}\u{0924}\u{093F}\u{091C}",
+            "\u{0915}\u{094D}\u{0937}\u{093F}\u{0924}\u{093F}\u{091C}",
+        ];
+        yield 'nukta spelt as base and sign' => [
+            "\u{0915}\u{093C}\u{0941}\u{0930}\u{0948}\u{0936}\u{0940}",
+            "\u{0915}\u{093C}\u{0941}\u{0930}\u{0948}\u{0936}\u{0940}",
+        ];
+        yield 'precomposed nukta letter is decomposed by NFC' => [
+            "\u{0958}\u{0941}\u{0930}\u{0948}\u{0936}\u{0940}",
+            "\u{0915}\u{093C}\u{0941}\u{0930}\u{0948}\u{0936}\u{0940}",
+        ];
+        yield 'zero-width joiner after virama' => [
+            "\u{0915}\u{094D}\u{200D}\u{0937}",
+            "\u{0915}\u{094D}\u{200D}\u{0937}",
+        ];
+        yield 'zero-width non-joiner after virama' => [
+            "\u{0915}\u{094D}\u{200C}\u{0937}",
+            "\u{0915}\u{094D}\u{200C}\u{0937}",
+        ];
         yield 'hyphen' => ['दास-गुप्ता', 'दास-गुप्ता'];
         yield 'NBSP between words' => ["राय\u{00A0}चौधरी", 'राय चौधरी'];
-        yield 'anusvara, visarga, chandrabindu' => ["\u{0939}\u{0902}\u{0938}\u{0903}\u{0901}", "\u{0939}\u{0902}\u{0938}\u{0903}\u{0901}"];
+        yield 'anusvara, visarga, chandrabindu' => [
+            "\u{0939}\u{0902}\u{0938}\u{0903}\u{0901}",
+            "\u{0939}\u{0902}\u{0938}\u{0903}\u{0901}",
+        ];
     }
 
     #[DataProvider('validNames')]

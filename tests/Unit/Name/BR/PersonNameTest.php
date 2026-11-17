@@ -118,7 +118,11 @@ final class PersonNameTest extends TestCase
 
     public function testAnOverrideThatIsTheDerivedFormIsNotKept(): void
     {
-        $name = new PersonName(FamilyName::from('da Silva'), GivenName::from('João'), IcaoPersonName::from('da<silva<<joao'));
+        $name = new PersonName(
+            FamilyName::from('da Silva'),
+            GivenName::from('João'),
+            IcaoPersonName::from('da<silva<<joao'),
+        );
 
         self::assertNull($name->latinOverride());
         self::assertTrue($name->equals(new PersonName(FamilyName::from('da Silva'), GivenName::from('João'))));
@@ -139,7 +143,11 @@ final class PersonNameTest extends TestCase
     public function testEqualityComparesPartsAndOverride(): void
     {
         $derived = new PersonName(FamilyName::from('da Silva'), GivenName::from('João'));
-        $override = new PersonName(FamilyName::from('da Silva'), GivenName::from('João'), IcaoPersonName::from('SILVA<<JOAO'));
+        $override = new PersonName(
+            FamilyName::from('da Silva'),
+            GivenName::from('João'),
+            IcaoPersonName::from('SILVA<<JOAO'),
+        );
 
         self::assertTrue($derived->equals(new PersonName(FamilyName::from('da Silva'), GivenName::from('João'))));
         self::assertFalse($derived->equals($override));

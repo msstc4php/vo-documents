@@ -14,11 +14,13 @@ use Override;
 
 /**
  * Nomor Pokok Wajib Pajak in either form DJP uses: the 15 digits printed `99.999.999.9-999.999`, or the 16 digits of
- * PMK 112/2022 (the NIK of a resident individual, a "0" put in front of the 15 digits for other taxpayers, an
- * Identity Number of a Business Place for a branch). All zeros are refused: DJP prints `00.000.000.0-000.000` and `0000000000000000` where a form has no number (PENG-6/PJ.09/2024, items 5a and 6b). Otherwise format only: DJP publishes no check digit and no meaning of
- * the 15 digits, and a 16-digit number cannot be told from a NIK, so none of its digits is read. Dots are accepted as
- * separators besides the package's. `formatted()` is DJP's form for 15 digits; no display form of 16 digits is
- * quoted, so it gives the digits. `masked()` keeps the last four digits (no official masking rule).
+ * PMK 112/2022 (the NIK of a resident individual, a "0" put in front of the 15 digits for other taxpayers, an Identity
+ * Number of a Business Place for a branch). All zeros are refused: DJP prints `00.000.000.0-000.000` and
+ * `0000000000000000` where a form has no number (PENG-6/PJ.09/2024, items 5a and 6b). Otherwise format only: DJP
+ * publishes no check digit and no meaning of the 15 digits, and a 16-digit number cannot be told from a NIK, so none of
+ * its digits is read. Dots are accepted as separators besides the package's. `formatted()` is DJP's form for 15 digits;
+ * no display form of 16 digits is quoted, so it gives the digits. `masked()` keeps the last four digits (no official
+ * masking rule).
  *
  * @see https://www.pajak.go.id/sites/default/files/2024-02/PENG-6-2024%20PENGGUNAAN%20NOMOR%20POKOK%20WAJIB%20PAJAK%20PADA%20SISTEM%20ADMINISTRASI%20PERPAJAKAN.pdf
  *      DJP, PENG-6/PJ.09/2024
@@ -78,7 +80,9 @@ final class TaxpayerNumber extends AbstractStringValueObject implements Maskable
         );
 
         if (\trim($number, '0') === '') {
-            throw new InvalidDocumentNumberException(\sprintf('Invalid %s (placeholder, not a number).', self::DOCUMENT));
+            $message = \sprintf('Invalid %s (placeholder, not a number).', self::DOCUMENT);
+
+            throw new InvalidDocumentNumberException($message);
         }
 
         return $number;

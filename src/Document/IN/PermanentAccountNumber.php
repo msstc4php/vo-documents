@@ -15,9 +15,9 @@ use Override;
 /**
  * Permanent Account Number, ten characters as the Income Tax Department describes them: three letters of the
  * "alphabetic series running from AAA to ZZZ", the status of the holder (one of the ten letters of
- * {@see PanHolderType}), the first letter of the holder's surname or name, "sequential numbers running from 0001 to 9999"
- * (so `0000` is refused) and "an alphabetic check digit". The fifth character is not checked against a name and no
- * formula for the check letter is published, so it is any letter. `masked()` keeps the last four characters (no
+ * {@see PanHolderType}), the first letter of the holder's surname or name, "sequential numbers running from 0001 to
+ * 9999" (so `0000` is refused) and "an alphabetic check digit". The fifth character is not checked against a name and
+ * no formula for the check letter is published, so it is any letter. `masked()` keeps the last four characters (no
  * official masking rule); PAN is written without separators, so there is no `formatted()`.
  *
  * @see https://web.archive.org/web/2025/https://incometaxindia.gov.in/tutorials/1.permanent%20account%20number%20(pan).pdf Income Tax Department

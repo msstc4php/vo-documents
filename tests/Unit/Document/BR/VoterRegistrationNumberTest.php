@@ -71,7 +71,9 @@ final class VoterRegistrationNumberTest extends TestCase
 
     public function testAShortNumberEqualsItsZeroPaddedForm(): void
     {
-        self::assertTrue(VoterRegistrationNumber::from('45670191')->equals(VoterRegistrationNumber::from('000045670191')));
+        self::assertTrue(
+            VoterRegistrationNumber::from('45670191')->equals(VoterRegistrationNumber::from('000045670191')),
+        );
     }
 
     public function testTellsARegistrationAbroad(): void
@@ -97,7 +99,10 @@ final class VoterRegistrationNumberTest extends TestCase
         yield 'state code 29' => ['123456782912', $state];
         yield 'state code 30' => ['123456783012', $state];
         yield 'state code 99' => ['123456789912', $state];
-        yield 'four digits, no running number' => ['0191', 'Invalid Brazilian voter registration number (4 characters).'];
+        yield 'four digits, no running number' => [
+            '0191',
+            'Invalid Brazilian voter registration number (4 characters).',
+        ];
         yield 'thirteen digits' => ['1234567801912', 'Invalid Brazilian voter registration number (13 characters).'];
         yield 'letter' => ['12345678019A', 'Invalid Brazilian voter registration number (invalid character).'];
         yield 'empty' => ['', 'Invalid Brazilian voter registration number (0 characters).'];

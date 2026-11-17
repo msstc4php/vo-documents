@@ -22,7 +22,8 @@ final readonly class TestPersonNameCodec extends AbstractFamilyGivenPersonNameCo
     #[Override]
     protected function shape(): string
     {
-        return 'Expected a test person name payload with string "family", string or null "given", string "latin", and no other keys.';
+        return 'Expected a test person name payload with string "family", string or null "given", '
+            . 'string "latin", and no other keys.';
     }
 
     #[Override]

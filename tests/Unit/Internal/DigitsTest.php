@@ -70,7 +70,10 @@ final class DigitsTest extends TestCase
 
     public function testUpperCasedOfLengthFoldsBeforeCounting(): void
     {
-        self::assertSame('AB', Digits::upperCasedOfLength("\u{FF41}\u{3000}\u{FF42}", static fn (int $n): bool => $n === 2, 'test number'));
+        self::assertSame(
+            'AB',
+            Digits::upperCasedOfLength("\u{FF41}\u{3000}\u{FF42}", static fn (int $n): bool => $n === 2, 'test number'),
+        );
     }
 
     public function testStrippedLengthFoldsBeforeCounting(): void

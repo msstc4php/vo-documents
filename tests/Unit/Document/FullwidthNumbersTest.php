@@ -18,7 +18,10 @@ final class FullwidthNumbersTest extends TestCase
     {
         self::assertSame(
             '11223344595',
-            Snils::from("\u{FF11}\u{FF11}\u{FF12}-\u{FF12}\u{FF13}\u{FF13}\u{3000}\u{FF14}\u{FF14}\u{FF15}\u{FF19}\u{FF15}")->value,
+            Snils::from(
+                "\u{FF11}\u{FF11}\u{FF12}-\u{FF12}\u{FF13}\u{FF13}\u{3000}\u{FF14}\u{FF14}" .
+                "\u{FF15}\u{FF19}\u{FF15}",
+            )->value,
         );
     }
 
@@ -26,7 +29,9 @@ final class FullwidthNumbersTest extends TestCase
     {
         self::assertSame(
             '123456789',
-            SocialSecurityNumber::from("\u{0661}\u{0662}\u{0663}\u{0664}\u{0665}\u{0666}\u{0667}\u{0668}\u{0669}")->value,
+            SocialSecurityNumber::from(
+                "\u{0661}\u{0662}\u{0663}\u{0664}\u{0665}\u{0666}\u{0667}\u{0668}\u{0669}",
+            )->value,
         );
     }
 
@@ -34,7 +39,9 @@ final class FullwidthNumbersTest extends TestCase
     {
         self::assertSame(
             '123456789',
-            SocialSecurityNumber::from("\u{FF11}\u{FF12}\u{FF13}\u{FF14}\u{FF15}\u{FF16}\u{FF17}\u{FF18}\u{FF19}")->value,
+            SocialSecurityNumber::from(
+                "\u{FF11}\u{FF12}\u{FF13}\u{FF14}\u{FF15}\u{FF16}\u{FF17}\u{FF18}\u{FF19}",
+            )->value,
         );
     }
 
@@ -42,7 +49,10 @@ final class FullwidthNumbersTest extends TestCase
     {
         self::assertSame(
             '12345678901',
-            TaxIdentificationNumber::from("\u{FF11}\u{FF12}\u{FF13}\u{FF14}\u{FF15}\u{FF16}\u{FF17}\u{FF18}\u{FF19}\u{FF10}\u{FF11}")->value,
+            TaxIdentificationNumber::from(
+                "\u{FF11}\u{FF12}\u{FF13}\u{FF14}\u{FF15}\u{FF16}\u{FF17}\u{FF18}\u{FF19}" .
+                "\u{FF10}\u{FF11}",
+            )->value,
         );
     }
 

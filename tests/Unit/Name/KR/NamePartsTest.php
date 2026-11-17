@@ -89,7 +89,10 @@ final class NamePartsTest extends TestCase
         yield 'lone leading consonant U+1100' => ["\u{1100}", $characters];
         yield 'lone vowel U+1161' => ["\u{1161}", $characters];
         yield 'lone final consonant U+11A8' => ["김\u{11A8}\u{11A8}", $characters];
-        yield 'fullwidth Latin' => ["\u{FF2B}\u{FF29}\u{FF2D}", 'Invalid Korean family name (compatibility character).'];
+        yield 'fullwidth Latin' => [
+            "\u{FF2B}\u{FF29}\u{FF2D}",
+            'Invalid Korean family name (compatibility character).',
+        ];
     }
 
     #[DataProvider('invalidNames')]

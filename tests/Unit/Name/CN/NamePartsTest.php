@@ -85,7 +85,10 @@ final class NamePartsTest extends TestCase
         yield 'ASCII full stop for the dot' => ['阿沛.阿旺', $characters];
         yield 'Arabic comma for the dot' => ["阿沛\u{060C}阿旺", $characters];
         yield 'fullwidth Latin' => ["\u{FF21}\u{FF22}", 'Invalid Chinese family name (compatibility character).'];
-        yield 'CJK radical (Script=Han, NFKC differs)' => ["\u{2F00}", 'Invalid Chinese family name (compatibility character).'];
+        yield 'CJK radical (Script=Han, NFKC differs)' => [
+            "\u{2F00}",
+            'Invalid Chinese family name (compatibility character).',
+        ];
     }
 
     #[DataProvider('invalidNames')]
@@ -106,7 +109,10 @@ final class NamePartsTest extends TestCase
     public function testEveryDotVariantGivesTheSameValue(): void
     {
         $variants = ["\u{00B7}", "\u{30FB}", "\u{2022}"];
-        $values = \array_map(static fn (string $dot): string => GivenName::from('阿沛' . $dot . '阿旺晋美')->value, $variants);
+        $values = \array_map(
+            static fn (string $dot): string => GivenName::from('阿沛' . $dot . '阿旺晋美')->value,
+            $variants,
+        );
 
         self::assertSame([$values[0], $values[0], $values[0]], $values);
         self::assertTrue(GivenName::from("阿沛\u{30FB}阿旺晋美")->equals(GivenName::from("阿沛\u{00B7}阿旺晋美")));

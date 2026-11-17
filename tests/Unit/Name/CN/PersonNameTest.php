@@ -98,7 +98,11 @@ final class PersonNameTest extends TestCase
         self::assertFalse(new PersonName(FamilyName::from('张'), null, $latin)->equals($this->person()));
         self::assertFalse($this->person()->equals(new PersonName(FamilyName::from('张'), null, $latin)));
         self::assertTrue(
-            new PersonName(FamilyName::from('张'), null, $latin)->equals(new PersonName(FamilyName::from('张'), null, $latin)),
+            new PersonName(
+                FamilyName::from('张'),
+                null,
+                $latin,
+            )->equals(new PersonName(FamilyName::from('张'), null, $latin)),
         );
     }
 

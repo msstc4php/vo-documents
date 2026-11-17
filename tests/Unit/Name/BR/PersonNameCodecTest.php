@@ -219,6 +219,9 @@ final class PersonNameCodecTest extends TestCase
         );
 
         self::assertSame('SILVA<<JOAO', $name->latin()->value);
-        self::assertSame(['family' => 'da Silva', 'given' => 'João', 'latin' => 'SILVA<<JOAO'], $mapper->toPayload($name));
+        self::assertSame(
+            ['family' => 'da Silva', 'given' => 'João', 'latin' => 'SILVA<<JOAO'],
+            $mapper->toPayload($name),
+        );
     }
 }

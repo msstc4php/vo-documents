@@ -11,8 +11,8 @@ use LogicException;
  *
  * Every method expects at least one ASCII digit and nothing else, and throws \LogicException otherwise.
  *
- * Sources: ISO/IEC 7812-1 (Luhn), ISO/IEC 7064:2003 (MOD 11-2), Verhoeff 1969 (the scheme UIDAI's "A UID Numbering Scheme"
- * recommends for the Aadhaar number)
+ * Sources: ISO/IEC 7812-1 (Luhn), ISO/IEC 7064:2003 (MOD 11-2), Verhoeff 1969 (the scheme UIDAI's "A UID Numbering
+ * Scheme" recommends for the Aadhaar number)
  */
 final class Checksum
 {

@@ -17,8 +17,8 @@ use Override;
  * A name in Latin letters as the Passport Seva form takes it: the given name, then an optional surname ("In case you do
  * not use a surname - leave the Surname column blank and write your full name in Applicant's Given Name column"). The
  * derived ICAO form is `JAIN<<PIYUSH<KUMAR`; a person with no surname has the given name as the only identifier
- * (`RAJESH<KUMAR`), the Doc 9303 rule for a single name. Override policy {@see TransliterationVariant}: no MEA text read
- * lets a passport keep another spelling, so an override must be another ICAO spelling of the parts. See
+ * (`RAJESH<KUMAR`), the Doc 9303 rule for a single name. Override policy {@see TransliterationVariant}: no MEA text
+ * read lets a passport keep another spelling, so an override must be another ICAO spelling of the parts. See
  * docs/sources/IN.md "Names".
  *
  * @see https://www.passportindia.gov.in/AppOnlineProject/pdf/ApplicationformInstructionBooklet-V3.0.pdf Column 2.1

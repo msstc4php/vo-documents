@@ -19,6 +19,8 @@ final class IndianFullName
      */
     public static function of(AbstractNamePart $given, ?AbstractNamePart $surname): string
     {
-        return Text::nonEmpty($surname instanceof AbstractNamePart ? $given->value . ' ' . $surname->value : $given->value);
+        return Text::nonEmpty(
+            $surname instanceof AbstractNamePart ? $given->value . ' ' . $surname->value : $given->value,
+        );
     }
 }

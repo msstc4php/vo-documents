@@ -22,7 +22,8 @@ final readonly class PersonNameCodec extends AbstractFamilyGivenPersonNameCodec
     #[Override]
     protected function shape(): string
     {
-        return 'Expected a Chinese person name payload with string "family", string or null "given", string "latin", and no other keys.';
+        return 'Expected a Chinese person name payload with string "family", string or null "given", '
+            . 'string "latin", and no other keys.';
     }
 
     #[Override]

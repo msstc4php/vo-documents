@@ -36,7 +36,11 @@ final class PermanentAccountNumberTest extends TestCase
     {
         yield 'individual' => ['BLGPS1234D', 'BLGPS1234D', PanHolderType::Individual];
         yield 'lower case and separators' => ["blgps 1234-d\u{00A0}", 'BLGPS1234D', PanHolderType::Individual];
-        yield 'fullwidth' => ["\u{FF22}\u{FF2C}\u{FF27}\u{FF30}\u{FF33}\u{FF11}\u{FF12}\u{FF13}\u{FF14}\u{FF24}", 'BLGPS1234D', PanHolderType::Individual];
+        yield 'fullwidth' => [
+            "\u{FF22}\u{FF2C}\u{FF27}\u{FF30}\u{FF33}\u{FF11}\u{FF12}\u{FF13}\u{FF14}\u{FF24}",
+            'BLGPS1234D',
+            PanHolderType::Individual,
+        ];
         yield 'company' => ['AAACR5055K', 'AAACR5055K', PanHolderType::Company];
         yield 'HUF' => ['ABCHD0001E', 'ABCHD0001E', PanHolderType::HinduUndividedFamily];
         yield 'association of persons' => ['ABCAD9999E', 'ABCAD9999E', PanHolderType::AssociationOfPersons];
@@ -96,6 +100,10 @@ final class PermanentAccountNumberTest extends TestCase
     #[DataProvider('invalidNumbers')]
     public function testRefusesWithoutEchoingTheInput(string $input, string $message): void
     {
-        self::assertRefusedWithoutEcho(static fn (string $value): PermanentAccountNumber => PermanentAccountNumber::from($value), $input, $message);
+        self::assertRefusedWithoutEcho(
+            static fn (string $value): PermanentAccountNumber => PermanentAccountNumber::from($value),
+            $input,
+            $message,
+        );
     }
 }

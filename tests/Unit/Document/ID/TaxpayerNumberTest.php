@@ -36,7 +36,8 @@ final class TaxpayerNumberTest extends TestCase
         yield '15 digits with spaces' => ['01 234 567 8 901 000', '012345678901000', true];
         yield '15 digits, NBSP' => ["01.234.567.8-901.000\u{00A0}", '012345678901000', true];
         yield '15 digits, fullwidth digits' => [
-            "\u{FF10}\u{FF11}.\u{FF12}\u{FF13}\u{FF14}.\u{FF15}\u{FF16}\u{FF17}.\u{FF18}-\u{FF19}\u{FF10}\u{FF11}.\u{FF10}\u{FF10}\u{FF10}",
+            "\u{FF10}\u{FF11}.\u{FF12}\u{FF13}\u{FF14}.\u{FF15}\u{FF16}\u{FF17}.\u{FF18}-\u{FF19}\u{FF10}\u{FF11}" .
+                ".\u{FF10}\u{FF10}\u{FF10}",
             '012345678901000',
             true,
         ];
@@ -45,7 +46,8 @@ final class TaxpayerNumberTest extends TestCase
         yield '0 in front of 15 digits' => ['0012345678901000', '0012345678901000', false];
         yield '16 digits with spaces' => ['3171 0115 0598 0001', '3171011505980001', false];
         yield '16 digits, fullwidth' => [
-            "\u{FF13}\u{FF11}\u{FF17}\u{FF11}\u{FF10}\u{FF11}\u{FF11}\u{FF15}\u{FF10}\u{FF15}\u{FF19}\u{FF18}\u{FF10}\u{FF10}\u{FF10}\u{FF11}",
+            "\u{FF13}\u{FF11}\u{FF17}\u{FF11}\u{FF10}\u{FF11}\u{FF11}\u{FF15}\u{FF10}\u{FF15}\u{FF19}\u{FF18}" .
+                "\u{FF10}\u{FF10}\u{FF10}\u{FF11}",
             '3171011505980001',
             false,
         ];
@@ -94,7 +96,10 @@ final class TaxpayerNumberTest extends TestCase
         yield 'empty' => ['', 'Invalid Indonesian taxpayer number (0 characters).'];
         yield '14 digits' => ['01234567890100', 'Invalid Indonesian taxpayer number (14 characters).'];
         yield '17 digits' => ['31710115059800011', 'Invalid Indonesian taxpayer number (17 characters).'];
-        yield '9 digits, the old form of a 9-digit NPWP' => ['012345678', 'Invalid Indonesian taxpayer number (9 characters).'];
+        yield '9 digits, the old form of a 9-digit NPWP' => [
+            '012345678',
+            'Invalid Indonesian taxpayer number (9 characters).',
+        ];
         yield 'far too long' => [\str_repeat('1', 41), 'Invalid Indonesian taxpayer number (too long).'];
         yield 'letter in 15' => ['01234567890100X', $character];
         yield 'letter in 16' => ['317101150598000X', $character];
