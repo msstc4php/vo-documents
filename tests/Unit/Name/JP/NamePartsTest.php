@@ -52,6 +52,7 @@ final class NamePartsTest extends TestCase
         yield 'kanji and hiragana' => ['ゆり子', 'ゆり子'];
         yield 'long-vowel mark ー (Script=Common)' => ['ジョー', 'ジョー'];
         yield 'ヶ' => ['八ヶ代', '八ヶ代'];
+        yield '〆 U+3006 (Script=Common)' => ['〆木', '〆木'];
         yield 'variant kanji outside the BMP' => ["\u{20BB7}野", "\u{20BB7}野"];
         yield 'old form' => ['髙橋', '髙橋'];
         yield 'combining voiced mark composed by NFC' => ["か\u{3099}", 'が'];
@@ -138,6 +139,7 @@ final class NamePartsTest extends TestCase
         yield 'too long' => [\str_repeat('さ', 101), 'Invalid Japanese family name reading (101 characters).'];
         yield 'kanji' => ['佐藤', $characters];
         yield 'iteration mark 々' => ['さ々', $characters];
+        yield '〆' => ['しめ〆', $characters];
         yield 'Latin' => ['sato', $characters];
         yield 'space' => ['さ とう', $characters];
         yield 'katakana middle dot' => ["マリア\u{30FB}テレサ", $characters];

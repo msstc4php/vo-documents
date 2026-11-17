@@ -37,7 +37,8 @@ final class PassportHepburnTest extends TestCase
     private const string NO_FORM = 'Invalid Japanese name reading (no Latin form).';
 
     /**
-     * Every row of the table except ン, which cannot start a reading (see {@see testMoraicN()}).
+     * Every row of the table except ン, which cannot start a reading ({@see testMoraicNRow()}), and the BA, BI, BE, BO
+     * spellings of the ヴ rows, which are overrides (PersonNameTest::testTheOtherSpellingOfAVuRowIsAnOverride()).
      *
      * @return iterable<string, array{non-empty-string, non-empty-string}>
      */
@@ -91,6 +92,29 @@ final class PassportHepburnTest extends TestCase
      */
     #[DataProvider('tableRows')]
     public function testTableRow(string $reading, string $latin): void
+    {
+        self::assertSame($latin, $this->latin($reading));
+    }
+
+    /**
+     * The ン row, N(M): it cannot start a reading, so it follows another kana.
+     *
+     * @return iterable<string, array{non-empty-string, non-empty-string}>
+     */
+    public static function moraicNRow(): iterable
+    {
+        yield 'ン N' => ['アン', 'AN'];
+        yield 'ン M' => ['アンマ', 'AMMA'];
+        yield 'ん N (hiragana)' => ['あん', 'AN'];
+        yield 'ん M (hiragana)' => ['あんま', 'AMMA'];
+    }
+
+    /**
+     * @param non-empty-string $reading
+     * @param non-empty-string $latin
+     */
+    #[DataProvider('moraicNRow')]
+    public function testMoraicNRow(string $reading, string $latin): void
     {
         self::assertSame($latin, $this->latin($reading));
     }
@@ -190,6 +214,8 @@ final class PassportHepburnTest extends TestCase
         yield 'っじ' => ['ハッジ', 'HAJJI'];
         yield 'っきょ' => ['ハッキョ', 'HAKKYO'];
         yield 'hiragana' => ['はっとり', 'HATTORI'];
+        yield 'っや (general 子音を重ねて rule)' => ['ハッヤ', 'HAYYA'];
+        yield 'っわ (general 子音を重ねて rule)' => ['ハッワ', 'HAWWA'];
     }
 
     /**
@@ -225,6 +251,9 @@ final class PassportHepburnTest extends TestCase
         yield 'final お after ぉ' => ['フォオ', 'FUOO'];
         yield 'お after ぉ' => ['フォオノ', 'FUONO'];
         yield 'mixed hiragana and katakana' => ['さとウ', 'SATO'];
+        // Kana cannot tell a long vowel from a morpheme boundary: these names need the Latin override.
+        yield '井上 いのうえ (boundary, derived as a long vowel)' => ['いのうえ', 'INOE'];
+        yield '大内 おおうち (boundary, derived as a long vowel)' => ['おおうち', 'OCHI'];
     }
 
     /**

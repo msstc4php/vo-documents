@@ -10,7 +10,10 @@ use MSSTC4PHP\ValueObject\Documents\Exception\InvalidPersonNameException;
  * The passport spelling of a reading by MOFA's ヘボン式ローマ字綴方表 and its 撥音, 促音 and 長音 rules: `ん` is M before
  * B, M and P; `っ` doubles the next consonant, T before CH; `ー` is omitted, `う` after O or U and `お` after O are
  * omitted, except a final `お` (SENOO). Katakana is folded to hiragana for the derivation only. A reading that starts
- * with a small kana, `ん`, `っ` or `ー`, or has a kana outside the table, has no spelling. See docs/sources/JP.md §3.
+ * with a small kana, `ん`, `っ` or `ー`, or has a kana outside the table, has no spelling. `っ` before Y or W (YYA,
+ * WWA) follows the general "子音を重ねて" rule; MOFA gives no example. Kana cannot tell a long vowel from a morpheme
+ * boundary: a non-long-vowel おう/うう/おお across a morpheme boundary, e.g. 井上 INOUE, 大内 OUCHI, is derived as a long
+ * vowel (INOE, OCHI) and needs the Latin override. See docs/sources/JP.md §3.
  *
  * @see https://www.ezairyu.mofa.go.jp/passport/hebon.html ヘボン式ローマ字綴方表 (外務省)
  *
@@ -120,6 +123,8 @@ final readonly class PassportHepburn
     }
 
     /**
+     * Y and W are doubled too (YYA, WWA): the general "子音を重ねて" rule, MOFA gives no example.
+     *
      * @throws InvalidPersonNameException when no consonant follows
      */
     private function geminate(string $nextLatin): string

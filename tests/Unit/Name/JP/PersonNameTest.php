@@ -149,6 +149,8 @@ final class PersonNameTest extends TestCase
         yield 'long vowel OH (伊藤 ITOH)' => ['伊藤', '洋子', 'イトウ', 'ヨウコ', 'itoh<<yoko', 'ITOH<<YOKO'];
         yield 'long vowel OH (大野 OHNO)' => ['大野', '翔', 'オオノ', 'ショウ', 'OHNO<<SHO', 'OHNO<<SHO'];
         yield 'ヴ as B (BIBIAN)' => ['スミス', 'ヴィヴィアン', 'スミス', 'ヴィヴィアン', 'SUMISU<<BIBIAN', 'SUMISU<<BIBIAN'];
+        yield '井上 INOUE (morpheme boundary)' => ['井上', '健', 'いのうえ', 'けん', 'INOUE<<KEN', 'INOUE<<KEN'];
+        yield '大内 OUCHI (morpheme boundary)' => ['大内', '健', 'おおうち', 'けん', 'OUCHI<<KEN', 'OUCHI<<KEN'];
         yield 'foreign spelling' => ['スミス', 'マリー', 'スミス', 'マリー', 'SMITH<<MARIE', 'SMITH<<MARIE'];
     }
 
@@ -165,6 +167,36 @@ final class PersonNameTest extends TestCase
 
         self::assertSame($stored, $name->latin()->value);
         self::assertSame($stored, $name->latinOverride()?->value);
+    }
+
+    public function testAMorphemeBoundaryIsDerivedAsALongVowel(): void
+    {
+        self::assertSame('INOE<<KEN', self::japaneseName('井上', '健', 'いのうえ', 'けん')->latin()->value);
+        self::assertSame('OCHI<<KEN', self::japaneseName('大内', '健', 'おおうち', 'けん')->latin()->value);
+    }
+
+    /**
+     * The ※参考 rows ヴァ BA, ヴィ BI, ヴェ BE, ヴォ BO: the derived form takes BUA, BUI, BUE, BUO.
+     *
+     * @return iterable<string, array{non-empty-string, non-empty-string, non-empty-string}>
+     */
+    public static function otherVuSpellings(): iterable
+    {
+        yield 'ヴァ BA' => ['ヴァ', 'BA', 'SUMISU<<BUA'];
+        yield 'ヴィ BI' => ['ヴィ', 'BI', 'SUMISU<<BUI'];
+        yield 'ヴェ BE' => ['ヴェ', 'BE', 'SUMISU<<BUE'];
+        yield 'ヴォ BO' => ['ヴォ', 'BO', 'SUMISU<<BUO'];
+    }
+
+    #[DataProvider('otherVuSpellings')]
+    public function testTheOtherSpellingOfAVuRowIsAnOverride(string $reading, string $spelling, string $derived): void
+    {
+        self::assertSame($derived, self::japaneseName('スミス', 'ヴァ', 'スミス', $reading)->latin()->value);
+
+        $name = self::japaneseName('スミス', 'ヴァ', 'スミス', $reading, IcaoPersonName::fromParts('SUMISU', [$spelling]));
+
+        self::assertSame('SUMISU<<' . $spelling, $name->latin()->value);
+        self::assertSame('SUMISU<<' . $spelling, $name->latinOverride()?->value);
     }
 
     public function testAnOverrideThatIsTheDerivedFormIsNotKept(): void

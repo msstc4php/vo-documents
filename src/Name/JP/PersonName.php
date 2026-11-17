@@ -16,7 +16,8 @@ use Override;
  * 氏名 and their 振り仮名. The derived Latin form is the MOFA Hepburn spelling of the readings ({@see PassportHepburn}),
  * FAMILY<<GIVEN. Override policy {@see AnyIcaoSpelling}: MOFA writes a non-Hepburn spelling (a foreign spelling on
  * documents, long vowels as OH: ITOH, OHNO) on request, so any valid ICAO name is kept; one equal to the derived form
- * is not kept. A reading without a Hepburn spelling needs the override. See docs/sources/JP.md §3-§4.
+ * is not kept. A reading without a Hepburn spelling needs the override, and so does a non-long-vowel おう/うう/おお
+ * across a morpheme boundary, e.g. 井上 INOUE, 大内 OUCHI (derived INOE, OCHI). See docs/sources/JP.md §3-§4.
  *
  * @see https://www.ezairyu.mofa.go.jp/passport/hebon.html 外務省, 【ヘボン式によらないローマ字氏名表記】
  */

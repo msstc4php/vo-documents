@@ -7,8 +7,8 @@ All dates UTC. Sources read 2026-11-17.
 | Source | Publisher | Where read |
 |---|---|---|
 | ヘボン式ローマ字綴方表, 【ヘボン式ローマ字表記へ変換する際の注意事項】, 【ヘボン式によらないローマ字氏名表記】, 【別名併記】 | 外務省 (MOFA) | <https://www.ezairyu.mofa.go.jp/passport/hebon.html> (read with `curl`; Internet Archive copy of 2025-01-09: <https://web.archive.org/web/20250109094317/https://www.ezairyu.mofa.go.jp/passport/hebon.html>) |
-| 戸籍法 (昭和二十二年法律第二百二十四号), Art. 13, Art. 50 | 国会; text of e-Gov 法令検索 (デジタル庁) | <https://laws.e-gov.go.jp/law/322AC0000000224> (read through the e-Gov API, `api/1/lawdata/322AC0000000224`) |
-| 戸籍法施行規則 (昭和二十二年司法省令第九十四号), Art. 30-2, Art. 60, 別表第二 (revision `322M40000010094_20260626_508M60000010043`, in force 2026-06-26) | 法務省; text of e-Gov 法令検索 | <https://laws.e-gov.go.jp/law/322M40000010094> (API `api/1/lawdata/322M40000010094`; the two figures of 別表第二 read as images through `api/2/attachment/…?src=./pict/2JH00000247973.jpg` and `…2JH00000247974.jpg`) |
+| 戸籍法 (昭和二十二年法律第二百二十四号), Art. 13, Art. 50 | 国会; text of e-Gov 法令検索 (デジタル庁) | <https://laws.e-gov.go.jp/law/322AC0000000224>, read through the e-Gov API <https://laws.e-gov.go.jp/api/1/lawdata/322AC0000000224> on 2026-11-17 (05:45 UTC; re-fetched 06:05 UTC to confirm the Art. 13 and Art. 50 quotes) |
+| 戸籍法施行規則 (昭和二十二年司法省令第九十四号), Art. 30-2, Art. 60, 別表第二 (revision `322M40000010094_20260626_508M60000010043`, in force 2026-06-26) | 法務省; text of e-Gov 法令検索 | <https://laws.e-gov.go.jp/law/322M40000010094>, read through <https://laws.e-gov.go.jp/api/1/lawdata/322M40000010094> on 2026-11-17 (05:45 UTC); the two figures of 別表第二 read as images from <https://laws.e-gov.go.jp/api/2/attachment/322M40000010094_20260626_508M60000010043?src=./pict/2JH00000247973.jpg> (katakana) and `…?src=./pict/2JH00000247974.jpg` (記号) on 2026-11-17 |
 | 子の名に使える漢字 | 法務省 民事局 | <https://www.moj.go.jp/MINJI/minji86.html> |
 
 Reachability (2026-11-17): WebFetch of `www.ezairyu.mofa.go.jp` returns 403 and WebFetch refuses `web.archive.org`;
@@ -25,8 +25,10 @@ Reachability (2026-11-17): WebFetch of `www.ezairyu.mofa.go.jp` returns 403 and 
 These rules bind a *new* given name at birth registration; family names and names registered earlier use any kanji
 of the 戸籍 (old forms, variant characters). A still-valid name is never refused, so the package does not enforce
 the 常用漢字/人名用漢字 lists nor the exclusion of 変体仮名: the letters are `\p{sc=Han}`, `\p{sc=Hiragana}`,
-`\p{sc=Katakana}` and the long-vowel mark `ー` U+30FC (Script=Common, listed explicitly). `々` U+3005 has Script=Han
-and is reached through `\p{sc=Han}` (`佐々木`). No separator: the 姓 and the 名 are separate fields, and a part has no
+`\p{sc=Katakana}`, the long-vowel mark `ー` U+30FC and `〆` U+3006 (both Script=Common, listed explicitly). The Art. 60
+list binds only a new given name, and real surnames contain `〆` (`〆木`), so it is accepted in every name part (not in
+a reading: 別表第二 has no `〆`, and it has no Hepburn spelling). `々` U+3005 has Script=Han and is reached through
+`\p{sc=Han}` (`佐々木`). No separator: the 姓 and the 名 are separate fields, and a part has no
 space, hyphen or dot. The katakana middle dot `・` U+30FB (Script=Common) is no letter of any of the texts and is
 refused. Combining voicing marks U+3099/U+309A (Script=Inherited) are composed by NFC with the kana before them
 (`か` + U+3099 → `が`); one left over after NFC (`ア` + U+3099 has no composed form) is refused. Halfwidth katakana
@@ -94,7 +96,8 @@ BIBIAN"); BA/BI/BE/BO are accepted as an override (§4). Designer's call. A kana
   → `ん` is N, M before a syllable whose Latin form starts with B, M or P (also `ゔ` BU).
 - "促音：子音を重ねて表記します。 例：服部（ハットリ）HATTORI、吉川（キッカワ）KIKKAWA ただし、チ（CHI）、チャ（CHA）、チュ（CHU）、チョ（CHO）音の前には「T」を表記します。 例：発地（ホッチ）HOTCHI、八丁（ハッチョウ）HATCHO"
   → `っ` doubles the first consonant of the next syllable, T before CH. Before a vowel, `ん`, `っ`, `ー` or at the end
-  it has no spelling.
+  it has no spelling. Before Y or W (`っや` YYA, `っわ` WWA) the package applies the general "子音を重ねて" rule; MOFA
+  gives no example for them.
 - "長音：OやUは記入しません。" with the cases:
   - "「―」を省略する場合 例：ニーナ（ニーナ）NINA、シーナ（シーナ）SHINA、サリー（サリー）SARI" → `ー` is omitted.
   - "「イ」を省略しない場合 例：新菜（ニイナ）NIINA、しいな（シイナ）SHIINA、さりい（サリイ）SARII" → `い` is kept.
@@ -108,6 +111,11 @@ BIBIAN"); BA/BI/BE/BO are accepted as an override (§4). Designer's call. A kana
   → `う` after a syllable ending in O or U is omitted; `お` after a syllable ending in O is omitted, except as the last
   kana of the reading (SENOO). `ー` after a syllable is omitted; a leading `ー` has no spelling. Other vowel pairs
   (`ああ`, `いい`, `えい`, `うお`) are kept: the rule names only O and U.
+
+**Limitation:** kana cannot tell a long vowel from a morpheme boundary. A non-long-vowel おう/うう/おお across a
+morpheme boundary, e.g. 井上 いのうえ INOUE, 大内 おおうち OUCHI, is derived as a long vowel (INOE, OCHI) and needs the
+Latin override (accepted under §4). The derivation is kept: the spec requires a derived form, and the reading alone
+does not carry the boundary.
 
 Every example above is a test case. The rules for the start of a reading are the package's (MOFA quotes none): a
 reading that starts with a small kana, `ん`, `っ` or `ー` has no Hepburn form. Such a name, or one whose Latin form is
