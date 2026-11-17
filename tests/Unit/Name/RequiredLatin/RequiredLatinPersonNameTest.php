@@ -109,7 +109,7 @@ final class RequiredLatinPersonNameTest extends TestCase
     {
         self::assertNameRefusedWithoutEcho(
             static fn (): TestPersonName => new TestPersonNameCodec()->decode($payload),
-            '',
+            'Zhang',
             self::SHAPE,
             InvalidPayloadException::class,
         );

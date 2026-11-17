@@ -20,9 +20,92 @@ final class Digits
     public const int MAX_REPORTED_LENGTH = 40;
 
     /**
-     * @var array<string, non-empty-string>|null
+     * Fullwidth digits and letters (letters upper-cased) and Arabic-Indic digits, mapped to ASCII.
      */
-    private static ?array $foldMap = null;
+    private const array FOLD_MAP = [
+        "\u{FF10}" => '0',
+        "\u{FF11}" => '1',
+        "\u{FF12}" => '2',
+        "\u{FF13}" => '3',
+        "\u{FF14}" => '4',
+        "\u{FF15}" => '5',
+        "\u{FF16}" => '6',
+        "\u{FF17}" => '7',
+        "\u{FF18}" => '8',
+        "\u{FF19}" => '9',
+        "\u{0660}" => '0',
+        "\u{0661}" => '1',
+        "\u{0662}" => '2',
+        "\u{0663}" => '3',
+        "\u{0664}" => '4',
+        "\u{0665}" => '5',
+        "\u{0666}" => '6',
+        "\u{0667}" => '7',
+        "\u{0668}" => '8',
+        "\u{0669}" => '9',
+        "\u{06F0}" => '0',
+        "\u{06F1}" => '1',
+        "\u{06F2}" => '2',
+        "\u{06F3}" => '3',
+        "\u{06F4}" => '4',
+        "\u{06F5}" => '5',
+        "\u{06F6}" => '6',
+        "\u{06F7}" => '7',
+        "\u{06F8}" => '8',
+        "\u{06F9}" => '9',
+        "\u{FF21}" => 'A',
+        "\u{FF22}" => 'B',
+        "\u{FF23}" => 'C',
+        "\u{FF24}" => 'D',
+        "\u{FF25}" => 'E',
+        "\u{FF26}" => 'F',
+        "\u{FF27}" => 'G',
+        "\u{FF28}" => 'H',
+        "\u{FF29}" => 'I',
+        "\u{FF2A}" => 'J',
+        "\u{FF2B}" => 'K',
+        "\u{FF2C}" => 'L',
+        "\u{FF2D}" => 'M',
+        "\u{FF2E}" => 'N',
+        "\u{FF2F}" => 'O',
+        "\u{FF30}" => 'P',
+        "\u{FF31}" => 'Q',
+        "\u{FF32}" => 'R',
+        "\u{FF33}" => 'S',
+        "\u{FF34}" => 'T',
+        "\u{FF35}" => 'U',
+        "\u{FF36}" => 'V',
+        "\u{FF37}" => 'W',
+        "\u{FF38}" => 'X',
+        "\u{FF39}" => 'Y',
+        "\u{FF3A}" => 'Z',
+        "\u{FF41}" => 'A',
+        "\u{FF42}" => 'B',
+        "\u{FF43}" => 'C',
+        "\u{FF44}" => 'D',
+        "\u{FF45}" => 'E',
+        "\u{FF46}" => 'F',
+        "\u{FF47}" => 'G',
+        "\u{FF48}" => 'H',
+        "\u{FF49}" => 'I',
+        "\u{FF4A}" => 'J',
+        "\u{FF4B}" => 'K',
+        "\u{FF4C}" => 'L',
+        "\u{FF4D}" => 'M',
+        "\u{FF4E}" => 'N',
+        "\u{FF4F}" => 'O',
+        "\u{FF50}" => 'P',
+        "\u{FF51}" => 'Q',
+        "\u{FF52}" => 'R',
+        "\u{FF53}" => 'S',
+        "\u{FF54}" => 'T',
+        "\u{FF55}" => 'U',
+        "\u{FF56}" => 'V',
+        "\u{FF57}" => 'W',
+        "\u{FF58}" => 'X',
+        "\u{FF59}" => 'Y',
+        "\u{FF5A}" => 'Z',
+    ];
 
     /**
      * Maps fullwidth digits and letters and Arabic-Indic digits to ASCII (letters upper-cased), so a number typed on
@@ -30,7 +113,7 @@ final class Digits
      */
     public static function fold(string $input): string
     {
-        return \strtr($input, self::foldMap());
+        return \strtr($input, self::FOLD_MAP);
     }
 
     public static function strip(string $input, string $separators = self::SEPARATORS): string
@@ -131,34 +214,5 @@ final class Digits
     private static function length(string $value): int
     {
         return \mb_strlen($value, 'UTF-8');
-    }
-
-    /**
-     * @return array<string, non-empty-string>
-     */
-    private static function foldMap(): array
-    {
-        return self::$foldMap ??= self::buildFoldMap();
-    }
-
-    /**
-     * @return array<string, non-empty-string>
-     */
-    private static function buildFoldMap(): array
-    {
-        $map = [];
-        foreach (\range(0, 9) as $digit) {
-            foreach ([0xFF10, 0x0660, 0x06F0] as $zero) {
-                $map[\mb_chr($zero + $digit, 'UTF-8')] = (string) $digit;
-            }
-        }
-
-        foreach (\range(0, 25) as $letter) {
-            foreach ([0xFF21, 0xFF41] as $first) {
-                $map[\mb_chr($first + $letter, 'UTF-8')] = \chr(0x41 + $letter);
-            }
-        }
-
-        return $map;
     }
 }

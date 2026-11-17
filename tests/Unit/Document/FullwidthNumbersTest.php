@@ -30,6 +30,14 @@ final class FullwidthNumbersTest extends TestCase
         );
     }
 
+    public function testSocialSecurityNumberAcceptsFullwidthDigits(): void
+    {
+        self::assertSame(
+            '123456789',
+            SocialSecurityNumber::from("\u{FF11}\u{FF12}\u{FF13}\u{FF14}\u{FF15}\u{FF16}\u{FF17}\u{FF18}\u{FF19}")->value,
+        );
+    }
+
     public function testTaxIdentificationNumberAcceptsFullwidthDigits(): void
     {
         self::assertSame(
