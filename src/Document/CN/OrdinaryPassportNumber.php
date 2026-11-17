@@ -16,7 +16,8 @@ use Override;
  * passport issued before April 2017; from then `E`, a letter other than `I` and `O`, and 7 digits ("第二位改为顺序使用英文字母
  * （I、O除外），第三位起仍然为阿拉伯数字，总位数仍为9位", starting at `EA0000001`); `G` and 8 digits for the older paper
  * passport. Official, diplomatic, public-affairs and SAR passports have no published format and are not covered (a
- * number of those kinds is refused here). No check character is published. `masked()` keeps the last four characters (no official masking rule).
+ * number of those kinds is refused here). No check character is published. `masked()` keeps the last four
+ * characters (no official masking rule).
  *
  * @see https://www.nia.gov.cn/n794014/n1050181/n1050479/c1197066/content.html 出入境证件简明手册
  * @see https://www.cac.gov.cn/2017-04/07/c_1120766993.htm 公安部网站, 2017-04-07

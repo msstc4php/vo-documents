@@ -14,8 +14,8 @@ use MSSTC4PHP\ValueObject\Payload\PayloadCodec;
 use Override;
 
 /**
- * {family: string, given: string|null, latin: string}, all three keys required (given may be null); latin is the `Icao\PersonName` string. Other
- * keys are refused.
+ * {family: string, given: string|null, latin: string}, all three keys required (given may be null); latin is the
+ * `Icao\PersonName` string. Other keys are refused.
  *
  * @internal
  *
@@ -75,5 +75,9 @@ abstract readonly class AbstractFamilyGivenPersonNameCodec implements PayloadCod
      *
      * @throws InvalidPersonNameException
      */
-    abstract protected function create(string $family, ?string $given, IcaoPersonName $latin): AbstractFamilyGivenPersonName;
+    abstract protected function create(
+        string $family,
+        ?string $given,
+        IcaoPersonName $latin,
+    ): AbstractFamilyGivenPersonName;
 }

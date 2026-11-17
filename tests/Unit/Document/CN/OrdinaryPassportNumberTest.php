@@ -16,7 +16,7 @@ use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
 
 /**
- * Expectations follow docs/sources/CN.md "Passport number".
+ * Expectations follow docs/sources/CN.md "Ordinary passport number".
  */
 #[CoversClass(OrdinaryPassportNumber::class)]
 #[UsesClass(NumberShapes::class)]

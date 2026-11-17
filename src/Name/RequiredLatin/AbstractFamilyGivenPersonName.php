@@ -27,7 +27,7 @@ abstract readonly class AbstractFamilyGivenPersonName implements PersonName
 {
     /**
      * @param TFamily $family
-     * @param TGiven $given
+     * @param TGiven|null $given
      */
     protected function __construct(
         public AbstractNamePart $family,
