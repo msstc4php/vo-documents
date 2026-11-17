@@ -488,7 +488,10 @@ script classes use `\p{sc=Latin}` / `\p{sc=Cyrillic}` (Script property only); `c
   detectable (`Digits::strip()` removes a trailing `\n` first); the flag stays (CR-026, defence in depth).
 - **Enum `from()` echoes its input.** A backed enum's `ValueError` contains the value, and vo-base does not re-run
   `parse()` on unserialize, so accessors use `tryFrom() ?? throw new LogicException(<fixed text>)` (PAN
-  `holderType()`, KR `regionCode()`); a tampered serialized value then fails without echo.
+  `holderType()`, KR `regionCode()`); a tampered serialized value then fails without echo. The same holds for table
+  lookups and dates: `KoreanRegistrationNumber::seventhDigit()` and `Gb11643::birthDate()` throw a fixed-text
+  `LogicException` (a raw `DateTimeImmutable` message would quote the date string). Tests build tampered objects
+  with `Tests\Fixture\TamperedValue::tampered()`.
 - **JP iteration marks.** `PassportHepburn` expands `ゝゞヽヾ` from the kana before (NFD, strip U+3099/309A, append
   the voiced mark for `ゞ`, NFC); `mb_convert_kana('c')` already folds `ヽヾ` to `ゝゞ`. The stored reading keeps the
   marks, so `いすゞ` and `いすず` readings are two values with one Latin form.

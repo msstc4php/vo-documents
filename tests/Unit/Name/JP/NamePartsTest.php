@@ -61,6 +61,7 @@ final class NamePartsTest extends TestCase
         yield 'hiragana iteration mark after a kana' => ["いす\u{309E}", "いす\u{309E}"];
         yield 'katakana iteration mark after a kana' => ["ス\u{30FD}キ", "ス\u{30FD}キ"];
         yield 'long-vowel mark after kanji' => ['山ー', '山ー'];
+        yield '〇 U+3007 (Script=Han, Nl)' => ["\u{3007}山", "\u{3007}山"];
     }
 
     #[DataProvider('validNames')]

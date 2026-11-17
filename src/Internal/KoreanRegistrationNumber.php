@@ -6,6 +6,7 @@ namespace MSSTC4PHP\ValueObject\Documents\Internal;
 
 use DateTimeImmutable;
 use DateTimeZone;
+use LogicException;
 use MSSTC4PHP\ValueObject\Documents\Exception\InvalidDocumentNumberException;
 use MSSTC4PHP\ValueObject\Documents\Sex;
 
@@ -19,6 +20,8 @@ use MSSTC4PHP\ValueObject\Documents\Sex;
 final class KoreanRegistrationNumber
 {
     private const int LENGTH = 13;
+
+    private const string NOT_NORMALIZED = 'Korean registration number validated by normalize().';
 
     private const int MONTH_OFFSET = 2;
 
@@ -61,10 +64,12 @@ final class KoreanRegistrationNumber
      */
     public static function birthDate(string $number): DateTimeImmutable
     {
-        return new DateTimeImmutable(
-            \sprintf('%04d-%02d-%02d', self::year($number), self::month($number), self::day($number)),
-            new DateTimeZone('UTC'),
-        );
+        [$year, $month, $day] = [self::year($number), self::month($number), self::day($number)];
+        if (!\checkdate($month, $day, $year)) {
+            throw new LogicException(self::NOT_NORMALIZED);
+        }
+
+        return new DateTimeImmutable(\sprintf('%04d-%02d-%02d', $year, $month, $day), new DateTimeZone('UTC'));
     }
 
     /**
@@ -72,12 +77,24 @@ final class KoreanRegistrationNumber
      */
     public static function sex(string $number): Sex
     {
-        return self::SEVENTH_DIGIT[$number[self::SEVENTH_DIGIT_INDEX]][1];
+        return self::seventhDigit($number)[1];
     }
 
     private static function year(string $number): int
     {
-        return self::SEVENTH_DIGIT[$number[self::SEVENTH_DIGIT_INDEX]][0] + (int) \substr($number, 0, 2);
+        return self::seventhDigit($number)[0] + (int) \substr($number, 0, 2);
+    }
+
+    /**
+     * A stored value is not parsed again on unserialize, so a tampered one fails here with fixed text instead of an
+     * "Undefined array key" warning that would show its digit.
+     *
+     * @return array{int, Sex}
+     */
+    private static function seventhDigit(string $number): array
+    {
+        return self::SEVENTH_DIGIT[$number[self::SEVENTH_DIGIT_INDEX] ?? '']
+            ?? throw new LogicException(self::NOT_NORMALIZED);
     }
 
     private static function month(string $number): int

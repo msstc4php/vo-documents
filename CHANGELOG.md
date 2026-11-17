@@ -107,11 +107,11 @@
   digits (`********3361`); `PermanentAccountNumber::holderType()` throws a fixed-text `LogicException` on a tampered
   value instead of echoing it. Numbers also strip the bidi marks U+200E, U+200F, U+061C, U+202A-202E and U+2066-2069.
   Name words start with a letter and use letters only: Han and Hangul parts take `\p{Lo}` (radicals, Hangzhou numerals
-  and the Hangul tone marks are refused; CN keeps `〇`, JP keeps `々` after a character), a JP part or reading cannot
-  start with `ー` or an iteration mark, and the Devanagari ZWJ/ZWNJ is allowed only after a virama. KR folds U+30FB and
-  U+2022 to `·` like CN; SA stores the Persian kaf U+06A9 and yeh U+06CC as U+0643 and U+064A. JP readings expand `ゝゞヽヾ`
-  before the Hepburn derivation (`いすゞ` → `ISUZU`). Name length messages say "(too long)" above 100 characters, and a raw
-  input over 10 000 bytes is refused before normalisation.
+  and the Hangul tone marks are refused; CN and JP keep `〇`, JP keeps `々` after a character), a JP part or reading
+  cannot start with `ー` or an iteration mark, and the Devanagari ZWJ/ZWNJ is allowed only after a virama. KR folds
+  U+30FB and U+2022 to `·` like CN; SA stores the Persian kaf U+06A9 and yeh U+06CC as U+0643 and U+064A. JP readings
+  expand `ゝゞヽヾ` before the Hepburn derivation (`いすゞ` → `ISUZU`). Name length messages say "(too long)" above 100
+  characters, and a raw input over 10 000 bytes is refused before normalisation.
 - Name classes use `\p{sc=Latin}`, `\p{sc=Cyrillic}`, `\p{sc=Han}`, `\p{sc=Hangul}`, `\p{sc=Arabic}` and
   `\p{sc=Devanagari}` (Script property): requires `lib-pcre >=10.40`.
 - Requires `msstc4php/vo-base ^1.1.1`.

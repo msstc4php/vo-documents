@@ -28,7 +28,8 @@ the 戸籍 (old forms, variant characters). A still-valid name is never refused,
 long-vowel mark `ー` U+30FC and `〆` U+3006 (both Script=Common, listed explicitly). The Art. 60 list binds only a new
 given name, and real surnames contain `〆` (`〆木`), so it is accepted in every name part (not in a reading: 別表第二 has no
 `〆`, and it has no Hepburn spelling). Han characters must be letters (`\p{Lo}`); `々` U+3005 (Script=Han, Lm) is listed
-explicitly (`佐々木`), while a radical (`⻄` U+2EC4), a Hangzhou numeral (`〡` U+3021) and `〻` are refused. A part starts
+explicitly (`佐々木`), and so is `〇` U+3007 (Script=Han, Nl), which names use as a character (as in CN; controller's ruling
+on the code review), while a radical (`⻄` U+2EC4), a Hangzhou numeral (`〡` U+3021) and `〻` are refused. A part starts
 with a letter: not with `ー` or an iteration mark `々ゝゞヽヾ`, which extend or repeat the character before (code review
 CR-006/CR-007; no name is written that way). No separator: the 姓 and the 名 are separate fields, and a part has no space,
 hyphen or dot. The katakana middle dot `・` U+30FB (Script=Common) is no letter of any of the texts and is refused.

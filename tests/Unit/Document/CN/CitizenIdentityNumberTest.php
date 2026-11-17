@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace MSSTC4PHP\ValueObject\Documents\Tests\Unit\Document\CN;
 
 use DateTimeZone;
+use LogicException;
 use MSSTC4PHP\ValueObject\Documents\Document\CN\CitizenIdentityNumber;
 use MSSTC4PHP\ValueObject\Documents\Internal\Checksum;
 use MSSTC4PHP\ValueObject\Documents\Internal\Digits;
@@ -14,6 +15,7 @@ use MSSTC4PHP\ValueObject\Documents\Internal\NumberFormat;
 use MSSTC4PHP\ValueObject\Documents\Internal\Text;
 use MSSTC4PHP\ValueObject\Documents\Sex;
 use MSSTC4PHP\ValueObject\Documents\Tests\Fixture\RefusesWithoutEchoingInput;
+use MSSTC4PHP\ValueObject\Documents\Tests\Fixture\TamperedValue;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\UsesClass;
@@ -33,6 +35,7 @@ use PHPUnit\Framework\TestCase;
 final class CitizenIdentityNumberTest extends TestCase
 {
     use RefusesWithoutEchoingInput;
+    use TamperedValue;
 
     /**
      * @return iterable<string, array{string, string}>
@@ -155,5 +158,27 @@ final class CitizenIdentityNumberTest extends TestCase
             $input,
             $message,
         );
+    }
+
+    /**
+     * @return iterable<string, array{string}>
+     */
+    public static function tamperedValues(): iterable
+    {
+        yield 'month 13' => ['110105199013071239'];
+        yield 'day 00' => ['110105199003001239'];
+        yield 'letter in the year that casts to a valid year' => ['110105199a03071239'];
+        yield 'too short' => ['110105'];
+    }
+
+    #[DataProvider('tamperedValues')]
+    public function testATamperedBirthDateFailsWithFixedText(string $value): void
+    {
+        $number = self::tampered(CitizenIdentityNumber::class, $value);
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('GB 11643 number validated by assertBirthDate().');
+
+        $number->birthDate();
     }
 }

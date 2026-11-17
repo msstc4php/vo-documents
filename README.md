@@ -241,11 +241,11 @@ $jp = new JP\PersonName(
   name part or reading cannot start with `ー` or an iteration mark.
 - **Scripts.** Name parts are checked with `\p{sc=Han}`, `\p{sc=Hangul}`, `\p{sc=Arabic}`, `\p{sc=Devanagari}` and the
   like, letters only (`\p{Lo}` for Han and Hangul: radicals, Hangzhou numerals and the Hangul tone marks are refused; CN
-  lists `〇` and JP `々` explicitly); the characters of a name that are Script=Common or Inherited are listed explicitly:
-  `ー` U+30FC and `〆` U+3006 (JP), `·` U+00B7 (CN, KR; U+30FB and U+2022 are stored as U+00B7), the Arabic harakat
-  U+064B-0652 and U+0670 (the tatweel U+0640 is removed; the Persian kaf U+06A9 and yeh U+06CC are stored as U+0643 and
-  U+064A), the Devanagari ZWJ and ZWNJ right after a virama. Hanja, Uyghur, Tibetan and Mongolian script names are not
-  covered.
+  and JP list `〇`, JP also `々` explicitly); the characters of a name that are Script=Common or Inherited are listed
+  explicitly: `ー` U+30FC and `〆` U+3006 (JP), `·` U+00B7 (CN, KR; U+30FB and U+2022 are stored as U+00B7), the Arabic
+  harakat U+064B-0652 and U+0670 (the tatweel U+0640 is removed; the Persian kaf U+06A9 and yeh U+06CC are stored as
+  U+0643 and U+064A), the Devanagari ZWJ and ZWNJ right after a virama. Hanja, Uyghur, Tibetan and Mongolian script
+  names are not covered.
 
 ### AU driving licences and the jurisdiction factory
 

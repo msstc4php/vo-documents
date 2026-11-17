@@ -27,7 +27,7 @@ abstract class AbstractChineseNamePart extends AbstractNamePart
     }
 
     #[Override]
-    protected function word(): string
+    final protected function word(): string
     {
         return '(?:(?=\p{Lo})' . $this->letters() . '|\x{3007})+';
     }

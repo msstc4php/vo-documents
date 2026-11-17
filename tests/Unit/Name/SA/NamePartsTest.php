@@ -119,6 +119,12 @@ final class NamePartsTest extends TestCase
         self::assertTrue(GivenName::from("\u{06A9}\u{0631}\u{06CC}\u{0645}")->equals(GivenName::from('كريم')));
     }
 
+    public function testAWordFinalPersianYehIsStoredAsYehNotAsAlefMaqsura(): void
+    {
+        self::assertSame("\u{0645}\u{0635}\u{0637}\u{0641}\u{064A}", GivenName::from("مصطف\u{06CC}")->value);
+        self::assertFalse(GivenName::from("مصطف\u{06CC}")->equals(GivenName::from("مصطف\u{0649}")));
+    }
+
     public function testTatweelBetweenALetterAndItsHarakatIsRemoved(): void
     {
         self::assertSame(

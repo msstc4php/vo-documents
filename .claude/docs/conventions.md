@@ -101,8 +101,8 @@
   after the virama U+094D). The tatweel U+0640 is removed, U+30FB and U+2022 are stored as U+00B7 (CN and KR), the
   Persian kaf/yeh U+06A9/U+06CC as U+0643/U+064A (SA).
 - **Name characters are letters, and every word starts with a letter** (code review of plan 4). A script class is
-  intersected with a general category in `word()`: `(?=\p{Lo})\p{sc=Han}` (CN adds `〇` U+3007, JP adds `々`), Hangul
-  `\p{Lo}` (tone marks refused), `(?=\p{L})` for kana. A leading `ー` or iteration mark is refused in JP parts and
+  intersected with a general category in `word()`: `(?=\p{Lo})\p{sc=Han}` (CN adds `〇` U+3007, JP adds `〇` and `々`),
+  Hangul `\p{Lo}` (tone marks refused), `(?=\p{L})` for kana. A leading `ー` or iteration mark is refused in JP parts and
   readings. Rule of thumb: no two stored values for one visible name, no non-letter (radical, numeral, tone mark) as a
   name.
 - **Mandatory Latin name** (CN, KR, ID, SA, IN-Devanagari): the passport spelling is a personal choice, so the Latin

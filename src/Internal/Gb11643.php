@@ -6,6 +6,7 @@ namespace MSSTC4PHP\ValueObject\Documents\Internal;
 
 use DateTimeImmutable;
 use DateTimeZone;
+use LogicException;
 use MSSTC4PHP\ValueObject\Documents\Exception\InvalidDocumentNumberException;
 
 /**
@@ -71,7 +72,14 @@ final class Gb11643
      */
     public static function birthDate(string $number): DateTimeImmutable
     {
-        return new DateTimeImmutable(\implode('-', self::birthDateParts($number)), new DateTimeZone('UTC'));
+        [$year, $month, $day] = self::birthDateParts($number);
+        // A tampered unserialized value would otherwise reach the DateTimeImmutable message.
+        $digits = \strspn($number, '0123456789', self::BIRTH_DATE_OFFSET, 8);
+        if ($digits !== 8 || !\checkdate((int) $month, (int) $day, (int) $year)) {
+            throw new LogicException('GB 11643 number validated by assertBirthDate().');
+        }
+
+        return new DateTimeImmutable($year . '-' . $month . '-' . $day, new DateTimeZone('UTC'));
     }
 
     /**

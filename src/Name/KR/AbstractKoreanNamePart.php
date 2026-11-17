@@ -36,7 +36,7 @@ abstract class AbstractKoreanNamePart extends AbstractNamePart
     }
 
     #[Override]
-    protected function word(): string
+    final protected function word(): string
     {
         return '(?:(?![' . self::LONE_JAMO . '])(?=\p{Lo})[' . $this->letters() . '])+';
     }

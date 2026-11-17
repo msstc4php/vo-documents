@@ -9,12 +9,14 @@ use Override;
 
 /**
  * A name part in Arabic: words of `\p{sc=Arabic}` letters joined by a space or a hyphen. The harakat U+064B-0652 and
- * the superscript alef U+0670 (Script=Inherited) are allowed after a letter, never at the start of a word. The
- * tatweel U+0640 (Script=Common) is typographic stretching and is removed, so a stretched and a plain spelling are one
- * value. The Persian kaf U+06A9 and yeh U+06CC, which a Persian keyboard types, are stored as the Arabic kaf U+0643 and
- * yeh U+064A. NFC joins `ا` + U+0654 with `أ` and orders the marks of a letter (fatha before shadda). Only letters
- * (Lo) are name characters: Arabic-Indic digits, Arabic punctuation, Quranic annotation marks and format characters
- * are not. A particle such as `آل` or `بن` is an ordinary word. See docs/sources/SA.md "Names".
+ * the superscript alef U+0670 (Script=Inherited) are allowed after a letter, never at the start of a word. The tatweel
+ * U+0640 (Script=Common) is typographic stretching and is removed, so a stretched and a plain spelling are one value.
+ * The Persian kaf U+06A9 and yeh U+06CC, which a Persian keyboard types, are stored as the Arabic kaf U+0643 and yeh
+ * U+064A. A word-final Persian yeh may also stand for the alef maqsura U+0649 (`مصطفی` is stored as `مصطفي`, apart from
+ * `مصطفى`): it is dotless in that position, and no fold is right for both readings. NFC joins `ا` + U+0654 with `أ` and
+ * orders the marks of a letter (fatha before shadda). Only letters (Lo) are name characters: Arabic-Indic digits,
+ * Arabic punctuation, Quranic annotation marks and format characters are not. A particle such as `آل` or `بن` is an
+ * ordinary word. See docs/sources/SA.md "Names".
  */
 abstract class AbstractArabicNamePart extends AbstractNamePart
 {

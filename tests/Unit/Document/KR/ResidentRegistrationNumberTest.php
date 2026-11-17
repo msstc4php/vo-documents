@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MSSTC4PHP\ValueObject\Documents\Tests\Unit\Document\KR;
 
+use LogicException;
 use MSSTC4PHP\ValueObject\Documents\Document\KR\ResidentRegistrationNumber;
 use MSSTC4PHP\ValueObject\Documents\Internal\Digits;
 use MSSTC4PHP\ValueObject\Documents\Internal\KoreanRegistrationNumber;
@@ -11,6 +12,7 @@ use MSSTC4PHP\ValueObject\Documents\Internal\Mask;
 use MSSTC4PHP\ValueObject\Documents\Internal\Text;
 use MSSTC4PHP\ValueObject\Documents\Sex;
 use MSSTC4PHP\ValueObject\Documents\Tests\Fixture\RefusesWithoutEchoingInput;
+use MSSTC4PHP\ValueObject\Documents\Tests\Fixture\TamperedValue;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\UsesClass;
@@ -27,6 +29,7 @@ use PHPUnit\Framework\TestCase;
 final class ResidentRegistrationNumberTest extends TestCase
 {
     use RefusesWithoutEchoingInput;
+    use TamperedValue;
 
     /**
      * @return iterable<string, array{string, string}>
@@ -125,5 +128,34 @@ final class ResidentRegistrationNumberTest extends TestCase
             $input,
             $message,
         );
+    }
+
+    /**
+     * @return iterable<string, array{string, 'birthDate'|'sex'}>
+     */
+    public static function tamperedValues(): iterable
+    {
+        yield 'letter as the seventh digit, sex' => ['900101X234567', 'sex'];
+        yield 'letter as the seventh digit, birth date' => ['900101X234567', 'birthDate'];
+        yield 'too short, sex' => ['900101', 'sex'];
+        yield 'month 13' => ['9013015234567', 'birthDate'];
+        yield 'day 32' => ['9001325234567', 'birthDate'];
+    }
+
+    /**
+     * @param 'birthDate'|'sex' $accessor
+     */
+    #[DataProvider('tamperedValues')]
+    public function testATamperedValueFailsWithFixedText(string $value, string $accessor): void
+    {
+        $number = self::tampered(ResidentRegistrationNumber::class, $value);
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Korean registration number validated by normalize().');
+
+        match ($accessor) {
+            'sex' => $number->sex(),
+            'birthDate' => $number->birthDate(),
+        };
     }
 }
