@@ -88,6 +88,10 @@ final class NamePartsTest extends TestCase
         yield 'zero-width joiner after a hyphen' => ["राज-\u{200D}ेश", 'invalid character'];
         yield 'two joiners in a row' => ["क\u{200D}\u{200C}ष", 'invalid character'];
         yield 'zero-width space' => ["राज\u{200B}ेश", 'invalid character'];
+        yield 'lone virama' => ["\u{094D}", 'invalid character'];
+        yield 'lone nukta' => ["\u{093C}", 'invalid character'];
+        yield 'word starting with a vowel sign' => ["\u{0947}\u{0936}", 'invalid character'];
+        yield 'second word starting with a vowel sign' => ["राज \u{0947}श", 'invalid character'];
         yield 'leading hyphen' => ['-राजेश', 'invalid character'];
         yield 'apostrophe' => ["राज'ेश", 'invalid character'];
     }

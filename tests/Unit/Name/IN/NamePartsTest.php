@@ -42,6 +42,8 @@ final class NamePartsTest extends TestCase
         yield 'two words, spaces collapsed' => ['  Piyush   Kumar ', 'Piyush Kumar'];
         yield 'surname of two words (MEA: Roy Choudhary)' => ['Roy Choudhary', 'Roy Choudhary'];
         yield 'surname Das Gupta' => ['Das Gupta', 'Das Gupta'];
+        yield 'initial as a letter (MEA: initials are not written, but an existing name is not refused)' => ['Piyush K', 'Piyush K'];
+        yield 'initials as letters' => ['P K', 'P K'];
         yield 'hyphen' => ['Roy-Choudhary', 'Roy-Choudhary'];
         yield 'apostrophe, typographic form stored as ASCII' => ["D\u{2019}Souza", "D'Souza"];
         yield 'diacritic' => ['Sreeniváisan', 'Sreeniváisan'];

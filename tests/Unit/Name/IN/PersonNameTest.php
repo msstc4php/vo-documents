@@ -19,6 +19,7 @@ use MSSTC4PHP\ValueObject\Documents\Name\IdentifierSpellings;
 use MSSTC4PHP\ValueObject\Documents\Name\IN\Devanagari\AbstractDevanagariNamePart;
 use MSSTC4PHP\ValueObject\Documents\Name\IN\Devanagari\GivenName as DevanagariGivenName;
 use MSSTC4PHP\ValueObject\Documents\Name\IN\GivenName;
+use MSSTC4PHP\ValueObject\Documents\Name\IN\IndianFullName;
 use MSSTC4PHP\ValueObject\Documents\Name\IN\PersonName;
 use MSSTC4PHP\ValueObject\Documents\Name\IN\PersonNameCodec;
 use MSSTC4PHP\ValueObject\Documents\Name\IN\Surname;
@@ -58,6 +59,7 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(Cyrillic::class)]
 #[UsesClass(UnicodeText::class)]
 #[UsesClass(Optional::class)]
+#[UsesClass(IndianFullName::class)]
 #[UsesClass(PayloadFields::class)]
 #[UsesClass(Text::class)]
 #[UsesClass(LatinForm::class)]

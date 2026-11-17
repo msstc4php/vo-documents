@@ -20,6 +20,7 @@ use MSSTC4PHP\ValueObject\Documents\Name\IN\Devanagari\GivenName;
 use MSSTC4PHP\ValueObject\Documents\Name\IN\Devanagari\PersonName;
 use MSSTC4PHP\ValueObject\Documents\Name\IN\Devanagari\PersonNameCodec;
 use MSSTC4PHP\ValueObject\Documents\Name\IN\Devanagari\Surname;
+use MSSTC4PHP\ValueObject\Documents\Name\IN\IndianFullName;
 use MSSTC4PHP\ValueObject\Documents\Tests\Fixture\RefusesNameWithoutEchoingInput;
 use MSSTC4PHP\ValueObject\Exception\InvalidPayloadException;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -38,6 +39,7 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(AbstractNamePart::class)]
 #[UsesClass(IcaoPersonName::class)]
 #[UsesClass(Optional::class)]
+#[UsesClass(IndianFullName::class)]
 #[UsesClass(PayloadFields::class)]
 #[UsesClass(Text::class)]
 #[UsesClass(UnicodeText::class)]

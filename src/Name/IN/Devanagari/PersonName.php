@@ -7,7 +7,7 @@ namespace MSSTC4PHP\ValueObject\Documents\Name\IN\Devanagari;
 use MSSTC4PHP\ValueObject\Contract\ValueObject;
 use MSSTC4PHP\ValueObject\Documents\Icao\PersonName as IcaoPersonName;
 use MSSTC4PHP\ValueObject\Documents\Internal\Optional;
-use MSSTC4PHP\ValueObject\Documents\Internal\Text;
+use MSSTC4PHP\ValueObject\Documents\Name\IN\IndianFullName;
 use MSSTC4PHP\ValueObject\Documents\Name\PersonName as NationalPersonName;
 use Override;
 
@@ -38,11 +38,7 @@ final readonly class PersonName implements NationalPersonName
     #[Override]
     public function full(): string
     {
-        return Text::nonEmpty(
-            $this->surname instanceof Surname
-                ? $this->given->value . ' ' . $this->surname->value
-                : $this->given->value,
-        );
+        return IndianFullName::of($this->given, $this->surname);
     }
 
     #[Override]

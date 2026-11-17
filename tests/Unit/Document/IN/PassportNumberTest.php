@@ -37,7 +37,7 @@ final class PassportNumberTest extends TestCase
         yield 'MEA old-passport specimen' => ['B5007771', 'B5007771'];
         yield 'lower case, separators, NBSP' => ["j 1234-002\u{00A0}", 'J1234002'];
         yield 'fullwidth' => ["\u{FF2A}\u{FF11}\u{FF12}\u{FF13}\u{FF14}\u{FF10}\u{FF10}\u{FF12}", 'J1234002'];
-        yield 'two letters, as a newer series may have' => ['AB123456', 'AB123456'];
+        yield 'any 8 letters or digits (format only)' => ['AB123456', 'AB123456'];
     }
 
     #[DataProvider('validNumbers')]

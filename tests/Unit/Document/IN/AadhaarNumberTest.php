@@ -15,7 +15,7 @@ use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
 
 /**
- * Expectations follow docs/sources/IN.md "Aadhaar number": 12 digits, first digit 2-9, Verhoeff check digit, UIDAI's
+ * Expectations follow docs/sources/IN.md "Aadhaar number": 12 digits, Verhoeff check digit, UIDAI's
  * masked form.
  */
 #[CoversClass(AadhaarNumber::class)]
@@ -39,6 +39,8 @@ final class AadhaarNumberTest extends TestCase
         yield 'Arabic-Indic digits' => ["\u{0662}\u{0663}\u{0664}\u{0665}\u{0666}\u{0667}\u{0668}\u{0669}\u{0660}\u{0661}\u{0662}\u{0664}", '234567890124'];
         yield 'first digit 2' => ['200000000009', '200000000009'];
         yield 'first digit 9' => ['999999999999', '999999999999'];
+        yield 'first digit 0 is not refused' => ['000000000003', '000000000003'];
+        yield 'first digit 1 is not refused' => ['123456789010', '123456789010'];
         yield 'first digit 7' => ['700000000016', '700000000016'];
     }
 
@@ -73,8 +75,6 @@ final class AadhaarNumberTest extends TestCase
         yield 'letter' => ['23456789012A', $name . ' (invalid character).'];
         yield 'punctuation' => ['23456789012.', $name . ' (invalid character).'];
         yield 'Devanagari digits are not folded' => ["\u{0968}\u{0969}\u{096A}\u{096B}\u{096C}\u{096D}\u{096E}\u{096F}\u{0966}\u{0967}\u{0968}\u{096A}", $name . ' (invalid character).'];
-        yield 'first digit 0 (Verhoeff valid)' => ['000000000003', $name . ' (invalid first digit).'];
-        yield 'first digit 1 (Verhoeff valid)' => ['123456789010', $name . ' (invalid first digit).'];
         yield 'wrong check digit' => ['234567890125', $name . ' checksum.'];
         yield 'adjacent transposition' => ['234567890214', $name . ' checksum.'];
         yield 'single digit error' => ['234567890134', $name . ' checksum.'];

@@ -8,7 +8,6 @@ use MSSTC4PHP\ValueObject\Contract\ValueObject;
 use MSSTC4PHP\ValueObject\Documents\Exception\InvalidPersonNameException;
 use MSSTC4PHP\ValueObject\Documents\Icao\PersonName as IcaoPersonName;
 use MSSTC4PHP\ValueObject\Documents\Internal\Optional;
-use MSSTC4PHP\ValueObject\Documents\Internal\Text;
 use MSSTC4PHP\ValueObject\Documents\Name\Latin\AbstractLatinPersonName;
 use MSSTC4PHP\ValueObject\Documents\Name\Latin\LatinPersonNameBuilder;
 use MSSTC4PHP\ValueObject\Documents\Name\TransliterationVariant;
@@ -51,11 +50,7 @@ final readonly class PersonName extends AbstractLatinPersonName
     #[Override]
     public function full(): string
     {
-        return Text::nonEmpty(
-            $this->surname instanceof Surname
-                ? $this->given->value . ' ' . $this->surname->value
-                : $this->given->value,
-        );
+        return IndianFullName::of($this->given, $this->surname);
     }
 
     #[Override]
