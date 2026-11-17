@@ -1,0 +1,33 @@
+<?php
+
+declare(strict_types=1);
+
+namespace MSSTC4PHP\ValueObject\Documents\Name\CN;
+
+use MSSTC4PHP\ValueObject\Documents\Icao\PersonName as IcaoPersonName;
+use MSSTC4PHP\ValueObject\Documents\Name\RequiredLatin\AbstractFamilyGivenPersonNameCodec;
+use Override;
+
+/**
+ * @extends AbstractFamilyGivenPersonNameCodec<PersonName>
+ */
+final readonly class PersonNameCodec extends AbstractFamilyGivenPersonNameCodec
+{
+    #[Override]
+    public function valueObjectClass(): string
+    {
+        return PersonName::class;
+    }
+
+    #[Override]
+    protected function shape(): string
+    {
+        return 'Expected a Chinese person name payload with string "family", "given" and "latin", and no other keys.';
+    }
+
+    #[Override]
+    protected function create(string $family, string $given, IcaoPersonName $latin): PersonName
+    {
+        return new PersonName(FamilyName::from($family), GivenName::from($given), $latin);
+    }
+}
