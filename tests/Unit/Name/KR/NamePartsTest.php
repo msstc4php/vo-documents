@@ -46,6 +46,7 @@ final class NamePartsTest extends TestCase
         yield 'decomposed 김' => ["\u{1100}\u{1175}\u{11B7}", '김'];
         yield 'foreign name written in Hangul, with a space' => ['마이클  존슨', '마이클 존슨'];
         yield 'foreign name, middle dot' => ["사라\u{00B7}알리", "사라\u{00B7}알리"];
+        yield 'foreign name, hyphen' => ['장-피에르', '장-피에르'];
         yield 'surrounding spaces' => ['  김 ', '김'];
     }
 
@@ -73,7 +74,10 @@ final class NamePartsTest extends TestCase
         yield 'katakana' => ['サクラ', $characters];
         yield 'Cyrillic' => ['Ким', $characters];
         yield 'digit' => ['김1', $characters];
-        yield 'hyphen' => ['김-민', $characters];
+        yield 'leading hyphen' => ['-김', $characters];
+        yield 'trailing hyphen' => ['김-', $characters];
+        yield 'doubled hyphen' => ['김--민', $characters];
+        yield 'hyphen and space in a row' => ['김- 민', $characters];
         yield 'apostrophe' => ["김'민", $characters];
         yield 'leading dot' => ["\u{00B7}김", $characters];
         yield 'trailing dot' => ["김\u{00B7}", $characters];

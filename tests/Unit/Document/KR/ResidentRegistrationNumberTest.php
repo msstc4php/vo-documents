@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace MSSTC4PHP\ValueObject\Documents\Tests\Unit\Document\KR;
 
-use DateTimeZone;
 use MSSTC4PHP\ValueObject\Documents\Document\KR\ResidentRegistrationNumber;
 use MSSTC4PHP\ValueObject\Documents\Internal\Digits;
 use MSSTC4PHP\ValueObject\Documents\Internal\KoreanRegistrationNumber;
@@ -84,7 +83,6 @@ final class ResidentRegistrationNumberTest extends TestCase
         self::assertSame($sex, $number->sex());
         self::assertSame($date . ' 00:00:00', $number->birthDate()->format('Y-m-d H:i:s'));
         self::assertSame('UTC', $number->birthDate()->getTimezone()->getName());
-        self::assertEquals(new DateTimeZone('UTC'), $number->birthDate()->getTimezone());
     }
 
     public function testMasksAllButTheLastFour(): void

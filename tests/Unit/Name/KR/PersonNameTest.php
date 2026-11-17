@@ -129,7 +129,7 @@ final class PersonNameTest extends TestCase
     {
         self::assertNameRefusedWithoutEcho(
             static fn (): PersonName => new PersonNameCodec()->decode($payload),
-            'Minjun',
+            'KIM<<MINJUN',
             self::SHAPE,
             InvalidPayloadException::class,
         );
