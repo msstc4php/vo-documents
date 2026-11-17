@@ -128,3 +128,75 @@ too long, is refused without a Latin override with "(no Latin form)" or "(Latin 
 A passport may carry a spelling outside the table (a foreign spelling on documents, or OH and others after
 consultation), so any valid ICAO name is kept as the override (`AnyIcaoSpelling`), as for RU. Nothing checks it
 against the readings. 【別名併記】 (a second name in brackets) is not modelled.
+
+## Documents
+
+All dates UTC. Sources read 2026-11-17 (10:09-10:15 UTC).
+
+| Document | Source | Where read |
+|---|---|---|
+| 個人番号 (My Number) | 行政手続における特定の個人を識別するための番号の利用等に関する法律に規定する個人番号、個人番号カード、特定個人情報の提供等に関する命令 (平成26年総務省令第85号; 総務省 / デジタル庁), Art. 5 (revision `426M60000008085_20261015_508M60004008021`, in force 2026-10-15) | text through the e-Gov API <https://laws.e-gov.go.jp/api/1/lawdata/426M60000008085>; the two formula figures read as images from <https://laws.e-gov.go.jp/api/2/attachment/426M60000008085_20261015_508M60004008021?src=./pict/2JH00000016997.jpg> and `…016998.jpg` |
+| 個人番号 worked procedure | 地方公共団体情報システム機構 (J-LIS), 月刊 J-LIS 2015-07, 番号移行サポートセンター Q&A 問1 | Internet Archive copy <https://web.archive.org/web/2020/https://j-lis.go.jp/data/open/cnt/3/1282/1/H2707_qa.pdf> (the live host answered an HTML error page) |
+| 基礎年金番号 | 日本年金機構, 基礎年金番号とは何ですか。 (updated 2023-04-28) | <https://www.nenkin.go.jp/section/faq/seidozenpan/kisoban/kisonenkinbango/20140807-02.html> |
+| 在留カード番号 | 厚生労働省 島根労働局, 外国人雇用状況の届出様式の記入要領 | <https://jsite.mhlw.go.jp/shimane-roudoukyoku/content/contents/001640228.pdf> |
+| Passport number | 外務省, 旅券への別名併記の記載方法変更 (sample `AB1234567`); 神奈川県 パスポートの読みかた等 | Internet Archive copy <https://web.archive.org/web/2025/https://www.mofa.go.jp/mofaj/files/100130952.pdf>; <https://www.pref.kanagawa.jp/docs/h6d/passport/aboutpass.html> |
+| 運転免許証の暗証番号 | 奈良県警察 | <https://www.police.pref.nara.jp/0000006927.html> |
+
+Hosts that failed (2026-11-17): `www.mofa.go.jp` (live pages: Access Denied; the Internet Archive copies read),
+`www.moj.go.jp` and `lapse-immi.moj.go.jp` (the Immigration Services Agency, 403 from CloudFront on every page tried),
+`j-lis.go.jp` (HTML error instead of the PDF; the archive copy reads). Not used (aggregators and blogs, never a rule):
+digitalforensic.jp, abbma2.sakura.ne.jp, resource-sharing.co.jp, gazoo.com, the licence explainers.
+
+### My Number (個人番号) — covered: `Document\JP\MyNumber`
+
+J-LIS (番号法施行令 Art. 8, quoted there): "個人番号は11桁の番号と１桁の検査用数字で構成される". 総務省令 Art. 5
+(verbatim; the formula is a figure): "令第六条の総務省令で定める算式は、次に掲げる算式とする。" The figure reads
+`11 - (Σ[n=1..11] Pn×Qn を11で除した余り)`, then "ただし、…を１１で除した余り≦１の場合は、０とする。" and
+"Ｐｎ　個人番号を構成する検査用数字以外の十一桁の番号の最下位の桁を１桁目としたときのｎ桁目の数字
+Ｑｎ　１≦ｎ≦６のとき　ｎ＋１　７≦ｎ≦１１のとき　ｎ－５". J-LIS's worked procedure: weights 2,3,4,5,6,7,2,3,4,5,6 from the
+last of the 11 digits, sum, divide by 11, "11より余りを引いた値がチェックデジット", remainder 0 or 1 gives 0.
+
+Implemented: 12 digits, the check digit as above. Neither the ordinance nor J-LIS publishes an example number; the test
+vectors are computed by hand from the formula (`12345678901` -> sum 212, remainder 3, check 8, so `123456789018`; the
+remainders 0, 1, 2 and 10 each have a case). No display form is quoted, so no `formatted()`; the 4-4-4 grouping printed on
+the card is accepted as separators only. Mask: last 4 (no rule). The 法人番号 is a different number, not covered.
+
+### Basic Pension Number (基礎年金番号) — covered, format only: `Document\JP\BasicPensionNumber`
+
+日本年金機構 (verbatim): "基礎年金番号とは、すべての公的年金制度で共通して使用する1人に1つの番号です。" and "基礎年金番号は、4桁と6桁の数字を組み合わせた10桁の数字です。"
+Ten digits. The agency publishes no check rule and no meaning of the 4 and 6 digit parts, and no display form: no
+accessor, no `formatted()`. Mask: last 4.
+
+### Residence card number (在留カード番号) — covered, format only: `Document\JP\ResidenceCardNumber`
+
+厚生労働省 島根労働局 (government form instructions, verbatim): "在留カードの右上に記載されている12桁（英字２桁ｰ数字８桁ｰ英字２桁）の番号を記入してください。"
+Two letters, eight digits, two letters; the hyphens are separators and are dropped. The Immigration Services Agency
+pages (`moj.go.jp`) returned 403, so the letters' meaning and any check rule could not be read there; a trade page says
+the agency publishes no numbering rule and another claims a checksum without a source, so none is enforced. Mask: last 4.
+Letters are `A-Z` only (no `I`/`O` exclusion is published; two commercial pages warn of confusing `O` with `0`, which is
+a typing tip, not a rule).
+
+### Passport number — covered, format only: `Document\JP\PassportNumber`
+
+外務省 sample in 旅券への別名併記の記載方法変更: `旅券番号/Passport No. AB1234567`. 神奈川県 (verbatim): "旅券番号 英字2桁と数字7桁の旅券番号".
+Two letters and seven digits. The same page lists passports of applications up to 2025-03-23 and from 2025-03-24 and
+gives one description for the number field. No check rule and no meaning of the letters is published (a description of
+`M` = 5 years and `T` = 10 years exists only in an encyclopedia, not enforced). The number is not carried over on
+renewal (MOFA 2021-09-14, "更新する前に所持していたパスポートと同じ番号を引き継ぐことはできません"), which is why it is no
+person identifier. Mask: last 4.
+
+### Driving licence number (運転免許証番号) — NOT covered
+
+The 12-digit layout (commission code, year, serial, check digit, reissue count) appears only in explainers and blogs,
+which also disagree on the position of the check digit and the reissue count. No government text read gives the length
+or the layout: 道路交通法施行規則 (e-Gov, all 335M50000002060 text searched for 免許証番号, 十二桁, 公安委員会コード, 検査) has
+no format; 奈良県警察 says only that the IC card PIN 1 is taken from "運転免許証の番号のうち5桁目から8桁目". The NPA notice
+"運転免許証の番号の形式及び内容について" named by a search engine could not be found. Under the owner's rule neither the
+length, the commission-code accessor nor the check digit is published, so the class is left out; adding it needs an
+official copy of that notice. (Hokkaido has five commissions, so the code would be a string accessor, not an ISO
+3166-2 code.)
+
+### Other residence and identity documents — NOT covered
+
+個人番号カード (the card number), 特別永住者証明書 (a different number from the 在留カード, no published format read) and
+the 在留カード's old 外国人登録証明書 number are not covered.
