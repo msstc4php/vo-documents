@@ -3,7 +3,8 @@
 Value objects for identity documents and personal names of the world's largest economies, with ICAO Doc 9303 Latin
 names. Built on [`msstc4php/vo-base`](https://github.com/msstc4php/vo-base); PHP >= 8.4. Today: the Russian Federation,
 Australia, Germany, France, Italy, Spain, the Netherlands, Switzerland, the United Kingdom, Türkiye, the United States,
-Canada, Mexico and Brazil (names, national documents and, where an official format is published, subnational ones).
+Canada, Mexico, Brazil, China, Japan, South Korea, India, Indonesia and Saudi Arabia (names, national documents and,
+where an official format is published, subnational ones).
 
 Every format, checksum and table cites its official source on the class (`@see`); the full notes, with quotes and the
 places where the sources disagree with the obvious guess, are in [`docs/sources/`](docs/sources).
@@ -44,6 +45,11 @@ Snils::tryFrom('112-233-445-96');         // null (checksum)
 message names the document and the length or the reason ("Invalid SNILS (14 characters).", "Invalid SNILS
 checksum."); **it never contains the input or any part of it**.
 
+A number typed on a CJK or Arabic keyboard reads as the ASCII one: every document number folds fullwidth digits and
+letters (`１２３`, `Ｘ`; letters are upper-cased) and Arabic-Indic digits (U+0660-0669, U+06F0-06F9) to ASCII, and
+strips the ideographic space U+3000 with the other separators (space, hyphen, tab, NBSP, U+2007, U+202F). Devanagari
+digits are not folded. Names do not fold: a compatibility character in a name is refused.
+
 `__toString()` and `jsonSerialize()` return the full canonical value. Masking is an explicit, separate call,
 `masked()` (interface `Contract\Maskable`). No masking rule is official unless the class says so; the default keeps the
 last four characters, and a number of 8 characters or fewer keeps three (CH identity document, GB Northern Ireland
@@ -64,7 +70,7 @@ licence). The AU classes keep three (their numbers are at most 10 characters lon
 | `Document\AU\DriverLicence\{Act,Nsw,Nt,Qld,Sa,Tas,Vic,Wa}DriverLicenceNumber` | Licence number per state or territory | shape only | Home Affairs DVS field rules |
 | `Document\AU\Jurisdiction` | The eight states and territories (enum, ISO 3166-2:AU) | n/a | ISO 3166-2:AU |
 
-### European documents
+### Documents by country
 
 "Checksum verified" means the algorithm is quoted from an official source (given in the last column and on the class);
 "format only" means the shape is checked and the check digit, if the number has one, is **not** verified because no
@@ -131,16 +137,40 @@ official algorithm is published. A number with the right shape is accepted, neve
 | `Document\BR\IdentityCard\SpIdentityCardNumber` | RG of the São Paulo Carteira de Identidade (IIRGD), 1-8 digits + check character (`12.345.678-2`) | check character verified (SSP-SP form's `checaRG`: weights 2-9 from the right, sum % 11, 10 → `X`); all zeros refused | none | SSP-SP Atestado de Antecedentes Criminais form and `aac.js` |
 | `Document\BR\Jurisdiction` | The 27 federative units (enum, ISO 3166-2:BR) | n/a | n/a | ISO 3166-2:BR |
 | `Document\BR\IdentityCardNumber`, `Document\BR\IdentityCardNumberFactory` | Interface of the one covered RG class and its factory | n/a | n/a | the SSP-SP form above |
+| `Document\CN\CitizenIdentityNumber` | 公民身份号码, 18 characters (also the number of the Hong Kong, Macao and Taiwan resident permit) | checksum verified (ISO 7064 MOD 11-2, `x` stored as `X`); birth date must exist; the 15-digit number is refused | `HasBirthDate`, `HasSex` (odd sequence code: man), `administrativeDivisionCode()` (GB/T 2260 string, not ISO) | GB 11643-1999; Resident Identity Card Law |
+| `Document\CN\ForeignerPermanentResidenceNumber` | Foreigner's permanent residence ID card since 2023-12-01, 18 characters starting with 9 | checksum verified (MOD 11-2, "与公民身份号码校验方式相同"); birth date must exist | `HasBirthDate`, `applicationPlaceCode()`, `nationalityCode()` (strings: the code lists are not named) | NIA notice on the new card |
+| `Document\CN\LegacyForeignerPermanentResidenceNumber` | Foreigner's permanent residence permit and 2017 ID card, 3 letters + 12 digits | format only (no check algorithm named; two-digit year) | `nationalityCode()` (the 3 letters) | NIA |
+| `Document\CN\OrdinaryPassportNumber` | Ordinary passport: `E` + 8 digits, `E` + letter + 7 digits (from April 2017), `G` + 8 digits | format only | none | NIA |
+| `Document\CN\ExitEntryPermitToHongKongMacauNumber` | 往来港澳通行证, `C` + 8 digits or `C` + letter + 7 digits (from 2025-10-15) | format only | none | NIA |
+| `Document\CN\ExitEntryPermitToTaiwanNumber` | 往来台湾通行证, `L` + 8 digits (older permit `T` + 8 digits) | format only | none | NIA |
+| `Document\JP\MyNumber` | 個人番号, 12 digits | checksum verified (総務省令 Art. 5) | none | 番号法施行令 Art. 8; 総務省令 Art. 5 |
+| `Document\JP\BasicPensionNumber` | 基礎年金番号, 10 digits | format only | none | 日本年金機構 |
+| `Document\JP\ResidenceCardNumber` | 在留カード番号, 2 letters + 8 digits + 2 letters | format only | none | 厚生労働省 (島根労働局) filing instructions |
+| `Document\JP\PassportNumber` | Passport, 2 letters + 7 digits | format only | none | 外務省 |
+| `Document\JP\DrivingLicenceNumber` | 運転免許証の番号, 12 digits (the マイナ免許証 number has the same layout) | check digit not verified (the notice names "モジュラス11" without weights) | `publicSafetyCommissionCode()` (string, not ISO), `yearSymbol()`, `serialNumber()`, `reissueSymbol()` | 警察庁丁運発第76号 (2025-03-10) |
+| `Document\KR\ResidentRegistrationNumber` | 주민등록번호, 13 digits | birth date must exist in the century of the 7th digit; no check digit verified (random digits since 2020-10) | `HasBirthDate`, `HasSex` | 주민등록법 시행규칙 Art. 2; 국가기록원; 행정안전부 |
+| `Document\KR\ForeignerRegistrationNumber` | 외국인등록번호, 13 digits (7th digit 5-8) | birth date must exist; no check digit | `HasBirthDate`, `HasSex` (법무부: 5 and 7 man, 6 and 8 woman) | 출입국관리법 시행규칙 별표 2; 법무부 release of 2023-03-28 |
+| `Document\KR\OrdinaryPassportNumber` | Multiple-entry (복수) `M` series: `M` + 8 digits, or `M` + 3 digits + letter + 4 digits (from 2021-12-21) | format only | none | 외교부 여권안내 |
+| `Document\KR\DrivingLicenceNumber` | 운전면허번호: 12 digits (from 2014-07-02) or the region name + 10 digits | region name checked against KoROAD's table; no check digit | `regionCode()` (string, not ISO), `formatted()` | 도로교통공단 (KoROAD) |
+| `Document\IN\AadhaarNumber` | Aadhaar, 12 digits | Verhoeff check digit (UIDAI's own paper *recommends* it); no first-digit rule | none; `masked()` is UIDAI's `XXXX XXXX 1234` | UIDAI "A UID Numbering Scheme" (2010) |
+| `Document\IN\PermanentAccountNumber` | PAN, 10 characters (`BLGPS1234D`) | layout of the Income Tax Department tutorial (`0000` refused); the check letter is not verified | `holderType()` (`PanHolderType`, the 4th character) | Income Tax Department |
+| `Document\IN\PassportNumber` | Passport, 8 characters | length and ASCII letters and digits only | none | MEA passport data page structure |
+| `Document\IN\AbhaNumber` | ABHA number, 14 digits | format only | none | PIB explainer, Ministry of Health and Family Welfare |
+| `Document\ID\NationalIdentityNumber` | NIK, 16 digits (also the driving licence number since July 2024) | birth date must exist (a woman's day plus 40); 29 February when the two-digit year is divisible by four | `HasSex`, `regionCode()` (string, not ISO), `birthDay()`, `birthMonth()`, `birthYearDigits()` | Ditjen Dukcapil |
+| `Document\ID\TaxpayerNumber` | NPWP, 15 digits (`99.999.999.9-999.999`) or 16 digits; all zeros refused | format only | `isFifteenDigits()`, `formatted()` (15 digits) | DJP PENG-6/PJ.09/2024; PMK 112/2022 |
+| `Document\ID\FamilyCardNumber` | Nomor Kartu Keluarga, 16 digits | format only | none | Ditjen Dukcapil |
+| `Document\SA\NationalIdentityNumber` | National ID number, 10 digits starting with 1; **also the driving licence number** | first digit 1 (ZATCA BR-KSA-F-10, a warning there, a refusal here); no check digit | none | ZATCA SDK v3.4.4 announcement |
+| `Document\SA\IqamaNumber` | Iqama number, 10 digits starting with 2; **also the driving licence number** | first digit 2 (ZATCA BR-KSA-F-11); no check digit | none | ZATCA SDK v3.4.4 announcement |
 
 Names: `Name\<CC>\FamilyName`, `GivenName` and `PersonName` for DE, FR, IT, ES, NL, CH, GB, TR, US, CA, MX and BR, like
-the RU and AU ones. Spain's `PersonName` has two surnames (`first`, optional `second`); in the Dutch one the prefixes
-(`van der`) are part of the family name; the Swiss, Dutch, British, US and Canadian ones accept a person without a
-given name. The US one is `Name\US\PersonName($family, ?$given, ?$middle, ?$suffix)` (`given` null for a one-word
-name), the suffix a `Name\US\NameSuffix` (the AAMVA list `JR`, `SR`, `1ST`/`I` … `9TH`/`IX`), written last among the
-secondary identifiers of the ICAO form, ordinals as Roman numerals (`SMITH<<JOHN<MICHAEL<III`). The Canadian one is
-`Name\CA\PersonName($family, ?$given)` (`given` null for a one-word name; IRCC: the name goes in the surname field),
-letters of the Latin script (English and French names). The Mexican one is
-`Name\MX\PersonName(?$first, ?$second, $given)`: two surnames, one, or none (RENAPO records persons without surnames;
+the RU and AU ones; the Asian ones: see "Asian documents and names" below. Spain's `PersonName` has two surnames
+(`first`, optional `second`); in the Dutch one the prefixes (`van der`) are part of the family name; the Swiss, Dutch,
+British, US and Canadian ones accept a person without a given name. The US one is `Name\US\PersonName($family, ?$given,
+?$middle, ?$suffix)` (`given` null for a one-word name), the suffix a `Name\US\NameSuffix` (the AAMVA list `JR`, `SR`,
+`1ST`/`I` … `9TH`/`IX`), written last among the secondary identifiers of the ICAO form, ordinals as Roman numerals
+(`SMITH<<JOHN<MICHAEL<III`). The Canadian one is `Name\CA\PersonName($family, ?$given)` (`given` null for a one-word
+name; IRCC: the name goes in the surname field), letters of the Latin script (English and French names). The Mexican one
+is `Name\MX\PersonName(?$first, ?$second, $given)`: two surnames, one, or none (RENAPO records persons without surnames;
 then the given names are the only ICAO identifier, `JUAN`). The Brazilian one is `Name\BR\PersonName($family, $given)`:
 both required (CNJ Código Nacional de Normas art. 515-B), each part holding several words with particles in the case
 given (`da Silva`, `Maria da Conceição`).
@@ -148,10 +178,68 @@ given (`da Silva`, `Maria da Conceição`).
 Contracts: `Contract\Maskable` (every number above), `Contract\Subdivision` and `Contract\IssuedBySubdivision` (AU,
 US, CA, MX and BR jurisdictions, AU licences, US DL/ID numbers, CA licence and health card numbers, MX licence numbers,
 BR RG numbers). `Contract\HasSex` and the `Sex` enum are implemented by the documents that encode a sex
-(`Nir`, `FiscalCode`, the DVLA licence number, `ChiNumber`, the Québec NAM, the Mexican CURP); `Sex::Unspecified` is
-the CURP's `X` (RENAPO, non-binary persons). `Contract\HasBirthDate` is implemented by the Mexican CURP only (its
-17th character gives the century); the other encoded birth dates lack a century, so those classes expose the year
-digits, month and day instead, and impossible dates (30 February) are refused.
+(`Nir`, `FiscalCode`, the DVLA licence number, `ChiNumber`, the Québec NAM, the Mexican CURP, the Chinese citizen
+identity number, the Korean resident and foreigner registration numbers, the Indonesian NIK); `Sex::Unspecified` is
+the CURP's `X` (RENAPO, non-binary persons). `Contract\HasBirthDate` is implemented by the Mexican CURP (its 17th
+character gives the century), the Chinese citizen identity number and 2023 permanent residence number (a full
+`YYYYMMDD`) and the Korean resident and foreigner registration numbers (the 7th digit gives the century); the other
+encoded birth dates lack a century, so those classes expose the year digits, month and day instead (the NIK:
+`birthYearDigits()`), and impossible dates (30 February) are refused.
+
+### Asian documents and names
+
+```php
+use MSSTC4PHP\ValueObject\Documents\Document\CN\CitizenIdentityNumber;
+use MSSTC4PHP\ValueObject\Documents\Document\SA\IqamaNumber;
+use MSSTC4PHP\ValueObject\Documents\Icao\PersonName as IcaoPersonName;
+use MSSTC4PHP\ValueObject\Documents\Name\CN\{FamilyName, GivenName, PersonName};
+use MSSTC4PHP\ValueObject\Documents\Name\JP;
+
+$id = CitizenIdentityNumber::from('１１０１０５１９４９１２３１００２Ｘ');   // fullwidth digits fold: 11010519491231002X
+$id->birthDate();                                                   // 1949-12-31 00:00 UTC
+$id->sex();                                                         // Sex::Female
+IqamaNumber::from('٢٣٤٥٦٧٨٩٠١');                                    // Arabic-Indic digits fold: 2345678901
+
+// China, Korea, Indonesia, Saudi Arabia, Indian Devanagari: the Latin form of the passport is required, never derived.
+$name = new PersonName(FamilyName::from('张'), GivenName::from('伟'), IcaoPersonName::from('ZHANG<<WEI'));
+$whole = new PersonName(FamilyName::from('阿沛·阿旺晋美'), null, IcaoPersonName::from('NGAPOI<NGAWANG<JIGME'));
+
+// Japan: the derived Latin form is the MOFA Hepburn spelling of the readings.
+$jp = new JP\PersonName(
+    JP\FamilyName::from('山田'),
+    JP\GivenName::from('太郎'),
+    JP\FamilyNameReading::from('やまだ'),
+    JP\GivenNameReading::from('たろう'),
+);
+(string) $jp->latin();   // "YAMADA<<TARO"
+```
+
+- **Driving licences of CN, SA and ID have no class of their own.** The Chinese licence number is the holder's citizen
+  identity number (use `Document\CN\CitizenIdentityNumber`), and the Saudi licence carries the national ID or iqama
+  number (use `Document\SA\NationalIdentityNumber` or `Document\SA\IqamaNumber`). The Indonesian SIM number is the NIK
+  since July 2024 (use `Document\ID\NationalIdentityNumber`). JP and KR have a licence class.
+- **A name where the passport spelling is a personal choice never gets a guessed Latin form** (CN pinyin against
+  Cantonese or Wade-Giles, KR Kim or Gim, SA, ID, and the Devanagari names of IN). `Name\CN\PersonName` and
+  `Name\KR\PersonName` take `(family, ?given, latin)`; a name with no family and given split (a CN minority-nationality
+  name, a KR foreigner's name kept after naturalisation) is stored whole in `family` with `given` null.
+  `Name\ID\PersonName` is one `FullName` (Dukcapil records a single "Nama Lengkap") and the Latin form.
+  `Name\SA\PersonName` takes the given name, the optional `father`, `grandfather` and `family` names and the Latin form.
+  `Name\IN\Devanagari\PersonName` takes `(given, ?surname, latin)`. None of them checks the Latin form against the
+  national one beyond being a valid ICAO name; equality includes the Latin form.
+- **India in Latin letters** is `Name\IN\PersonName(given, ?surname, ?latin)`, separate from the Devanagari one (the
+  Passport Seva form: a person with no surname writes the whole name in the given part, ICAO `RAJESH<KUMAR`; derived
+  `JAIN<<PIYUSH<KUMAR`; policy `TransliterationVariant`).
+- **Japan** takes the 氏名 and the 振り仮名 of each part and derives the passport spelling by MOFA's Hepburn table
+  (`ん` is M before B, M and P; `っ` doubles the consonant; the long vowel `ー`, `おう`/`うう` and `おお` are omitted:
+  `さとう` is `SATO`). Kana cannot tell a long vowel from a morpheme boundary, so `井上` (いのうえ) is derived `INOE`
+  while the passport says `INOUE`: give that as the override. MOFA lets a passport carry another spelling (`ITOH`,
+  `OHNO`) on request, so the policy is `AnyIcaoSpelling`; a reading that starts with a small kana, `ん`, `っ` or `ー`
+  has no spelling and needs the override too.
+- **Scripts.** Name parts are checked with `\p{sc=Han}`, `\p{sc=Hangul}`, `\p{sc=Arabic}`, `\p{sc=Devanagari}` and the
+  like; the characters of a name that are Script=Common or Inherited are listed explicitly: `ー` U+30FC and `〆` U+3006
+  (JP), `·` U+00B7 (CN, KR; U+30FB and U+2022 are stored as U+00B7), the Arabic harakat U+064B-0652 and U+0670 (the
+  tatweel U+0640 is removed), the Devanagari ZWJ and ZWNJ between two letters. Hanja, Uyghur, Tibetan and Mongolian
+  script names are not covered.
 
 ### AU driving licences and the jurisdiction factory
 
@@ -209,7 +297,9 @@ HealthCardNumberFactory::fromNumber('9876543217');                     // Ambigu
 HealthCardNumberFactory::fromNumber('123456789');                      // AmbiguousJurisdictionException, 6 jurisdictions
 ```
 
-Both factories work like the AU and US ones. BC and SK licence numbers share every shape (1-8 digits, stored padded to
+Both factories work like the AU and US ones. When `HealthCardNumberFactory::fromNumber()` finds no match and the input
+is an Ontario card with a version code, its message points to `OnHealthCardNumber::fromCard()` (nothing of the input is
+echoed). BC and SK licence numbers share every shape (1-8 digits, stored padded to
 8), so a bare BC or SK number is always ambiguous: pass the issuer. All 13 health card formats are published (Ontario's
 reciprocal-billing table, checked against each province's own text where one exists). The ON version code is part of
 the card, not of the health number: two cards of one person have the same number and are equal, and they differ in
@@ -258,7 +348,8 @@ want both in one string). The RG of a CIN is its CPF: use `Document\BR\Cpf`. Old
 
 A national name part (`Name\RU\FamilyName`, `GivenName`, `Patronymic`, and `FamilyName`, `GivenName` of `Name\AU`,
 `Name\DE`, `Name\FR`, `Name\IT`, `Name\ES`, `Name\NL`, `Name\CH`, `Name\GB`, `Name\TR`, `Name\US`, `Name\CA`,
-`Name\MX`, plus `Name\US\MiddleName`) is NFC-normalised, trimmed, has inner whitespace runs collapsed to one space, and
+`Name\MX`, `Name\BR`, plus `Name\US\MiddleName`; the Asian name parts have the same rules in their own script) is
+NFC-normalised, trimmed, has inner whitespace runs collapsed to one space, and
 keeps its letter case. Limits: 100 characters per part. Russian parts accept only the 33 Russian letters; a Cyrillic
 name typed with Latin look-alikes (Latin `a`, `o`, `e`, `c`) is refused. A compatibility character (its NFKC form
 differs: fullwidth `Ｓｍｉｔｈ`, `ª`, the ligature `ﬁ`) is refused in every country, because it would be a second stored
@@ -319,6 +410,9 @@ then depends on the country's sources:
 | GB | any valid ICAO name (policy `AnyIcaoSpelling`) | HM Passport Office lets a passport carry an evidenced spelling (`docs/sources/GB.md`) |
 | CA | any valid ICAO name (policy `AnyIcaoSpelling`) | the Passport Program points to "alternative spellings" and lets an adult drop or invert given names (`docs/sources/CA.md`) |
 | BR | any valid ICAO name (policy `AnyIcaoSpelling`; `SANTOS<OLIVEIRA<<ANA` for `dos Santos de Oliveira, Ana`) | the Polícia Federal's passport system abbreviates a field over 30 characters (drops `de`, `da`, `dos`, then shortens words to one letter), and "a abreviação não configura erro no passaporte" (`docs/sources/BR.md`) |
+| JP | any valid ICAO name (policy `AnyIcaoSpelling`; `INOUE<<TARO` for 井上 いのうえ, derived `INOE<<TARO`) | MOFA writes a non-Hepburn spelling (`ITOH`, `OHNO`) on request (`docs/sources/JP.md` §4) |
+| IN (Latin letters) | only an ICAO spelling of the parts (policy `TransliterationVariant`) | no MEA text read lets a passport keep another spelling (`docs/sources/IN.md`) |
+| CN, KR, ID, SA, IN (Devanagari) | none: the Latin form is **required** and never derived, so there is nothing to override | the passport spelling is a personal choice (pinyin against Cantonese, Kim against Gim, Arabic transliteration); it is checked only as a valid `Icao\PersonName` |
 
 An override that is the derived form (also when it writes a hyphen as `<`) is not kept, so `latinOverride()` is null
 and the name equals the one built without it. Text that is no ICAO name (`IVANOV1<<IVAN`) is refused by
@@ -357,7 +451,8 @@ it as unsupported (a configuration error, not a 500 on request input). The inter
 ### Composite names need the codecs
 
 Document numbers and name parts are strings and need nothing. The composite names (`Name\<CC>\PersonName` of every
-country: RU, AU, DE, FR, IT, ES, NL, CH, GB, TR, US, CA, MX, BR) are read through a payload codec, so the mapper that the
+country: RU, AU, DE, FR, IT, ES, NL, CH, GB, TR, US, CA, MX, BR, CN, JP, KR, IN, ID, SA, and the Devanagari one of IN:
+21 codecs) are read through a payload codec, so the mapper that the
 bridge uses must be built with `Codecs::all()`:
 
 ```php
@@ -420,6 +515,13 @@ services:
     MSSTC4PHP\ValueObject\Documents\Name\CA\PersonNameCodec: ~
     MSSTC4PHP\ValueObject\Documents\Name\MX\PersonNameCodec: ~
     MSSTC4PHP\ValueObject\Documents\Name\BR\PersonNameCodec: ~
+    MSSTC4PHP\ValueObject\Documents\Name\CN\PersonNameCodec: ~
+    MSSTC4PHP\ValueObject\Documents\Name\JP\PersonNameCodec: ~
+    MSSTC4PHP\ValueObject\Documents\Name\KR\PersonNameCodec: ~
+    MSSTC4PHP\ValueObject\Documents\Name\IN\PersonNameCodec: ~
+    MSSTC4PHP\ValueObject\Documents\Name\IN\Devanagari\PersonNameCodec: ~
+    MSSTC4PHP\ValueObject\Documents\Name\ID\PersonNameCodec: ~
+    MSSTC4PHP\ValueObject\Documents\Name\SA\PersonNameCodec: ~
 ```
 
 ```php
@@ -478,6 +580,30 @@ Collected from the source notes; each is a deliberate omission with its reason i
   online forms limit the field at most (BA: eight digits with an optional control digit and no algorithm); the forms of
   BA, CE, MG, PE, RJ, RN and RS could not be read live on 2026-11-16 UTC and are to be re-checked
   (`docs/sources/BR.md`).
+- **CN:** the 港澳居民来往内地通行证 (回乡证) and 台湾居民来往大陆通行证 (台胞证) numbers (formats are published but were outside the
+  plan; the `HA`/`MA` shape beyond nine characters is not), the first-generation 15-digit citizen number (invalid since
+  2013-01-01, refused by length), official (公务), diplomatic (外交) and public-affairs (因公) passports, Hong Kong and
+  Macao SAR passports and every series other than the ordinary `E`/`G` (no published format), a check digit of the
+  15-character permanent residence number, the **driving licence** (its number is the citizen identity number: use
+  `CitizenIdentityNumber`), hukou, the social credit code, the military ID, and Uyghur, Tibetan and Mongolian script
+  names (`docs/sources/CN.md`).
+- **JP:** the 個人番号カード number, the 特別永住者証明書 number (no published format read), the old 外国人登録証明書 number,
+  the corporate number (法人番号), and the derivation of a long vowel across a morpheme boundary (井上 is derived `INOE`;
+  give the override `INOUE`) (`docs/sources/JP.md`).
+- **KR:** Hanja names, passports other than the multiple-entry `M` series (single-use and emergency 단수·긴급, official,
+  diplomatic and others: no published prefix), the 영주증 and 국내거소신고증 numbers as such, the 법인등록번호 and 사업자등록번호,
+  and a foreigner registration number whose birth date is not a calendar date (refused; an official practice for unknown
+  dates was not found) (`docs/sources/KR.md`).
+- **IN:** the EPIC (voter ID: the ECI text could not be read, legacy series exist), the driving licence number (no
+  official text states a structure; the 2+2+4+7 layout is on aggregators only), the Passport Seva file number, the ABHA
+  address, the Aadhaar Virtual ID (refused by length), voter-roll serial numbers, the ration card and state-issued
+  documents (`docs/sources/IN.md`).
+- **ID:** the SIM (driving licence) number (the NIK form is covered by `NationalIdentityNumber`, an old SIM number has
+  no quotable rule), the passport number (no Imigrasi text with the layout found), the BPJS Kesehatan number (regional
+  articles and secondary sites only), and the Kemendagri code list behind the NIK region code (`docs/sources/ID.md`).
+- **SA:** the border number (رقم الحدود: blogs only), the passport number (no Jawazat format found), a check digit of
+  the national ID and iqama number (none is published) and the **driving licence** (it carries the identity number:
+  use `NationalIdentityNumber` or `IqamaNumber`) (`docs/sources/SA.md`).
 - **No region value object for RU**: no field encodes a region with a published mapping to ISO 3166-2:RU (`RU.md`).
 - **RU driving licences of the 1999 form** (Cyrillic series): expired by 2026 (`RU.md`).
 - **RU old-form OMS policies** (series and number) and AU **11-digit Medicare individual numbers**.
@@ -487,6 +613,17 @@ Collected from the source notes; each is a deliberate omission with its reason i
 
 ## Limits to know about
 
+- **Asia, checksums:** verified are the CN citizen identity number and 2023 permanent residence number (ISO 7064 MOD
+  11-2, GB 11643), the JP My Number (総務省令) and the IN Aadhaar (Verhoeff). Format only: every other number of the six
+  countries, among them the JP driving licence check digit ("モジュラス11" without weights), the KR registration numbers
+  (random digits since 2020-10), the IN PAN check letter and the ID and SA numbers.
+- **Aadhaar and the Saudi first digit rest on thin texts:** UIDAI's 2010 paper only *recommends* Verhoeff, and the
+  first-digit rules 1 (national ID) and 2 (iqama) come from a ZATCA staff announcement on its developer forum, where
+  they are warnings (`docs/sources/IN.md`, `docs/sources/SA.md`). Both are enforced as refusals.
+- **Asia, derived Latin names:** only JP derives one (MOFA Hepburn); `井上` (いのうえ) is derived `INOE` and needs the
+  override `INOUE`. The other five countries require the Latin form of the passport.
+- **Birth dates:** a KR foreigner number with a non-calendar birth date and an ID NIK with an impossible date are
+  refused (the NIK as the spec says; 29 February is accepted for a two-digit year divisible by four).
 - **Format only, check digit not verified:** INN, TFN, Medicare card number, CA SIN, the CA health card numbers other
   than BC and ON, the MX CURP, RFC, NSS and clave de elector, and the BR título de eleitor and CNH registration number.
   No official algorithm is published (FNS says only "по алгоритму, определенному ФНС"; the ATO gives the TFN algorithm

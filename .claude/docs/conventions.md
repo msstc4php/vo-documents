@@ -86,3 +86,28 @@
   the raw input run in the `stored()` hook.
 - **Equivalent mutants with one covered subdivision:** `ArrayOneItem` on `coveredJurisdictions()` (MX, BR) escapes
   until a second subdivision is covered.
+
+## Asia (plan 4)
+
+- **Digit folding is package-wide for numbers, never for names.** `Internal\Digits::fold()` runs before every number
+  parse: fullwidth digits and letters (letters upper-cased) and Arabic-Indic digits (U+0660-0669, U+06F0-06F9) become
+  ASCII, and U+3000 is a separator. Devanagari digits are not folded (an Aadhaar typed in them is refused). A name part
+  refuses a compatibility character instead (it would be a second stored spelling).
+- **Script classes use `\p{sc=...}` only** (`Han`, `Hangul`, `Arabic`, `Devanagari`, `Latin`, `Cyrillic`). Characters of
+  a name that are Script=Common or Inherited are listed one by one, never through a wider class: `ー` U+30FC and `〆`
+  U+3006 (JP), `·` U+00B7 (CN, KR), the harakat U+064B-0652 and U+0670 (SA), the Devanagari ZWJ/ZWNJ (IN). The
+  tatweel U+0640 is removed, U+30FB and U+2022 are stored as U+00B7.
+- **Mandatory Latin name** (CN, KR, ID, SA, IN-Devanagari): the passport spelling is a personal choice, so the Latin
+  `Icao\PersonName` is a required constructor argument and a required codec key, never derived; nothing compares it with
+  the national form. `Name\RequiredLatin\AbstractFamilyGivenPersonName` (CN, KR) takes a nullable `given`: a name with
+  no family/given split is stored whole in `family`. ID, SA and IN-Devanagari have their own layouts. JP is the one
+  that derives (MOFA Hepburn) and so takes an optional override.
+- **A class name claims only what it covers:** `OrdinaryPassportNumber` (CN `E`/`G`, KR `M` series) refuses the other
+  series; the KR resident class refuses foreigner digits and the foreigner class resident digits.
+- **A document number that is another document's number gets no class** (CN and SA driving licence, ID SIM since
+  2024): README and the source note say which class to use.
+- **Regions and codes are plain strings** (`administrativeDivisionCode()`, `regionCode()`,
+  `publicSafetyCommissionCode()`, `nationalityCode()`) because the source codes do not map one to one to ISO 3166-2 (Hokkaido has five commissions,
+  KoROAD names are not ISO). No `Jurisdiction` enum for Asia.
+- **Line length is 120 characters in `src/` and `tests/`** (the rule of the style commit of plan 4). A URL in an `@see`
+  cannot be wrapped and is exempt; a long `\u{...}` string is split with `.` concatenation.

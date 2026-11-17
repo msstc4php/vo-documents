@@ -28,6 +28,23 @@
   México licence with `DriverLicenceNumberFactory`. BR: CPF, título de eleitor, NIS, CNS, CNH, passport and the São
   Paulo RG with `IdentityCardNumberFactory`. Each country has a `Jurisdiction` enum (ISO 3166-2: 51, 13, 32 and 27
   cases). Source notes `docs/sources/{US,CA,MX,BR}.md`.
+- - Asia and Saudi Arabia (plan 4): names (`Name\<CC>`, codecs in `Codecs::all()`, 21 in all) and documents for China,
+  Japan, South Korea, India, Indonesia and Saudi Arabia. CN: citizen identity number, 2023 and legacy foreigner
+  permanent residence numbers, ordinary passport, Hong Kong/Macao and Taiwan exit-entry permits. JP: My Number, basic
+  pension number, residence card, passport, driving licence. KR: resident and foreigner registration numbers,
+  multiple-entry passport, driving licence. IN: Aadhaar, PAN with `PanHolderType`, passport, ABHA number. ID: NIK, NPWP,
+  family card number. SA: national ID and iqama numbers (`AbstractIdentityNumber`). Names: CN, KR, ID, SA and the
+  Devanagari ones of IN require the Latin form of the passport and never derive it
+  (`Name\RequiredLatin\AbstractFamilyGivenPersonName` for CN and KR; a name with no family and given split is stored
+  whole in `family` with a null `given`); JP derives it by MOFA's Hepburn table from the 振り仮名
+  (`Name\JP\PassportHepburn`, override policy `AnyIcaoSpelling`); IN in Latin letters uses `TransliterationVariant`.
+  Source notes `docs/sources/{CN,JP,KR,IN,ID,SA}.md`.
+- Every document number folds fullwidth digits and letters and Arabic-Indic digits (U+0660-0669, U+06F0-06F9) to ASCII
+  and strips U+3000 (`Internal\Digits::fold()`), so numbers typed on a CJK or Arabic keyboard parse. Names do not fold.
+- `Name\Latin\AbstractLatinNamePart::wordWithAbbreviationDots()` (full stops after or between letters: `Moh.`, `M.A.`),
+  shared by the Mexican and Indonesian name parts.
+- `HealthCardNumberFactory::fromNumber()` points to `OnHealthCardNumber::fromCard()` in its no-match message for an
+  Ontario card with a version code.
 - `Name\Latin\AbstractLatinNamePart` and internal bases shared by the Latin-script countries (`LatinPersonNameBuilder`,
   `AbstractLatinPersonName`, `AbstractFamilyGivenPersonName`, `AbstractFamilyGivenPersonNameCodec`); `Name\AU\*` moved
   onto them with the same class names, constructors and methods. The public `family`/`given` properties of the family +
@@ -35,7 +52,8 @@
   analysers see the country's classes through `@extends`.
 - `Contract\HasSex` is implemented by `Nir`, `FiscalCode`, the DVLA licence number, `ChiNumber`, the Québec NAM and the
   Mexican CURP. `Contract\HasBirthDate` is implemented by the CURP only (its 17th character gives the century).
-- Source notes in `docs/sources/` (RU, AU, ICAO, DE, FR, IT, ES, NL, CH, GB, TR, US, CA, MX, BR).
+- - Source notes in `docs/sources/` (RU, AU, ICAO, DE, FR, IT, ES, NL, CH, GB, TR, US, CA, MX, BR, CN, JP, KR, IN, ID,
+  SA).
 
 ### Notes
 
@@ -77,7 +95,16 @@
   and their reasons are in README "Not covered" (`fromNumberIn()` throws "(format not covered)").
 - With one covered unit (MX licences, BR RG), `fromNumber()` assigns any fitting number to that unit; callers that
   know the issuer must use `fromNumberIn()`.
-- Name classes use `\p{sc=Latin}` and `\p{sc=Cyrillic}` (Script property): requires `lib-pcre >=10.40`.
+- - Asian decisions: checksums verified are the CN citizen identity and 2023 permanent residence numbers (ISO 7064 MOD
+  11-2), the JP My Number and the IN Aadhaar (Verhoeff); everything else is format only (JP driving licence check digit:
+  the notice gives no weights; KR numbers carry random digits since 2020-10). The Aadhaar Verhoeff rests on UIDAI's 2010
+  paper, which recommends it (no first-digit rule is enforced); the SA national ID and iqama first digits (1 and 2) rest
+  on a ZATCA staff forum announcement and are refused, not warned; a KR foreigner number with a non-calendar birth date
+  and an ID NIK with an impossible date are refused. The CN and SA driving licence numbers are the identity numbers (no
+  class); the ID SIM is the NIK. JP passports derive `井上` as `INOE` (a long vowel); the override `INOUE` fixes it.
+  README "Not covered" now lists all 20 countries.
+- - Name classes use `\p{sc=Latin}`, `\p{sc=Cyrillic}`, `\p{sc=Han}`, `\p{sc=Hangul}`, `\p{sc=Arabic}` and
+  `\p{sc=Devanagari}` (Script property): requires `lib-pcre >=10.40`.
 - Requires `msstc4php/vo-base ^1.1.1`.
 
 ### Compatibility policy

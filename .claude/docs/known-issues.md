@@ -449,3 +449,42 @@ script classes use `\p{sc=Latin}` / `\p{sc=Cyrillic}` (Script property only); `c
 - **SP RG mask counts only significant characters:** the stored RG is padded to 9 with leading zeros, so masking the
   last 4 of `000000012` would show every real digit (`*****0012`). `AbstractIdentityCardNumber::masked()` keeps
   `min(4, strlen(ltrim(value, '0')) - 1)`; zeros-only is refused, so the significant part is never empty.
+
+## Asia (plan 4): owner-visible open decisions
+
+- **JP derived long vowel (morpheme boundary).** Kana cannot tell a long vowel from a morpheme boundary, so a
+  non-long-vowel おう/うう/おお across a boundary (井上 いのうえ, 大内 おおうち) is derived as a long vowel (`INOE`, `OCHI`;
+  the passports say `INOUE`, `OUCHI`). `PassportHepburn` follows MOFA's table; the fix is the Latin override
+  (`AnyIcaoSpelling`). No dictionary is used, so none is guessed.
+- **IN Aadhaar Verhoeff rests on UIDAI's 2010 recommendation.** "A UID Numbering Scheme" says "We recommend the
+  Verhoeff scheme"; no later UIDAI text restating it was found (the Handbook 2021 says only "12-digit"). It is enforced
+  as UIDAI's own publication. The first-digit remarks (0 and 1 "could be reserved") are proposals and are not enforced.
+- **SA first-digit rule rests on a ZATCA staff forum announcement.** BR-KSA-F-10 (first digit 1, scheme NAT) and
+  BR-KSA-F-11 (first digit 2, scheme IQA) appear in the SDK v3.4.4 announcement on `zatca1.discourse.group` (poster
+  flagged staff/moderator), as warnings; the Schematron itself was not reached. The package refuses instead.
+- **KR foreigner number with a non-calendar birth date is refused.** No official text on unknown month or day was
+  found; to revisit if an official practice appears. The sex digits (5/7 man, 6/8 woman) are official (법무부 release of
+  2023-03-28), the century split (5, 6 for the 1900s, 7, 8 for the 2000s) is from secondary sources.
+- **ID NIK impossible dates are refused per the spec.** Dukcapil describes digits 7-12 as the birth date (woman's day
+  plus 40); an impossible date is no "tanggal lahir". The two-digit year has no published century rule, so 29 February
+  is accepted when the year is divisible by four (`00` included) and there is no `birthDate()`.
+
+## Asia (plan 4): other quirks
+
+- **`Digits::SEPARATORS` includes U+3000.** The ideographic space is stripped from every number, so `１１２　２３３`
+  parses (`tests/Unit/Document/FullwidthNumbersTest.php`).
+- **CN driving licence = citizen identity number; SA driving licence = national ID or iqama number; ID SIM = NIK since
+  July 2024 (old SIM numbers keep their form until renewal and have no quotable rule).** No classes.
+- **KR driving licence has two forms**, the 12 digits from 2014-07-02 and the Hangul region name + ten digits before it;
+  both are kept as written, and the stored value is not converted (the number of a new licence is not checked against
+  the region table, since offices are renumbered).
+- **KR passport covers the multiple-entry `M` series only** (the MOFA guide shows no other prefix).
+- **CN `HA`/`MA` and `台胞证` permits are not covered** (formats quoted from the NIA reply of 2021-09-23, outside the
+  plan); `ExitEntryPermitToHongKongMacauNumber` is the 往来港澳通行证 `C` series.
+- **Source hosts:** `www.ezairyu.mofa.go.jp` (JP) answers 403 to WebFetch but reads with `curl`, `www.moj.go.jp` and
+  the Immigration Services Agency answer 403 on every page, `j-lis.go.jp` serves an HTML error instead of the PDF (use
+  the Internet Archive copy); the details and dates are in the source notes.
+- **ES `ŀ` stays in ES.** The `l·l` fold (`ŀ` → `l·`) is not moved to `AbstractNamePart`: NL table 5.2 lists `ŀ` as a
+  letter and `·` is invalid there, so folding there would refuse a valid name.
+- **`HealthCardNumberFactory::fromNumber()`** points to `OnHealthCardNumber::fromCard()` in its no-match message for an
+  Ontario card with a version code (nothing of the input is echoed).

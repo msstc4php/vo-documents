@@ -6,15 +6,16 @@ core.
 | Area | Purpose |
 |---|---|
 | `Contract\`, `Exception\`, `Sex` | Shared interfaces (`HasSex`, `HasBirthDate` (CURP only), `Maskable`, `Subdivision`, `IssuedBySubdivision`), the three exception families, the sex enum (`Female`, `Male`, `Unspecified` for the CURP `X`) |
-| `Internal\` | `@internal` helpers: `Checksum`, `Mask`, `Digits`, `UnicodeText`/`Text`, `NumberFormat` (character class + length range of a licence), `NumberShapes` (several fixed shapes, length derived from the shape: US DL/ID; shares `Digits::upperCasedOfLength()` with `NumberFormat`), `SubdivisionResolver` (one match / none / ambiguous over an enum of subdivisions), `PayloadFields` (codec payload validation), `Optional` (`equal()` of two optional value objects), `TwoDigitYearDate` (day/month valid in some century: DVLA, CHI, IT codice fiscale) |
+| `Internal\` | `@internal` helpers: `Checksum`, `Mask`, `Digits`, `UnicodeText`/`Text`, `NumberFormat` (character class + length range of a licence), `NumberShapes` (several fixed shapes, length derived from the shape: US DL/ID; shares `Digits::upperCasedOfLength()` with `NumberFormat`), `SubdivisionResolver` (one match / none / ambiguous over an enum of subdivisions), `PayloadFields` (codec payload validation), `Optional` (`equal()` of two optional value objects), `TwoDigitYearDate` (day/month valid in some century: DVLA, CHI, IT codice fiscale), `Gb11643` (18-character layout shared by the CN citizen number and the 2023 permanent residence number: `normalize()`, birth date, MOD 11-2 check), `KoreanRegistrationNumber` (13 digits of the KR resident and foreigner numbers: birth date and sex from the 7th digit). `Digits::fold()` maps fullwidth digits and letters and Arabic-Indic digits (U+0660-0669, U+06F0-06F9) to ASCII before every number parse, and `SEPARATORS` includes U+3000; `Checksum` gains `verhoeff()` (IN Aadhaar) |
 | `Icao\PersonName` | MRZ-style Latin name (`A-Z`, `-`, `<`; `<<` between primary and secondary), `mrzField()` truncation |
 | `Icao\Transliterator` | National name part → ICAO Latin (`toLatin()` default, `variants()` all spellings) |
 | `Icao\Table\*` | `@internal` `TransliterationTable` per script (LatinMultinational, Cyrillic); add a class + register it in the `Transliterator` constructor for a new script |
 | `Name\AbstractNamePart` | Base of every national name part: `letters()` (regex class), `label()` (message), `innerSeparators()` (default `-' `) |
 | `Name\LatinSpelling` | `@internal`: finds a Latin override among the ICAO spellings of a name, word by word (`Name\IdentifierSpellings`: variants per word + national separators; hyphen ≡ `<`; cap 4096 per word) |
-| `Name\LatinOverridePolicy` | `@internal` abstract: `resolve(?override, derived)` (template method, drops the derived form); `withoutDerivedForm()` (refuses, except `AnyIcaoSpelling` with an override); subclasses `AnyIcaoSpelling` (RU, GB, CA, BR) and `TransliterationVariant` (AU, DE, FR, IT, ES, NL, CH, TR, US, MX; via `LatinSpelling`) |
+| `Name\LatinOverridePolicy` | `@internal` abstract: `resolve(?override, derived)` (template method, drops the derived form); `withoutDerivedForm()` (refuses, except `AnyIcaoSpelling` with an override); subclasses `AnyIcaoSpelling` (RU, GB, CA, BR, JP) and `TransliterationVariant` (AU, DE, FR, IT, ES, NL, CH, TR, US, MX, IN in Latin letters; via `LatinSpelling`). CN, KR, ID, SA and IN-Devanagari have no policy: the Latin form is required |
 | `Name\PersonName` | Interface of a national full name: `latin(): Icao\PersonName`, `full()` |
-| `Name\Latin\*` | `AbstractLatinNamePart` (`\p{Latin}` part); `@internal`: `LatinPersonNameBuilder` (derived form, spellings per word for `TransliterationVariant`; strips the `$omitted` punctuation first), `AbstractLatinPersonName` (effective Latin form + kept override, hook `overridePolicy()`; constructor argument `$omittedPunctuation` (MRZ-omitted punctuation, default none, MX `.` `/`, ES `·`)), `AbstractFamilyGivenPersonName<TFamily, TGiven>` (public `family`/`given`, `full()`, `equals()`, JSON view; AU DE FR IT TR NL CH GB CA BR), `AbstractFamilyGivenPersonNameCodec<TName>` (keys `family`/`given`/`latin`; hooks `shape()`, `create()`) |
+| `Name\Latin\*` | `AbstractLatinNamePart` (`\p{sc=Latin}` part; `wordWithAbbreviationDots()` for MX and ID); `@internal`: `LatinPersonNameBuilder` (derived form, spellings per word for `TransliterationVariant`; strips the `$omitted` punctuation first), `AbstractLatinPersonName` (effective Latin form + kept override, hook `overridePolicy()`; constructor argument `$omittedPunctuation` (MRZ-omitted punctuation, default none, MX `.` `/`, ES `·`)), `AbstractFamilyGivenPersonName<TFamily, TGiven>` (public `family`/`given`, `full()`, `equals()`, JSON view; AU DE FR IT TR NL CH GB CA BR), `AbstractFamilyGivenPersonNameCodec<TName>` (keys `family`/`given`/`latin`; hooks `shape()`, `create()`) |
+| `Name\RequiredLatin\*` | `@internal` `AbstractFamilyGivenPersonName<TFamily, TGiven>` (family + nullable given in a national script + a **mandatory** `Icao\PersonName`, never derived; equality includes it; JSON view has `latin`) and its codec (keys `family`, `given`, `latin`; hooks `shape()`, `create()`); used by CN and KR. `given` null stores a name with no family/given split whole in `family`. The Latin base (`Name\Latin`) is the opposite: derived form plus optional override |
 | `Name\RU\*` | `AbstractRussianNamePart` (letters, word pattern), `FamilyName`, `GivenName`, `Patronymic`, `PersonName` (+ `short()`, `initialsFirst()`), `PersonNameCodec`; `@internal RussianTransliteration` (drops Ь, then `Icao\Transliterator`) |
 | `Document\RU\*` | Number VOs (`Snils`, `Inn`, `InternalPassportNumber`, `PassportIssuingUnitCode`, `InternationalPassportNumber`, `DriverLicenceNumber`, `OmsPolicyNumber`): `final`, extend `AbstractStringValueObject`, implement `Maskable`, store digits only, `formatted()`; enum `DriverLicenceCategory`. No `Region` (no published ISO mapping, RU.md) |
 | `Codecs` | `Codecs::all()`: every payload codec, for `new ValueObjectMapper(Codecs::all())`; add each new composite's codec here |
@@ -151,3 +152,45 @@ resolver document "Brazilian identity card"). Named `IdentityCard…`, not `Rg�
 `Name\BR\PersonName($family, $given, ?$latin)` on `AbstractFamilyGivenPersonName` (both required), parts on the plain
 `AbstractLatinNamePart` (no extra punctuation), policy `AnyIcaoSpelling` (PF SINPA abbreviation); codec as IT (`given`
 required).
+
+`Document\CN\*` (plan 4): `CitizenIdentityNumber` (`Gb11643`; `HasBirthDate`, `HasSex` from the odd/even sequence code,
+`administrativeDivisionCode()` string; lower-case `x` stored `X`; the 15-digit number refused by length; also the Hong
+Kong/Macao/Taiwan resident permit number, address codes 810000/820000/830000), `ForeignerPermanentResidenceNumber` (2023
+card, `Gb11643`, first digit 9, `applicationPlaceCode()`, `nationalityCode()`, `HasBirthDate`, no `HasSex`),
+`LegacyForeignerPermanentResidenceNumber` (3 letters + 12 digits, format only), `OrdinaryPassportNumber` (named for the
+ordinary `E`/`G` series only), `ExitEntryPermitToHongKongMacauNumber` (`C`), `ExitEntryPermitToTaiwanNumber` (`L`/`T`).
+No driving licence class: the licence number is the citizen identity number.
+`Name\CN\PersonName($family, ?$given, $latin)` on `RequiredLatin`; parts on `AbstractChineseNamePart` (`\p{sc=Han}` plus
+U+00B7 between words; U+30FB and U+2022 folded to U+00B7).
+
+`Document\JP\*` (plan 4): `MyNumber` (総務省令 Art. 5 check digit verified), `BasicPensionNumber`, `ResidenceCardNumber`,
+`PassportNumber` (all format only), `DrivingLicenceNumber` (12 digits from the NPA notice;
+`publicSafetyCommissionCode()`, `yearSymbol()`, `serialNumber()`, `reissueSymbol()` strings; check digit not verified).
+`Name\JP\PersonName(family, given, familyReading, givenReading, ?latinOverride)`: not on a shared base (four parts), the
+derived form is `Name\JP\PassportHepburn` (internal, MOFA table; katakana folded to hiragana for the derivation only),
+policy `AnyIcaoSpelling`; readings on `AbstractJapaneseReading` (hiragana, katakana, `ー` U+30FC listed explicitly),
+parts on `AbstractJapaneseNamePart` (`\p{sc=Han}`, kana, `ー`, `〆`). Codec keys `family`, `given`, `familyReading`,
+`givenReading`, `latin` (override only).
+
+`Document\KR\*` (plan 4): `ResidentRegistrationNumber` and `ForeignerRegistrationNumber` (`KoreanRegistrationNumber`;
+`HasBirthDate`, `HasSex`; the resident class refuses 7th digits 5-8, the foreigner class 1-4, 9 and 0),
+`OrdinaryPassportNumber` (multiple-entry `M` series only), `DrivingLicenceNumber` (12 digits or the region name + ten
+digits; `regionCode()`/`formatted()` for the numbered form). `Name\KR\PersonName` mirrors CN (Hangul, `·`, hyphen, space
+between words).
+
+`Document\IN\*` (plan 4): `AadhaarNumber` (`Checksum::verhoeff()`), `PermanentAccountNumber`
+(`holderType(): PanHolderType`), `PassportNumber` (8 ASCII letters/digits), `AbhaNumber`. Two name families: `Name\IN\*`
+(Latin: `GivenName`, optional `Surname`, `PersonName` on `AbstractLatinPersonName`, `IndianFullName` internal helper)
+and `Name\IN\Devanagari\*` (own `PersonName` with required Latin form, `\p{sc=Devanagari}` plus ZWJ/ZWNJ between two
+letters; the Devanagari digits and the danda are not name characters).
+
+`Document\ID\*` (plan 4): `NationalIdentityNumber` (NIK; `HasSex` with the woman's day +40, `regionCode()`,
+`birthDay()`, `birthMonth()`, `birthYearDigits()`; date validated through `TwoDigitYearDate`), `TaxpayerNumber` (15 or
+16 digits, all zeros refused, `isFifteenDigits()`, `formatted()` for 15 digits), `FamilyCardNumber`.
+`Name\ID\PersonName` is one `FullName` (`wordWithAbbreviationDots()`; nothing enforced from Permendagri 73/2022) plus
+the required Latin form.
+
+`Document\SA\*` (plan 4): `AbstractIdentityNumber` (ten digits, `@internal`) with `NationalIdentityNumber` (first digit
+1) and `IqamaNumber` (first digit 2); the driving licence carries the same number (no class).
+`Name\SA\PersonName(given, ?father, ?grandfather, ?family, latin)` (own layout, parts on `AbstractArabicNamePart`:
+`\p{sc=Arabic}` letters, harakat U+064B-0652 and U+0670 after a letter, tatweel U+0640 removed).
