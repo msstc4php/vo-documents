@@ -43,6 +43,7 @@ use MSSTC4PHP\ValueObject\Documents\Name\LatinSpelling;
 use MSSTC4PHP\ValueObject\Documents\Name\MX\PersonNameCodec as MxPersonNameCodec;
 use MSSTC4PHP\ValueObject\Documents\Name\NL\PersonNameCodec as NlPersonNameCodec;
 use MSSTC4PHP\ValueObject\Documents\Name\RU\PersonNameCodec as RuPersonNameCodec;
+use MSSTC4PHP\ValueObject\Documents\Name\SA\PersonNameCodec as SaPersonNameCodec;
 use MSSTC4PHP\ValueObject\Documents\Name\TR\AbstractTurkishNamePart;
 use MSSTC4PHP\ValueObject\Documents\Name\TR\FamilyName;
 use MSSTC4PHP\ValueObject\Documents\Name\TR\GivenName;
@@ -71,6 +72,7 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(InPersonNameCodec::class)]
 #[UsesClass(InDevanagariPersonNameCodec::class)]
 #[UsesClass(IdPersonNameCodec::class)]
+#[UsesClass(SaPersonNameCodec::class)]
 #[UsesClass(CaPersonNameCodec::class)]
 #[UsesClass(RuPersonNameCodec::class)]
 #[UsesClass(AuPersonNameCodec::class)]

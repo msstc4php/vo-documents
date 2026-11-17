@@ -47,6 +47,7 @@ use MSSTC4PHP\ValueObject\Documents\Name\NL\GivenName;
 use MSSTC4PHP\ValueObject\Documents\Name\NL\PersonName;
 use MSSTC4PHP\ValueObject\Documents\Name\NL\PersonNameCodec;
 use MSSTC4PHP\ValueObject\Documents\Name\RU\PersonNameCodec as RuPersonNameCodec;
+use MSSTC4PHP\ValueObject\Documents\Name\SA\PersonNameCodec as SaPersonNameCodec;
 use MSSTC4PHP\ValueObject\Documents\Name\TR\PersonNameCodec as TrPersonNameCodec;
 use MSSTC4PHP\ValueObject\Documents\Name\TransliterationVariant;
 use MSSTC4PHP\ValueObject\Documents\Name\US\PersonNameCodec as UsPersonNameCodec;
@@ -71,6 +72,7 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(InPersonNameCodec::class)]
 #[UsesClass(InDevanagariPersonNameCodec::class)]
 #[UsesClass(IdPersonNameCodec::class)]
+#[UsesClass(SaPersonNameCodec::class)]
 #[UsesClass(CaPersonNameCodec::class)]
 #[UsesClass(RuPersonNameCodec::class)]
 #[UsesClass(AuPersonNameCodec::class)]

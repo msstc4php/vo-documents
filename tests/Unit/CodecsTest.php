@@ -43,6 +43,8 @@ use MSSTC4PHP\ValueObject\Documents\Name\NL\PersonName as NlPersonName;
 use MSSTC4PHP\ValueObject\Documents\Name\NL\PersonNameCodec as NlPersonNameCodec;
 use MSSTC4PHP\ValueObject\Documents\Name\RU\PersonName;
 use MSSTC4PHP\ValueObject\Documents\Name\RU\PersonNameCodec;
+use MSSTC4PHP\ValueObject\Documents\Name\SA\PersonName as SaPersonName;
+use MSSTC4PHP\ValueObject\Documents\Name\SA\PersonNameCodec as SaPersonNameCodec;
 use MSSTC4PHP\ValueObject\Documents\Name\TR\PersonName as TrPersonName;
 use MSSTC4PHP\ValueObject\Documents\Name\TR\PersonNameCodec as TrPersonNameCodec;
 use MSSTC4PHP\ValueObject\Documents\Name\US\PersonName as UsPersonName;
@@ -74,6 +76,7 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(InPersonNameCodec::class)]
 #[UsesClass(InDevanagariPersonNameCodec::class)]
 #[UsesClass(IdPersonNameCodec::class)]
+#[UsesClass(SaPersonNameCodec::class)]
 final class CodecsTest extends TestCase
 {
     public function testListsEveryCodecOfThePackage(): void
@@ -100,6 +103,7 @@ final class CodecsTest extends TestCase
                 InPersonName::class,
                 InDevanagariPersonName::class,
                 IdPersonName::class,
+                SaPersonName::class,
             ],
             \array_map(static fn (PayloadCodec $codec): string => $codec->valueObjectClass(), Codecs::all()),
         );
@@ -131,6 +135,7 @@ final class CodecsTest extends TestCase
         self::assertTrue($mapper->isComposite(InPersonName::class));
         self::assertTrue($mapper->isComposite(InDevanagariPersonName::class));
         self::assertTrue($mapper->isComposite(IdPersonName::class));
+        self::assertTrue($mapper->isComposite(SaPersonName::class));
     }
 
     /**

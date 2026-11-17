@@ -1,0 +1,49 @@
+<?php
+
+declare(strict_types=1);
+
+namespace MSSTC4PHP\ValueObject\Documents\Name\SA;
+
+use MSSTC4PHP\ValueObject\Documents\Name\AbstractNamePart;
+use Override;
+
+/**
+ * A name part in Arabic: words of `\p{sc=Arabic}` letters joined by a space or a hyphen. The harakat U+064B-0652 and
+ * the superscript alef U+0670 (Script=Inherited) are allowed after a letter, never at the start of a word. The
+ * tatweel U+0640 (Script=Common) is typographic stretching and is removed, so a stretched and a plain spelling are one
+ * value; NFC joins `ا` + U+0654 with `أ` and orders the marks of a letter (fatha before shadda). Only letters
+ * (Lo) are name characters: Arabic-Indic digits, Arabic punctuation, Quranic annotation marks and format characters
+ * are not. A particle such as `آل` or `بن` is an ordinary word. See docs/sources/SA.md "Names".
+ */
+abstract class AbstractArabicNamePart extends AbstractNamePart
+{
+    private const string LETTER = '(?:(?=\p{Lo})\p{sc=Arabic})';
+
+    private const string MARKS = '[\x{064B}-\x{0652}\x{0670}]*';
+
+    private const string TATWEEL = "\u{0640}";
+
+    #[Override]
+    protected function parse(string $value): string
+    {
+        return parent::parse(\str_replace(self::TATWEEL, '', $value));
+    }
+
+    #[Override]
+    protected function letters(): string
+    {
+        return '\p{sc=Arabic}';
+    }
+
+    #[Override]
+    protected function innerSeparators(): string
+    {
+        return ' -';
+    }
+
+    #[Override]
+    protected function word(): string
+    {
+        return self::LETTER . self::MARKS . '(?:' . self::LETTER . self::MARKS . ')*';
+    }
+}

@@ -44,6 +44,7 @@ use MSSTC4PHP\ValueObject\Documents\Name\RU\Patronymic;
 use MSSTC4PHP\ValueObject\Documents\Name\RU\PersonName;
 use MSSTC4PHP\ValueObject\Documents\Name\RU\PersonNameCodec;
 use MSSTC4PHP\ValueObject\Documents\Name\RU\RussianTransliteration;
+use MSSTC4PHP\ValueObject\Documents\Name\SA\PersonNameCodec as SaPersonNameCodec;
 use MSSTC4PHP\ValueObject\Documents\Name\TR\PersonNameCodec as TrPersonNameCodec;
 use MSSTC4PHP\ValueObject\Documents\Name\US\PersonNameCodec as UsPersonNameCodec;
 use MSSTC4PHP\ValueObject\Documents\Tests\Fixture\RefusesNameWithoutEchoingInput;
@@ -64,6 +65,7 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(InPersonNameCodec::class)]
 #[UsesClass(InDevanagariPersonNameCodec::class)]
 #[UsesClass(IdPersonNameCodec::class)]
+#[UsesClass(SaPersonNameCodec::class)]
 #[UsesClass(CaPersonNameCodec::class)]
 #[UsesClass(AuPersonNameCodec::class)]
 #[UsesClass(DePersonNameCodec::class)]
