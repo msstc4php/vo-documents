@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace MSSTC4PHP\ValueObject\Documents\Name\CN;
 
 use MSSTC4PHP\ValueObject\Documents\Icao\PersonName as IcaoPersonName;
-use MSSTC4PHP\ValueObject\Documents\Name\RequiredLatin\AbstractFamilyGivenPersonNameCodec;
+use MSSTC4PHP\ValueObject\Documents\Name\RequiredLatin\AbstractRequiredLatinPersonNameCodec;
 use Override;
 
 /**
- * @extends AbstractFamilyGivenPersonNameCodec<PersonName>
+ * @extends AbstractRequiredLatinPersonNameCodec<PersonName>
  */
-final readonly class PersonNameCodec extends AbstractFamilyGivenPersonNameCodec
+final readonly class PersonNameCodec extends AbstractRequiredLatinPersonNameCodec
 {
     #[Override]
     public function valueObjectClass(): string
@@ -22,7 +22,7 @@ final readonly class PersonNameCodec extends AbstractFamilyGivenPersonNameCodec
     #[Override]
     protected function shape(): string
     {
-        return 'Expected a Chinese person name payload with string "family", string or null "given", '
+        return 'Expected a Chinese person name payload with string "family", string, null or missing "given", '
             . 'string "latin", and no other keys.';
     }
 

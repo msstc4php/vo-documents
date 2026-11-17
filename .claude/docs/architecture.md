@@ -15,7 +15,7 @@ core.
 | `Name\LatinOverridePolicy` | `@internal` abstract: `resolve(?override, derived)` (template method, drops the derived form); `withoutDerivedForm()` (refuses, except `AnyIcaoSpelling` with an override); subclasses `AnyIcaoSpelling` (RU, GB, CA, BR, JP) and `TransliterationVariant` (AU, DE, FR, IT, ES, NL, CH, TR, US, MX, IN in Latin letters; via `LatinSpelling`). CN, KR, ID, SA and IN-Devanagari have no policy: the Latin form is required |
 | `Name\PersonName` | Interface of a national full name: `latin(): Icao\PersonName`, `full()` |
 | `Name\Latin\*` | `AbstractLatinNamePart` (`\p{sc=Latin}` part; `wordWithAbbreviationDots()` for MX and ID); `@internal`: `LatinPersonNameBuilder` (derived form, spellings per word for `TransliterationVariant`; strips the `$omitted` punctuation first), `AbstractLatinPersonName` (effective Latin form + kept override, hook `overridePolicy()`; constructor argument `$omittedPunctuation` (MRZ-omitted punctuation, default none, MX `.` `/`, ES `·`)), `AbstractFamilyGivenPersonName<TFamily, TGiven>` (public `family`/`given`, `full()`, `equals()`, JSON view; AU DE FR IT TR NL CH GB CA BR), `AbstractFamilyGivenPersonNameCodec<TName>` (keys `family`/`given`/`latin`; hooks `shape()`, `create()`) |
-| `Name\RequiredLatin\*` | `@internal` `AbstractFamilyGivenPersonName<TFamily, TGiven>` (family + nullable given in a national script + a **mandatory** `Icao\PersonName`, never derived; equality includes it; JSON view has `latin`) and its codec (keys `family`, `given`, `latin`; hooks `shape()`, `create()`); used by CN and KR. `given` null stores a name with no family/given split whole in `family`. The Latin base (`Name\Latin`) is the opposite: derived form plus optional override |
+| `Name\RequiredLatin\*` | `@internal` `AbstractRequiredLatinPersonName<TFamily, TGiven>` (family + nullable given in a national script + a **mandatory** `Icao\PersonName`, never derived; equality includes it; JSON view has `latin`) and its codec (keys `family`, `given`, `latin`; hooks `shape()`, `create()`); used by CN and KR. `given` null stores a name with no family/given split whole in `family`. The Latin base (`Name\Latin`) is the opposite: derived form plus optional override |
 | `Name\RU\*` | `AbstractRussianNamePart` (letters, word pattern), `FamilyName`, `GivenName`, `Patronymic`, `PersonName` (+ `short()`, `initialsFirst()`), `PersonNameCodec`; `@internal RussianTransliteration` (drops Ь, then `Icao\Transliterator`) |
 | `Document\RU\*` | Number VOs (`Snils`, `Inn`, `InternalPassportNumber`, `PassportIssuingUnitCode`, `InternationalPassportNumber`, `DriverLicenceNumber`, `OmsPolicyNumber`): `final`, extend `AbstractStringValueObject`, implement `Maskable`, store digits only, `formatted()`; enum `DriverLicenceCategory`. No `Region` (no published ISO mapping, RU.md) |
 | `Codecs` | `Codecs::all()`: every payload codec, for `new ValueObjectMapper(Codecs::all())`; add each new composite's codec here |
@@ -164,9 +164,9 @@ No driving licence class: the licence number is the citizen identity number.
 U+00B7 between words; U+30FB and U+2022 folded to U+00B7).
 
 `Document\JP\*` (plan 4): `MyNumber` (総務省令 Art. 5 check digit verified), `BasicPensionNumber`, `ResidenceCardNumber`,
-`PassportNumber` (all format only), `DrivingLicenceNumber` (12 digits from the NPA notice;
+`PassportNumber` (all format only), `DriverLicenceNumber` (12 digits from the NPA notice;
 `publicSafetyCommissionCode()`, `yearSymbol()`, `serialNumber()`, `reissueSymbol()` strings; check digit not verified).
-`Name\JP\PersonName(family, given, familyReading, givenReading, ?latinOverride)`: not on a shared base (four parts), the
+`Name\JP\PersonName(family, given, familyReading, givenReading, ?latin)`: not on a shared base (four parts), the
 derived form is `Name\JP\PassportHepburn` (internal, MOFA table; katakana folded to hiragana for the derivation only),
 policy `AnyIcaoSpelling`; readings on `AbstractJapaneseReading` (hiragana, katakana, `ー` U+30FC listed explicitly),
 parts on `AbstractJapaneseNamePart` (`\p{sc=Han}`, kana, `ー`, `〆`). Codec keys `family`, `given`, `familyReading`,
@@ -174,7 +174,7 @@ parts on `AbstractJapaneseNamePart` (`\p{sc=Han}`, kana, `ー`, `〆`). Codec ke
 
 `Document\KR\*` (plan 4): `ResidentRegistrationNumber` and `ForeignerRegistrationNumber` (`KoreanRegistrationNumber`;
 `HasBirthDate`, `HasSex`; the resident class refuses 7th digits 5-8, the foreigner class 1-4, 9 and 0),
-`OrdinaryPassportNumber` (multiple-entry `M` series only), `DrivingLicenceNumber` (12 digits or the region name + ten
+`MultipleEntryPassportNumber` (`M` series only), `DriverLicenceNumber` (12 digits or the region name + ten
 digits; `regionCode()`/`formatted()` for the numbered form). `Name\KR\PersonName` mirrors CN (Hangul, `·`, hyphen, space
 between words).
 

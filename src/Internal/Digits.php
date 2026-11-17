@@ -8,11 +8,17 @@ use Closure;
 use MSSTC4PHP\ValueObject\Documents\Exception\InvalidDocumentNumberException;
 
 /**
+ * Number normalisation. The separators are the space, the ASCII hyphen, the tab, the line breaks, the no-break,
+ * figure and narrow no-break spaces, the ideographic space and the hyphen look-alikes typed on a CJK keyboard or
+ * pasted from a document: the fullwidth hyphen-minus (U+FF0D), the halfwidth (U+FF70) and the katakana-hiragana
+ * (U+30FC) prolonged sound marks, the hyphen (U+2010), the non-breaking hyphen (U+2011) and the minus sign (U+2212).
+ *
  * @internal
  */
 final class Digits
 {
-    public const string SEPARATORS = " -\t\r\n\u{00A0}\u{2007}\u{202F}\u{3000}";
+    public const string SEPARATORS = " -\t\r\n\u{00A0}\u{2007}\u{202F}\u{3000}"
+        . "\u{FF0D}\u{FF70}\u{30FC}\u{2010}\u{2011}\u{2212}";
 
     /**
      * Above this the message says "too long": a count of 100 or more would be a three-digit run.

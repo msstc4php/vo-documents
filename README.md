@@ -147,11 +147,11 @@ official algorithm is published. A number with the right shape is accepted, neve
 | `Document\JP\BasicPensionNumber` | 基礎年金番号, 10 digits | format only | none | 日本年金機構 |
 | `Document\JP\ResidenceCardNumber` | 在留カード番号, 2 letters + 8 digits + 2 letters | format only | none | 厚生労働省 (島根労働局) filing instructions |
 | `Document\JP\PassportNumber` | Passport, 2 letters + 7 digits | format only | none | 外務省 |
-| `Document\JP\DrivingLicenceNumber` | 運転免許証の番号, 12 digits (the マイナ免許証 number has the same layout) | check digit not verified (the notice names "モジュラス11" without weights) | `publicSafetyCommissionCode()` (string, not ISO), `yearSymbol()`, `serialNumber()`, `reissueSymbol()` | 警察庁丁運発第76号 (2025-03-10) |
+| `Document\JP\DriverLicenceNumber` | 運転免許証の番号, 12 digits (the マイナ免許証 number has the same layout) | check digit not verified (the notice names "モジュラス11" without weights) | `publicSafetyCommissionCode()` (string, not ISO), `yearSymbol()`, `serialNumber()`, `reissueSymbol()` | 警察庁丁運発第76号 (2025-03-10) |
 | `Document\KR\ResidentRegistrationNumber` | 주민등록번호, 13 digits | birth date must exist in the century of the 7th digit; no check digit verified (random digits since 2020-10) | `HasBirthDate`, `HasSex` | 주민등록법 시행규칙 Art. 2; 국가기록원; 행정안전부 |
 | `Document\KR\ForeignerRegistrationNumber` | 외국인등록번호, 13 digits (7th digit 5-8) | birth date must exist; no check digit | `HasBirthDate`, `HasSex` (법무부: 5 and 7 man, 6 and 8 woman) | 출입국관리법 시행규칙 별표 2; 법무부 release of 2023-03-28 |
-| `Document\KR\OrdinaryPassportNumber` | Multiple-entry (복수) `M` series: `M` + 8 digits, or `M` + 3 digits + letter + 4 digits (from 2021-12-21) | format only | none | 외교부 여권안내 |
-| `Document\KR\DrivingLicenceNumber` | 운전면허번호: 12 digits (from 2014-07-02) or the region name + 10 digits | region name checked against KoROAD's table; no check digit | `regionCode()` (string, not ISO), `formatted()` | 도로교통공단 (KoROAD) |
+| `Document\KR\MultipleEntryPassportNumber` | Multiple-entry (복수) `M` series: `M` + 8 digits, or `M` + 3 digits + letter + 4 digits (from 2021-12-21) | format only | none | 외교부 여권안내 |
+| `Document\KR\DriverLicenceNumber` | 운전면허번호: 12 digits (from 2014-07-02) or the region name + 10 digits | region name checked against KoROAD's table; no check digit | `regionCode()` (string, not ISO), `formatted()` | 도로교통공단 (KoROAD) |
 | `Document\IN\AadhaarNumber` | Aadhaar, 12 digits | Verhoeff check digit (UIDAI's own paper *recommends* it); no first-digit rule | none; `masked()` is UIDAI's `XXXX XXXX 1234` | UIDAI "A UID Numbering Scheme" (2010) |
 | `Document\IN\PermanentAccountNumber` | PAN, 10 characters (`BLGPS1234D`) | layout of the Income Tax Department tutorial (`0000` refused); the check letter is not verified | `holderType()` (`PanHolderType`, the 4th character) | Income Tax Department |
 | `Document\IN\PassportNumber` | Passport, 8 characters | length and ASCII letters and digits only | none | MEA passport data page structure |

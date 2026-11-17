@@ -23,7 +23,7 @@ use Override;
  * @template-covariant TGiven of AbstractNamePart the country's given-name part, null for a name stored whole in the
  *                                                 family part
  */
-abstract readonly class AbstractFamilyGivenPersonName implements PersonName
+abstract readonly class AbstractRequiredLatinPersonName implements PersonName
 {
     /**
      * @param TFamily $family

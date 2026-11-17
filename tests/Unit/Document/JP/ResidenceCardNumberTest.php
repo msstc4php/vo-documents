@@ -37,6 +37,12 @@ final class ResidenceCardNumberTest extends TestCase
         yield 'lower case' => ['ab12345678cd', 'AB12345678CD'];
         yield 'hyphens as printed' => ['AB-12345678-CD', 'AB12345678CD'];
         yield 'spaces and NBSP' => ["AB 12345678\u{00A0}CD", 'AB12345678CD'];
+        yield 'fullwidth with fullwidth hyphens' => [
+            "\u{FF21}\u{FF22}\u{FF0D}\u{FF11}\u{FF12}\u{FF13}\u{FF14}\u{FF15}\u{FF16}\u{FF17}\u{FF18}"
+            . "\u{FF0D}\u{FF23}\u{FF24}",
+            'AB12345678CD',
+        ];
+        yield 'halfwidth prolonged sound mark' => ["AB\u{FF70}12345678\u{FF70}CD", 'AB12345678CD'];
         yield 'fullwidth' => [
             "\u{FF21}\u{FF22}\u{FF11}\u{FF12}\u{FF13}\u{FF14}\u{FF15}\u{FF16}\u{FF17}\u{FF18}\u{FF23}\u{FF24}",
             'AB12345678CD',

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MSSTC4PHP\ValueObject\Documents\Tests\Unit\Document\KR;
 
-use MSSTC4PHP\ValueObject\Documents\Document\KR\DrivingLicenceNumber;
+use MSSTC4PHP\ValueObject\Documents\Document\KR\DriverLicenceNumber;
 use MSSTC4PHP\ValueObject\Documents\Internal\Digits;
 use MSSTC4PHP\ValueObject\Documents\Internal\Mask;
 use MSSTC4PHP\ValueObject\Documents\Internal\Text;
@@ -18,11 +18,11 @@ use PHPUnit\Framework\TestCase;
  * Expectations follow docs/sources/KR.md "Driving licence number": KoROAD's notice of 2014-07-02, `11-95-255933-61`
  * and its region-name table.
  */
-#[CoversClass(DrivingLicenceNumber::class)]
+#[CoversClass(DriverLicenceNumber::class)]
 #[UsesClass(Digits::class)]
 #[UsesClass(Text::class)]
 #[UsesClass(Mask::class)]
-final class DrivingLicenceNumberTest extends TestCase
+final class DriverLicenceNumberTest extends TestCase
 {
     use RefusesWithoutEchoingInput;
 
@@ -44,7 +44,7 @@ final class DrivingLicenceNumberTest extends TestCase
     #[DataProvider('validNumbers')]
     public function testAccepts(string $input, string $expected): void
     {
-        $number = DrivingLicenceNumber::from($input);
+        $number = DriverLicenceNumber::from($input);
 
         self::assertSame($expected, $number->value);
         self::assertSame($expected, (string) $number);
@@ -53,7 +53,7 @@ final class DrivingLicenceNumberTest extends TestCase
 
     public function testRegionCodeAndTheDisplayForm(): void
     {
-        $number = DrivingLicenceNumber::from('119525593361');
+        $number = DriverLicenceNumber::from('119525593361');
 
         self::assertSame('11', $number->regionCode());
         self::assertSame('11-95-255933-61', $number->formatted());
@@ -78,7 +78,7 @@ final class DrivingLicenceNumberTest extends TestCase
     #[DataProvider('regions')]
     public function testEarlierFormMapsTheRegionNameThroughKoroadsTable(string $name, string $code): void
     {
-        $number = DrivingLicenceNumber::from($name . ' 95-255933-61');
+        $number = DriverLicenceNumber::from($name . ' 95-255933-61');
 
         self::assertSame($name . ' 95-255933-61', $number->value);
         self::assertSame($name . ' 95-255933-61', $number->formatted());
@@ -100,22 +100,22 @@ final class DrivingLicenceNumberTest extends TestCase
     #[DataProvider('earlierForms')]
     public function testEarlierFormIsKeptAsKoroadPrintsIt(string $input): void
     {
-        $number = DrivingLicenceNumber::from($input);
+        $number = DriverLicenceNumber::from($input);
 
         self::assertSame('서울 95-255933-61', $number->value);
         self::assertSame('서울 95-255933-61', (string) $number);
         self::assertSame('서울 95-255933-61', $number->jsonSerialize());
-        self::assertFalse($number->equals(DrivingLicenceNumber::from('119525593361')));
+        self::assertFalse($number->equals(DriverLicenceNumber::from('119525593361')));
     }
 
     public function testEarlierFormMasksAllButTheLastFourDigits(): void
     {
-        self::assertSame('서울 **-****33-61', DrivingLicenceNumber::from('서울 95-255933-61')->masked());
+        self::assertSame('서울 **-****33-61', DriverLicenceNumber::from('서울 95-255933-61')->masked());
     }
 
     public function testMasksAllButTheLastFour(): void
     {
-        self::assertSame('********3361', DrivingLicenceNumber::from('11-95-255933-61')->masked());
+        self::assertSame('********3361', DriverLicenceNumber::from('11-95-255933-61')->masked());
     }
 
     /**
@@ -145,7 +145,7 @@ final class DrivingLicenceNumberTest extends TestCase
     public function testRefusesWithoutEchoingTheInput(string $input, string $message): void
     {
         self::assertRefusedWithoutEcho(
-            static fn (string $value): DrivingLicenceNumber => DrivingLicenceNumber::from($value),
+            static fn (string $value): DriverLicenceNumber => DriverLicenceNumber::from($value),
             $input,
             $message,
         );

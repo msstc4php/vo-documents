@@ -26,6 +26,25 @@ final class DigitsTest extends TestCase
         self::assertSame('123', Digits::strip("1\t2\t3"));
     }
 
+    /**
+     * @return iterable<string, array{string}>
+     */
+    public static function dashLikeSeparators(): iterable
+    {
+        yield 'fullwidth hyphen-minus U+FF0D' => ["\u{FF0D}"];
+        yield 'halfwidth prolonged sound mark U+FF70' => ["\u{FF70}"];
+        yield 'katakana-hiragana prolonged sound mark U+30FC' => ["\u{30FC}"];
+        yield 'hyphen U+2010' => ["\u{2010}"];
+        yield 'non-breaking hyphen U+2011' => ["\u{2011}"];
+        yield 'minus sign U+2212' => ["\u{2212}"];
+    }
+
+    #[DataProvider('dashLikeSeparators')]
+    public function testStripRemovesEveryDashLikeCharacter(string $separator): void
+    {
+        self::assertSame('1234', Digits::strip('12' . $separator . '34'));
+    }
+
     public function testStripKeepsLettersAndHonoursCustomSeparators(): void
     {
         self::assertSame('1a-2', Digits::strip('1a-2.', '.'));

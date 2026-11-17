@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MSSTC4PHP\ValueObject\Documents\Tests\Unit\Document\KR;
 
-use MSSTC4PHP\ValueObject\Documents\Document\KR\OrdinaryPassportNumber;
+use MSSTC4PHP\ValueObject\Documents\Document\KR\MultipleEntryPassportNumber;
 use MSSTC4PHP\ValueObject\Documents\Internal\Digits;
 use MSSTC4PHP\ValueObject\Documents\Internal\Mask;
 use MSSTC4PHP\ValueObject\Documents\Internal\NumberShapes;
@@ -16,14 +16,14 @@ use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
 
 /**
- * Expectations follow docs/sources/KR.md "Ordinary passport number": MOFA's `M12345678` and `M123A4567`.
+ * Expectations follow docs/sources/KR.md "Multiple-entry passport number": MOFA's `M12345678` and `M123A4567`.
  */
-#[CoversClass(OrdinaryPassportNumber::class)]
+#[CoversClass(MultipleEntryPassportNumber::class)]
 #[UsesClass(NumberShapes::class)]
 #[UsesClass(Digits::class)]
 #[UsesClass(Text::class)]
 #[UsesClass(Mask::class)]
-final class OrdinaryPassportNumberTest extends TestCase
+final class MultipleEntryPassportNumberTest extends TestCase
 {
     use RefusesWithoutEchoingInput;
 
@@ -42,7 +42,7 @@ final class OrdinaryPassportNumberTest extends TestCase
     #[DataProvider('validNumbers')]
     public function testAccepts(string $input, string $expected): void
     {
-        $number = OrdinaryPassportNumber::from($input);
+        $number = MultipleEntryPassportNumber::from($input);
 
         self::assertSame($expected, $number->value);
         self::assertSame($expected, (string) $number);
@@ -51,7 +51,7 @@ final class OrdinaryPassportNumberTest extends TestCase
 
     public function testMasksAllButTheLastFour(): void
     {
-        self::assertSame('*****4567', OrdinaryPassportNumber::from('M123A4567')->masked());
+        self::assertSame('*****4567', MultipleEntryPassportNumber::from('M123A4567')->masked());
     }
 
     /**
@@ -59,7 +59,7 @@ final class OrdinaryPassportNumberTest extends TestCase
      */
     public static function invalidNumbers(): iterable
     {
-        $name = 'Invalid Korean ordinary passport number';
+        $name = 'Invalid Korean multiple-entry passport number';
 
         yield 'letter in the wrong place' => ['M12A34567', $name . ' (invalid character).'];
         yield 'two letters' => ['M12AB4567', $name . ' (invalid character).'];
@@ -77,7 +77,7 @@ final class OrdinaryPassportNumberTest extends TestCase
     public function testRefusesWithoutEchoingTheInput(string $input, string $message): void
     {
         self::assertRefusedWithoutEcho(
-            static fn (string $value): OrdinaryPassportNumber => OrdinaryPassportNumber::from($value),
+            static fn (string $value): MultipleEntryPassportNumber => MultipleEntryPassportNumber::from($value),
             $input,
             $message,
         );

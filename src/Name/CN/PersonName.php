@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace MSSTC4PHP\ValueObject\Documents\Name\CN;
 
 use MSSTC4PHP\ValueObject\Documents\Icao\PersonName as IcaoPersonName;
-use MSSTC4PHP\ValueObject\Documents\Name\RequiredLatin\AbstractFamilyGivenPersonName;
+use MSSTC4PHP\ValueObject\Documents\Name\RequiredLatin\AbstractRequiredLatinPersonName;
 use Override;
 
 /**
@@ -15,9 +15,9 @@ use Override;
  * split (a minority-nationality name such as `阿沛·阿旺晋美`, a Tibetan name) is stored whole in the family part with a
  * null given name, like the single 姓名 field of the ID card. See docs/sources/CN.md "Names".
  *
- * @extends AbstractFamilyGivenPersonName<FamilyName, GivenName>
+ * @extends AbstractRequiredLatinPersonName<FamilyName, GivenName>
  */
-final readonly class PersonName extends AbstractFamilyGivenPersonName
+final readonly class PersonName extends AbstractRequiredLatinPersonName
 {
     public function __construct(FamilyName $family, ?GivenName $given, IcaoPersonName $latin)
     {

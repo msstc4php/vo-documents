@@ -41,6 +41,11 @@ final class MyNumberTest extends TestCase
         yield 'groups of four' => ['1234 5678 9018', '123456789018'];
         yield 'hyphens and NBSP' => ["1234-5678\u{00A0}9018", '123456789018'];
         yield 'ideographic space' => ["1234\u{3000}5678\u{3000}9018", '123456789018'];
+        yield 'fullwidth digits with fullwidth hyphens' => [
+            "\u{FF11}\u{FF12}\u{FF13}\u{FF14}\u{FF0D}\u{FF15}\u{FF16}\u{FF17}\u{FF18}\u{FF0D}"
+            . "\u{FF19}\u{FF10}\u{FF11}\u{FF18}",
+            '123456789018',
+        ];
         yield 'fullwidth digits' => [
             "\u{FF11}\u{FF12}\u{FF13}\u{FF14}\u{FF15}\u{FF16}\u{FF17}\u{FF18}\u{FF19}\u{FF10}\u{FF11}\u{FF18}",
             '123456789018',

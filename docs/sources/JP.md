@@ -191,7 +191,7 @@ gives one description for the number field. No check rule and no meaning of the 
 renewal (MOFA 2021-09-14, "更新する前に所持していたパスポートと同じ番号を引き継ぐことはできません"), which is why it is no
 person identifier. Mask: last 4.
 
-### Driving licence number (運転免許証番号) — covered, check digit not verified: `Document\JP\DrivingLicenceNumber`
+### Driving licence number (運転免許証番号) — covered, check digit not verified: `Document\JP\DriverLicenceNumber`
 
 警察庁丁運発第76号 (令和7年3月10日, 警察庁交通局運転免許課長), 「運転免許証の番号等の形式及び内容について（通達）」,
 <https://www.npa.go.jp/laws/notification/menkyo20250310_76.pdf>, fetched with `curl` and read with `pdftotext` on

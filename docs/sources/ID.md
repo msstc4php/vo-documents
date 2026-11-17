@@ -84,7 +84,8 @@ digit". DJP PENG-6/PJ.09/2024: the 15-digit NPWP or the NIK is used in the admin
 - **Decision:** one class for both, named `TaxpayerNumber` (the NPWP), accepting 15 digits or 16 digits. A 16-digit
   number is a NIK, a "0" + 15 digits, or a branch number, and cannot be told apart without rules DJP does not publish,
   so it is not read; the class does not claim to be only the 15-digit or only the NIK form. `isFifteenDigits()` tells
-  them.
+  them. The 15-digit form and its 16-digit `0`-prefixed form are distinct values: no conversion between them is done
+  and they are not equal.
 - **Placeholders refused:** PENG-6/PJ.09/2024 item 5a: "kolom NPWP pembeli BKP/penerima JKP diisi dengan
   00.000.000.0-000.000" when the buyer is identified by NIK; item 6b: "Elemen data NIKPemegangRek atau NIK_CP diisi
   dengan 0000000000000000" for a non-resident individual (items 6a1 and 6a2 repeat the 15-digit form for a NIK holder).

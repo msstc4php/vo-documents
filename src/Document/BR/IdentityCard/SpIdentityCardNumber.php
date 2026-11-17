@@ -64,6 +64,7 @@ final class SpIdentityCardNumber extends AbstractIdentityCardNumber
      */
     public static function fromNumberAndCheckCharacter(string $number, ?string $checkCharacter): self
     {
+        $number = Digits::fold($number);
         if (\strspn($number, self::NUMBER_FIELD_CHARACTERS) !== \strlen($number)) {
             $message = \sprintf('Invalid %s (number field: digits and dots only).', self::FORM_FIELDS);
 

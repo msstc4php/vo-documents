@@ -14,16 +14,16 @@ use MSSTC4PHP\ValueObject\Payload\PayloadCodec;
 use Override;
 
 /**
- * {family: string, given: string|null, latin: string}, all three keys required (given may be null); latin is the
- * `Icao\PersonName` string. Other keys are refused.
+ * {family: string, given: string|null, latin: string}; `family` and `latin` are required, `given` may be missing or
+ * null; latin is the `Icao\PersonName` string. Other keys are refused.
  *
  * @internal
  *
- * @template TName of AbstractFamilyGivenPersonName the country's composite name
+ * @template TName of AbstractRequiredLatinPersonName the country's composite name
  *
  * @implements PayloadCodec<TName>
  */
-abstract readonly class AbstractFamilyGivenPersonNameCodec implements PayloadCodec
+abstract readonly class AbstractRequiredLatinPersonNameCodec implements PayloadCodec
 {
     private const array KEYS = ['family', 'given', 'latin'];
 
@@ -50,13 +50,9 @@ abstract readonly class AbstractFamilyGivenPersonNameCodec implements PayloadCod
      * @throws InvalidPersonNameException when a field is not a valid name part or Latin form
      */
     #[Override]
-    final public function decode(array $payload): AbstractFamilyGivenPersonName
+    final public function decode(array $payload): AbstractRequiredLatinPersonName
     {
         PayloadFields::assertOnlyKeys($payload, self::KEYS, $this->shape());
-
-        if (!\array_key_exists('given', $payload)) {
-            throw new InvalidPayloadException($this->shape());
-        }
 
         return $this->create(
             PayloadFields::string($payload, 'family', $this->shape()),
@@ -79,5 +75,5 @@ abstract readonly class AbstractFamilyGivenPersonNameCodec implements PayloadCod
         string $family,
         ?string $given,
         IcaoPersonName $latin,
-    ): AbstractFamilyGivenPersonName;
+    ): AbstractRequiredLatinPersonName;
 }

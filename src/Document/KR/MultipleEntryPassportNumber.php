@@ -20,11 +20,11 @@ use Override;
  * characters (no official masking rule).
  *
  * @see https://www.passport.go.kr/home/kor/onlineExperience/index.do?menuPos=58 외교부 여권안내
- * @see docs/sources/KR.md "Ordinary passport number"
+ * @see docs/sources/KR.md "Multiple-entry passport number"
  */
-final class OrdinaryPassportNumber extends AbstractStringValueObject implements Maskable
+final class MultipleEntryPassportNumber extends AbstractStringValueObject implements Maskable
 {
-    private const string DOCUMENT = 'Korean ordinary passport number';
+    private const string DOCUMENT = 'Korean multiple-entry passport number';
 
     #[Override]
     public function masked(): string

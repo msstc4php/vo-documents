@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MSSTC4PHP\ValueObject\Documents\Tests\Unit\Document\JP;
 
-use MSSTC4PHP\ValueObject\Documents\Document\JP\DrivingLicenceNumber;
+use MSSTC4PHP\ValueObject\Documents\Document\JP\DriverLicenceNumber;
 use MSSTC4PHP\ValueObject\Documents\Internal\Digits;
 use MSSTC4PHP\ValueObject\Documents\Internal\Mask;
 use MSSTC4PHP\ValueObject\Documents\Internal\Text;
@@ -18,11 +18,11 @@ use PHPUnit\Framework\TestCase;
  * Expectations follow docs/sources/JP.md "Driving licence number" (警察庁丁運発第76号). The notice publishes no example
  * number and no check weights; the numbers below are made up.
  */
-#[CoversClass(DrivingLicenceNumber::class)]
+#[CoversClass(DriverLicenceNumber::class)]
 #[UsesClass(Digits::class)]
 #[UsesClass(Text::class)]
 #[UsesClass(Mask::class)]
-final class DrivingLicenceNumberTest extends TestCase
+final class DriverLicenceNumberTest extends TestCase
 {
     use RefusesWithoutEchoingInput;
 
@@ -45,7 +45,7 @@ final class DrivingLicenceNumberTest extends TestCase
     #[DataProvider('validNumbers')]
     public function testAcceptsAndStoresDigits(string $input, string $expected): void
     {
-        $number = DrivingLicenceNumber::from($input);
+        $number = DriverLicenceNumber::from($input);
 
         self::assertSame($expected, $number->value);
         self::assertSame($expected, (string) $number);
@@ -54,7 +54,7 @@ final class DrivingLicenceNumberTest extends TestCase
 
     public function testReadsTheFieldsOfTheNotice(): void
     {
-        $number = DrivingLicenceNumber::from('301912345673');
+        $number = DriverLicenceNumber::from('301912345673');
 
         self::assertSame('30', $number->publicSafetyCommissionCode());
         self::assertSame('19', $number->yearSymbol());
@@ -64,7 +64,7 @@ final class DrivingLicenceNumberTest extends TestCase
 
     public function testKeepsLeadingZerosOfEveryField(): void
     {
-        $number = DrivingLicenceNumber::from('010000000700');
+        $number = DriverLicenceNumber::from('010000000700');
 
         self::assertSame('01', $number->publicSafetyCommissionCode());
         self::assertSame('00', $number->yearSymbol());
@@ -74,7 +74,7 @@ final class DrivingLicenceNumberTest extends TestCase
 
     public function testMasksAllButTheLastFour(): void
     {
-        self::assertSame('********5670', DrivingLicenceNumber::from('301912345670')->masked());
+        self::assertSame('********5670', DriverLicenceNumber::from('301912345670')->masked());
     }
 
     /**
@@ -94,7 +94,7 @@ final class DrivingLicenceNumberTest extends TestCase
     public function testRefusesWithoutEchoingTheInput(string $input, string $message): void
     {
         self::assertRefusedWithoutEcho(
-            static fn (string $value): DrivingLicenceNumber => DrivingLicenceNumber::from($value),
+            static fn (string $value): DriverLicenceNumber => DriverLicenceNumber::from($value),
             $input,
             $message,
         );

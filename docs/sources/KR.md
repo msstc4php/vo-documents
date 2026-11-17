@@ -43,7 +43,9 @@ foreigner used abroad before naturalization, nationality acquisition, or restora
   may keep the name used abroad (the exception quoted above), written in Hangul as one name with spaces. So the given
   name is nullable as in CN: a name with no split is stored whole in the family part. One space, `·` U+00B7 or hyphen
   between words is allowed (a decision of the owner; no official text read settles the separators of such a name).
-  `nationalSeparator()` is `''`: family and given are written together (`김민준`).
+  `nationalSeparator()` is `''`: family and given are written together (`김민준`). `full()` joins the two with no
+  space also for a naturalised multi-word name split into family and given (존슨 + 마이클 gives 존슨마이클); such a
+  name can be stored whole in the family part instead (`존슨 마이클`, given null), which keeps its space.
 - **Passport spelling:** the Latin form is mandatory, never derived, never compared with the Hangul (Kim, Gim, Yi, Lee).
 
 ## Resident registration number (`Document\KR\ResidentRegistrationNumber`)
@@ -81,7 +83,7 @@ covers); the owner confirmed the split. Open question for the owner (no official
 birth date is not a calendar date (for instance a registered unknown month or day) is refused here; kept as decided, to
 revisit if an official practice for unknown dates is found. Mask: last 4.
 
-## Ordinary passport number (`Document\KR\OrdinaryPassportNumber`)
+## Multiple-entry passport number (`Document\KR\MultipleEntryPassportNumber`)
 
 MOFA 여권안내, 차세대 전자여권 (Internet Archive copy 2023): "여권번호 체계를 변경(M12345678 → M123A4567)하고, 주민등록번호를 삭제하며, 월(月) 표기방법을 변경(영문
 → 한글/영문) 했습니다." The 2021-11-11 release: "외교부는 올해 12월 21일부터 일반 국민을 대상으로 … 차세대 전자여권 발급을 개시합니다." So `M` + 8 digits, and `M`
@@ -90,7 +92,7 @@ for what the guide shows and covers that series only. The letter's set and a che
 letter. Mask: last 4. Not covered (prefix unpublished): the single-use and emergency (단수, 긴급) passports, official,
 diplomatic and other series.
 
-## Driving licence number (`Document\KR\DrivingLicenceNumber`)
+## Driving licence number (`Document\KR\DriverLicenceNumber`)
 
 KoROAD, 2014-07-14: "2014년 7월 2일부터 새로 발급되는 운전면허증에는 면허번호의 지역명이 숫자로 표기됩니다. 11 : 서울 12 : 부산 13 : 경기 14 : 강원 15 : 충북 16 : 충남
 17 : 전북 18 : 전남 19 : 경북 20 : 경남 21 : 제주 22 : 대구 23 : 인천 24 : 광주 25 : 대전 26 : 울산". The embassy reprints (2014-04-15 and

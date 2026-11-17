@@ -121,6 +121,6 @@ identifier and is not covered.
   Parivahan DL-status page <https://parivahan.gov.in/rcdlstatus/?pur_cd=101> (reported input hint "SS-RRYYYYNNNNNNN OR
   SSRR YYYYNNNNNNN", old licences to be converted) answers 404 to `curl` (also without the query) and "socket hang up"
   to WebFetch; the sarathi.parivahan.gov.in state pages that load carry no such hint. Without a readable official text
-  no `DrivingLicenceNumber` is added.
+  no `DriverLicenceNumber` is added.
 - Passport Seva file number, ABHA address, Aadhaar Virtual ID, voter-roll serial numbers, ration card, state-issued
   documents.

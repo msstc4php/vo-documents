@@ -28,7 +28,7 @@ use Override;
  * @see https://www.koroad.or.kr/kp_web/licNewsView.do?board_code=PRBBS_080&board_num=101697 도로교통공단 면허소식 2014-07-14
  * @see docs/sources/KR.md "Driving licence number"
  */
-final class DrivingLicenceNumber extends AbstractStringValueObject implements Maskable
+final class DriverLicenceNumber extends AbstractStringValueObject implements Maskable
 {
     private const string DOCUMENT = 'Korean driving licence number';
 

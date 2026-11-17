@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace MSSTC4PHP\ValueObject\Documents\Tests\Fixture\RequiredLatin;
 
 use MSSTC4PHP\ValueObject\Documents\Icao\PersonName as IcaoPersonName;
-use MSSTC4PHP\ValueObject\Documents\Name\RequiredLatin\AbstractFamilyGivenPersonNameCodec;
+use MSSTC4PHP\ValueObject\Documents\Name\RequiredLatin\AbstractRequiredLatinPersonNameCodec;
 use Override;
 
 /**
- * @extends AbstractFamilyGivenPersonNameCodec<TestPersonName>
+ * @extends AbstractRequiredLatinPersonNameCodec<TestPersonName>
  */
-final readonly class TestPersonNameCodec extends AbstractFamilyGivenPersonNameCodec
+final readonly class TestPersonNameCodec extends AbstractRequiredLatinPersonNameCodec
 {
     #[Override]
     public function valueObjectClass(): string
@@ -22,7 +22,7 @@ final readonly class TestPersonNameCodec extends AbstractFamilyGivenPersonNameCo
     #[Override]
     protected function shape(): string
     {
-        return 'Expected a test person name payload with string "family", string or null "given", '
+        return 'Expected a test person name payload with string "family", string, null or missing "given", '
             . 'string "latin", and no other keys.';
     }
 

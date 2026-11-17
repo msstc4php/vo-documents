@@ -160,6 +160,11 @@ final class IdentityCardNumbersTest extends TestCase
         yield 'supplied check character' => ['12.345.678', '2', '123456782'];
         yield 'supplied x upper-cased' => ['24681357', 'x', '24681357X'];
         yield 'leading zeros kept' => ['00000001', null, '000000012'];
+        yield 'fullwidth digits and dots' => [
+            "\u{FF12}\u{FF14}.\u{FF19}\u{FF15}\u{FF15}.\u{FF19}\u{FF17}\u{FF15}",
+            '4',
+            '249559754',
+        ];
     }
 
     #[DataProvider('formFields')]

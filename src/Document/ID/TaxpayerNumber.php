@@ -20,7 +20,7 @@ use Override;
  * publishes no check digit and no meaning of the 15 digits, and a 16-digit number cannot be told from a NIK, so none of
  * its digits is read. Dots are accepted as separators besides the package's. `formatted()` is DJP's form for 15 digits;
  * no display form of 16 digits is quoted, so it gives the digits. `masked()` keeps the last four digits (no official
- * masking rule).
+ * masking rule). The 15-digit form and its 16-digit `0`-prefixed form are distinct values: no conversion is done.
  *
  * @see https://www.pajak.go.id/sites/default/files/2024-02/PENG-6-2024%20PENGGUNAAN%20NOMOR%20POKOK%20WAJIB%20PAJAK%20PADA%20SISTEM%20ADMINISTRASI%20PERPAJAKAN.pdf
  *      DJP, PENG-6/PJ.09/2024

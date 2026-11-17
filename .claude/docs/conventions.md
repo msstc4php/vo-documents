@@ -31,7 +31,8 @@
 - Name tests use `Tests\Fixture\RefusesNameWithoutEchoingInput::assertNameRefusedWithoutEcho()`: exact message and no
   input word of three or more letters in it (as typed or upper-cased).
 - A document number VO parses with `Internal\Digits::exactly($input, $length, $label)` (`exactlyStripped()` when the
-  separators are already removed; strips `Digits::SEPARATORS`: space, `-`, tab, CR/LF, NBSP, U+2007, U+202F; message
+  separators are already removed; strips `Digits::SEPARATORS`: space, `-`, tab, CR/LF, NBSP, U+2007, U+202F, U+3000
+  and the hyphen look-alikes U+FF0D, U+FF70, U+30FC, U+2010, U+2011, U+2212; message
   `Invalid <label> (<n> characters).`, or `(too long)` above `Digits::MAX_REPORTED_LENGTH` = 40; right length with a
   non-digit: `(invalid character)`), then its checksum where an official algorithm exists (`Invalid <label>
   checksum.`). The label is a `private const string DOCUMENT` per class, used in every message. `masked()` keeps the
@@ -99,11 +100,12 @@
   tatweel U+0640 is removed, U+30FB and U+2022 are stored as U+00B7.
 - **Mandatory Latin name** (CN, KR, ID, SA, IN-Devanagari): the passport spelling is a personal choice, so the Latin
   `Icao\PersonName` is a required constructor argument and a required codec key, never derived; nothing compares it with
-  the national form. `Name\RequiredLatin\AbstractFamilyGivenPersonName` (CN, KR) takes a nullable `given`: a name with
+  the national form. `Name\RequiredLatin\AbstractRequiredLatinPersonName` (CN, KR) takes a nullable `given`: a name with
   no family/given split is stored whole in `family`. ID, SA and IN-Devanagari have their own layouts. JP is the one
   that derives (MOFA Hepburn) and so takes an optional override.
-- **A class name claims only what it covers:** `OrdinaryPassportNumber` (CN `E`/`G`, KR `M` series) refuses the other
-  series; the KR resident class refuses foreigner digits and the foreigner class resident digits.
+- **A class name claims only what it covers:** `OrdinaryPassportNumber` (CN `E`/`G`) and KR
+  `MultipleEntryPassportNumber` (`M` series) refuse the other series; the KR resident class refuses foreigner digits
+  and the foreigner class resident digits.
 - **A document number that is another document's number gets no class** (CN and SA driving licence, ID SIM since
   2024): README and the source note say which class to use.
 - **Regions and codes are plain strings** (`administrativeDivisionCode()`, `regionCode()`,

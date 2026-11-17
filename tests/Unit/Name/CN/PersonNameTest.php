@@ -20,8 +20,8 @@ use MSSTC4PHP\ValueObject\Documents\Name\CN\FamilyName;
 use MSSTC4PHP\ValueObject\Documents\Name\CN\GivenName;
 use MSSTC4PHP\ValueObject\Documents\Name\CN\PersonName;
 use MSSTC4PHP\ValueObject\Documents\Name\CN\PersonNameCodec;
-use MSSTC4PHP\ValueObject\Documents\Name\RequiredLatin\AbstractFamilyGivenPersonName;
-use MSSTC4PHP\ValueObject\Documents\Name\RequiredLatin\AbstractFamilyGivenPersonNameCodec;
+use MSSTC4PHP\ValueObject\Documents\Name\RequiredLatin\AbstractRequiredLatinPersonName;
+use MSSTC4PHP\ValueObject\Documents\Name\RequiredLatin\AbstractRequiredLatinPersonNameCodec;
 use MSSTC4PHP\ValueObject\Documents\Tests\Fixture\RefusesNameWithoutEchoingInput;
 use MSSTC4PHP\ValueObject\Exception\InvalidPayloadException;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -31,8 +31,8 @@ use PHPUnit\Framework\TestCase;
 
 #[CoversClass(PersonName::class)]
 #[CoversClass(PersonNameCodec::class)]
-#[UsesClass(AbstractFamilyGivenPersonName::class)]
-#[UsesClass(AbstractFamilyGivenPersonNameCodec::class)]
+#[UsesClass(AbstractRequiredLatinPersonName::class)]
+#[UsesClass(AbstractRequiredLatinPersonNameCodec::class)]
 #[UsesClass(AbstractChineseNamePart::class)]
 #[UsesClass(FamilyName::class)]
 #[UsesClass(GivenName::class)]
@@ -49,8 +49,8 @@ final class PersonNameTest extends TestCase
 {
     use RefusesNameWithoutEchoingInput;
 
-    private const string SHAPE = 'Expected a Chinese person name payload with string "family", string or null "given", '
-        . 'string "latin", and no other keys.';
+    private const string SHAPE = 'Expected a Chinese person name payload with string "family", '
+        . 'string, null or missing "given", string "latin", and no other keys.';
 
     public function testFullWritesFamilyAndGivenTogether(): void
     {
@@ -136,7 +136,6 @@ final class PersonNameTest extends TestCase
     {
         yield 'latin missing' => [['family' => '张', 'given' => '伟']];
         yield 'latin null' => [['family' => '张', 'given' => '伟', 'latin' => null]];
-        yield 'given key missing' => [['family' => '张', 'latin' => 'ZHANG<<WEI']];
         yield 'given int' => [['family' => '张', 'given' => 1, 'latin' => 'ZHANG<<WEI']];
         yield 'family int' => [['family' => 1, 'given' => '伟', 'latin' => 'ZHANG<<WEI']];
         yield 'unknown key' => [['family' => '张', 'given' => '伟', 'latin' => 'ZHANG<<WEI', 'x' => 'y']];

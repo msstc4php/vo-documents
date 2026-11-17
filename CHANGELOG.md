@@ -35,7 +35,7 @@
   multiple-entry passport, driving licence. IN: Aadhaar, PAN with `PanHolderType`, passport, ABHA number. ID: NIK, NPWP,
   family card number. SA: national ID and iqama numbers (`AbstractIdentityNumber`). Names: CN, KR, ID, SA and the
   Devanagari ones of IN require the Latin form of the passport and never derive it
-  (`Name\RequiredLatin\AbstractFamilyGivenPersonName` for CN and KR; a name with no family and given split is stored
+  (`Name\RequiredLatin\AbstractRequiredLatinPersonName` for CN and KR; a name with no family and given split is stored
   whole in `family` with a null `given`); JP derives it by MOFA's Hepburn table from the 振り仮名
   (`Name\JP\PassportHepburn`, override policy `AnyIcaoSpelling`); IN in Latin letters uses `TransliterationVariant`.
   Source notes `docs/sources/{CN,JP,KR,IN,ID,SA}.md`.

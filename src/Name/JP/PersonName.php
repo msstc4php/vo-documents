@@ -36,7 +36,7 @@ final readonly class PersonName implements NationalPersonName
         public GivenName $given,
         public FamilyNameReading $familyReading,
         public GivenNameReading $givenReading,
-        ?IcaoPersonName $latinOverride = null,
+        ?IcaoPersonName $latin = null,
     ) {
         $hepburn = new PassportHepburn();
         $form = new AnyIcaoSpelling()->effective(
@@ -44,7 +44,7 @@ final readonly class PersonName implements NationalPersonName
                 $hepburn->toLatin($familyReading),
                 [$hepburn->toLatin($givenReading)],
             ),
-            $latinOverride,
+            $latin,
         );
         $this->effective = $form->effective;
         $this->override = $form->override;
