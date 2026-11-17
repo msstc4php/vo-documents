@@ -12,18 +12,32 @@ use MSSTC4PHP\ValueObject\Documents\Exception\InvalidDocumentNumberException;
  */
 final class Digits
 {
-    public const string SEPARATORS = " -\t\r\n\u{00A0}\u{2007}\u{202F}";
+    public const string SEPARATORS = " -\t\r\n\u{00A0}\u{2007}\u{202F}\u{3000}";
 
     /**
      * Above this the message says "too long": a count of 100 or more would be a three-digit run.
      */
     public const int MAX_REPORTED_LENGTH = 40;
 
+    /**
+     * @var array<string, non-empty-string>|null
+     */
+    private static ?array $foldMap = null;
+
+    /**
+     * Maps fullwidth digits and letters and Arabic-Indic digits to ASCII (letters upper-cased), so a number typed on
+     * a CJK or Arabic keyboard reads as the ASCII one. Names do not use it: they refuse compatibility characters.
+     */
+    public static function fold(string $input): string
+    {
+        return \strtr($input, self::foldMap());
+    }
+
     public static function strip(string $input, string $separators = self::SEPARATORS): string
     {
         $characters = \mb_str_split($separators, 1, 'UTF-8');
 
-        return \str_replace($characters, '', $input);
+        return \str_replace($characters, '', self::fold($input));
     }
 
     /**
@@ -117,5 +131,34 @@ final class Digits
     private static function length(string $value): int
     {
         return \mb_strlen($value, 'UTF-8');
+    }
+
+    /**
+     * @return array<string, non-empty-string>
+     */
+    private static function foldMap(): array
+    {
+        return self::$foldMap ??= self::buildFoldMap();
+    }
+
+    /**
+     * @return array<string, non-empty-string>
+     */
+    private static function buildFoldMap(): array
+    {
+        $map = [];
+        foreach (\range(0, 9) as $digit) {
+            foreach ([0xFF10, 0x0660, 0x06F0] as $zero) {
+                $map[\mb_chr($zero + $digit, 'UTF-8')] = (string) $digit;
+            }
+        }
+
+        foreach (\range(0, 25) as $letter) {
+            foreach ([0xFF21, 0xFF41] as $first) {
+                $map[\mb_chr($first + $letter, 'UTF-8')] = \chr(0x41 + $letter);
+            }
+        }
+
+        return $map;
     }
 }

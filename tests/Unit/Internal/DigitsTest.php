@@ -41,6 +41,43 @@ final class DigitsTest extends TestCase
         self::assertSame("1\u{0420}2", Digits::strip("1\u{0420}\u{00A0}2"));
     }
 
+    public function testFoldMapsFullwidthDigitsAndLettersToAscii(): void
+    {
+        self::assertSame('1234', Digits::fold("\u{FF11}\u{FF12}\u{FF13}\u{FF14}"));
+        self::assertSame('AB', Digits::fold("\u{FF41}\u{FF42}"));
+        self::assertSame('AZ09', Digits::fold("\u{FF21}\u{FF3A}\u{FF10}\u{FF19}"));
+        self::assertSame('ZA', Digits::fold("\u{FF5A}\u{FF21}"));
+    }
+
+    public function testFoldMapsArabicIndicDigitsToAscii(): void
+    {
+        self::assertSame('123', Digits::fold("\u{0661}\u{0662}\u{0663}"));
+        self::assertSame('123', Digits::fold("\u{06F1}\u{06F2}\u{06F3}"));
+        self::assertSame('09', Digits::fold("\u{0660}\u{0669}"));
+        self::assertSame('09', Digits::fold("\u{06F0}\u{06F9}"));
+    }
+
+    public function testFoldLeavesOtherCharactersAndInvalidUtf8Alone(): void
+    {
+        self::assertSame("ab-1\u{0420}", Digits::fold("ab-1\u{0420}"));
+        self::assertSame("\xFF", Digits::fold("\xFF"));
+    }
+
+    public function testStripFoldsAndRemovesTheIdeographicSpace(): void
+    {
+        self::assertSame('1234', Digits::strip("\u{FF11}\u{FF12}\u{3000}\u{FF13}\u{FF14}"));
+    }
+
+    public function testUpperCasedOfLengthFoldsBeforeCounting(): void
+    {
+        self::assertSame('AB', Digits::upperCasedOfLength("\u{FF41}\u{3000}\u{FF42}", static fn (int $n): bool => $n === 2, 'test number'));
+    }
+
+    public function testStrippedLengthFoldsBeforeCounting(): void
+    {
+        self::assertSame(3, Digits::strippedLength("\u{0661}\u{3000}\u{0662}\u{06F3}"));
+    }
+
     public function testExactlyReturnsTheDigits(): void
     {
         self::assertSame('0123', Digits::exactly(' 01-23 ', 4, 'test number'));

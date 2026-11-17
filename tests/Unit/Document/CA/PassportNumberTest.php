@@ -69,7 +69,7 @@ final class PassportNumberTest extends TestCase
         yield 'eight digits' => ['12345678', $character];
         yield 'new form with three letters' => ['AB12345CD', $character];
         yield 'letter first then digits' => ['A12345678', $character];
-        yield 'non-ASCII digit' => ["AB12345\u{0663}", $character];
+        yield 'non-ASCII digit' => ["AB12345\u{0969}", $character];
         yield 'seven characters' => ['AB12345', 'Invalid Canadian passport number (7 characters).'];
         yield 'ten characters' => ['A123456BCD', 'Invalid Canadian passport number (10 characters).'];
     }
