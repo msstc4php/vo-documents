@@ -250,6 +250,18 @@ vendor and insurer guides (Kavak, Ahorra Seguros), news sites, Justia copies, Wi
 tiene 14 dígitos" cites no official text; a search-index snippet of a Baja California verification page shows a sample
 number, but the page could not be read and a sample is not a rule.
 
+**Re-check of the unreachable hosts, 2026-11-17 UTC (plan 4, task 10).** `curl` from the sandbox, hosts allowed one by
+one: `appsextssl.ebajacalifornia.gob.mx` (BCN), `www.semovi.cdmx.gob.mx` (CMX), `icvnl.gob.mx` (NLE) and
+`tramites.yucatan.gob.mx` (YUC) timed out after 25 s; `ventanilla.puebla.gob.mx` (PUE) closed the TLS handshake
+(`SSL_ERROR_SYSCALL`); `michoacan.gob.mx` (MIC) failed certificate verification (`unable to verify the first
+certificate`; WebFetch gave the same; not bypassed). WebFetch answered "Socket is closed" for all but MIC. The Internet
+Archive answered (CDX): no 200 capture of the BCN verifier or of any CMX licence page (only the home page and Incapsula
+stubs; a domain-wide CDX query for CMX returned 504); PUE has only 301/302 captures of `/`; YUC has captures of `/`
+and `.well-known` files only; MIC has a 2015 `tramitar-o-renovar-licencia` capture that carries no text, and a 2015
+news item on licence renewal incentives; NLE has captures of `icvnl.gob.mx/Licencia` (2025-04-07, a shell without form
+fields) and the POE of 2020-10-21 with the digital-licence notice, none of which describes the number. Result: no new
+state is covered; every row stays "not covered" and the `fromNumber()` overlap table is unchanged.
+
 **Estado de México (verbatim).** MEX-VAL2, the number field: `placeholder="12 dígitos" maxlength="12"
 data-val-length="El Número de Licencia es de 12 dígitos" data-val-length-max="12" data-val-length-min="12"
 data-val-regex="El Número de Licencia debe contener solo números." data-val-regex-pattern="^\d{12}$"
@@ -287,12 +299,12 @@ stop there (verbatim):
 | ISO | Source | Quoted format | Normalised shape | Encoded data | Official sample | Verdict |
 |---|---|---|---|---|---|---|
 | MX-AGU | AGU-LV; `aguascalientes.gob.mx` (searched) | none | — | — | — | not covered: no published format |
-| MX-BCN | `appsextssl.ebajacalifornia.gob.mx/Verificacion/Licencias` (unreachable, no IA capture); `ebajacalifornia.gob.mx` (searched) | none read | — | — | none read (an index snippet only) | not covered: issuer's pages unreachable on 2026-11-16 UTC, re-check |
+| MX-BCN | `appsextssl.ebajacalifornia.gob.mx/Verificacion/Licencias` (unreachable, no IA capture); `ebajacalifornia.gob.mx` (searched) | none read | — | — | none read (an index snippet only) | not covered: issuer's pages unreachable on 2026-11-16 and 2026-11-17 UTC, no format found (plan 4 re-check) |
 | MX-BCS | `bcs.gob.mx` (searched) | none | — | — | — | not covered: no published format |
 | MX-CAM | `campeche.gob.mx` (searched) | none | — | — | — | not covered: no published format |
 | MX-CHH | `chihuahua.gob.mx` (searched) | none | — | — | — | not covered: no published format |
 | MX-CHP | `chiapas.gob.mx` (searched) | none | — | — | — | not covered: no published format |
-| MX-CMX | CMX-RLM; CMX-VAL; `semovi.cdmx.gob.mx` licence pages (unreachable, no IA capture) | number named, no format | — | — | — | not covered: issuer's pages unreachable on 2026-11-16 UTC, re-check |
+| MX-CMX | CMX-RLM; CMX-VAL; `semovi.cdmx.gob.mx` licence pages (unreachable, no IA capture) | number named, no format | — | — | — | not covered: issuer's pages unreachable on 2026-11-16 and 2026-11-17 UTC, no format found (plan 4 re-check) |
 | MX-COA | `coahuila.gob.mx` (searched) | none | — | — | — | not covered: no published format |
 | MX-COL | `col.gob.mx` (searched) | none | — | — | — | not covered: no published format |
 | MX-DUR | `durango.gob.mx` (searched) | none | — | — | — | not covered: no published format |
@@ -301,12 +313,12 @@ stop there (verbatim):
 | MX-HID | `hidalgo.gob.mx` (searched) | none | — | — | — | not covered: no published format |
 | MX-JAL | JAL-LMT art. 58; JAL-ML | "El número de registro de dicha licencia" | — | — | — | not covered: no published format |
 | MX-MEX | MEX-VAL, MEX-VAL2, MEX-VAL3 | "El Número de Licencia es de 12 dígitos", "debe contener solo números", `^\d{12}$`; "los DOCE números de su licencia" | `[0-9]{12}` | none (format only) | none | covered |
-| MX-MIC | `michoacan.gob.mx/tramites/licencias/` (unreachable, no IA capture) | none read | — | — | — | not covered: issuer's pages unreachable on 2026-11-16 UTC, re-check |
+| MX-MIC | `michoacan.gob.mx/tramites/licencias/` (unreachable, no IA capture) | none read | — | — | — | not covered: issuer's pages unreachable on 2026-11-16 and 2026-11-17 UTC, no format found (plan 4 re-check) |
 | MX-MOR | `morelos.gob.mx` (searched) | none | — | — | — | not covered: no published format |
 | MX-NAY | `nayarit.gob.mx` (searched) | none | — | — | — | not covered: no published format |
-| MX-NLE | NLE-LRL art. 18; `icvnl.gob.mx` (Instituto de Control Vehicular, unreachable, no IA capture) | "b) Número de licencia" | — | — | — | not covered: issuer's pages unreachable on 2026-11-16 UTC, re-check |
+| MX-NLE | NLE-LRL art. 18; `icvnl.gob.mx` (Instituto de Control Vehicular, unreachable, no IA capture) | "b) Número de licencia" | — | — | — | not covered: issuer's pages unreachable on 2026-11-16 and 2026-11-17 UTC, no format found (plan 4 re-check) |
 | MX-OAX | `oaxaca.gob.mx` (searched) | none | — | — | — | not covered: no published format |
-| MX-PUE | `ventanilla.puebla.gob.mx` licence-digital FAQ (unreachable, no IA capture) | none read | — | — | — | not covered: issuer's pages unreachable on 2026-11-16 UTC, re-check |
+| MX-PUE | `ventanilla.puebla.gob.mx` licence-digital FAQ (unreachable, no IA capture) | none read | — | — | — | not covered: issuer's pages unreachable on 2026-11-16 and 2026-11-17 UTC, no format found (plan 4 re-check) |
 | MX-QUE | `queretaro.gob.mx` (searched; CEMER projects) | none | — | — | — | not covered: no published format |
 | MX-ROO | `qroo.gob.mx` (searched) | none | — | — | — | not covered: no published format |
 | MX-SIN | `sinaloa.gob.mx` (searched) | none | — | — | — | not covered: no published format |
@@ -316,7 +328,7 @@ stop there (verbatim):
 | MX-TAM | `finanzas.tamaulipas.gob.mx` requirement and fee sheets (searched) | none | — | — | — | not covered: no published format |
 | MX-TLA | `tlaxcala.gob.mx` (searched) | none | — | — | — | not covered: no published format |
 | MX-VER | `veracruz.gob.mx` (searched) | none | — | — | — | not covered: no published format |
-| MX-YUC | `tramites.yucatan.gob.mx` (unreachable); Reglamento de Tránsito seen only on Justia (not official) | none read | — | — | — | not covered: no official source read, re-check |
+| MX-YUC | `tramites.yucatan.gob.mx` (unreachable); Reglamento de Tránsito seen only on Justia (not official) | none read | — | — | — | not covered: no official source read on 2026-11-16 and 2026-11-17 UTC (plan 4 re-check) |
 | MX-ZAC | `zacatecas.gob.mx` (searched) | none | — | — | — | not covered: no published format |
 
 Rulings: separators of `Internal\Digits::SEPARATORS` are removed, as in US and CA (the Edomex field itself takes only

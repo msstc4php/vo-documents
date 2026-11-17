@@ -69,10 +69,28 @@ apellidos a cualquiera de las lenguas oficiales correspondiente al origen o domi
   no PCRE2 build's letter class decides it. The ICAO form omits it, as Doc 9303 Part 3 §4.6 says for "All other
   punctuation characters" ("no filler character shall be inserted in their place in the MRZ"): `PersonName` passes
   `['·']` as `$omittedPunctuation`, so `Marcel·lí` → `MARCELLI`.
+- **Catalan middle dot, sources looked for (2026-11-17 UTC).** No registry text (Ley 20/2011 del Registro Civil, the
+  DGSJFP/DGRN instructions and circulars, the RRC) was found that mentions the "ela geminada" or `l·l`: web searches
+  on the terms with "Registro Civil", "DGRN" and "Registre Civil" returned none, and the Boletín del Ministerio de
+  Justicia issue
+  <https://www.mjusticia.gob.es/es/AreaTematica/DocumentacionPublicaciones/InstLibraryRegisterNotary/2112_RC_2011.pdf>
+  (December 2011, the one a search listed), read with `pdftotext`, has no occurrence of "geminada", "l·l" or "volat".
+  So the acceptance of `l·l` rests on the never-refuse rule (a still-valid name is never refused), not on a registry
+  rule. The only official text found is the Parlament de Catalunya's note "ELA GEMINADA" (2011,
+  <https://www.parlament.cat/document/intrade/6642>, read 2026-11-17 UTC), on the writing, not on registration:
+  "La ela geminada és un signe gràfic exclusiu del català que consisteix en dues eles seguides amb un punt volat al
+  mig. […] Per tant, la representació gràfica correcta d'una ela geminada és: ĿL, ŀl. Tanmateix, a causa que el signe
+  per a representar la ela amb punt volat és exclusiu del català i manca en algunes fonts tipogràfiques, es considera
+  tolerable representar la ela geminada amb dues eles separades per un punt volat de l'amplada d'un espai tipogràfic,
+  d'aquesta manera: L·L, l·l. En canvi, és totalment inadmissible la substitució del punt volat per un punt baix (L.L,
+  l.l) o per un guió (L-L, l-l)." This agrees with the shape accepted (U+00B7 between two `l`, no `.` or `-`) and
+  names `ŀ`/`Ŀ` as the other, preferred spelling, which the fold below keeps valid. Secondary only (never a rule):
+  Softcatalà and press reports (Avui 2004, Ara) say the computerised Registro Civil has taken `l·l` and rejected `Ŀ`.
 - **`ŀ` and `Ŀ`** (U+0140, U+013F) are folded to their NFKC forms `l·` and `L·` before validation, so `Marceŀlí` and
   `Marcel·lí` are one stored value (`Marcel·lí`) and equal. This follows the package's compatibility-character rule
   (two spellings of one name must not give two values): elsewhere the rule refuses such characters, but table 6.A
-  lists `Ŀ`, so the other countries keep accepting it as typed (no `·` is allowed there to fold it to); in ES, where
+  lists `Ŀ`, so the other countries keep accepting it as typed (no `·` is allowed there to fold it to; NL table 5.2 lists `ŀ`
+  as a letter, and folding it would give a name the NL rules refuse). The fold therefore stays in ES (task 10 ruling); in ES, where
   `l·` is valid, the fold gives the one canonical spelling. The Latin form is unchanged (`Geŀla` → `GELLA`).
 - **Derived Latin:** the primary identifier is both surnames joined by a space (plan decision), the given name the
   secondary identifier, through ICAO Doc 9303 Part 3 table 6.A (`ICAO.md`): `García López, María José` →

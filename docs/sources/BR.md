@@ -515,6 +515,25 @@ algorithm); RS-AAC `name="fRG"` `maxlength="100"` (RG or CPF, script: `fRG: { re
 (MX precedent: Edomex was covered on "es de 12 dígitos", an exact length); BA's maximum of eight digits matches SP's,
 but BA publishes no check algorithm and makes the control digit optional, so its shape is not known.
 
+### RG per state — plan 4 re-check (2026-11-17 UTC)
+
+- **BA, MG** (`antecedentes.pc.ba.gov.br`, `wwws.pc.mg.gov.br`): proxy answered 502 to `CONNECT`; **CE**
+  (`sistemas.sspds.ce.gov.br`), **PE** (`www.servicos.sds.pe.gov.br`), **RN** (`www8.defesasocial.rn.gov.br`): timeout.
+  The IA captures already read stand; they give input limits only (`maxlength`), which is not a format (plan 3 ruling).
+  RN: IA captures of 2017 to 2018 exist; the one read (2018-11-20) is the landing page, whose notice says "Antecedentes
+  criminais será emitido apenas pelo TJ a partir deste sábado (23/02/2018)"; no RG field.
+- **RJ**: `atestadodic.detran.rj.gov.br/apresentacao.aspx` answered 200 and its "Solicitar Atestado" postback now
+  redirects (302) to `Informe.aspx`: "A partir de 06/01/2025 a solicitação de Atestado de Antecedentes deverá ser feita
+  através da opção Serviços constante no Site da Policia Civil do Rio de Janeiro". The linked
+  `certidaocacciifppcerj.detran.rj.gov.br` is a frameset that redirects to a login (`IULogin.aspx`, 302); no RG field
+  readable.
+- **RS**: `www.pc.rs.gov.br/emitir-certidao-de-antecedentes-policiais` answered 200 (the WAF page of 2026-11-16 is
+  gone). The field: `<input id="fRG" … type="text" size="35" maxlength="100" name="fRG" placeholder="Digite seu RG ou
+  CPF (Carteira de identidade nacional)" required>`; `emissaodeantecedentes.js` validates `fRG: { required: true }`.
+  Free text, no format.
+
+Result: no new unit is covered; the overlap table below is unchanged.
+
 ### RG per state — per unit
 
 | ISO | Source | Quoted format | Normalised shape | Check digit / encoding | Official sample | Verdict |
@@ -523,25 +542,25 @@ but BA publishes no check algorithm and makes the control digit optional, so its
 | BR-AL | `al.gov.br` (searched; Polícia Científica "Nada consta" page: number, "dígito verificador, quando houver", no rule) | none | — | — | — | not covered: no published format |
 | BR-AM | `am.gov.br` (searched; DPTC antecedentes page, no field rule) | none | — | — | — | not covered: no published format |
 | BR-AP | `ap.gov.br` (searched; in-person service only) | none | — | — | — | not covered: no published format |
-| BR-BA | BA-AAC | "maxlength=8", digits; control digit "opcional" | — | none published | — | not covered: input limit only, no check algorithm; live host unreachable on 2026-11-16 UTC, re-check |
-| BR-CE | CE-AAC | "maxlength=13"; "Não é preciso informa o dígito verificador" | — | — | — | not covered: input limit only; live host unreachable on 2026-11-16 UTC, re-check |
+| BR-BA | BA-AAC | "maxlength=8", digits; control digit "opcional" | — | none published | — | not covered: input limit only, no check algorithm; live host unreachable on 2026-11-16 and 2026-11-17 UTC (plan 4 re-check) |
+| BR-CE | CE-AAC | "maxlength=13"; "Não é preciso informa o dígito verificador" | — | — | — | not covered: input limit only; live host unreachable on 2026-11-16 and 2026-11-17 UTC (plan 4 re-check) |
 | BR-DF | DF-AAC | "maxlength=20" | — | — | — | not covered: input limit only |
 | BR-ES | `es.gov.br` (searched; the PCIES form takes the number of any of nine documents) | none | — | — | — | not covered: no published format |
 | BR-GO | `go.gov.br` (searched; I.I. Virtual, no field rule read) | none | — | — | — | not covered: no published format |
 | BR-MA | MA-AAC | "RG deve ter ao menos 5 dígitos" | — | — | — | not covered: minimum length only |
-| BR-MG | MG-AAC | "maxlength=10" | — | — | — | not covered: input limit only; live host unreachable on 2026-11-16 UTC, re-check |
+| BR-MG | MG-AAC | "maxlength=10" | — | — | — | not covered: input limit only; live host unreachable on 2026-11-16 and 2026-11-17 UTC (plan 4 re-check) |
 | BR-MS | `ms.gov.br` (searched; antecedentes service lists the RG, no field rule) | none | — | — | — | not covered: no published format |
 | BR-MT | `mt.gov.br` (searched; SESP form takes CPF and a document type) | none | — | — | — | not covered: no published format |
 | BR-PA | PA-AAC | free text, required | — | — | — | not covered: no published format |
 | BR-PB | PB-AAC | free text ("RG ou CIN") | — | — | — | not covered: no published format |
-| BR-PE | PE-AAC | "maxlength=20", digits | — | — | — | not covered: input limit only; live host unreachable on 2026-11-16 UTC, re-check |
+| BR-PE | PE-AAC | "maxlength=20", digits | — | — | — | not covered: input limit only; live host unreachable on 2026-11-16 and 2026-11-17 UTC (plan 4 re-check) |
 | BR-PI | `pi.gov.br` (searched; requests by e-mail) | none | — | — | — | not covered: no published format |
 | BR-PR | PR-AAC | "Somente números", RG or CPF | — | — | — | not covered: no published format |
-| BR-RJ | RJ-AAC (request form not reached: postback HTTP 500) | none read | — | — | — | not covered: request form unreachable on 2026-11-16 UTC, re-check |
-| BR-RN | `www8.defesasocial.rn.gov.br/antecedentes/` (timeout; IA offline at the attempt) | none read | — | — | — | not covered: issuer's form unreachable on 2026-11-16 UTC, re-check |
+| BR-RJ | RJ-AAC (request form not reached: postback HTTP 500) | none read | — | — | — | not covered: the legacy request ends at a notice (2026-11-17 UTC); the new service takes no RG field rule we could read |
+| BR-RN | `www8.defesasocial.rn.gov.br/antecedentes/` (timeout; IA offline at the attempt) | none read | — | — | — | not covered: issuer's form unreachable on 2026-11-16 and 2026-11-17 UTC (plan 4 re-check) |
 | BR-RO | `ro.gov.br` (searched; Portal do Cidadão service, no field rule) | none | — | — | — | not covered: no published format |
 | BR-RR | RR-AAC | "maxlength=15", DV "maxlength=1" | — | none published | — | not covered: input limit only, no check algorithm |
-| BR-RS | RS-AAC | free text (RG or CPF) | — | — | — | not covered: no published format; host answered a WAF "Request Rejected" page on a re-read (2026-11-16 12:52 UTC), re-check |
+| BR-RS | RS-AAC | free text (RG or CPF) | — | — | — | not covered: no published format; host re-read on 2026-11-17 UTC: one free-text field `maxlength="100"`, jQuery rule `required` only |
 | BR-SC | SC-AAC | required, no rule | — | — | — | not covered: no published format |
 | BR-SE | `se.gov.br` (searched; in-person antecedentes) | none | — | — | — | not covered: no published format |
 | BR-SP | SP-AAC | number `maxlength="8"`, digits, `verificaRange(…, 1, 99999999)`; check character `"0123456789xX"`, required; `checaRG` | `[0-9]{1,8}[0-9X]` (2 to 9 characters) | `checaRG`: weights 2-9 from the right, sum mod 11, 10 = `X` | none | covered |

@@ -13,7 +13,9 @@ use MSSTC4PHP\ValueObject\Documents\Document\CA\HealthCard\NlHealthCardNumber;
 use MSSTC4PHP\ValueObject\Documents\Document\CA\HealthCard\NsHealthCardNumber;
 use MSSTC4PHP\ValueObject\Documents\Document\CA\HealthCard\NtHealthCardNumber;
 use MSSTC4PHP\ValueObject\Documents\Document\CA\HealthCard\NuHealthCardNumber;
+use MSSTC4PHP\ValueObject\Documents\Document\CA\HealthCard\OnHealthCard;
 use MSSTC4PHP\ValueObject\Documents\Document\CA\HealthCard\OnHealthCardNumber;
+use MSSTC4PHP\ValueObject\Documents\Document\CA\HealthCard\OnHealthCardVersionCode;
 use MSSTC4PHP\ValueObject\Documents\Document\CA\HealthCard\PeHealthCardNumber;
 use MSSTC4PHP\ValueObject\Documents\Document\CA\HealthCard\QcHealthCardNumber;
 use MSSTC4PHP\ValueObject\Documents\Document\CA\HealthCard\SkHealthCardNumber;
@@ -48,6 +50,8 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(NtHealthCardNumber::class)]
 #[UsesClass(NuHealthCardNumber::class)]
 #[UsesClass(OnHealthCardNumber::class)]
+#[UsesClass(OnHealthCard::class)]
+#[UsesClass(OnHealthCardVersionCode::class)]
 #[UsesClass(PeHealthCardNumber::class)]
 #[UsesClass(QcHealthCardNumber::class)]
 #[UsesClass(SkHealthCardNumber::class)]
@@ -210,13 +214,15 @@ final class HealthCardNumberFactoryTest extends TestCase
     public static function numbersValidNowhere(): iterable
     {
         $noJurisdiction = 'Invalid Canadian health card number (fits no jurisdiction).';
+        $onHint = 'Invalid Canadian health card number (fits no jurisdiction; an Ontario card with a version code:'
+            . ' use OnHealthCardNumber::fromCard()).';
 
         yield 'seven digits' => ['1234567', 'Invalid Canadian health card number (7 characters).'];
         yield 'eleven digits, an ON length' => ['12345678901', $noJurisdiction];
         yield 'thirteen characters' => ['9876543217ABC', 'Invalid Canadian health card number (13 characters).'];
         yield 'AB illustration with version code' => ['5584486674YM', $noJurisdiction];
-        yield 'printed ON card with a version code' => ['9876543217 YM', $noJurisdiction];
-        yield 'printed ON card with one letter' => ['9876543217A', $noJurisdiction];
+        yield 'printed ON card with a version code' => ['9876543217 YM', $onHint];
+        yield 'printed ON card with one letter' => ['9876543217A', $onHint];
         yield 'ten digits + two letters failing ON' => ['1234567890AB', $noJurisdiction];
         yield 'letter outside the NT set' => ['A1234567', $noJurisdiction];
         yield 'QC month 31' => ['BOUF94311419', $noJurisdiction];

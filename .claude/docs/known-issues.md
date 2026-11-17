@@ -172,6 +172,10 @@
   accepted override. Catalan `l·l` (U+00B7) is accepted only between two `l`/`L` (`Name\ES\AbstractSpanishNamePart`,
   matched as `\x{00B7}`, not through `\p{sc=Latin}`) and omitted from the ICAO form (`Marcel·lí` → `MARCELLI`); `ŀ`/`Ŀ`
   are folded to `l·`/`L·` (NFKC) first, so `Marceŀlí` equals `Marcel·lí` (final review of plan 3).
+  The fold stays in ES and is not moved to `AbstractNamePart` (task 10 of plan 4): the only other wave-1 source that lists
+  `ŀ`/`Ŀ` is NL table 5.2, as letters, and `·` is not valid in NL, so folding there would turn a valid name into a
+  refused one. No registry text on `l·l` exists in our sources; acceptance rests on the never-refuse rule (ES.md).
+  `HealthCardNumberFactory::fromNumber()` points to `OnHealthCardNumber::fromCard()` for an Ontario card with a version code.
 - Escaped equivalent mutants in `Document\ES\*`: the `(int)` cast in `ControlLetter::of()` (a numeric string divides
   the same), and the `substr()` length / unwrap in
   `Dni`/`Nie` (an `(int)` cast stops at the trailing check letter).

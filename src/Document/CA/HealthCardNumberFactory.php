@@ -14,6 +14,7 @@ use MSSTC4PHP\ValueObject\Documents\Document\CA\HealthCard\NsHealthCardNumber;
 use MSSTC4PHP\ValueObject\Documents\Document\CA\HealthCard\NtHealthCardNumber;
 use MSSTC4PHP\ValueObject\Documents\Document\CA\HealthCard\NuHealthCardNumber;
 use MSSTC4PHP\ValueObject\Documents\Document\CA\HealthCard\OnHealthCardNumber;
+use MSSTC4PHP\ValueObject\Documents\Document\CA\HealthCard\OnHealthCardVersionCode;
 use MSSTC4PHP\ValueObject\Documents\Document\CA\HealthCard\PeHealthCardNumber;
 use MSSTC4PHP\ValueObject\Documents\Document\CA\HealthCard\QcHealthCardNumber;
 use MSSTC4PHP\ValueObject\Documents\Document\CA\HealthCard\SkHealthCardNumber;
@@ -36,11 +37,17 @@ final class HealthCardNumberFactory
     /**
      * @throws AmbiguousJurisdictionException<Jurisdiction> when several jurisdictions match, listed in enum order
      * @throws InvalidDocumentNumberException when none matches: "(fits no jurisdiction)" if the length fits a
-     *                                        jurisdiction, otherwise the length
+     *                                        jurisdiction, otherwise the length; the message adds a pointer to
+     *                                        {@see OnHealthCardNumber::fromCard()} when the input is an Ontario card
+     *                                        with a version code
      */
     public static function fromNumber(string $number): HealthCardNumber
     {
-        return self::resolver()->resolve($number);
+        try {
+            return self::resolver()->resolve($number);
+        } catch (InvalidDocumentNumberException $exception) {
+            throw self::carriesOntarioVersionCode($number) ? new InvalidDocumentNumberException('Invalid Canadian health card number (fits no jurisdiction; an Ontario card with a version code: use OnHealthCardNumber::fromCard()).', previous: $exception) : $exception;
+        }
     }
 
     /**
@@ -57,6 +64,15 @@ final class HealthCardNumberFactory
     public static function jurisdictionsMatching(string $number): array
     {
         return self::resolver()->matching($number);
+    }
+
+    private static function carriesOntarioVersionCode(string $number): bool
+    {
+        try {
+            return OnHealthCardNumber::fromCard($number)->versionCode() instanceof OnHealthCardVersionCode;
+        } catch (InvalidDocumentNumberException) {
+            return false;
+        }
     }
 
     /**
