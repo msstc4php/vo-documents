@@ -2,6 +2,16 @@
 
 ## [Unreleased]
 
+### Added
+
+- `Icao\Mrz\MachineReadableZone` with the final classes `Td1`, `Td2` and `Td3`: the ICAO Doc 9303 machine readable
+  zone of TD1, TD2 and TD3 documents (Parts 3 to 6), every check digit enforced, composite one included, TD1 and TD2
+  long document numbers supported; `fromString()` takes 2 or 3 lines joined by `\n` or `\r\n` or one string of 88, 72
+  or 90 characters. Accessors for the codes, name, sex, document number, optional data and the raw dates; `masked()`.
+  `InvalidMrzException`. `MachineReadableZone` does not implement `HasBirthDate` (`birthDate()` takes the reference
+  date, since the MRZ has no century) nor `HasSex` (`sex()` is null for `<`). The century rules are not in Doc 9303,
+  see `docs/sources/ICAO.md`.
+
 ## [0.1.0] - 2026-11-17
 
 ### Added

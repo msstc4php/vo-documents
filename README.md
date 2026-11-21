@@ -389,6 +389,35 @@ $latin->visualZone();        // "VAN DER BERG, JAN PIETER"
 $latin->mrzField(39);        // padded with "<" or truncated per Doc 9303 Part 4 §4.2.3
 ```
 
+### ICAO machine readable zone
+
+`Icao\Mrz\MachineReadableZone::fromString()` reads the MRZ of a TD3 passport (2 lines of 44), a TD2 (2 of 36) or a
+TD1 identity card (3 of 30) and returns a `Td3`, `Td2` or `Td1`. Lines are joined by `\n` or `\r\n`, or the whole zone
+is one string of 88, 72 or 90 characters; the stored form joins them by `\n`. Every check digit is verified (the
+composite one included), TD1 and TD2 long document numbers are joined from the optional data.
+
+| Class | Document | Check | Source |
+|---|---|---|---|
+| `Icao\Mrz\Td3` | MRP and other TD3 documents | document number, birth date, expiry date, personal number, composite | Doc 9303 Parts 3, 4 |
+| `Icao\Mrz\Td2` | TD2 official travel documents | document number (long form too), dates, composite | Doc 9303 Parts 3, 6 |
+| `Icao\Mrz\Td1` | TD1 official travel documents | document number (long form too), dates, composite | Doc 9303 Parts 3, 5 |
+
+```php
+use MSSTC4PHP\ValueObject\Documents\Icao\Mrz\MachineReadableZone;
+
+$mrz = MachineReadableZone::fromString($twoLinesOf44);
+$mrz->issuingState();                       // "UTO", raw (also "D", "GBD", "XXA")
+$mrz->issuingCountry();                     // CountryCode or null outside ISO 3166
+$mrz->name();                               // Icao\PersonName
+$mrz->documentNumber();                     // "L898902C3"
+$mrz->birthDate(new DateTimeImmutable());   // null when the day or month is unknown (<<)
+$mrz->masked();                             // document number, optional data, birth date -> "*"
+```
+
+Doc 9303 gives no century for the two-digit years, so `birthDate($today)` takes the most recent past one and
+`expiryDate($reference)` the one nearest to the reference date; `birthDateDigits()` and `expiryDateDigits()` give the
+raw `YYMMDD`. The visa formats MRV-A and MRV-B (Part 7) are not read. Notes: `docs/sources/ICAO.md` section 5.
+
 `Icao\Transliterator` turns a national name part into its ICAO spelling (`toLatin()`, or `variants()` for every
 spelling the table allows). Two rules that follow the sources, not the obvious guess:
 

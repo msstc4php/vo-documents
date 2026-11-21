@@ -11,6 +11,13 @@ Sources (free PDFs published by ICAO, both "Eighth Edition, 2021"; fetched 2026-
   <https://www.icao.int/sites/default/files/publications/DocSeries/9303_p4_cons_en.pdf>
   (record of amendments: No. 1 of 20/3/24, No. 2 of 20/2/26; the §4.2.3 pages carry the "20/2/26 No. 2" marker).
 
+For the machine readable zone (section 5) two more parts were fetched on 2026-11-21 UTC:
+
+- Doc 9303 Part 5, *Specifications for TD1 Size Machine Readable Official Travel Documents (MROTDs)*:
+  <https://www.icao.int/sites/default/files/publications/DocSeries/9303_p5_cons_en.pdf>.
+- Doc 9303 Part 6, *Specifications for TD2 Size Machine Readable Official Travel Documents (MROTDs)*:
+  <https://www.icao.int/sites/default/files/publications/DocSeries/9303_p6_cons_en.pdf>.
+
 Part 3 §4.6 delegates truncation to "the form factor specific Parts 4 to 7"; the truncation rule and the
 examples below therefore come from **Part 4 §4.2.2 / §4.2.3** (TD3, 39-character name field).
 
@@ -355,3 +362,112 @@ Derived examples (computed with the procedure above, not printed by ICAO; used i
 | truncation "by the Doc 9303 Part 3 rule" | Part 3 §4.6 delegates to Parts 4–7 | Part 4 §4.2.2–§4.2.3 procedure above |
 | `mrzField(20)` "equals the truncation example" | ICAO examples are all width 39 | width-39 examples verbatim; width 20 from the derived table |
 | `Ь` (needed by Russian names) | absent from 6.B | uncovered: the transliterator throws |
+
+## 5. Machine readable zone (Part 3 §4.8-§4.10, §5; Part 4 §4.2; Part 5 §4.2; Part 6 §4.2)
+
+`Icao\Mrz\{Td3, Td2, Td1}` read and check an MRZ; `MachineReadableZone::fromString()` picks the format by the length.
+
+### 5.1 Formats
+
+TD3 (Part 4): 2 lines of 44. TD2 (Part 6): 2 lines of 36. TD1 (Part 5): 3 lines of 30. Part 3 §4.10: "Machine readable
+data shall be arranged from left to right in fixed-length fields in two lines (upper and lower) except for TD1 size
+travel documents where there are three lines (upper, middle and lower)", unused positions "completed with filler
+characters (<)". Positions (1-based):
+
+| Field | TD3 (Part 4 §4.2.2) | TD2 (Part 6 §4.2.2) | TD1 (Part 5 §4.2.2) |
+|---|---|---|---|
+| Document code | 1: 1-2 | 1: 1-2 | 1: 1-2 |
+| Issuing state | 1: 3-5 | 1: 3-5 | 1: 3-5 |
+| Name | 1: 6-44 | 1: 6-36 | 3: 1-30 |
+| Document number, check digit | 2: 1-9, 10 | 2: 1-9, 10 | 1: 6-14, 15 |
+| Nationality | 2: 11-13 | 2: 11-13 | 2: 16-18 |
+| Date of birth, check digit | 2: 14-19, 20 | 2: 14-19, 20 | 2: 1-6, 7 |
+| Sex | 2: 21 | 2: 21 | 2: 8 |
+| Date of expiry, check digit | 2: 22-27, 28 | 2: 22-27, 28 | 2: 9-14, 15 |
+| Optional data (TD3: personal number) | 2: 29-42, check digit 43 | 2: 29-35 | 1: 16-30, and 2: 19-29 |
+| Composite check digit | 2: 44 | 2: 36 | 2: 30 |
+
+Document code: Part 4 §4.4 "The first letter P shall identify the document as an MRP"; Part 5 and Part 6 note k "The
+first character shall be A, C or I". Sex (Part 4 table, position 21): "F = female; M = male; < = unspecified." (the
+VIZ uses `X`; Part 5 note f: "Where an issuing State or organization does not want to identify the sex, the filler
+character (<) shall be used in this field in the MRZ and an X in this field in the VIZ."). The implementation checks
+only the first character of the document code and leaves the second to the issuing State (Part 5 note k).
+
+### 5.2 Check digit (Part 3 §4.9)
+
+> The check digits shall be calculated on modulus 10 with a continuously repetitive weighting of 731 731 ...
+> [...] the symbol < shall be used to complete vacant positions and shall be given the value of zero [...] the
+> characters A to Z shall have the values 10 to 35 consecutively.
+
+Covered characters (Part 4 §4.2.4, Part 5 §4.2.4, Part 6 §4.2.4): the document number, the birth date, the expiry
+date, the TD3 personal number, and the composite digit over TD3 lines 2 positions 1-10, 14-20, 22-43; TD2 line 2
+positions 1-10, 14-20, 22-35; TD1 line 1 positions 6-30 with line 2 positions 1-7, 9-15, 19-29. Part 4 for the TD3
+personal number check: "When the personal number field is not used and filler characters (<) are used in
+positions 29 to 42, the check digit may be zero or the filler character (<) at the option of the issuing State or
+organization." `Td3` accepts `<` only for a blank field. Part 3 Appendix A examples: `520727` has check digit 3,
+`AB2134<<<` has 5; the specimens below are used in the tests.
+
+### 5.3 Long document numbers (Part 5 note j, Part 6 note j)
+
+> if the document number has more than 9 characters, the 9 principal characters shall be shown in the MRZ [...]. They
+> shall be followed by a filler character instead of a check digit to indicate a truncated number. The remaining
+> characters of the document number shall be shown at the beginning of the field reserved for optional data elements
+> [...] followed by a check digit and a filler character.
+
+Part 5 §4.2.4: the long number check digit covers positions 6-14 and 16-28 ("Position 15 contains '<' and is excluded
+from the check digit calculation"). The text does not say where the number ends inside the optional data; the
+implementation tries every overflow length 1..n for which the next character is a digit, the one after it is `<` and
+the digit is the check digit of the number so far, and takes the first one that has only fillers after it, else the
+first one that validates. TD3 has no long form; a `<` check digit there is refused.
+
+### 5.4 Dates (Part 3 §4.8)
+
+> Dates in the MRZ of the MRTD shall be shown as a six-digit string consisting of the last two digits for the year (YY)
+> immediately followed by two digits for the number of the month (MM) and by two digits for the day (DD). [...] If all
+> or part of the date of birth is unknown, the relevant character positions shall be completed with filler characters
+> (<).
+
+So an unknown part of the birth date is `<<` per year, month or day; the class returns a null `birthDate()` and keeps
+`birthDateDigits()`. The expiry date has no unknown form and must be six digits.
+
+**Not in Doc 9303:** the century of the two-digit years (the word does not occur in Part 3; the Part 3 Appendix A TD3
+specimen even has the expiry `960108`). Chosen, conservatively and with the caller supplying the reference date (no
+hidden clock):
+
+- `birthDate($today)`: the most recent date not after `$today` (UTC date) with the century stepped back as needed (a
+  29 February of a century year that is not a leap year goes back to the next leap year);
+- `expiryDate($reference)`: the century that puts the date nearest to `$reference` (a document may be expired or not
+  yet expired, so no direction can be assumed).
+
+### 5.5 Codes (Part 3 §5)
+
+> Two- and three-letter codes shall be obtained from the [ISO 3166] maintenance agency [...] Codes not included in
+> [ISO 3166-1], such as extensions for other States and organizations, or other exceptions, are outlined in the
+> following table:
+
+The table lists Germany as `DE` / `D` (the MRZ field is `D` padded with two fillers, `D<<`, by §4.10), Kosovo `KS` / `RKS`, British categories `GBD`, `GBN`, `GBO`, `GBS`, `GBP`, the EU `EUE`, United
+Nations `UNO`, `UNA`, `UNK`, other issuing authorities (`XBA`, `XIM`, `XCC`, `XCE`, `XCO`, `XEC`, `XPO`, `XES`, `XMP`,
+`XOM`, `XDC`) and the persons without a defined nationality `XXA`, `XXB`, `XXC`, `XXX`. `issuingState()` and
+`nationality()` return the code as printed without its fillers; `issuingCountry()` and `nationalityCountry()` give
+an ISO 3166-1 `CountryCode` for an alpha-3 code and for `D` (Germany, from that table), and null for every other
+code outside ISO 3166.
+
+### 5.6 Specimens used in the tests
+
+| Format | Source | Lines |
+|---|---|---|
+| TD3 | Part 4 Appendix A | `PPUTOERIKSSON<<ANNA<MARIA<<<<<<<<<<<<<<<<<<<` / `L898902C36UTO7408122F3404159ZE184226B<<<<<16` |
+| TD2 | Part 6 Appendix A | `I<UTOERIKSSON<<ANNA<MARIA<<<<<<<<<<<` / `D231458907UTO7408122F1204159<<<<<<<6` |
+| TD1 | Part 5 Appendix A | `I<UTOD231458907<<<<<<<<<<<<<<<` / `7408122F1204159UTO<<<<<<<<<<<6` / `ERIKSSON<<ANNA<MARIA<<<<<<<<<<` |
+
+The Part 4 Figure A-2 second TD3 line (`L898902C36UTO7408122F2504155184226<<<<<<<<<18`) is not used: the extracted PDF
+text of that line does not have 44 characters. The Part 5 and Part 6 name examples at full width
+(`PAPANDROPOULOUS<<JONATHOON<ALEC`, `NILAVADHANANANDA<<CHAYAPA<DE<K`) and Part 4 §4.2.3.4
+(`PAPANDROPOULOUS<<JONATHON<WARREN<TREVOR`) are used as full-width name fields. There is no Doc 9303 specimen of a
+long document number or of a birth date with unknown parts; the tests build those with the check digits computed by
+an independent script.
+
+### 5.7 Masking
+
+`masked()` replaces the document number, the optional data, the birth date and their check digits (and the composite
+digit) with `*`. Doc 9303 has no masking rule; `*` is not an MRZ character, so a masked MRZ never parses.
