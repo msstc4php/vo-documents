@@ -394,7 +394,8 @@ Part 4 note p, Part 5 and Part 6 note f: "Where an issuing State or organization
 filler character (<) shall be used in this field in the MRZ and an X in this field in the VIZ."). The VIZ field
 description (Part 4 field 11, Parts 5 and 6 field 05) reads "the capital letter F for female, M for male, or X for
 unspecified". Decision (wave 3 review CR-015): `<` is defined as "unspecified", so `sex()` returns `Sex::Unspecified`
-for it and `MachineReadableZone` implements `HasSex`; `X` is a VIZ value only, not an MRZ one, and stays refused. The second character is, per Part 5 and
+for it and `MachineReadableZone` implements `HasSex`; `X` is a VIZ value only, not an MRZ one, and stays refused.
+The second character is, per Part 5 and
 Part 6 note k, "at the discretion of the issuing State or organization except that i) V shall not be used, ii) I shall
 not be used after A (i.e. AI), and iii) C shall not be used after A (i.e. AC) except in the crew member certificate".
 `Td1` and `Td2` refuse a second character `V` and `AI`; `AC` stays allowed, because the crew member certificate is a
