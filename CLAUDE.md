@@ -29,3 +29,9 @@ enforces it. Do not edit `.php-cs-fixer.dist.php`, `rector.php`, `phpstan*.neon`
 `infection.json5`, `Makefile` or `.gitignore` here. The hex layout of that standard does not apply.
 
 Exception messages never contain the input or any part of it.
+
+## MRZ gotchas
+
+- `Icao\Mrz\MachineReadableZone` does not implement `HasBirthDate`/`HasSex` (century unknown, sex may be `<`); dates take a caller-supplied reference.
+- `Contract\Maskable` extends vo-base's `Contract\Maskable` (vo-base `^1.2`).
+- Releasing: tag vo-documents `v0.2.0` (the MRZ) before `vo-documents-doctrine` can pass its minimal CI job.

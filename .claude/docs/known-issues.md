@@ -501,3 +501,18 @@ script classes use `\p{sc=Latin}` / `\p{sc=Cyrillic}` (Script property only); `c
   letter and `·` is invalid there, so folding there would refuse a valid name.
 - **`HealthCardNumberFactory::fromNumber()`** points to `OnHealthCardNumber::fromCard()` in its no-match message for an
   Ontario card with a version code (nothing of the input is echoed).
+
+## MRZ (ICAO Doc 9303 Parts 3 to 6)
+
+- **No `HasBirthDate`/`HasSex` on `MachineReadableZone`.** The interfaces have no room for what the MRZ needs: two-digit years without a century
+  (`birthDate(DateTimeImmutable $today)`, `expiryDate($reference)`: most recent past century for birth, nearest to the reference for expiry,
+  earlier on a tie) and a sex field that may be `<` (`sex(): ?Sex`). The century rules are this package's, not Doc 9303's (`docs/sources/ICAO.md` 5.4).
+- **Long document numbers (TD1, TD2).** The nine principal characters are followed by `<` instead of a check digit; the overflow runs from the
+  first optional-data position to the first `<`, its last character is its check digit, optional data starts after that `<` (Part 5 §4.2.4). A
+  value where this reading does not hold is refused. TD3 has no long form.
+- `Td1`/`Td2` refuse a second document-code character `V` and `AI`; `AC` stays allowed (crew member certificate). `Td3` checks only `P`.
+- `issuingState()`/`nationality()` are the raw printed code without fillers (`D`, `GBD`, `XXA`); `issuingCountry()` is null outside ISO 3166
+  (Germany's `D` is mapped).
+- MRV-A/MRV-B visas (Part 7) are not read.
+- `masked()` output is not a valid MRZ by design.
+- `make infection` crashes on escaped mutants with `<<` in the diff (see the first entry); keep Icao mutants killed.

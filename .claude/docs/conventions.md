@@ -1,5 +1,6 @@
 # Conventions
 
+- MRZ: tests use the Doc 9303 Appendix A specimens (`docs/sources/ICAO.md` 5.6); long numbers and unknown birth dates have no specimen, so their check digits come from an independent script and are labelled so.
 - Exception messages name the document and the length or reason, never the input.
 - Tool configuration is byte-identical to the bundle-standard `php84` templates.
 - Tests: `tests/Unit` (what Infection runs), fixtures in `tests/Fixture`.

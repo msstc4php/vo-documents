@@ -27,7 +27,7 @@ Not on Packagist yet; register the GitHub repositories:
 
 Runtime requirements: `msstc4php/vo-base ^1.2`, `ext-mbstring`, `lib-pcre >=10.40` (the `\p{sc=Latin}` script
 syntax of the name classes), `symfony/polyfill-intl-normalizer`. No framework.
-vo-base 1.1.1 (the mapper no longer reports interfaces as supported) must be tagged before this package is released.
+vo-base 1.2 is the first release with the core `Contract\Maskable` that `Contract\Maskable` here extends.
 
 ## Document numbers
 
@@ -177,7 +177,7 @@ then the given names are the only ICAO identifier, `JUAN`). The Brazilian one is
 both required (CNJ Código Nacional de Normas art. 515-B), each part holding several words with particles in the case
 given (`da Silva`, `Maria da Conceição`).
 
-Contracts: `Contract\Maskable` (every number above), `Contract\Subdivision` and `Contract\IssuedBySubdivision` (AU,
+Contracts: `Contract\Maskable` (every number above and the MRZ; it extends vo-base's `Contract\Maskable`, so every document class is also a core `Maskable`), `Contract\Subdivision` and `Contract\IssuedBySubdivision` (AU,
 US, CA, MX and BR jurisdictions, AU licences, US DL/ID numbers, CA licence and health card numbers, MX licence numbers,
 BR RG numbers). `Contract\HasSex` and the `Sex` enum are implemented by the documents that encode a sex
 (`Nir`, `FiscalCode`, the DVLA licence number, `ChiNumber`, the Québec NAM, the Mexican CURP, the Chinese citizen
@@ -414,7 +414,11 @@ $mrz->birthDate(new DateTimeImmutable());   // null when the day or month is unk
 $mrz->masked();                             // document number, optional data, birth date -> "*"
 ```
 
-Doc 9303 gives no century for the two-digit years, so `birthDate($today)` takes the most recent past one and
+`MachineReadableZone` implements neither `HasBirthDate` nor `HasSex`. `HasBirthDate::birthDate()` takes no argument, but the MRZ
+holds only two year digits and Doc 9303 gives no century, so `birthDate($today)` and `expiryDate($reference)` take the date they
+resolve against (no hidden clock). `HasSex::sex()` must return a `Sex`, but the MRZ sex field may be `<` (unspecified), so
+`sex()` returns `?Sex`. `masked()` puts `*` over the document number, optional data, birth date and their check digits; `*` is
+not an MRZ character, so a masked zone never parses. Doc 9303 gives no century for the two-digit years, so `birthDate($today)` takes the most recent past one and
 `expiryDate($reference)` the one nearest to the reference date; `birthDateDigits()` and `expiryDateDigits()` give the
 raw `YYMMDD`. The visa formats MRV-A and MRV-B (Part 7) are not read. Notes: `docs/sources/ICAO.md` section 5.
 
