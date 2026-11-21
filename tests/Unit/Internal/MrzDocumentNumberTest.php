@@ -54,22 +54,6 @@ final class MrzDocumentNumberTest extends TestCase
         );
     }
 
-    public function testTheSplitWithOnlyFillersAfterItIsPreferred(): void
-    {
-        self::assertSame(
-            ['number' => 'ABC123456123<345', 'optional' => '<<<<<<'],
-            MrzDocumentNumber::resolve('ABC123456', '<', '123<3454<<<<<<<', true),
-        );
-    }
-
-    public function testWithoutSuchASplitTheFirstValidOneWins(): void
-    {
-        self::assertSame(
-            ['number' => 'ABC12345612', 'optional' => '3454<XYZ<<<'],
-            MrzDocumentNumber::resolve('ABC123456', '<', '123<3454<XYZ<<<', true),
-        );
-    }
-
     public function testALongNumberIsRefusedWhereTheFormatHasNone(): void
     {
         self::assertNull(MrzDocumentNumber::resolve('ABC123456', '<', '783<<<<<<<<<<<<', false));
@@ -86,12 +70,24 @@ final class MrzDocumentNumberTest extends TestCase
         self::assertNull(MrzDocumentNumber::resolve('ABC123456', '<', '7830<<<<<<<<<<<', true));
     }
 
-    public function testDataAfterTheCheckDigitStaysOptionalData(): void
+    public function testTheNumberEndsAtTheFirstFiller(): void
     {
-        $number = MrzDocumentNumber::resolve('ABC123456', '<', '783<<XYZ<<<<<<<', true);
+        self::assertSame(
+            ['number' => 'ABC12345678', 'optional' => 'A06<<<<<<<<'],
+            MrzDocumentNumber::resolve('ABC123456', '<', '783<A06<<<<<<<<', true),
+        );
+    }
 
-        self::assertSame('ABC12345678', $number['number'] ?? null);
-        self::assertSame('<XYZ<<<<<<<', $number['optional'] ?? null);
+    public function testAnotherSplitThatValidatesDoesNotRescueAWrongCheckDigit(): void
+    {
+        self::assertNull(MrzDocumentNumber::resolve('ABC123456', '<', '124<3454<<<<<<<', true));
+    }
+
+    public function testALongNumberNeedsACharacterAndACheckDigitBeforeTheFiller(): void
+    {
+        self::assertNull(MrzDocumentNumber::resolve('ABC123456', '<', '<<<<<<<<<<<<<<<', true));
+        self::assertNull(MrzDocumentNumber::resolve('ABC123456', '<', '7<<<<<<<<<<<<<<', true));
+        self::assertNull(MrzDocumentNumber::resolve('ABC123456', '<', '783783783783783', true));
     }
 
     public function testALongNumberFillsTheOptionalFieldOfATd2(): void

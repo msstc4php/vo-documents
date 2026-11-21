@@ -7,7 +7,8 @@ namespace MSSTC4PHP\ValueObject\Documents\Internal;
 /**
  * Document number of a TD1 or TD2 MRZ, with the long form of Doc 9303 Part 5 §4.2.2.1 note j and Part 6 §4.2.2.2
  * note j: a `<` in the check digit position, the remaining characters at the start of the optional data followed by
- * their check digit and a `<`.
+ * their check digit and a `<` (Part 5 §4.2.4: the check digit follows the last digit of the number and is followed
+ * by `<`, so the number ends at the first `<`).
  *
  * @internal
  */
@@ -33,22 +34,16 @@ final class MrzDocumentNumber
             return null;
         }
 
-        $fallback = null;
-        for ($overflow = 1; $overflow + 1 < \strlen($optional); $overflow++) {
-            $number = $principal . \substr($optional, 0, $overflow);
-            if ($optional[$overflow + 1] !== '<' || !MrzCheckDigit::matches($number, $optional[$overflow])) {
-                continue;
-            }
-
-            $rest = \substr($optional, $overflow + 2);
-            $candidate = ['number' => \rtrim($number, '<'), 'optional' => $rest];
-            if (\strspn($rest, '<') === \strlen($rest)) {
-                return $candidate;
-            }
-
-            $fallback ??= $candidate;
+        $end = \strpos($optional, '<');
+        if ($end === false || $end < 2) {
+            return null;
         }
 
-        return $fallback;
+        $number = $principal . \substr($optional, 0, $end - 1);
+        if (!MrzCheckDigit::matches($number, $optional[$end - 1])) {
+            return null;
+        }
+
+        return ['number' => \rtrim($number, '<'), 'optional' => \substr($optional, $end + 1)];
     }
 }

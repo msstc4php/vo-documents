@@ -390,8 +390,11 @@ characters (<)". Positions (1-based):
 Document code: Part 4 §4.4 "The first letter P shall identify the document as an MRP"; Part 5 and Part 6 note k "The
 first character shall be A, C or I". Sex (Part 4 table, position 21): "F = female; M = male; < = unspecified." (the
 VIZ uses `X`; Part 5 note f: "Where an issuing State or organization does not want to identify the sex, the filler
-character (<) shall be used in this field in the MRZ and an X in this field in the VIZ."). The implementation checks
-only the first character of the document code and leaves the second to the issuing State (Part 5 note k).
+character (<) shall be used in this field in the MRZ and an X in this field in the VIZ."). The second character is, per Part 5 and
+Part 6 note k, "at the discretion of the issuing State or organization except that i) V shall not be used, ii) I shall
+not be used after A (i.e. AI), and iii) C shall not be used after A (i.e. AC) except in the crew member certificate".
+`Td1` and `Td2` refuse a second character `V` and `AI`; `AC` stays allowed, because the crew member certificate is a
+valid use and the code cannot tell it apart. `Td3` checks only the first character `P` (Part 4 §4.4).
 
 ### 5.2 Check digit (Part 3 §4.9)
 
@@ -414,11 +417,15 @@ organization." `Td3` accepts `<` only for a blank field. Part 3 Appendix A examp
 > characters of the document number shall be shown at the beginning of the field reserved for optional data elements
 > [...] followed by a check digit and a filler character.
 
-Part 5 §4.2.4: the long number check digit covers positions 6-14 and 16-28 ("Position 15 contains '<' and is excluded
-from the check digit calculation"). The text does not say where the number ends inside the optional data; the
-implementation tries every overflow length 1..n for which the next character is a digit, the one after it is `<` and
-the digit is the check digit of the number so far, and takes the first one that has only fillers after it, else the
-first one that validates. TD3 has no long form; a `<` check digit there is refused.
+Part 5 §4.2.4 fixes where the number ends: "Long document number check digit | 6 – 14, 16 – 28 | 17 – 18 (one digit
+only). Note: Position 15 contains '<' and is excluded from the check digit calculation. The position of the last
+digit of a long document number is in the range of 16 – 28. [...] Since the check digit follows the last digit of the
+document number, its position is in the range of 17 – 29. The check digit is followed by '<'." Fillers only complete
+vacant positions (Part 3 §4.10), so the number has none after its ninth character: the overflow runs from the first
+optional-data position to the first `<`, its last character is the check digit (a digit, with at least one number
+character before it) and the optional data starts after that `<`. Exactly one reading exists; a value where it does
+not hold (no `<`, no digit before it, wrong check digit) is refused. TD3 has no long form; a `<` check digit there is
+refused. Part 6 note j says the same for TD2 (overflow at positions 29 to 35).
 
 ### 5.4 Dates (Part 3 §4.8)
 
@@ -434,10 +441,12 @@ So an unknown part of the birth date is `<<` per year, month or day; the class r
 specimen even has the expiry `960108`). Chosen, conservatively and with the caller supplying the reference date (no
 hidden clock):
 
-- `birthDate($today)`: the most recent date not after `$today` (UTC date) with the century stepped back as needed (a
-  29 February of a century year that is not a leap year goes back to the next leap year);
-- `expiryDate($reference)`: the century that puts the date nearest to `$reference` (a document may be expired or not
-  yet expired, so no direction can be assumed).
+- `birthDate($today)`: the most recent date not after `$today` (UTC date), taking the current century or the one
+  before; null when neither holds the date, which only happens for 29 February `00` before 29 February 2000 (1900 is
+  not a leap year, and 1600 is no birth date);
+- `expiryDate($reference)`: the century, among the three either side, that puts the date nearest to `$reference`, the
+  earlier one on a tie (a document may be expired or not yet expired, so no direction can be assumed; the wide window
+  lets 29 February `00` always find a leap year: 1600, 2000, 2400).
 
 ### 5.5 Codes (Part 3 §5)
 

@@ -11,6 +11,8 @@
   `InvalidMrzException`. `MachineReadableZone` does not implement `HasBirthDate` (`birthDate()` takes the reference
   date, since the MRZ has no century) nor `HasSex` (`sex()` is null for `<`). The century rules are not in Doc 9303,
   see `docs/sources/ICAO.md`.
+- `Contract\Maskable` now extends vo-base `Contract\Maskable`, so every `Maskable` document class is also one of the
+  core. Requires `msstc4php/vo-base ^1.2` (was `^1.1.1`).
 
 ## [0.1.0] - 2026-11-17
 

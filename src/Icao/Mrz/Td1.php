@@ -32,7 +32,7 @@ final class Td1 extends MachineReadableZone
         return new MrzLayout(
             lines: self::LINES,
             lineLength: self::LINE_LENGTH,
-            documentCodePattern: '/^[ACI][A-Z<]$/D',
+            documentCodePattern: '/^(?:[CI][A-UW-Z<]|A[A-HJ-UW-Z<])$/D',
             documentCode: new MrzField(1, 1, 2),
             issuingState: new MrzField(1, 3, 3),
             name: new MrzField(3, 1, 30),

@@ -47,25 +47,21 @@ abstract class MachineReadableZone extends AbstractStringValueObject implements 
     private const string CHARACTERS = '/^[A-Z0-9<]+$/D';
 
     /**
-     * Returns a {@see Td1}, {@see Td2} or {@see Td3}.
+     * Same as {@see from()}: `MachineReadableZone::fromString()` returns a {@see Td1}, {@see Td2} or {@see Td3} by
+     * the shape of the lines, and `Td3::fromString()` refuses the lines of another format.
      *
-     * @throws InvalidMrzException when no format fits the lines or the format's own rules refuse the value
+     * @throws InvalidMrzException when no format fits the lines, the format is not the called class, or the format's
+     *                             own rules refuse the value
      */
-    public static function fromString(string $value): self
+    final public static function fromString(string $value): static
     {
-        foreach ([Td3::class, Td2::class, Td1::class] as $class) {
-            if (self::split($value, $class::LINES, $class::LINE_LENGTH) !== null) {
-                return new $class($value);
-            }
-        }
-
-        throw new InvalidMrzException('Invalid ICAO MRZ.');
+        return static::from($value);
     }
 
     #[Override]
     public static function from(string $value): static
     {
-        $mrz = self::fromString($value);
+        $mrz = self::detect($value);
         if (!$mrz instanceof static) {
             throw new InvalidMrzException('Invalid ICAO MRZ.');
         }
@@ -163,8 +159,9 @@ abstract class MachineReadableZone extends AbstractStringValueObject implements 
     }
 
     /**
-     * The birth date in the most recent past century: not after `$today` (UTC date). Null when the year, the month
-     * or the day is unknown (`<<`).
+     * The birth date in the most recent past century: not after `$today` (UTC date), at most one century back. Null
+     * when the year, the month or the day is unknown (`<<`), or when neither of the two centuries has the date
+     * (a 29 February `00` before 29 February 2000).
      */
     public function birthDate(DateTimeImmutable $today): ?DateTimeImmutable
     {
@@ -176,20 +173,19 @@ abstract class MachineReadableZone extends AbstractStringValueObject implements 
         [$yearDigits, $month, $day] = $parts;
         $utcToday = $today->setTimezone(new DateTimeZone('UTC'));
         $limit = $utcToday->format('Y-m-d');
-        $year = \intdiv((int) $utcToday->format('Y'), 100) * 100 + $yearDigits;
-        while ($year >= 1) {
-            if (\checkdate($month, $day, $year) && $this->format($year, $month, $day) <= $limit) {
+        $latest = \intdiv((int) $utcToday->format('Y'), 100) * 100 + $yearDigits;
+        foreach ([$latest, $latest - 100] as $year) {
+            if ($year >= 1 && \checkdate($month, $day, $year) && $this->format($year, $month, $day) <= $limit) {
                 return $this->date($year, $month, $day);
             }
-
-            $year -= 100;
         }
 
         return null;
     }
 
     /**
-     * The expiry date in the century that puts it nearest to `$reference`. Doc 9303 gives no rule.
+     * The expiry date in the century that puts it nearest to `$reference` (the earlier one on a tie), among the three
+     * centuries either side so that a 29 February `00` always finds a leap year. Doc 9303 gives no rule.
      */
     public function expiryDate(DateTimeImmutable $reference): DateTimeImmutable
     {
@@ -202,7 +198,7 @@ abstract class MachineReadableZone extends AbstractStringValueObject implements 
         $referenceYear = (int) $reference->setTimezone(new DateTimeZone('UTC'))->format('Y');
         $best = null;
         $bestDistance = null;
-        foreach ([-100, 0, 100] as $shift) {
+        foreach ([-300, -200, -100, 0, 100, 200, 300] as $shift) {
             $year = \intdiv($referenceYear, 100) * 100 + $yearDigits + $shift;
             if ($year < 1 || !\checkdate($month, $day, $year)) {
                 continue;
@@ -270,6 +266,17 @@ abstract class MachineReadableZone extends AbstractStringValueObject implements 
         $this->assertCheckDigits($lines, $layout);
 
         return \implode("\n", $lines);
+    }
+
+    private static function detect(string $value): self
+    {
+        foreach ([Td3::class, Td2::class, Td1::class] as $class) {
+            if (self::split($value, $class::LINES, $class::LINE_LENGTH) !== null) {
+                return new $class($value);
+            }
+        }
+
+        throw new InvalidMrzException('Invalid ICAO MRZ.');
     }
 
     /**
@@ -385,7 +392,7 @@ abstract class MachineReadableZone extends AbstractStringValueObject implements 
      */
     private function dateParts(string $digits): ?array
     {
-        $parts = self::splitDigits($digits, true);
+        $parts = $this->splitDigits($digits, true);
         if ($parts === null) {
             return null;
         }

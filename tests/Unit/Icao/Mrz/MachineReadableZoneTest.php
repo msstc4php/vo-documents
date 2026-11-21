@@ -150,6 +150,21 @@ final class MachineReadableZoneTest extends TestCase
         self::assertSame($text, (string) MachineReadableZone::fromString(\str_replace("\n", '', $text)));
     }
 
+    public function testFromStringOfAConcreteClassRefusesAnotherFormat(): void
+    {
+        self::assertSame(self::TD1, Td1::fromString(self::TD1)->value);
+        self::assertInstanceOf(Td2::class, MachineReadableZone::fromString(self::TD2));
+
+        foreach ([[Td3::class, self::TD1], [Td2::class, self::TD3], [Td1::class, self::TD2]] as [$class, $text]) {
+            try {
+                $class::fromString($text);
+                self::fail('Expected a refusal.');
+            } catch (InvalidMrzException $exception) {
+                self::assertSame('Invalid ICAO MRZ.', $exception->getMessage());
+            }
+        }
+    }
+
     public function testTheConcreteClassesRefuseOtherFormats(): void
     {
         self::assertSame(self::TD3, Td3::from(self::TD3)->value);
@@ -205,6 +220,15 @@ final class MachineReadableZoneTest extends TestCase
         $this->assertRefusedAs('Invalid ICAO MRZ check digit.', \str_replace('<783<', '<784<', self::TD1_LONG));
     }
 
+    public function testALongNumberEndsAtTheFirstFillerAndOptionalDataFollows(): void
+    {
+        $mrz = Td1::from("I<UTOABC123456<783<A06<<<<<<<<\n7408122F1204159UTO<<<<<<<<<<<8\nERIKSSON<<ANNA<MARIA<<<<<<<<<<");
+
+        self::assertSame('ABC12345678', $mrz->documentNumber());
+        self::assertSame('A06', $mrz->optionalData());
+        self::assertRefusedAs('Invalid ICAO MRZ check digit.', "I<UTOABC123456<784<A06<<<<<<<<\n7408122F1204159UTO<<<<<<<<<<<8\nERIKSSON<<ANNA<MARIA<<<<<<<<<<");
+    }
+
     public function testATd2LongDocumentNumber(): void
     {
         $check = MrzCheckDigit::of('ABC12345612345');
@@ -255,16 +279,17 @@ final class MachineReadableZoneTest extends TestCase
         self::assertSame('UTC', $birth->getTimezone()->getName());
     }
 
-    public function testABirthOnA29thOfFebruaryOfACenturyYearFallsBackToALeapCentury(): void
+    public function testABirthOnThe29thOfFebruaryOf00IsInTheYear2000OrUnknown(): void
     {
-        $line2 = 'L898902C36UTO000229?F3404159ZE184226B<<<<<1';
         $birth = '000229';
         $line2 = 'L898902C36UTO' . $birth . MrzCheckDigit::of($birth) . 'F3404159ZE184226B<<<<<1';
         $composite = MrzCheckDigit::of(\substr($line2, 0, 10) . \substr($line2, 13, 7) . \substr($line2, 21, 22));
         $mrz = Td3::from(self::TD3_LINE_1 . "\n" . $line2 . $composite);
 
         self::assertSame('2000-02-29', $mrz->birthDate(new DateTimeImmutable('2026-11-21T00:00:00Z'))?->format('Y-m-d'));
-        self::assertSame('1600-02-29', $mrz->birthDate(new DateTimeImmutable('1999-11-21T00:00:00Z'))?->format('Y-m-d'));
+        self::assertSame('2000-02-29', $mrz->birthDate(new DateTimeImmutable('2000-02-29T00:00:00Z'))?->format('Y-m-d'));
+        self::assertNull($mrz->birthDate(new DateTimeImmutable('2000-02-28T23:59:59Z')));
+        self::assertNull($mrz->birthDate(new DateTimeImmutable('1999-11-21T00:00:00Z')));
     }
 
     public function testTheExpiryDateTakesTheCenturyNearestToTheReference(): void
@@ -359,6 +384,15 @@ final class MachineReadableZoneTest extends TestCase
         $this->assertRefusedAs('Invalid ICAO MRZ field.', $this->withCodes('PP', 'UTO', 'U<T'));
         $this->assertRefusedAs('Invalid ICAO MRZ field.', \str_replace('I<UTO', 'PPUTO', self::TD2));
         $this->assertRefusedAs('Invalid ICAO MRZ field.', \str_replace('I<UTO', 'V<UTO', self::TD1));
+        foreach (['IV', 'AV', 'CV', 'AI'] as $code) {
+            $this->assertRefusedAs('Invalid ICAO MRZ field.', \str_replace('I<UTO', $code . 'UTO', self::TD1));
+            $this->assertRefusedAs('Invalid ICAO MRZ field.', $this->withTd2DocumentCode($code));
+        }
+
+        foreach (['AC', 'AA', 'AW', 'AZ', 'A<', 'CC', 'IA', 'IZ', 'ID'] as $code) {
+            self::assertSame(\rtrim($code, '<'), Td2::from($this->withTd2DocumentCode($code))->documentCode());
+        }
+
         self::assertSame('AC', Td2::from($this->withTd2DocumentCode('AC'))->documentCode());
         self::assertSame('C', Td2::from($this->withTd2DocumentCode('C<'))->documentCode());
     }
@@ -573,6 +607,9 @@ final class MachineReadableZoneTest extends TestCase
         $mrz = MachineReadableZone::fromString($this->withExpiryDate('000229'));
 
         self::assertSame('2000-02-29', $mrz->expiryDate(new DateTimeImmutable('1950-01-01T00:00:00Z'))->format('Y-m-d'));
+        self::assertSame('1600-02-29', $mrz->expiryDate(new DateTimeImmutable('1750-06-01T00:00:00Z'))->format('Y-m-d'));
+        self::assertSame('2400-02-29', $mrz->expiryDate(new DateTimeImmutable('2250-06-01T00:00:00Z'))->format('Y-m-d'));
+        self::assertSame('2000-02-29', $mrz->expiryDate(new DateTimeImmutable('2150-06-01T00:00:00Z'))->format('Y-m-d'));
     }
 
     private function assertRefusedAs(string $message, string $input): void

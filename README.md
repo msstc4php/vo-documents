@@ -25,7 +25,7 @@ Not on Packagist yet; register the GitHub repositories:
 }
 ```
 
-Runtime requirements: `msstc4php/vo-base ^1.1.1`, `ext-mbstring`, `lib-pcre >=10.40` (the `\p{sc=Latin}` script
+Runtime requirements: `msstc4php/vo-base ^1.2`, `ext-mbstring`, `lib-pcre >=10.40` (the `\p{sc=Latin}` script
 syntax of the name classes), `symfony/polyfill-intl-normalizer`. No framework.
 vo-base 1.1.1 (the mapper no longer reports interfaces as supported) must be tagged before this package is released.
 
