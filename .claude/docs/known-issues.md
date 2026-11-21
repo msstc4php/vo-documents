@@ -504,9 +504,14 @@ script classes use `\p{sc=Latin}` / `\p{sc=Cyrillic}` (Script property only); `c
 
 ## MRZ (ICAO Doc 9303 Parts 3 to 6)
 
-- **No `HasBirthDate`/`HasSex` on `MachineReadableZone`.** The interfaces have no room for what the MRZ needs: two-digit years without a century
-  (`birthDate(DateTimeImmutable $today)`, `expiryDate($reference)`: most recent past century for birth, nearest to the reference for expiry,
-  earlier on a tie) and a sex field that may be `<` (`sex(): ?Sex`). The century rules are this package's, not Doc 9303's (`docs/sources/ICAO.md` 5.4).
+- **No `HasBirthDate` on `MachineReadableZone`; `HasSex` yes.** Two-digit years have no century (`birthDate(DateTimeImmutable $today)`: most
+  recent past century; `expiryDate($reference)`: year in [reference - 84, reference + 15], wave 3 ruling CR-016). `<` is `Sex::Unspecified` (Doc 9303
+  "< = unspecified", CR-015); `X` is refused (VIZ only). The century rules are this package's, not Doc 9303's (`docs/sources/ICAO.md` 5.4).
+- **Serialization:** `MachineReadableZone` uses `Internal\ReparsesOnUnserialize` (copied from vo-finance, but throws vo-base
+  `InvalidValueObjectException` for a payload without a string value and ignores other keys). A forged `Td3` holding `HELLO` or another
+  format now throws instead of hitting undefined offsets. Any new string VO that caches state or is Maskable should use it.
+- `from()` on a concrete class filters the formats by `is_a($class, static::class)` before building, so `Td3::from($td2)` is "Invalid ICAO MRZ.";
+  the `instanceof static` guard after `detect()` is only for PHPStan (an equivalent mutant if Infection reports it).
 - **Long document numbers (TD1, TD2).** The nine principal characters are followed by `<` instead of a check digit; the overflow runs from the
   first optional-data position to the first `<`, its last character is its check digit, optional data starts after that `<` (Part 5 §4.2.4). A
   value where this reading does not hold is refused. TD3 has no long form.

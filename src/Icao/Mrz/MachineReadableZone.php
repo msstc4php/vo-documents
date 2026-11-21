@@ -7,6 +7,7 @@ namespace MSSTC4PHP\ValueObject\Documents\Icao\Mrz;
 use DateTimeImmutable;
 use DateTimeZone;
 use LogicException;
+use MSSTC4PHP\ValueObject\Documents\Contract\HasSex;
 use MSSTC4PHP\ValueObject\Documents\Contract\Maskable;
 use MSSTC4PHP\ValueObject\Documents\Exception\InvalidMrzException;
 use MSSTC4PHP\ValueObject\Documents\Exception\InvalidPersonNameException;
@@ -15,6 +16,7 @@ use MSSTC4PHP\ValueObject\Documents\Internal\MrzCheckDigit;
 use MSSTC4PHP\ValueObject\Documents\Internal\MrzDocumentNumber;
 use MSSTC4PHP\ValueObject\Documents\Internal\MrzField;
 use MSSTC4PHP\ValueObject\Documents\Internal\MrzLayout;
+use MSSTC4PHP\ValueObject\Documents\Internal\ReparsesOnUnserialize;
 use MSSTC4PHP\ValueObject\Documents\Internal\Text;
 use MSSTC4PHP\ValueObject\Documents\Internal\TwoDigitYearDate;
 use MSSTC4PHP\ValueObject\Documents\Sex;
@@ -30,10 +32,11 @@ use Override;
  * composite one included. `fromString()` picks the format by the length.
  *
  * Doc 9303 gives no century for the two-digit years: {@see birthDate()} takes the most recent past one,
- * {@see expiryDate()} the one nearest to a reference date; the caller passes the date, there is no hidden clock.
- * `masked()` replaces the document number, the optional data, the birth date and their check digits by `*`, which is
- * not an MRZ character, so a masked MRZ never parses. It does not implement `HasSex` (`sex()` is null for `<`) nor
- * `HasBirthDate` (`birthDate()` takes the reference date).
+ * {@see expiryDate()} the one within 84 years before and 15 years after a reference date; the caller passes the date,
+ * there is no hidden clock. `masked()` replaces the document number, the optional data, the birth date and their check
+ * digits by `*`, which is not an MRZ character, so a masked MRZ never parses. The sex `<` is `Sex::Unspecified` (Doc 9303
+ * Parts 4-6: "< = unspecified"). It does not implement `HasBirthDate` (`birthDate()` takes the reference date). A
+ * serialized MRZ is validated again on unserialize.
  *
  * @see https://www.icao.int/sites/default/files/publications/DocSeries/9303_p3_cons_en.pdf ICAO Doc 9303 Part 3,
  *      8th ed. (2021), §4.8 (dates), §4.9 (check digits), §5 (codes)
@@ -42,8 +45,12 @@ use Override;
  * @see https://www.icao.int/sites/default/files/publications/DocSeries/9303_p6_cons_en.pdf Part 6 (TD2)
  * @see docs/sources/ICAO.md "Machine readable zone"
  */
-abstract class MachineReadableZone extends AbstractStringValueObject implements Maskable
+abstract class MachineReadableZone extends AbstractStringValueObject implements HasSex, Maskable
 {
+    use ReparsesOnUnserialize;
+
+    private const int EXPIRY_YEARS_BACK = 84;
+
     private const string CHARACTERS = '/^[A-Z0-9<]+$/D';
 
     /**
@@ -61,12 +68,9 @@ abstract class MachineReadableZone extends AbstractStringValueObject implements 
     #[Override]
     public static function from(string $value): static
     {
-        $mrz = self::detect($value);
-        if (!$mrz instanceof static) {
-            throw new InvalidMrzException('Invalid ICAO MRZ.');
-        }
+        $mrz = self::detect($value, static::class);
 
-        return $mrz;
+        return $mrz instanceof static ? $mrz : throw new LogicException('detect() builds only the called class.');
     }
 
     #[Override]
@@ -161,7 +165,7 @@ abstract class MachineReadableZone extends AbstractStringValueObject implements 
     /**
      * The birth date in the most recent past century: not after `$today` (UTC date), at most one century back. Null
      * when the year, the month or the day is unknown (`<<`), or when neither of the two centuries has the date
-     * (a 29 February `00` before 29 February 2000).
+     * (a 29 February `00` before 29 February 2000). The century is searched from the reference year clamped to 1-9999.
      */
     public function birthDate(DateTimeImmutable $today): ?DateTimeImmutable
     {
@@ -172,10 +176,10 @@ abstract class MachineReadableZone extends AbstractStringValueObject implements 
 
         [$yearDigits, $month, $day] = $parts;
         $utcToday = $today->setTimezone(new DateTimeZone('UTC'));
-        $limit = $utcToday->format('Y-m-d');
-        $latest = \intdiv((int) $utcToday->format('Y'), 100) * 100 + $yearDigits;
+        $limit = [(int) $utcToday->format('Y'), (int) $utcToday->format('n'), (int) $utcToday->format('j')];
+        $latest = \intdiv($this->clampYear($limit[0]), 100) * 100 + $yearDigits;
         foreach ([$latest, $latest - 100] as $year) {
-            if ($year >= 1 && \checkdate($month, $day, $year) && $this->format($year, $month, $day) <= $limit) {
+            if ($year >= 1 && \checkdate($month, $day, $year) && [$year, $month, $day] <= $limit) {
                 return $this->date($year, $month, $day);
             }
         }
@@ -184,9 +188,10 @@ abstract class MachineReadableZone extends AbstractStringValueObject implements 
     }
 
     /**
-     * The expiry date in the century that puts it nearest to `$reference` (the earlier one on a tie), among the four
-     * centuries either side, which hold a leap year for a 29 February `00` whatever the reference year (the year is
-     * clamped to 1-9999 for the search). Doc 9303 gives no rule.
+     * The expiry date in the century that puts its year between 84 years before and 15 years after the reference year
+     * (UTC, clamped to 1-9999): documents are valid for about 10 to 15 years, so a date far in the past is an archived
+     * document. A 29 February `00` whose year is not a leap year takes the nearest century that has it, the earlier one
+     * on a tie. Doc 9303 gives no rule.
      */
     public function expiryDate(DateTimeImmutable $reference): DateTimeImmutable
     {
@@ -196,35 +201,29 @@ abstract class MachineReadableZone extends AbstractStringValueObject implements 
         }
 
         [$yearDigits, $month, $day] = $parts;
-        $referenceYear = \max(1, \min(9999, (int) $reference->setTimezone(new DateTimeZone('UTC'))->format('Y')));
-        $best = null;
-        $bestDistance = null;
-        foreach ([-400, -300, -200, -100, 0, 100, 200, 300, 400] as $shift) {
-            $year = \intdiv($referenceYear, 100) * 100 + $yearDigits + $shift;
-            if ($year < 1 || $year > 9999 || !\checkdate($month, $day, $year)) {
-                continue;
-            }
-
-            $date = $this->date($year, $month, $day);
-            $distance = \abs($date->getTimestamp() - $reference->getTimestamp());
-            if ($bestDistance === null || $distance < $bestDistance) {
-                $best = $date;
-                $bestDistance = $distance;
+        $earliest = $this->clampYear((int) $reference->setTimezone(new DateTimeZone('UTC'))->format('Y')) - self::EXPIRY_YEARS_BACK;
+        $inWindow = $earliest + (($yearDigits - $earliest) % 100 + 100) % 100;
+        foreach ([0, -100, 100, -200, 200, -300, 300, -400, 400] as $shift) {
+            $year = $inWindow + $shift;
+            if ($year >= 1 && $year <= 9999 && \checkdate($month, $day, $year)) {
+                return $this->date($year, $month, $day);
             }
         }
 
-        return $best ?? throw new LogicException('Some century always holds the date.');
+        throw new LogicException('Some century always holds the date.');
     }
 
     /**
-     * @return Sex|null null for `<` (unspecified)
+     * `F`, `M`, or `Sex::Unspecified` for the filler `<` (Doc 9303 Parts 4-6: "< = unspecified"). The VIZ letter `X` is
+     * not an MRZ value and is refused.
      */
-    public function sex(): ?Sex
+    #[Override]
+    public function sex(): Sex
     {
         return match (static::layout()->sex->of($this->lines())) {
             'F' => Sex::Female,
             'M' => Sex::Male,
-            default => null,
+            default => Sex::Unspecified,
         };
     }
 
@@ -269,10 +268,18 @@ abstract class MachineReadableZone extends AbstractStringValueObject implements 
         return \implode("\n", $lines);
     }
 
-    private static function detect(string $value): self
+    /**
+     * Builds the first format of `$target` (the class `from()` was called on, or one of its subclasses) whose shape fits,
+     * so no other format's rules ever decide the outcome.
+     *
+     * @param class-string<self> $target
+     *
+     * @throws InvalidMrzException
+     */
+    private static function detect(string $value, string $target): self
     {
         foreach ([Td3::class, Td2::class, Td1::class] as $class) {
-            if (self::split($value, $class::LINES, $class::LINE_LENGTH) !== null) {
+            if (\is_a($class, $target, true) && self::split($value, $class::LINES, $class::LINE_LENGTH) !== null) {
                 return new $class($value);
             }
         }
@@ -460,13 +467,13 @@ abstract class MachineReadableZone extends AbstractStringValueObject implements 
         return null;
     }
 
-    private function format(int $year, int $month, int $day): string
+    private function clampYear(int $year): int
     {
-        return \sprintf('%04d-%02d-%02d', $year, $month, $day);
+        return \max(1, \min(9999, $year));
     }
 
     private function date(int $year, int $month, int $day): DateTimeImmutable
     {
-        return new DateTimeImmutable($this->format($year, $month, $day) . ' 00:00:00', new DateTimeZone('UTC'));
+        return new DateTimeImmutable('@0')->setTimezone(new DateTimeZone('UTC'))->setDate($year, $month, $day)->setTime(0, 0);
     }
 }

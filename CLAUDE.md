@@ -32,6 +32,6 @@ Exception messages never contain the input or any part of it.
 
 ## MRZ gotchas
 
-- `Icao\Mrz\MachineReadableZone` does not implement `HasBirthDate`/`HasSex` (century unknown, sex may be `<`); dates take a caller-supplied reference.
+- `Icao\Mrz\MachineReadableZone` implements `HasSex` (`<` is `Sex::Unspecified`, `X` refused) but not `HasBirthDate` (century unknown); dates take a caller-supplied reference. It uses `Internal\ReparsesOnUnserialize` (vo-base does not re-validate on unserialize).
 - `Contract\Maskable` extends vo-base's `Contract\Maskable` (vo-base `^1.2`).
 - Releasing: tag vo-documents `v0.2.0` (the MRZ) before `vo-documents-doctrine` can pass its minimal CI job.

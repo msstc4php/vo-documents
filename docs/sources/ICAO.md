@@ -388,9 +388,13 @@ characters (<)". Positions (1-based):
 | Composite check digit | 2: 44 | 2: 36 | 2: 30 |
 
 Document code: Part 4 §4.4 "The first letter P shall identify the document as an MRP"; Part 5 and Part 6 note k "The
-first character shall be A, C or I". Sex (Part 4 table, position 21): "F = female; M = male; < = unspecified." (the
-VIZ uses `X`; Part 5 note f: "Where an issuing State or organization does not want to identify the sex, the filler
-character (<) shall be used in this field in the MRZ and an X in this field in the VIZ."). The second character is, per Part 5 and
+first character shall be A, C or I". Sex (Part 4 table, position 21; Part 5 table, line 2 position 8; Part 6 table,
+position 21; 8th ed. 2021, checked again 2026-11-21 UTC): "F = female; M = male; < = unspecified." (the VIZ uses `X`;
+Part 4 note p, Part 5 and Part 6 note f: "Where an issuing State or organization does not want to identify the sex, the
+filler character (<) shall be used in this field in the MRZ and an X in this field in the VIZ."). The VIZ field
+description (Part 4 field 11, Parts 5 and 6 field 05) reads "the capital letter F for female, M for male, or X for
+unspecified". Decision (wave 3 review CR-015): `<` is defined as "unspecified", so `sex()` returns `Sex::Unspecified`
+for it and `MachineReadableZone` implements `HasSex`; `X` is a VIZ value only, not an MRZ one, and stays refused. The second character is, per Part 5 and
 Part 6 note k, "at the discretion of the issuing State or organization except that i) V shall not be used, ii) I shall
 not be used after A (i.e. AI), and iii) C shall not be used after A (i.e. AC) except in the crew member certificate".
 `Td1` and `Td2` refuse a second character `V` and `AI`; `AC` stays allowed, because the crew member certificate is a
@@ -444,9 +448,14 @@ hidden clock):
 - `birthDate($today)`: the most recent date not after `$today` (UTC date), taking the current century or the one
   before; null when neither holds the date, which only happens for 29 February `00` before 29 February 2000 (1900 is
   not a leap year, and 1600 is no birth date);
-- `expiryDate($reference)`: the century, among the four either side (the reference year clamped to 1-9999), that puts the date nearest to `$reference`, the
-  earlier one on a tie (a document may be expired or not yet expired, so no direction can be assumed; the wide window
-  lets 29 February `00` always find a leap year: 1600, 2000, 2400).
+- `birthDate($today)` searches from the reference year clamped to 1-9999 and compares year, month and day as integers,
+  so a reference after 9999 still finds the date (`991231` with a reference in 10050 is 9999-12-31);
+- `expiryDate($reference)` (wave 3 review CR-016, controller ruling): the century that puts the year in
+  [reference year - 84, reference year + 15] (UTC year, clamped to 1-9999). Documents are valid for about 10 to 15
+  years, so a far past date is an archived document rather than one valid for decades: `760101` with the reference
+  2026-11-21 is 1976 (the earlier "nearest century" rule gave 2076). A 29 February `00` whose year in that window is not
+  a leap year (2100) takes the nearest century that has it among the four either side, the earlier one on a tie
+  (1600, 2000, 2400); the year stays in 1-9999.
 
 ### 5.5 Codes (Part 3 §5)
 

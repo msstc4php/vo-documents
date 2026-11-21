@@ -6,6 +6,8 @@ namespace MSSTC4PHP\ValueObject\Documents\Tests\Unit\Icao\Mrz;
 
 use DateTimeImmutable;
 use DateTimeZone;
+use LogicException;
+use MSSTC4PHP\ValueObject\Documents\Contract\HasSex;
 use MSSTC4PHP\ValueObject\Documents\Exception\InvalidMrzException;
 use MSSTC4PHP\ValueObject\Documents\Icao\Mrz\MachineReadableZone;
 use MSSTC4PHP\ValueObject\Documents\Icao\Mrz\Td1;
@@ -16,12 +18,15 @@ use MSSTC4PHP\ValueObject\Documents\Internal\MrzCheckDigit;
 use MSSTC4PHP\ValueObject\Documents\Internal\MrzDocumentNumber;
 use MSSTC4PHP\ValueObject\Documents\Internal\MrzField;
 use MSSTC4PHP\ValueObject\Documents\Internal\MrzLayout;
+use MSSTC4PHP\ValueObject\Documents\Internal\ReparsesOnUnserialize;
 use MSSTC4PHP\ValueObject\Documents\Internal\Text;
 use MSSTC4PHP\ValueObject\Documents\Internal\TwoDigitYearDate;
 use MSSTC4PHP\ValueObject\Documents\Internal\UnicodeText;
 use MSSTC4PHP\ValueObject\Documents\Sex;
+use MSSTC4PHP\ValueObject\Exception\InvalidValueObjectException;
 use MSSTC4PHP\ValueObject\I18n\CountryCode;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\CoversTrait;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
@@ -31,6 +36,7 @@ use ReflectionClass;
 #[CoversClass(Td1::class)]
 #[CoversClass(Td2::class)]
 #[CoversClass(Td3::class)]
+#[CoversTrait(ReparsesOnUnserialize::class)]
 #[UsesClass(PersonName::class)]
 #[UsesClass(UnicodeText::class)]
 #[UsesClass(MrzCheckDigit::class)]
@@ -300,14 +306,18 @@ final class MachineReadableZoneTest extends TestCase
         self::assertNull($mrz->birthDate(new DateTimeImmutable('1999-11-21T00:00:00Z')));
     }
 
-    public function testTheExpiryDateTakesTheCenturyNearestToTheReference(): void
+    public function testTheExpiryYearIsAtMost84YearsBeforeAnd15YearsAfterTheReference(): void
     {
         $mrz = MachineReadableZone::fromString(self::TD3);
 
         self::assertSame('2034-04-15', $mrz->expiryDate(new DateTimeImmutable('2026-11-21T00:00:00Z'))->format('Y-m-d'));
-        self::assertSame('2034-04-15', $mrz->expiryDate(new DateTimeImmutable('1990-01-01T00:00:00Z'))->format('Y-m-d'));
+        self::assertSame('1934-04-15', $mrz->expiryDate(new DateTimeImmutable('2018-12-31T23:59:59Z'))->format('Y-m-d'));
+        self::assertSame('2034-04-15', $mrz->expiryDate(new DateTimeImmutable('2019-01-01T00:00:00Z'))->format('Y-m-d'));
+        self::assertSame('2034-04-15', $mrz->expiryDate(new DateTimeImmutable('2118-12-31T23:59:59Z'))->format('Y-m-d'));
+        self::assertSame('2134-04-15', $mrz->expiryDate(new DateTimeImmutable('2119-01-01T00:00:00Z'))->format('Y-m-d'));
+        self::assertSame('1934-04-15', $mrz->expiryDate(new DateTimeImmutable('1990-01-01T00:00:00Z'))->format('Y-m-d'));
         self::assertSame('1934-04-15', $mrz->expiryDate(new DateTimeImmutable('1980-01-01T00:00:00Z'))->format('Y-m-d'));
-        self::assertSame('2134-04-15', $mrz->expiryDate(new DateTimeImmutable('2090-01-01T00:00:00Z'))->format('Y-m-d'));
+        self::assertSame('2034-04-15', $mrz->expiryDate(new DateTimeImmutable('2090-01-01T00:00:00Z'))->format('Y-m-d'));
         self::assertSame('2034-04-15', $mrz->expiryDate(new DateTimeImmutable('2034-04-15T12:00:00+14:00'))->format('Y-m-d'));
         self::assertSame('UTC', $mrz->expiryDate(new DateTimeImmutable('2026-11-21T00:00:00Z'))->getTimezone()->getName());
     }
@@ -331,13 +341,14 @@ final class MachineReadableZoneTest extends TestCase
         self::assertSame('<<0229', MachineReadableZone::fromString($this->withBirthDate('<<0229'))->birthDateDigits());
     }
 
-    public function testSexIsNullForAFiller(): void
+    public function testAFillerSexIsUnspecifiedAndTheVizLetterXIsRefused(): void
     {
         $male = MachineReadableZone::fromString($this->withSex('M'));
         $unspecified = MachineReadableZone::fromString($this->withSex('<'));
 
         self::assertSame(Sex::Male, $male->sex());
-        self::assertNull($unspecified->sex());
+        self::assertSame(Sex::Unspecified, $unspecified->sex());
+        self::assertTrue(new ReflectionClass(MachineReadableZone::class)->implementsInterface(HasSex::class));
         $this->assertRefusedAs('Invalid ICAO MRZ field.', $this->withSex('X'));
     }
 
@@ -606,7 +617,8 @@ final class MachineReadableZoneTest extends TestCase
         $mrz = MachineReadableZone::fromString($this->withExpiryDate('950415'));
 
         self::assertSame('1995-04-15', $mrz->expiryDate(new DateTimeImmutable('2000-01-01T00:00:00Z'))->format('Y-m-d'));
-        self::assertSame('2095-04-15', $mrz->expiryDate(new DateTimeImmutable('2060-01-01T00:00:00Z'))->format('Y-m-d'));
+        self::assertSame('1995-04-15', $mrz->expiryDate(new DateTimeImmutable('2060-01-01T00:00:00Z'))->format('Y-m-d'));
+        self::assertSame('2095-04-15', $mrz->expiryDate(new DateTimeImmutable('2080-01-01T00:00:00Z'))->format('Y-m-d'));
         self::assertSame('2095-04-15 00:00:00', $mrz->expiryDate(new DateTimeImmutable('2095-04-15T00:00:00Z'))->format('Y-m-d H:i:s'));
     }
 
@@ -628,8 +640,189 @@ final class MachineReadableZoneTest extends TestCase
 
         self::assertSame('2000-02-29', $mrz->expiryDate(new DateTimeImmutable('1950-01-01T00:00:00Z'))->format('Y-m-d'));
         self::assertSame('1600-02-29', $mrz->expiryDate(new DateTimeImmutable('1750-06-01T00:00:00Z'))->format('Y-m-d'));
-        self::assertSame('2400-02-29', $mrz->expiryDate(new DateTimeImmutable('2250-06-01T00:00:00Z'))->format('Y-m-d'));
+        self::assertSame('2000-02-29', $mrz->expiryDate(new DateTimeImmutable('2250-06-01T00:00:00Z'))->format('Y-m-d'));
+        self::assertSame('2400-02-29', $mrz->expiryDate(new DateTimeImmutable('2350-06-01T00:00:00Z'))->format('Y-m-d'));
         self::assertSame('2000-02-29', $mrz->expiryDate(new DateTimeImmutable('2150-06-01T00:00:00Z'))->format('Y-m-d'));
+    }
+
+    public function testAnExpiryInThe70sReadsAsPastWithAReferenceIn2026(): void
+    {
+        $mrz = MachineReadableZone::fromString($this->withExpiryDate('760101'));
+
+        self::assertSame('1976-01-01', $mrz->expiryDate(new DateTimeImmutable('2026-11-21T00:00:00Z'))->format('Y-m-d'));
+    }
+
+    public function testTheExpiryWindowFollowsTheUtcYearOfTheReference(): void
+    {
+        $mrz = MachineReadableZone::fromString($this->withExpiryDate('420101'));
+
+        self::assertSame('2042-01-01', $mrz->expiryDate(new DateTimeImmutable('2027-01-01T00:00:00Z'))->format('Y-m-d'));
+        self::assertSame('1942-01-01', $mrz->expiryDate(new DateTimeImmutable('2027-01-01T00:30:00+01:00'))->format('Y-m-d'));
+    }
+
+    public function testTheExpiryWindowIsClampedToYears1To9999(): void
+    {
+        $mrz = MachineReadableZone::fromString($this->withExpiryDate('500101'));
+
+        self::assertSame('0050-01-01', $mrz->expiryDate(new DateTimeImmutable('0001-01-01T00:00:00Z'))->format('Y-m-d'));
+        self::assertSame('9950-01-01', $mrz->expiryDate(new DateTimeImmutable('9999-12-31T00:00:00Z'))->format('Y-m-d'));
+        self::assertSame('9950-01-01', $mrz->expiryDate(new DateTimeImmutable('+10050-01-01T00:00:00Z'))->format('Y-m-d'));
+        self::assertSame('0050-01-01', $mrz->expiryDate(new DateTimeImmutable('-0500-01-01T00:00:00Z'))->format('Y-m-d'));
+    }
+
+    public function testTheExpiryYearStaysWithinYears1To9999(): void
+    {
+        self::assertSame('0001-01-01', MachineReadableZone::fromString($this->withExpiryDate('010101'))->expiryDate(new DateTimeImmutable('0001-01-01T00:00:00Z'))->format('Y-m-d'));
+        self::assertSame('9999-01-01', MachineReadableZone::fromString($this->withExpiryDate('990101'))->expiryDate(new DateTimeImmutable('9999-12-31T00:00:00Z'))->format('Y-m-d'));
+    }
+
+    public function testAnExpiry29thOfFebruaryFallsBackInTheSearchOrder(): void
+    {
+        $mrz = MachineReadableZone::fromString($this->withExpiryDate('000229'));
+
+        self::assertSame('0400-02-29', $mrz->expiryDate(new DateTimeImmutable('0250-06-01T00:00:00Z'))->format('Y-m-d'));
+        self::assertSame('9600-02-29', $mrz->expiryDate(new DateTimeImmutable('9950-06-01T00:00:00Z'))->format('Y-m-d'));
+    }
+
+    public function testABirthInTheYear1IsFound(): void
+    {
+        $mrz = MachineReadableZone::fromString($this->withBirthDate('010101'));
+
+        self::assertSame('0001-01-01', $mrz->birthDate(new DateTimeImmutable('0001-06-01T00:00:00Z'))?->format('Y-m-d'));
+        self::assertNull(MachineReadableZone::fromString($this->withBirthDate('000101'))->birthDate(new DateTimeImmutable('0050-06-01T00:00:00Z')));
+    }
+
+    public function testABirthDateAfterTheYear9999IsInTheLastCenturyThatExists(): void
+    {
+        $mrz = MachineReadableZone::fromString($this->withBirthDate('991231'));
+        $birth = $mrz->birthDate(new DateTimeImmutable('+10050-06-01T00:00:00Z'));
+
+        self::assertSame('9999-12-31 00:00:00', $birth?->format('Y-m-d H:i:s'));
+        self::assertSame('UTC', $birth->getTimezone()->getName());
+        self::assertSame('9974-08-12', MachineReadableZone::fromString(self::TD3)->birthDate(new DateTimeImmutable('+10050-06-01T00:00:00Z'))?->format('Y-m-d'));
+        self::assertNull(MachineReadableZone::fromString(self::TD3)->birthDate(new DateTimeImmutable('-0001-06-01T00:00:00Z')));
+    }
+
+    public function testTheBirthDateLimitComparesYearMonthAndDay(): void
+    {
+        $mrz = MachineReadableZone::fromString(self::TD3);
+
+        self::assertSame('1974-08-12', $mrz->birthDate(new DateTimeImmutable('2074-07-31T00:00:00Z'))?->format('Y-m-d'));
+        self::assertSame('1974-08-12', $mrz->birthDate(new DateTimeImmutable('2074-08-11T00:00:00Z'))?->format('Y-m-d'));
+        self::assertSame('2074-08-12', $mrz->birthDate(new DateTimeImmutable('2074-09-01T00:00:00Z'))?->format('Y-m-d'));
+        self::assertSame('2074-08-12', $mrz->birthDate(new DateTimeImmutable('2075-01-01T00:00:00Z'))?->format('Y-m-d'));
+    }
+
+    public function testAConcreteClassRefusesAnotherFormatWithoutApplyingItsRules(): void
+    {
+        $td2WithABadCheckDigit = "I<UTOERIKSSON<<ANNA<MARIA<<<<<<<<<<<\nD231458907UTO7408122F1204159<<<<<<<7";
+
+        foreach ([Td3::class, Td1::class] as $class) {
+            try {
+                $class::from($td2WithABadCheckDigit);
+                self::fail('Expected an exception.');
+            } catch (InvalidMrzException $exception) {
+                self::assertSame('Invalid ICAO MRZ.', $exception->getMessage());
+            }
+        }
+
+        $this->assertRefusedAs('Invalid ICAO MRZ check digit.', $td2WithABadCheckDigit);
+    }
+
+    /**
+     * @return iterable<string, array{class-string<MachineReadableZone>, string}>
+     */
+    public static function serializable(): iterable
+    {
+        yield 'TD1' => [Td1::class, self::TD1];
+        yield 'TD1 long number' => [Td1::class, self::TD1_LONG];
+        yield 'TD2' => [Td2::class, self::TD2];
+        yield 'TD3' => [Td3::class, self::TD3];
+    }
+
+    /**
+     * @param class-string<MachineReadableZone> $class
+     */
+    #[DataProvider('serializable')]
+    public function testSerializesAsItsValueAloneAndRoundTrips(string $class, string $text): void
+    {
+        $mrz = MachineReadableZone::fromString($text);
+
+        $serialized = \serialize($mrz);
+        $restored = \unserialize($serialized);
+
+        self::assertSame(\sprintf('O:%d:"%s":1:{s:5:"value";%s}', \strlen($class), $class, \serialize($text)), $serialized);
+        self::assertInstanceOf($class, $restored);
+        self::assertTrue($mrz->equals($restored));
+        self::assertSame($mrz->masked(), $restored->masked());
+        self::assertSame($mrz->documentNumber(), $restored->documentNumber());
+    }
+
+    /**
+     * @return iterable<string, array{class-string<MachineReadableZone>, string}>
+     */
+    public static function forged(): iterable
+    {
+        yield 'TD3 holding text' => [Td3::class, 'HELLO'];
+        yield 'TD3 holding a TD1' => [Td3::class, self::TD1];
+        yield 'TD1 holding a TD3' => [Td1::class, self::TD3];
+        yield 'TD2 with a wrong composite check digit' => [Td2::class, \substr(self::TD2, 0, -1) . '7'];
+        yield 'TD3 masked' => [Td3::class, MachineReadableZone::fromString(self::TD3)->masked()];
+    }
+
+    /**
+     * @param class-string<MachineReadableZone> $class
+     */
+    #[DataProvider('forged')]
+    public function testAForgedPayloadIsValidatedAgain(string $class, string $value): void
+    {
+        $this->expectException(InvalidMrzException::class);
+
+        \unserialize($this->payload($class, ['value' => $value]));
+    }
+
+    public function testOtherKeysOfThePayloadAreIgnored(): void
+    {
+        $restored = \unserialize($this->payload(Td3::class, ['value' => self::TD3, 'documentNumber' => 'X', 'masked' => 'X']));
+
+        self::assertInstanceOf(Td3::class, $restored);
+        self::assertSame(self::TD3, $restored->value);
+        self::assertSame('L898902C3', $restored->documentNumber());
+    }
+
+    /**
+     * @return iterable<string, array{array<array-key, mixed>}>
+     */
+    public static function malformedPayloads(): iterable
+    {
+        yield 'no value' => [[]];
+        yield 'a value that is no string' => [['value' => 1]];
+    }
+
+    /**
+     * @param array<array-key, mixed> $data
+     */
+    #[DataProvider('malformedPayloads')]
+    public function testAPayloadWithoutAStringValueIsRefused(array $data): void
+    {
+        $this->expectException(InvalidValueObjectException::class);
+        $this->expectExceptionMessage('A serialized value object must hold its value, as a string.');
+
+        \unserialize($this->payload(Td3::class, $data));
+    }
+
+    public function testABuiltMrzRefusesUnserializeAndKeepsItsValue(): void
+    {
+        $mrz = MachineReadableZone::fromString(self::TD3);
+
+        try {
+            $mrz->__unserialize(['value' => self::TD3]);
+            self::fail('__unserialize() on a built object must throw.');
+        } catch (LogicException $exception) {
+            self::assertSame('A value object is immutable; __unserialize() runs only on a new object.', $exception->getMessage());
+        }
+
+        self::assertSame(self::TD3, $mrz->value);
     }
 
     private function assertRefusedAs(string $message, string $input): void
@@ -643,6 +836,15 @@ final class MachineReadableZoneTest extends TestCase
         }
 
         self::fail('Expected an InvalidMrzException.');
+    }
+
+    /**
+     * @param class-string $class
+     * @param array<array-key, mixed> $data
+     */
+    private function payload(string $class, array $data): string
+    {
+        return \sprintf('O:%d:"%s":%d:{%s}', \strlen($class), $class, \count($data), \substr(\serialize($data), \strlen(\sprintf('a:%d:{', \count($data))), -1));
     }
 
     private function withBirthDate(string $digits): string

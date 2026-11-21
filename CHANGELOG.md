@@ -8,9 +8,16 @@
   zone of TD1, TD2 and TD3 documents (Parts 3 to 6), every check digit enforced, composite one included, TD1 and TD2
   long document numbers supported; `fromString()` takes 2 or 3 lines joined by `\n` or `\r\n` or one string of 88, 72
   or 90 characters. Accessors for the codes, name, sex, document number, optional data and the raw dates; `masked()`.
-  `InvalidMrzException`. `MachineReadableZone` does not implement `HasBirthDate` (`birthDate()` takes the reference
-  date, since the MRZ has no century) nor `HasSex` (`sex()` is null for `<`). The century rules are not in Doc 9303,
-  see `docs/sources/ICAO.md`.
+  `InvalidMrzException`. `MachineReadableZone` implements `HasSex`: `sex()` is `Sex::Unspecified` for `<` (Doc 9303:
+  "< = unspecified"); `X` (a VIZ value) is refused. It does not implement `HasBirthDate` (`birthDate()` takes the
+  reference date, since the MRZ has no century). The century rules are not in Doc 9303, see `docs/sources/ICAO.md`:
+  `expiryDate()` puts the year between 84 years before and 15 years after the reference year; `birthDate()` takes the
+  most recent past century and works for any reference year.
+- `Td1::fromString()`, `Td2::fromString()` and `Td3::fromString()` refuse another format's lines as "Invalid ICAO MRZ."
+  without building that format.
+- The MRZ serializes as its value alone and is validated again on `unserialize()` (`Internal\ReparsesOnUnserialize`):
+  a forged or stale payload throws `InvalidMrzException`, a payload without a string value vo-base
+  `InvalidValueObjectException`, other keys are ignored.
 - `Contract\Maskable` now extends vo-base `Contract\Maskable`, so every `Maskable` document class is also one of the
   core. Requires `msstc4php/vo-base ^1.2` (was `^1.1.1`).
 

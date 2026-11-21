@@ -181,8 +181,8 @@ Contracts: `Contract\Maskable` (every number above and the MRZ; it extends vo-ba
 US, CA, MX and BR jurisdictions, AU licences, US DL/ID numbers, CA licence and health card numbers, MX licence numbers,
 BR RG numbers). `Contract\HasSex` and the `Sex` enum are implemented by the documents that encode a sex
 (`Nir`, `FiscalCode`, the DVLA licence number, `ChiNumber`, the Québec NAM, the Mexican CURP, the Chinese citizen
-identity number, the Korean resident and foreigner registration numbers, the Indonesian NIK); `Sex::Unspecified` is
-the CURP's `X` (RENAPO, non-binary persons). `Contract\HasBirthDate` is implemented by the Mexican CURP (its 17th
+identity number, the Korean resident and foreigner registration numbers, the Indonesian NIK, the ICAO MRZ);
+`Sex::Unspecified` is the CURP's `X` (RENAPO, non-binary persons) and the MRZ filler `<` (Doc 9303 "< = unspecified"). `Contract\HasBirthDate` is implemented by the Mexican CURP (its 17th
 character gives the century), the Chinese citizen identity number and 2023 permanent residence number (a full
 `YYYYMMDD`) and the Korean resident and foreigner registration numbers (the 7th digit gives the century); the other
 encoded birth dates lack a century, so those classes expose the year digits, month and day instead (the NIK:
@@ -414,13 +414,16 @@ $mrz->birthDate(new DateTimeImmutable());   // null when the day or month is unk
 $mrz->masked();                             // document number, optional data, birth date -> "*"
 ```
 
-`MachineReadableZone` implements neither `HasBirthDate` nor `HasSex`. `HasBirthDate::birthDate()` takes no argument, but the MRZ
-holds only two year digits and Doc 9303 gives no century, so `birthDate($today)` and `expiryDate($reference)` take the date they
-resolve against (no hidden clock). `HasSex::sex()` must return a `Sex`, but the MRZ sex field may be `<` (unspecified), so
-`sex()` returns `?Sex`. `masked()` puts `*` over the document number, optional data, birth date and their check digits; `*` is
-not an MRZ character, so a masked zone never parses. Doc 9303 gives no century for the two-digit years, so `birthDate($today)` takes the most recent past one and
-`expiryDate($reference)` the one nearest to the reference date; `birthDateDigits()` and `expiryDateDigits()` give the
-raw `YYMMDD`. The visa formats MRV-A and MRV-B (Part 7) are not read. Notes: `docs/sources/ICAO.md` section 5.
+`MachineReadableZone` implements `HasSex` but not `HasBirthDate`. `sex()` is `Sex::Female`, `Sex::Male`, or `Sex::Unspecified`
+for the filler `<` (Doc 9303 Parts 4-6: "< = unspecified"); the VIZ letter `X` is not an MRZ value and is refused.
+`HasBirthDate::birthDate()` takes no argument, but the MRZ holds only two year digits and Doc 9303 gives no century, so
+`birthDate($today)` and `expiryDate($reference)` take the date they resolve against (no hidden clock). `masked()` puts `*`
+over the document number, optional data, birth date and their check digits; `*` is not an MRZ character, so a masked zone
+never parses. `birthDate($today)` takes the most recent past century; `expiryDate($reference)` the century that puts the
+year between 84 years before and 15 years after the reference year (documents are valid for about 10 to 15 years, so an
+archived document reads as past: `760101` with a 2026 reference is 1976). `birthDateDigits()` and `expiryDateDigits()`
+give the raw `YYMMDD`. `Td3::fromString()` (and `Td1`, `Td2`) refuses the lines of another format as "Invalid ICAO MRZ."
+without applying that format's rules. A serialized MRZ holds its value alone and is validated again on `unserialize()`. The visa formats MRV-A and MRV-B (Part 7) are not read. Notes: `docs/sources/ICAO.md` section 5.
 
 `Icao\Transliterator` turns a national name part into its ICAO spelling (`toLatin()`, or `variants()` for every
 spelling the table allows). Two rules that follow the sources, not the obvious guess:
