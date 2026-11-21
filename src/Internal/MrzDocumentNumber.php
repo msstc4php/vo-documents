@@ -30,7 +30,7 @@ final class MrzDocumentNumber
                 : null;
         }
 
-        if (!$longAllowed) {
+        if (!$longAllowed || \str_contains($principal, '<')) {
             return null;
         }
 

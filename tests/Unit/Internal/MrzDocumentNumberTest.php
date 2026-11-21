@@ -54,6 +54,12 @@ final class MrzDocumentNumberTest extends TestCase
         );
     }
 
+    public function testALongNumberWithFillersInItsPrincipalCharactersIsRefused(): void
+    {
+        self::assertNull(MrzDocumentNumber::resolve('AB<<<<<<<', '<', '126<X<<<<<<<<<<', true));
+        self::assertNull(MrzDocumentNumber::resolve('<<<<<<<<<', '<', '126<X<<<<<<<<<<', true));
+    }
+
     public function testALongNumberIsRefusedWhereTheFormatHasNone(): void
     {
         self::assertNull(MrzDocumentNumber::resolve('ABC123456', '<', '783<<<<<<<<<<<<', false));

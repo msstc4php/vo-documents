@@ -424,7 +424,7 @@ document number, its position is in the range of 17 – 29. The check digit is f
 vacant positions (Part 3 §4.10), so the number has none after its ninth character: the overflow runs from the first
 optional-data position to the first `<`, its last character is the check digit (a digit, with at least one number
 character before it) and the optional data starts after that `<`. Exactly one reading exists; a value where it does
-not hold (no `<`, no digit before it, wrong check digit) is refused. TD3 has no long form; a `<` check digit there is
+not hold (no `<`, no digit before it, wrong check digit, or a `<` among the nine principal characters) is refused. TD3 has no long form; a `<` check digit there is
 refused. Part 6 note j says the same for TD2 (overflow at positions 29 to 35).
 
 ### 5.4 Dates (Part 3 §4.8)
@@ -444,7 +444,7 @@ hidden clock):
 - `birthDate($today)`: the most recent date not after `$today` (UTC date), taking the current century or the one
   before; null when neither holds the date, which only happens for 29 February `00` before 29 February 2000 (1900 is
   not a leap year, and 1600 is no birth date);
-- `expiryDate($reference)`: the century, among the three either side, that puts the date nearest to `$reference`, the
+- `expiryDate($reference)`: the century, among the four either side (the reference year clamped to 1-9999), that puts the date nearest to `$reference`, the
   earlier one on a tie (a document may be expired or not yet expired, so no direction can be assumed; the wide window
   lets 29 February `00` always find a leap year: 1600, 2000, 2400).
 

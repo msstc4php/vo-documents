@@ -184,8 +184,9 @@ abstract class MachineReadableZone extends AbstractStringValueObject implements 
     }
 
     /**
-     * The expiry date in the century that puts it nearest to `$reference` (the earlier one on a tie), among the three
-     * centuries either side so that a 29 February `00` always finds a leap year. Doc 9303 gives no rule.
+     * The expiry date in the century that puts it nearest to `$reference` (the earlier one on a tie), among the four
+     * centuries either side, which hold a leap year for a 29 February `00` whatever the reference year (the year is
+     * clamped to 1-9999 for the search). Doc 9303 gives no rule.
      */
     public function expiryDate(DateTimeImmutable $reference): DateTimeImmutable
     {
@@ -195,12 +196,12 @@ abstract class MachineReadableZone extends AbstractStringValueObject implements 
         }
 
         [$yearDigits, $month, $day] = $parts;
-        $referenceYear = (int) $reference->setTimezone(new DateTimeZone('UTC'))->format('Y');
+        $referenceYear = \max(1, \min(9999, (int) $reference->setTimezone(new DateTimeZone('UTC'))->format('Y')));
         $best = null;
         $bestDistance = null;
-        foreach ([-300, -200, -100, 0, 100, 200, 300] as $shift) {
+        foreach ([-400, -300, -200, -100, 0, 100, 200, 300, 400] as $shift) {
             $year = \intdiv($referenceYear, 100) * 100 + $yearDigits + $shift;
-            if ($year < 1 || !\checkdate($month, $day, $year)) {
+            if ($year < 1 || $year > 9999 || !\checkdate($month, $day, $year)) {
                 continue;
             }
 

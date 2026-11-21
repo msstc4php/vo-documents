@@ -229,6 +229,14 @@ final class MachineReadableZoneTest extends TestCase
         self::assertRefusedAs('Invalid ICAO MRZ check digit.', "I<UTOABC123456<784<A06<<<<<<<<\n7408122F1204159UTO<<<<<<<<<<<8\nERIKSSON<<ANNA<MARIA<<<<<<<<<<");
     }
 
+    public function testALongNumberWithFillersInItsPrincipalCharactersIsRefused(): void
+    {
+        $this->assertRefusedAs(
+            'Invalid ICAO MRZ check digit.',
+            "I<UTOAB<<<<<<<<126<X<<<<<<<<<<\n7408122F1204159UTO<<<<<<<<<<<3\nERIKSSON<<ANNA<MARIA<<<<<<<<<<",
+        );
+    }
+
     public function testATd2LongDocumentNumber(): void
     {
         $check = MrzCheckDigit::of('ABC12345612345');
@@ -600,6 +608,18 @@ final class MachineReadableZoneTest extends TestCase
         self::assertSame('1995-04-15', $mrz->expiryDate(new DateTimeImmutable('2000-01-01T00:00:00Z'))->format('Y-m-d'));
         self::assertSame('2095-04-15', $mrz->expiryDate(new DateTimeImmutable('2060-01-01T00:00:00Z'))->format('Y-m-d'));
         self::assertSame('2095-04-15 00:00:00', $mrz->expiryDate(new DateTimeImmutable('2095-04-15T00:00:00Z'))->format('Y-m-d H:i:s'));
+    }
+
+    public function testTheExpiryOfA29thOfFebruaryNeverThrowsWhateverTheReference(): void
+    {
+        $mrz = MachineReadableZone::fromString($this->withExpiryDate('000229'));
+
+        foreach (['0001-01-01', '0001-06-01', '0050-06-01', '0099-12-31', '0100-01-01', '0399-06-01', '0401-06-01', '1700-06-01', '2250-06-01', '9999-12-31'] as $date) {
+            self::assertSame('02-29', $mrz->expiryDate(new DateTimeImmutable($date . 'T00:00:00Z'))->format('m-d'), $date);
+        }
+
+        self::assertSame('0400-02-29', $mrz->expiryDate(new DateTimeImmutable('0001-06-01T00:00:00Z'))->format('Y-m-d'));
+        self::assertSame('9600-02-29', $mrz->expiryDate(new DateTimeImmutable('9999-12-31T00:00:00Z'))->format('Y-m-d'));
     }
 
     public function testTheExpiryOfA29thOfFebruarySkipsCenturiesWithoutIt(): void
