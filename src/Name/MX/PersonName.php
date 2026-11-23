@@ -15,7 +15,7 @@ use Override;
 
 /**
  * First surname, second surname and given names, as RENAPO captures them: two surnames, one ("solo tiene un
- * apellido", `$second` null) or none ("no cuenta con apellidos", both null; a second surname without a first is
+ * apellido", `$secondSurname` null) or none ("no cuenta con apellidos", both null; a second surname without a first is
  * refused). The derived Latin form has the surnames joined by a space as the primary identifier and the given names
  * as the secondary one, through the ICAO multinational Latin table (`Hernández de la Cruz, José Ángel` →
  * `HERNANDEZ<DE<LA<CRUZ<<JOSE<ANGEL`); a person without surnames has the given names as the only identifier
@@ -41,13 +41,13 @@ final readonly class PersonName extends AbstractLatinPersonName
      *                                    the parts
      */
     public function __construct(
-        public ?FamilyName $first,
-        public ?FamilyName $second,
+        public ?FamilyName $firstSurname,
+        public ?FamilyName $secondSurname,
         public GivenName $given,
         ?IcaoPersonName $latin = null,
     ) {
-        if (!$first instanceof FamilyName) {
-            if ($second instanceof FamilyName) {
+        if (!$firstSurname instanceof FamilyName) {
+            if ($secondSurname instanceof FamilyName) {
                 throw new InvalidPersonNameException(self::SECOND_WITHOUT_FIRST);
             }
 
@@ -57,7 +57,9 @@ final readonly class PersonName extends AbstractLatinPersonName
         }
 
         parent::__construct(
-            $second instanceof FamilyName ? [$first->value, $second->value] : [$first->value],
+            $secondSurname instanceof FamilyName
+                ? [$firstSurname->value, $secondSurname->value]
+                : [$firstSurname->value],
             [$given->value],
             $latin,
             AbstractMexicanNamePart::OMITTED_PUNCTUATION,
@@ -72,8 +74,8 @@ final readonly class PersonName extends AbstractLatinPersonName
     {
         return \implode(' ', [
             $this->given->value,
-            ...($this->first instanceof FamilyName ? [$this->first->value] : []),
-            ...($this->second instanceof FamilyName ? [$this->second->value] : []),
+            ...($this->firstSurname instanceof FamilyName ? [$this->firstSurname->value] : []),
+            ...($this->secondSurname instanceof FamilyName ? [$this->secondSurname->value] : []),
         ]);
     }
 
@@ -81,8 +83,8 @@ final readonly class PersonName extends AbstractLatinPersonName
     public function equals(ValueObject $other): bool
     {
         return $other instanceof self
-            && Optional::equal($this->first, $other->first)
-            && Optional::equal($this->second, $other->second)
+            && Optional::equal($this->firstSurname, $other->firstSurname)
+            && Optional::equal($this->secondSurname, $other->secondSurname)
             && $this->given->equals($other->given)
             && Optional::equal($this->latinOverride(), $other->latinOverride());
     }
@@ -90,14 +92,14 @@ final readonly class PersonName extends AbstractLatinPersonName
     /**
      * A view, not the storage payload ({@see PersonNameCodec}): `latin` is {@see latin()}, derived or not.
      *
-     * @return array{first: string|null, second: string|null, given: string, latin: string}
+     * @return array{firstSurname: string|null, secondSurname: string|null, given: string, latin: string}
      */
     #[Override]
     public function jsonSerialize(): array
     {
         return [
-            'first' => $this->first?->value,
-            'second' => $this->second?->value,
+            'firstSurname' => $this->firstSurname?->value,
+            'secondSurname' => $this->secondSurname?->value,
             'given' => $this->given->value,
             'latin' => $this->latin()->value,
         ];

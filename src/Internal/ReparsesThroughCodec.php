@@ -18,12 +18,18 @@ use TypeError;
  * instead of being restored.
  *
  * Payloads written by 0.2 hold PHP's default object layout; they are copied into an unchecked instance, encoded and
- * then decoded the same way. Keys of properties the class does not have are ignored.
+ * then decoded the same way. Keys of properties the class does not have are ignored. This read path pins the 0.2
+ * property names and declaring classes (`tests/Unit/Name/SerializationTest`); it is removed in 2.0.
  *
  * @internal
  */
 trait ReparsesThroughCodec
 {
+    /**
+     * Public properties renamed since 0.2, by their 1.0 name: the ES and MX surnames.
+     */
+    private const array LEGACY_PROPERTY_NAMES = ['firstSurname' => 'first', 'secondSurname' => 'second'];
+
     /**
      * @return array<string, scalar|null>
      */
@@ -84,7 +90,7 @@ trait ReparsesThroughCodec
         foreach (NameProperties::of(static::class) as $property) {
             $key = $property->isPrivate()
                 ? "\0" . $property->getDeclaringClass()->name . "\0" . $property->name
-                : $property->name;
+                : self::LEGACY_PROPERTY_NAMES[$property->name] ?? $property->name;
             if (!\array_key_exists($key, $data)) {
                 throw self::malformed();
             }

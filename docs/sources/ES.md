@@ -48,13 +48,13 @@ apellidos a cualquiera de las lenguas oficiales correspondiente al origen o domi
 
 | Part | Letters | Separators inside |
 |---|---|---|
-| `FamilyName` (`first`, `second`) | `\p{sc=Latin}` (`ñ`, `á é í ó ú`, `ü`, `ç` and foreign diacritics) | hyphen, apostrophe (`d'Ors`), space (`de la Fuente`); U+00B7 between two `l` (`Paral·lel`) |
+| `FamilyName` (`firstSurname`, `secondSurname`) | `\p{sc=Latin}` (`ñ`, `á é í ó ú`, `ü`, `ç` and foreign diacritics) | hyphen, apostrophe (`d'Ors`), space (`de la Fuente`); U+00B7 between two `l` (`Paral·lel`) |
 | `GivenName` | `\p{sc=Latin}` | hyphen, apostrophe, space (`María José`); U+00B7 between two `l` (`Marcel·lí`) |
 
 - No Spanish text lists the letters of a civil-status name; the co-official languages (art. 50.4, 53.4.º) and the
   foreign surnames of art. 56 rule out a Castilian-only list, so the package's Latin default applies.
 - **Two surnames, the second optional** (plan decision; art. 49.2: one recognised filiation can give one surname
-  line, and foreign-born nationals keep their surnames under art. 56). `PersonName($first, $second, $given)` with
+  line, and foreign-born nationals keep their surnames under art. 56). `PersonName($firstSurname, $secondSurname, $given)` with
   `$second` nullable.
 - Particles stay in the surname they belong to and keep their case (`de la Fuente`, `del Río`). The conjunction «y» /
   «i» between the surnames (art. 49.2, 53.2.º) is not modelled: when it is registered, the whole form can be given as
@@ -102,8 +102,8 @@ apellidos a cualquiera de las lenguas oficiales correspondiente al origen o domi
   of the table: `ARGUELLES<<ANA` for `Argüelles` (table default `ARGUEELLES`), `MUNXXOZ<<…` for `Muñoz`.
 - **Display order** (`full()`): given name, first surname, second surname (`María José García López`).
 
-Payload (`PersonNameCodec`): `{first, second, given, latinOverride}` with `second` null for one surname and `latinOverride` the
-override only (0.x key `latin`, still read); the JSON view is `{first, second, given, latin}` (the full Latin form) and reads back through the codec as the same name.
+Payload (`PersonNameCodec`): `{firstSurname, secondSurname, given, latinOverride}` with `secondSurname` null for one surname and `latinOverride` the
+override only (0.x key `latin`, still read); the JSON view is `{firstSurname, secondSurname, given, latin}` (the full Latin form) and reads back through the codec as the same name.
 
 ## DNI (`Document\ES\Dni`)
 

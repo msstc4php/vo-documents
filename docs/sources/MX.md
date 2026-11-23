@@ -46,7 +46,7 @@ Wikipedia, news sites, CURP/RFC generator and validator sites, law-firm summarie
 
 | Part | Letters | Separators inside |
 |---|---|---|
-| `FamilyName` (`first`, `second`) | `\p{sc=Latin}` (`ñ`, `á é í ó ú`, `ü` and foreign diacritics) | hyphen, apostrophe (`O'Hara`), space (`de la Cruz`, `Riva Palacio`), slash (`D/Amico`); a full stop after or between letters |
+| `FamilyName` (`firstSurname`, `secondSurname`) | `\p{sc=Latin}` (`ñ`, `á é í ó ú`, `ü` and foreign diacritics) | hyphen, apostrophe (`O'Hara`), space (`de la Cruz`, `Riva Palacio`), slash (`D/Amico`); a full stop after or between letters |
 | `GivenName` | `\p{sc=Latin}` | the same (`María Guadalupe`, `Ma. Guadalupe`, `J. Ricardo`, `M.A.`) |
 
 - No RENAPO text lists the letters of a name ("tal cual viene en el documento probatorio"), so the package's Latin
@@ -72,8 +72,8 @@ Wikipedia, news sites, CURP/RFC generator and validator sites, law-firm summarie
   spelling: `ARGUELLO<<ANA` for `Argüello`, `NUNXXEZ<<ANA` for `Núñez`.
 - **Display order** (`full()`): given names, first surname, second surname.
 
-Payload (`PersonNameCodec`): `{first, second, given, latinOverride}`; `first` and `second` null for no surname, `second` null
-for one, `latinOverride` the override only (0.x key `latin`, still read). The JSON view `{first, second, given, latin}` (the full Latin form) reads back through the codec as the same name.
+Payload (`PersonNameCodec`): `{firstSurname, secondSurname, given, latinOverride}` (0.x keys `first`, `second`, still read); `firstSurname` and `secondSurname` null for no surname, `secondSurname` null
+for one, `latinOverride` the override only (0.x key `latin`, still read). The JSON view `{firstSurname, secondSurname, given, latin}` (the full Latin form) reads back through the codec as the same name.
 
 ## CURP (`Document\MX\Curp`)
 

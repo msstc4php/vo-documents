@@ -14,9 +14,10 @@ use MSSTC4PHP\ValueObject\Payload\PayloadCodec;
 use Override;
 
 /**
- * {first: string|null, second: string|null, given: string, latinOverride: string|null}; second is null for one surname,
- * first and second for none, latinOverride holds only an override, the derived form is never stored; a missing "first",
- * "second" or "latinOverride" key reads as null. The 0.x key `latin` is read as `latinOverride`, so the
+ * {firstSurname: string|null, secondSurname: string|null, given: string, latinOverride: string|null}; secondSurname is
+ * null for one surname, firstSurname and secondSurname for none, latinOverride holds only an override, the derived form
+ * is never stored; a missing "firstSurname", "secondSurname" or "latinOverride" key reads as null. The 0.x keys
+ * `first`, `second` and `latin` are read as `firstSurname`, `secondSurname` and `latinOverride`, so the
  * `jsonSerialize()` view (whose `latin` is the full Latin form) reads back as the same name; other keys are refused.
  *
  * @implements PayloadCodec<PersonName>
@@ -24,9 +25,12 @@ use Override;
 final readonly class PersonNameCodec implements PayloadCodec
 {
     private const string SHAPE = 'Expected a Mexican person name payload with string "given", '
-        . 'string, null or missing "first", "second" and "latinOverride", and no other keys.';
+        . 'string, null or missing "firstSurname", "secondSurname" and "latinOverride", and no other keys.';
 
-    private const array KEYS = ['first', 'second', 'given', 'latinOverride'];
+    private const array LEGACY_KEYS = ['first' => 'firstSurname', 'second' => 'secondSurname']
+        + PayloadFields::LEGACY_LATIN_OVERRIDE;
+
+    private const array KEYS = ['firstSurname', 'secondSurname', 'given', 'latinOverride'];
 
     #[Override]
     public function valueObjectClass(): string
@@ -35,7 +39,7 @@ final readonly class PersonNameCodec implements PayloadCodec
     }
 
     /**
-     * @return array{first: string|null, second: string|null, given: string, latinOverride: string|null}
+     * @return array{firstSurname: string|null, secondSurname: string|null, given: string, latinOverride: string|null}
      */
     #[Override]
     public function encode(ValueObject $value): array
@@ -47,8 +51,8 @@ final readonly class PersonNameCodec implements PayloadCodec
         }
 
         return [
-            'first' => $value->first?->value,
-            'second' => $value->second?->value,
+            'firstSurname' => $value->firstSurname?->value,
+            'secondSurname' => $value->secondSurname?->value,
             'given' => $value->given->value,
             'latinOverride' => $value->latinOverride()?->value,
         ];
@@ -61,15 +65,15 @@ final readonly class PersonNameCodec implements PayloadCodec
     #[Override]
     public function decode(array $payload): PersonName
     {
-        $payload = PayloadFields::upgraded($payload, PayloadFields::LEGACY_LATIN_OVERRIDE, self::SHAPE);
+        $payload = PayloadFields::upgraded($payload, self::LEGACY_KEYS, self::SHAPE);
         PayloadFields::assertOnlyKeys($payload, self::KEYS, self::SHAPE);
-        $first = PayloadFields::nullableString($payload, 'first', self::SHAPE);
-        $second = PayloadFields::nullableString($payload, 'second', self::SHAPE);
+        $firstSurname = PayloadFields::nullableString($payload, 'firstSurname', self::SHAPE);
+        $secondSurname = PayloadFields::nullableString($payload, 'secondSurname', self::SHAPE);
         $latin = PayloadFields::nullableString($payload, 'latinOverride', self::SHAPE);
 
         return new PersonName(
-            $first === null ? null : FamilyName::from($first),
-            $second === null ? null : FamilyName::from($second),
+            $firstSurname === null ? null : FamilyName::from($firstSurname),
+            $secondSurname === null ? null : FamilyName::from($secondSurname),
             GivenName::from(PayloadFields::string($payload, 'given', self::SHAPE)),
             $latin === null ? null : IcaoPersonName::from($latin),
         );

@@ -45,8 +45,8 @@ through lookup tables; year as two digits, `birthMonth()`/`birthDay()` ints, `bi
 `Document\ES\*`: `Dni` (8 digits + mod 23 letter, verified), `Nie` (X/Y/Z + 7 digits + letter, verified through the
 internal `ControlLetter`; pre-2008 X + 8 digits + letter, format only), `SocialSecurityNumber` (12 digits, format only;
 `provinceCode()` string). The driving licence number is the DNI or NIE (no class); the passport number is not covered.
-`Name\ES\PersonName($first, ?$second, $given, ?$latin)` extends `AbstractLatinPersonName` only: both surnames are family
-parts (primary identifier joined by a space); codec keys `first`, `second`, `given`, `latinOverride`. Parts extend
+`Name\ES\PersonName($firstSurname, ?$secondSurname, $given, ?$latin)` extends `AbstractLatinPersonName` only: both surnames are family
+parts (primary identifier joined by a space); codec keys `firstSurname`, `secondSurname` (0.x `first`, `second`, still read), `given`, `latinOverride`. Parts extend
 `Name\ES\AbstractSpanishNamePart` (U+00B7 only in `l·l`, matched as `\x{00B7}`; `ŀ`/`Ŀ` folded to `l·`/`L·`); the
 `PersonName` passes `['·']` as `$omittedPunctuation`.
 
@@ -130,9 +130,9 @@ digits, format only). No passport class. `Sex::Unspecified` exists for the CURP 
 and `Document\MX\DriverLicenceNumberFactory` (CA pattern, resolver document "Mexican driver's licence"). Only MX-MEX
 (12 digits) is covered, so `fromNumber()` reports any 12-digit number as MX-MEX; the base's `masked()` always keeps 4
 (no covered shape is 8 characters or shorter: restore the CA `<= 8 ? 3 : 4` rule, with a test, when one is added).
-`Name\MX\PersonName(?$first, ?$second, $given, ?$latin)` extends `AbstractLatinPersonName` like ES (parts on
+`Name\MX\PersonName(?$firstSurname, ?$secondSurname, $given, ?$latin)` extends `AbstractLatinPersonName` like ES (parts on
 `AbstractMexicanNamePart`: `/` separator, `.` after or between letters, both omitted in the ICAO form); no surnames →
-the given names are the primary identifier (`JUAN`); policy `TransliterationVariant`; codec keys `first`, `second`,
+the given names are the primary identifier (`JUAN`); policy `TransliterationVariant`; codec keys `firstSurname`, `secondSurname` (0.x `first`, `second`, still read),
 `given`, `latinOverride` (`first` and `second` nullable).
 
 `Document\BR\*` (national, plan 3 Task 7a): `Cpf` (Receita "DV módulo 11": weights 1-9 then 0-9 from the left, `sum %

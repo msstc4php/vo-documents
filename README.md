@@ -167,13 +167,14 @@ official algorithm is published. A number with the right shape is accepted, neve
 
 Names: `Name\<CC>\FamilyName`, `GivenName` and `PersonName` for DE, FR, IT, ES, NL, CH, GB, TR, US, CA, MX and BR, like
 the RU and AU ones; the Asian ones: see "Asian documents and names" below. Spain's `PersonName` has two surnames
-(`first`, optional `second`); in the Dutch one the prefixes (`van der`) are part of the family name; the Swiss, Dutch,
+(`firstSurname`, optional `secondSurname`; 0.x called them `first` and `second`, and stored payloads with those keys
+still load); in the Dutch one the prefixes (`van der`) are part of the family name; the Swiss, Dutch,
 British, US and Canadian ones accept a person without a given name. The US one is `Name\US\PersonName($family, ?$given,
 ?$middle, ?$suffix)` (`given` null for a one-word name), the suffix a `Name\US\NameSuffix` (the AAMVA list `JR`, `SR`,
 `1ST`/`I` … `9TH`/`IX`), written last among the secondary identifiers of the ICAO form, ordinals as Roman numerals
 (`SMITH<<JOHN<MICHAEL<III`). The Canadian one is `Name\CA\PersonName($family, ?$given)` (`given` null for a one-word
 name; IRCC: the name goes in the surname field), letters of the Latin script (English and French names). The Mexican one
-is `Name\MX\PersonName(?$first, ?$second, $given)`: two surnames, one, or none (RENAPO records persons without surnames;
+is `Name\MX\PersonName(?$firstSurname, ?$secondSurname, $given)`: two surnames, one, or none (RENAPO records persons without surnames;
 then the given names are the only ICAO identifier, `JUAN`). The Brazilian one is `Name\BR\PersonName($family, $given)`:
 both required (CNJ Código Nacional de Normas art. 515-B), each part holding several words with particles in the case
 given (`da Silva`, `Maria da Conceição`).
@@ -232,7 +233,9 @@ $jp = new JP\PersonName(
 - **India in Latin letters** is `Name\IN\PersonName(given, ?surname, ?latin)`, separate from the Devanagari one (the
   Passport Seva form: a person with no surname writes the whole name in the given part, ICAO `RAJESH<KUMAR`, the Doc
   9303 single-name rule, although Passport Seva prints such a passport with a blank surname, `P<IND<<RAJESH<KUMAR`,
-  which cannot be stored; derived `JAIN<<PIYUSH<KUMAR`; policy `TransliterationVariant`).
+  which cannot be stored; derived `JAIN<<PIYUSH<KUMAR`; policy `TransliterationVariant`). Its parts are
+  `Name\IN\GivenName` and `Name\IN\Surname`, not `FamilyName`: "Surname" is the Passport Seva form's own term, so it
+  stays the class and payload key (`surname`) in 1.x.
 - **Japan** takes the 氏名 and the 振り仮名 of each part and derives the passport spelling by MOFA's Hepburn table
   (`ん` is M before B, M and P; `っ` doubles the consonant; the long vowel `ー`, `おう`/`うう` and `おお` are omitted:
   `さとう` is `SATO`). Kana cannot tell a long vowel from a morpheme boundary, so `井上` (いのうえ) is derived `INOE`

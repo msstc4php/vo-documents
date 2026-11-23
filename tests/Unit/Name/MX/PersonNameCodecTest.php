@@ -102,7 +102,7 @@ final class PersonNameCodecTest extends TestCase
     use RefusesNameWithoutEchoingInput;
 
     private const string SHAPE = 'Expected a Mexican person name payload with string "given", '
-        . 'string, null or missing "first", "second" and "latinOverride", and no other keys.';
+        . 'string, null or missing "firstSurname", "secondSurname" and "latinOverride", and no other keys.';
 
     public function testMapsItsClass(): void
     {
@@ -117,12 +117,12 @@ final class PersonNameCodecTest extends TestCase
         $payload = $codec->encode($name);
 
         self::assertSame(
-            ['first' => 'Hernández', 'second' => 'de la Cruz', 'given' => 'José', 'latinOverride' => null],
+            ['firstSurname' => 'Hernández', 'secondSurname' => 'de la Cruz', 'given' => 'José', 'latinOverride' => null],
             $payload,
         );
         $decoded = $codec->decode($payload);
         self::assertTrue($decoded->equals($name));
-        self::assertSame('de la Cruz', $decoded->second?->value);
+        self::assertSame('de la Cruz', $decoded->secondSurname?->value);
     }
 
     public function testRoundTripWithOneSurnameUnchanged(): void
@@ -132,10 +132,10 @@ final class PersonNameCodecTest extends TestCase
 
         $payload = $codec->encode($name);
 
-        self::assertSame(['first' => 'de la Cruz', 'second' => null, 'given' => 'Pilar', 'latinOverride' => null], $payload);
+        self::assertSame(['firstSurname' => 'de la Cruz', 'secondSurname' => null, 'given' => 'Pilar', 'latinOverride' => null], $payload);
         $decoded = $codec->decode($payload);
         self::assertTrue($decoded->equals($name));
-        self::assertNull($decoded->second);
+        self::assertNull($decoded->secondSurname);
         self::assertSame('DE<LA<CRUZ<<PILAR', $decoded->latin()->value);
     }
 
@@ -146,7 +146,7 @@ final class PersonNameCodecTest extends TestCase
 
         $payload = $codec->encode($name);
 
-        self::assertSame(['first' => null, 'second' => null, 'given' => 'Nancy', 'latinOverride' => null], $payload);
+        self::assertSame(['firstSurname' => null, 'secondSurname' => null, 'given' => 'Nancy', 'latinOverride' => null], $payload);
         self::assertTrue($codec->decode($payload)->equals($name));
     }
 
@@ -162,7 +162,7 @@ final class PersonNameCodecTest extends TestCase
         $payload = $codec->encode($name);
 
         self::assertSame(
-            ['first' => 'D/Amico', 'second' => 'Álvarez', 'given' => 'Ma. Guadalupe', 'latinOverride' => null],
+            ['firstSurname' => 'D/Amico', 'secondSurname' => 'Álvarez', 'given' => 'Ma. Guadalupe', 'latinOverride' => null],
             $payload,
         );
         $decoded = $codec->decode($payload);
@@ -183,7 +183,7 @@ final class PersonNameCodecTest extends TestCase
         $payload = $codec->encode($name);
 
         self::assertSame(
-            ['first' => 'Argüello', 'second' => null, 'given' => 'Ana', 'latinOverride' => 'ARGUELLO<<ANA'],
+            ['firstSurname' => 'Argüello', 'secondSurname' => null, 'given' => 'Ana', 'latinOverride' => 'ARGUELLO<<ANA'],
             $payload,
         );
         $decoded = $codec->decode($payload);
@@ -195,10 +195,10 @@ final class PersonNameCodecTest extends TestCase
     {
         $name = new PersonNameCodec()->decode(['given' => 'Ana']);
 
-        self::assertNull($name->first);
-        self::assertNull($name->second);
+        self::assertNull($name->firstSurname);
+        self::assertNull($name->secondSurname);
         self::assertNull($name->latinOverride());
-        self::assertNull(new PersonNameCodec()->decode(['first' => 'Zaro', 'given' => 'Ana'])->second);
+        self::assertNull(new PersonNameCodec()->decode(['firstSurname' => 'Zaro', 'given' => 'Ana'])->secondSurname);
     }
 
     /**
@@ -206,13 +206,13 @@ final class PersonNameCodecTest extends TestCase
      */
     public static function malformedPayloads(): iterable
     {
-        yield 'first is an int' => [['first' => 1, 'given' => 'Ana']];
-        yield 'given missing' => [['first' => 'García']];
-        yield 'given is null' => [['first' => 'García', 'given' => null]];
-        yield 'second is an int' => [['first' => 'García', 'second' => 1, 'given' => 'Ana']];
-        yield 'latin is an int' => [['first' => 'García', 'given' => 'Ana', 'latinOverride' => 1]];
+        yield 'first is an int' => [['firstSurname' => 1, 'given' => 'Ana']];
+        yield 'given missing' => [['firstSurname' => 'García']];
+        yield 'given is null' => [['firstSurname' => 'García', 'given' => null]];
+        yield 'second is an int' => [['firstSurname' => 'García', 'secondSurname' => 1, 'given' => 'Ana']];
+        yield 'latin is an int' => [['firstSurname' => 'García', 'given' => 'Ana', 'latinOverride' => 1]];
         yield 'family key of other countries' => [['family' => 'García', 'given' => 'Ana']];
-        yield 'int key' => [['first' => 'García', 'given' => 'Ana', 0 => 'x']];
+        yield 'int key' => [['firstSurname' => 'García', 'given' => 'Ana', 0 => 'x']];
     }
 
     /**
@@ -240,18 +240,18 @@ final class PersonNameCodecTest extends TestCase
     {
         self::assertNameRefusedWithoutEcho(
             fn (): PersonName => new PersonNameCodec()->decode(
-                ['first' => 'García', 'second' => 'Лопес', 'given' => 'Ana'],
+                ['firstSurname' => 'García', 'secondSurname' => 'Лопес', 'given' => 'Ana'],
             ),
             '',
             'Invalid Mexican family name (invalid character).',
         );
         self::assertNameRefusedWithoutEcho(
-            fn (): PersonName => new PersonNameCodec()->decode(['first' => 'Лопес', 'given' => 'Ana']),
+            fn (): PersonName => new PersonNameCodec()->decode(['firstSurname' => 'Лопес', 'given' => 'Ana']),
             '',
             'Invalid Mexican family name (invalid character).',
         );
         self::assertNameRefusedWithoutEcho(
-            fn (): PersonName => new PersonNameCodec()->decode(['second' => 'García', 'given' => 'Ana']),
+            fn (): PersonName => new PersonNameCodec()->decode(['secondSurname' => 'García', 'given' => 'Ana']),
             '',
             'Invalid Mexican person name (second surname without a first surname).',
         );
@@ -273,11 +273,11 @@ final class PersonNameCodecTest extends TestCase
 
         $name = $mapper->fromUntrustedPayload(
             PersonName::class,
-            ['first' => 'Núñez', 'second' => null, 'given' => 'Ana', 'latinOverride' => 'nunxxez<<ana'],
+            ['firstSurname' => 'Núñez', 'secondSurname' => null, 'given' => 'Ana', 'latinOverride' => 'nunxxez<<ana'],
         );
 
         self::assertSame('NUNXXEZ<<ANA', $name->latin()->value);
-        $expected = ['first' => 'Núñez', 'second' => null, 'given' => 'Ana', 'latinOverride' => 'NUNXXEZ<<ANA'];
+        $expected = ['firstSurname' => 'Núñez', 'secondSurname' => null, 'given' => 'Ana', 'latinOverride' => 'NUNXXEZ<<ANA'];
         self::assertSame($expected, $mapper->toPayload($name));
     }
 }

@@ -33,13 +33,15 @@ final readonly class PersonName extends AbstractLatinPersonName
      *                                    a transliteration of the parts
      */
     public function __construct(
-        public FamilyName $first,
-        public ?FamilyName $second,
+        public FamilyName $firstSurname,
+        public ?FamilyName $secondSurname,
         public GivenName $given,
         ?IcaoPersonName $latin = null,
     ) {
         parent::__construct(
-            $second instanceof FamilyName ? [$first->value, $second->value] : [$first->value],
+            $secondSurname instanceof FamilyName
+                ? [$firstSurname->value, $secondSurname->value]
+                : [$firstSurname->value],
             [$given->value],
             $latin,
             AbstractSpanishNamePart::OMITTED_PUNCTUATION,
@@ -52,9 +54,9 @@ final readonly class PersonName extends AbstractLatinPersonName
     #[Override]
     public function full(): string
     {
-        $surnames = $this->second instanceof FamilyName
-            ? $this->first->value . ' ' . $this->second->value
-            : $this->first->value;
+        $surnames = $this->secondSurname instanceof FamilyName
+            ? $this->firstSurname->value . ' ' . $this->secondSurname->value
+            : $this->firstSurname->value;
 
         return $this->given->value . ' ' . $surnames;
     }
@@ -63,8 +65,8 @@ final readonly class PersonName extends AbstractLatinPersonName
     public function equals(ValueObject $other): bool
     {
         return $other instanceof self
-            && $this->first->equals($other->first)
-            && Optional::equal($this->second, $other->second)
+            && $this->firstSurname->equals($other->firstSurname)
+            && Optional::equal($this->secondSurname, $other->secondSurname)
             && $this->given->equals($other->given)
             && Optional::equal($this->latinOverride(), $other->latinOverride());
     }
@@ -72,14 +74,14 @@ final readonly class PersonName extends AbstractLatinPersonName
     /**
      * A view, not the storage payload ({@see PersonNameCodec}): `latin` is {@see latin()}, derived or not.
      *
-     * @return array{first: string, second: string|null, given: string, latin: string}
+     * @return array{firstSurname: string, secondSurname: string|null, given: string, latin: string}
      */
     #[Override]
     public function jsonSerialize(): array
     {
         return [
-            'first' => $this->first->value,
-            'second' => $this->second?->value,
+            'firstSurname' => $this->firstSurname->value,
+            'secondSurname' => $this->secondSurname?->value,
             'given' => $this->given->value,
             'latin' => $this->latin()->value,
         ];
