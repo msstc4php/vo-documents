@@ -136,12 +136,11 @@ The formats overlap so much that **no number fits exactly one jurisdiction**:
 | 7–8 characters with a letter | NSW, Tas |
 | anything else | none |
 
-So `fromNumber()` throws `AmbiguousJurisdictionException` (message: ISO codes only) or `InvalidDocumentNumberException`
-("Invalid Australian driver licence number (wrong length).") for every real input today; its single-match branch
-exists for the pattern later plans copy and would only be reached if a format changed. Callers that know the issuing
-jurisdiction use `fromNumberIn()`. The resolution (parse once per jurisdiction, one match → it, none → invalid,
-several → ambiguous in enum order) is the generic `Internal\SubdivisionResolver`, tested with fixtures; the factory
-keeps only the exhaustive enum → class `match`.
+So a bare number never identifies its issuer. **Since 1.0 the factory has no `fromNumber()`** (1.0 review, ruling
+CR-006): in 0.x it threw `AmbiguousJurisdictionException` or `InvalidDocumentNumberException` for every real input,
+and a 1.x method that can only throw would be frozen. Callers that know the issuing jurisdiction use
+`fromNumberIn()`; `jurisdictionsMatching()` lists the candidates in enum order (`Internal\SubdivisionResolver::matches()`).
+It can come back additively if a format change ever lets a number fit one jurisdiction only.
 
 ### Card numbers — not covered
 
@@ -211,6 +210,6 @@ length (`min(3, ⌊length / 2⌋)`), so a 2-character number shows one.
 |---|---|---|
 | licence formats "from the issuing authority" | no authority publishes one; the Commonwealth DVS rules do | Home Affairs table |
 | "the card number where it is separate" | separate everywhere; formats published | not covered (licence number only) |
-| `fromNumber()` returns the one match | the published formats always overlap | always ambiguous or invalid today |
+| `fromNumber()` returns the one match | the published formats always overlap | no `fromNumber()` since 1.0 (it could only throw) |
 | TFN checksum from the ATO | ATO algorithm restricted to registered developers | not verified; format only |
 | Medicare check digit from Services Australia | ADHA Appendix E, not reachable | not verified; format only |

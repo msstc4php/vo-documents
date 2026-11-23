@@ -128,9 +128,10 @@ INS57P "How to check your driver number" (verbatim), example `MORGA 657054 SM 9I
 Implemented: 16 characters (A-D; the issue number E is not part of the number and is refused as extra length):
 
 - characters 1-5: letters followed by zero or more `9` (A);
-- 6-11: digits; the month field (7-8) is `01`-`12` or `51`-`62` (B); the day (9-10) must exist in that month, and
-  29 February is accepted only when the two-digit year (6 and 11) is divisible by four — no century is encoded, so only
-  dates impossible in every century are refused (same rule as IT);
+- 6-11: digits; the month field (7-8) is `01`-`12` or `51`-`62` (B); the day (9-10) is `01`-`31`. Since the 1.0
+  review (ruling CR-004) the calendar is not checked (31 April, 30 February accepted; 0.x refused a day that is no
+  date in any century): the leaflet explains the digits to the holder but does not say a number with a day its month
+  lacks is never issued (README "Birth dates");
 - 12-13: a letter, then a letter or `9` (C);
 - 14-16: letters or digits (D, "randomly generated": **no check**; the example `9IJ` mixes both).
 
@@ -200,7 +201,8 @@ they meet the modulo 10 criteria" (a CHI passes either a modulus 11 or a modulus
 published as text by PHS or ISD Scotland (the reference page gives only the function's switches).
 
 Implemented: 10 digits; the date `DDMMYY` must exist (month 01-12, day of that month; 29 February only for a two-digit
-year divisible by four, no century encoded); **format only for the check digit** (no official algorithm text, and two
+year divisible by four, no century encoded; a calendar check under the 1.0 rule, README "Birth dates": the Data
+Dictionary constructs the number from the PERSON BIRTH DATE and PHS's own `chi_check()` refuses an invalid date); **format only for the check digit** (no official algorithm text, and two
 algorithms are in use since August 2026). Encoded data: `sex()` (`HasSex`, ninth digit), `birthDay()`, `birthMonth()`,
 `birthYearDigits()` (no `HasBirthDate`: no century). No published display form; `masked()` keeps the last four
 digits: `******6719` (for `1203456719`). No official example; tests use synthetic numbers.

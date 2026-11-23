@@ -5,6 +5,7 @@ All dates UTC. Sources read 2026-11-17.
 | Source | Publisher | Where read |
 |---|---|---|
 | 주민등록법 시행규칙 Art. 2 (주민등록번호의 부여), as amended 2017-05-29 and 2020-10-05 | 행정안전부 | text on <https://www.nepla.ai/law/%EC%A3%BC%EB%AF%BC%EB%93%B1%EB%A1%9D%EB%B2%95-%EC%8B%9C%ED%96%89%EA%B7%9C%EC%B9%99> (an aggregator: "quoted from"); `www.law.go.kr` serves the page without the article text to WebFetch and `curl` |
+| 2017 주민등록 사무편람 (posted 2018-06-15), p. 28 (PDF p. 34), "11. 주민등록번호 구성 및 부여 / 나. 주민등록번호의 구성(규칙 제2조)" | 행정안전부 | board page <https://www.mois.go.kr/frt/bbs/type001/commonSelectBoardArticle.do?bbsId=BBSMSTR_000000000052&nttId=64125>, PDF <https://www.mois.go.kr/cmm/fms/FileDown.do?atchFileId=FILE_000793526NlTJXs&fileSn=0> (291 pp., read with `pdftotext` 2026-11-23 UTC) |
 | 주민등록증 (한국기록 · 국가기록원 theme page) | 국가기록원 | <https://theme.archives.go.kr/next/koreaOfRecord/identityCard.do> |
 | 주민번호 뒷자리 지역표시번호 10월부터 폐지 (2020-05-25) | 행정안전부, 정책브리핑 | <https://www.korea.kr/news/policyNewsView.do?newsId=148872723>; announcement of 2019-12-17 <https://www.mois.go.kr/frt/bbs/type010/commonSelectBoardArticle.do?bbsId=BBSMSTR_000000000008&nttId=74731> |
 | 출입국관리법 시행규칙 [별표 2] 외국인등록번호의 구성체계(제46조제3항 관련) | 법무부 | <https://law.go.kr/LSW/flDownload.do?flSeq=89453591&bylClsCd=110201> (PDF, one figure, read as an image with `pdftoppm`) |
@@ -57,13 +58,24 @@ foreigner used abroad before naturalization, nationality acquisition, or restora
   premise that the 시행규칙 decodes the digits is wrong): the layout is 13 digits.
 - **국가기록원:** "13자리 주민등록번호 앞의 6자리는 생년월일, 뒷부분 7자리는 성별과 지역코드, 검증번호로 이루어진다"; "1은 남자, 2는 여자이다"; "2000년 출생자부터는남자는 3, 여자는 4를
   부여받았다". So 1, 2 (1900s) and 3, 4 (2000s) are decoded from an official page.
-- **9 and 0 (1800s):** quoted from secondary sources only (Wikipedia "Resident registration number": 9 and 0 for
-  1800-1899; 한국일보 2025-04-16 and 거제타임즈 repeat it), found in no government text. They are decoded the same way (9 man, 0
-  woman, in the 1800s) and nothing else rests on them. 5-8 are accepted only by `ForeignerRegistrationNumber` (below).
+- **9 and 0 (1800s), official since the 1.0 review:** 행정안전부, *2017 주민등록 사무편람*, p. 28, "(2) 각 숫자의 설명": "○ 앞 번호
+  숫자 6자리는 각기 2자리씩 생년월일 표시 : 050615" and "○ 뒷 번호 첫 번째 숫자는 성별 표시 ☞ 1800년대 생(1800～1899)은 남자는 "9", 여자는 "0"으로 / 1900년대 생(1900～1999)은
+  남자는 "1", 여자는 "2"로 / 2000년대 생(2000~2099)의 경우 남자는 "3", 여자는 "4"로 표시". It is the issuing ministry's procedures
+  handbook, not a statute (the 시행규칙 Art. 2 lists no digit values), and predates the 2020-10 randomisation, which kept
+  the seventh digit. It counts as a government body's own publication, so 9/0 (and the 29 February 1800 refusal) rest
+  on an official text. Before the review they were quoted from secondary sources only (Wikipedia, which cites this
+  handbook pp. 27-28; 한국일보 2025-04-16, 거제타임즈). 5-8 are accepted only by `ForeignerRegistrationNumber` (below).
+- **p. 27 footnote 10 of the same handbook** (owner input, not applied): "주민등록번호 체계와 유사한 국내거소신고번호는 출입국관리사무소장이
+  재외동포에게 부여하며 … - 성별번호는 2000년대는 남자 7, 여자 8, 1900년대는 남자 5, 여자 6". It is about the **국내거소신고번호** of
+  재외동포, not the 외국인등록번호; for the foreigner number it is an analogy only, so ruling B4 stands (no `HasBirthDate`, no
+  century).
 - **After 2020-10:** 행정안전부, 2020-05-25: "오는 10월부터 주민등록번호를 신규로 부여받거나 변경하는 경우 뒷자리는 성별 표시 첫 자리를 제외하고 6자리의 임의번호를 부여받게 된다"
   ("지역번호를 폐지하고 뒷자리 성별 뒤 6자리에 임의번호를 부여한다"). The old check digit is therefore **not enforced**: also its formula is not
   quoted by any government text read ("검증번호 … 계산"), so a number with a wrong last digit is accepted.
 - **Birth date:** must exist in the century of the seventh digit (`checkdate`): 29 February 1900 refused, 2000 accepted.
+  Calendar check (1.0 rule, README "Birth dates"): the 시행규칙 Art. 2 says the number is issued to show the 생년월일, and the
+  handbook reads the first six digits as the birth date and the seventh as its century, so the issuer constructs the
+  digits from a real date.
 - **Mask:** no 개인정보보호위원회 / 행정안전부 masking text found (a search of go.kr sites returned none); last 4: `*********4567`.
 - No display form is quoted: no `formatted()`.
 
@@ -84,11 +96,13 @@ Two classes: the resident class refuses 5-8 and this one refuses 1-4, 9 and 0 (t
 covers); the owner confirmed the split.
 
 **1.0 (ruling B4):** the century is not official, so the class no longer implements `HasBirthDate`. It gives
-`birthYearDigits()`, `birthMonth()` and `birthDay()`, and a birth date is refused only when it exists in no century
-(`Internal\TwoDigitYearDate`: 29 February `00` is accepted with any of 5-8; it was refused with 5 or 6 in 0.x). The
-resident class keeps `HasBirthDate`: its digits 1-4 are decoded from an official page; 9 and 0 stay secondary (above). Open question for the owner (no official text read): a foreigner number whose
-birth date is not a calendar date (for instance a registered unknown month or day) is refused here; kept as decided, to
-revisit if an official practice for unknown dates is found. Mask: last 4.
+`birthYearDigits()`, `birthMonth()` and `birthDay()`. The resident class keeps `HasBirthDate`: its digits 9/0 and
+1-4 are decoded from official texts (above).
+
+**Birth date (1.0 review, ruling CR-004):** only the month 01-12 and the day 01-31 are checked, not the calendar
+(`Internal\TwoDigitYearDate::inRanges()`), as for the ID NIK: the 별표 labels the first six digits 생년월일 but no official
+text says a number with a day its month lacks (31 April, 30 February) is never issued. In 0.x a date that exists in
+no century was refused, and 29 February `00` with 5 or 6 as well. Mask: last 4.
 
 ## Multiple-entry passport number (`Document\KR\MultipleEntryPassportNumber`)
 

@@ -9,16 +9,17 @@ parameter names and return types; the canonical stored form of every document nu
 codec and `__serialize()` payload keys of the names; enum backed values and case names; the public `MAX_LENGTH`
 bounds and the bridge's type names and column lengths; exception classes and their parents; the MRZ century windows.
 A minor never refuses a value an earlier 1.x release accepted (a check that gets a source later is reported by
-`hasValid…()`, refusing waits for 2.0); a minor may accept more only within `MAX_LENGTH`; factory candidate sets are
-frozen per major (`fromNumber()` exists only for fully covered countries); enum cases may be added (keep a default
-arm); the package's interfaces are implemented by the package only and may gain methods in minors; `masked()` may hide
+`hasValid…()`, refusing waits for 2.0); a minor may accept more only within `MAX_LENGTH` and only when that adds no
+candidate to a factory's frozen candidate set; `fromNumber()` exists only where a bare number can identify one
+jurisdiction (CA health cards); enum cases may be added (keep a default arm); the package's interfaces are implemented by the package only and may gain methods in minors; `masked()` may hide
 more, never less. Not covered: exception message wording, `Internal\` and `@internal`.
 
 ### Added
 
 - A public `MAX_LENGTH` (in characters) on every string value object: the longest stored value, frozen for 1.x.
 - `Document\KR\ForeignerRegistrationNumber::birthYearDigits()`, `birthMonth()`, `birthDay()`.
-- `Internal\SubdivisionResolver::matches()` and `Internal\LengthProbe` (internal).
+- `Internal\SubdivisionResolver::matches()`, `Internal\TwoDigitYearDate::inRanges()` and
+  `Internal\Digits::composedWithCapitalEnye()` (internal).
 - README sections "Rules that may relax" and "Backward compatibility".
 
 ### Changed
@@ -31,11 +32,20 @@ more, never less. Not covered: exception message wording, `Internal\` and `@inte
 - The ES and MX surnames are `firstSurname` and `secondSurname` (properties, constructor parameters, view and payload
   keys; were `first`, `second`).
 - `ForeignerRegistrationNumber` no longer implements `HasBirthDate`: no official text gives the century of the seventh
-  digits 5-8. A birth date is refused only when it exists in no century (29 February `00` is now accepted with 5 or 6).
+  digits 5-8.
 - Relaxed where no official text supports a refusal: the SA first digit only routes a number to
-  `NationalIdentityNumber` or `IqamaNumber` (a number with another first digit is accepted by both); the ID NIK checks
-  the day and month ranges, not the calendar (30 February is accepted); the MX clave de elector accepts `Ñ` among its
-  six letters. `NameSuffix::fromCode()` reads `Jr.` (one trailing period).
+  `NationalIdentityNumber` or `IqamaNumber` (a number with another first digit is accepted by both, and both accept
+  the same ten digits); the MX clave de elector accepts `Ñ` among its six letters. `NameSuffix::fromCode()` reads
+  `Jr.` (one trailing period).
+- Birth dates are checked against the calendar only where an official text makes the digits the holder's birth date
+  and binds the issuer to construct them from it (README "Limits to know about", "Birth dates"). Ranges only (month
+  01-12, day 01-31; 30 February and 31 April accepted) for the ID NIK, the KR foreigner registration number, the MX
+  clave de elector and the GB DVLA driver number; in 0.x all four refused a day their month lacks.
+- `MX\Rfc` and `MX\ElectorKey` upper-case ASCII letters and `ñ` only: `ß`, `ﬁ`, `ı`, `ſ` and every other character
+  outside the official alphabet are refused (`Rfc` accepted them in 0.x by full Unicode case mapping, `ßAB800101AB1`
+  as `SSAB800101AB1`).
+- `fitsLength()` of the CA health card classes is `@internal` (it serves the factory's "(fits no jurisdiction)"
+  message); the AU classes have none.
 - Enum cases are named after their code in upper case: the `Jurisdiction` cases of AU, US, CA, MX and BR
   (`Jurisdiction::NSW`, `::SP`), `DriverLicenceCategory::TM`, `::TB`, `NameSuffix::JR`, `::SR` and the ordinals
   `::FIRST` to `::NINTH`. Backed values are unchanged.
@@ -54,16 +64,33 @@ more, never less. Not covered: exception message wording, `Internal\` and `@inte
 - `fromNumber()` of `US\DlIdNumberFactory`, `CA\DriverLicenceNumberFactory`, `MX\DriverLicenceNumberFactory` and
   `BR\IdentityCardNumberFactory`: those countries are only partly covered, so a single match among the covered
   jurisdictions does not identify the issuer (and would change when a jurisdiction is covered). `fromNumberIn()` and
-  `jurisdictionsMatching()` stay. AU licences and CA health cards cover every jurisdiction and keep `fromNumber()`.
+  `jurisdictionsMatching()` stay. CA health cards cover every jurisdiction and keep `fromNumber()`.
+- `AU\DriverLicenceNumberFactory::fromNumber()`: every valid number fits two or more jurisdictions with the published
+  formats, so it could only throw.
 - `Contract\Maskable` (it only redeclared vo-base's `Contract\Maskable`).
-- `Digits::MAX_REPORTED_LENGTH`, `Icao\Transliterator::MAX_VARIANTS` (now private) and the public `fitsLength()` of
-  the jurisdiction classes (internal API).
+- `Icao\Transliterator::MAX_VARIANTS` (now private; the cap is 4096), `Internal\Digits::MAX_REPORTED_LENGTH`, the
+  public `fitsLength()` of the AU licence classes, and the public constructors of the factories, `Codecs` and the
+  static helpers.
 
 ### Upgrading from 0.x
 
 - Replace `US\DlIdNumberFactory::fromNumber()`, `CA\DriverLicenceNumberFactory::fromNumber()`,
-  `MX\DriverLicenceNumberFactory::fromNumber()` and `BR\IdentityCardNumberFactory::fromNumber()` with
-  `fromNumberIn($number, $jurisdiction)`; `jurisdictionsMatching()` lists the covered jurisdictions a number fits.
+  `MX\DriverLicenceNumberFactory::fromNumber()`, `BR\IdentityCardNumberFactory::fromNumber()` and
+  `AU\DriverLicenceNumberFactory::fromNumber()` (which always threw) with `fromNumberIn($number, $jurisdiction)`;
+  `jurisdictionsMatching()` lists the covered jurisdictions a number fits.
+- `isValid()` and `tryFrom()` now accept, where 0.4 refused: any first digit in `SA\NationalIdentityNumber` and
+  `SA\IqamaNumber`; a day the month lacks (month 01-12, day 01-31) in `ID\NationalIdentityNumber` (30 February),
+  `KR\ForeignerRegistrationNumber` (also 29 February `00` with 5 or 6), `MX\ElectorKey` and
+  `GB\GreatBritainDriverLicenceNumber`; `Ñ` among the six letters of `MX\ElectorKey`
+  (`US\NameSuffix::fromCode()` also reads `Jr.`). They now refuse, where 0.4 accepted: `ß`, `ﬁ`, `ı`, `ſ` and other characters outside
+  the SAT alphabet in `MX\Rfc` (0.4 rewrote them as `SS`, `FI`, `I`, `S`).
+- **SA routing:** both SA classes accept the same ten digits, so `NationalIdentityNumber::tryFrom($n) ??
+  IqamaNumber::from($n)` now types every iqama as a national ID, and a column of either type accepts the other's
+  numbers. Branch on the first digit yourself (`1` national ID, `2` iqama, ZATCA BR-KSA-F-10/F-11) and decide what
+  another first digit means for you (README, SA row and "Limits to know about").
+- `fitsLength()` of the AU licence classes is gone and that of the CA health card classes is `@internal`: use
+  `jurisdictionsMatching()`. `Icao\Transliterator::MAX_VARIANTS` is private (the cap is 4096).
+  `new Codecs()` and `new` on a factory or a static helper fail: call their static methods.
 - `Name\PersonName` (interface) is `Name\NationalPersonName`.
 - `MSSTC4PHP\ValueObject\Documents\Contract\Maskable` is `MSSTC4PHP\ValueObject\Contract\Maskable`.
 - ES and MX names: `->first`/`->second` and the named arguments `first:`/`second:` are `firstSurname`/`secondSurname`.
@@ -75,11 +102,20 @@ more, never less. Not covered: exception message wording, `Internal\` and `@inte
   treated it as `HasBirthDate` must not.
 - Clients of the JSON views: read `latin` instead of `effectiveLatin` (RU, AU, DE, FR, IT, ES, NL, CH, GB, TR, US, CA,
   MX, BR, JP, IN), and `firstSurname`/`secondSurname` instead of `first`/`second` (ES, MX).
-- Stored payloads and serialized names need no migration: the codecs read `latin` as `latinOverride` and `first`/
-  `second` as the new surname keys, and new writes use the 1.0 keys. Do not run 0.x and 1.x side by side on one store:
-  0.x cannot read the 1.0 keys. The 0.2 PHP object layout is still read and will be dropped in 2.0.
+- **Stored payloads change text.** Every composite name is written with the 1.0 keys (`latinOverride` on every name
+  that derives its Latin form, also when it is null; `firstSurname`/`secondSurname` for ES and MX). Reading 0.x
+  payloads and serialized names keeps working through 1.x (the codecs read `latin` as `latinOverride` and `first`/
+  `second` as the surname keys). A stored row keeps its 0.x text until the application writes a new instance of the
+  name into it: an ORM or ODM flush does not rewrite an unchanged property. Until then, lookups by the stored text
+  miss: an equality query binds the 1.0 text and misses 0.x rows, and a JSON-path or ODM field query on one version's
+  keys (`->>'latin'`, `$.first`, `name.first`) misses the other's rows. Migrate once after upgrading by loading each
+  row and assigning a new instance (the `vo-documents-doctrine` 1.0.0 entry gives a Doctrine example), or rename the
+  keys in the database for JSON-path queries only.
+- Going back to 0.x once 1.0 payloads exist is not supported: 0.x cannot read the 1.0 keys. Do not run 0.x and 1.x
+  side by side on one store. The 0.2 PHP object layout is still read and will be dropped in 2.0.
 - Code that matched exception messages: lengths are no longer reported (`(wrong length)`, `(empty)`), and zeros only
-  reads as a checksum failure; the SA "(invalid first digit)" and the KR foreigner/ID NIK calendar refusals are gone.
+  reads as a checksum failure; the SA "(invalid first digit)" and the calendar refusals of the KR foreigner number, the ID NIK, the MX clave de
+  elector and the GB DVLA driver number are gone (month and day ranges remain).
 - Subclasses of `InvalidDocumentNumberException`, `InvalidMrzException` and `InvalidPersonNameException` are no longer
   possible; catch the family. Extending a jurisdiction or name part base, or `MachineReadableZone`, is outside the
   promise.

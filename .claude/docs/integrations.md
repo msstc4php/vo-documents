@@ -1,6 +1,7 @@
 # Integrations
 
-Runtime requirements: `msstc4php/vo-base ^1.4` (the documents implement the core's `Contract\Maskable` directly since 1.0), `ext-mbstring`, `symfony/polyfill-intl-normalizer`.
+Runtime requirements: `msstc4php/vo-base ^1.4` (the documents implement the core's `Contract\Maskable` directly since 1.0), `ext-mbstring`, `symfony/polyfill-intl-normalizer` (supplies `Normalizer`, the only intl API used; `ext-intl` is
+deliberately not required, see known-issues "1.0 review").
 `composer-local.json` (gitignored) points a path repository at `../vo-base`.
 
 ## Bridges

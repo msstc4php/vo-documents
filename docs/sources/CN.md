@@ -32,7 +32,9 @@ and validator sites.
 - **5.1.1 地址码:** "表示编码对象常住户口所在县（市、旗、区）的行政区划代码，按GB/T 2260的规定执行。" The GB/T 2260 list is not part of this text: the address
   code is read, not checked (`administrativeDivisionCode()`).
 - **5.1.2 出生日期码:** "表示编码对象出生的年、月、日，按GB/T 7408的规定执行。年、月、日代码之间不用分隔符。例：某人出生日期为1966年10月26日，其出生日期码为19661026。" Four-digit
-  year, so the date is a calendar date (`checkdate`): 1900-02-29 is refused, 2000-02-29 accepted. Annex A2 is of a man
+  year, so the date is a calendar date (`checkdate`): 1900-02-29 is refused, 2000-02-29 accepted. Calendar check under
+  the 1.0 rule (README "Birth dates"): the national standard binds the issuer (国办发〔2018〕81号 Art. 3: "由公安机关按照公民身份号码
+  国家标准编制") and refers the date to GB/T 7408. Annex A2 is of a man
   born 1880-01-01 (`440524188001010014`): no lower bound on the year.
 - **5.1.3 顺序码:** "…顺序码的奇数分配给男性，偶数分配给女性。" `sex()`: the last digit of the three, odd = `Sex::Male`.
 - **5.1.4 校验码:** "校验码采用ISO 7064:1983，MOD 11-2校验码系统。" 5.1.4.1: Σ(aᵢ×Wᵢ) ≡ 1 (mod 11), i from the right, "Wᵢ＝2^(i-1) (mod

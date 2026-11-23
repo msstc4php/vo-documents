@@ -48,8 +48,8 @@
 - **www.ffoms.gov.ru fails TLS verification** (curl error 60) from this environment: FFOMS sources are cited by URL and
   quoted from legalacts.ru copies.
 - **AU licence formats always overlap**: per the Home Affairs DVS field rules (AU.md) every valid licence number fits
-  2-6 jurisdictions, so `Document\AU\DriverLicenceNumberFactory::fromNumber()` is always ambiguous or invalid today.
-  Use `fromNumberIn()`. The resolution lives in `Internal\SubdivisionResolver` (fixture-tested single-match path).
+  2-6 jurisdictions, so the AU factory has no `fromNumber()` since 1.0 (review CR-006: a frozen method that can only
+  throw). Use `fromNumberIn()`; `jurisdictionsMatching()` goes through `SubdivisionResolver::matches()`.
 - **No AU issuing authority publishes its licence format**; the source is the Commonwealth DVS rules on
   immi.homeaffairs.gov.au (the only AU gov site that reliably answers from this environment; most others reset HTTP/2
   or return 403).
@@ -108,9 +108,10 @@
   `UE`/`UXX`/`U`) is still refused when an override differs from the derived form. `LatinOverridePolicy::resolve()`
   compares with the derived form **before** computing spellings, so the derived override of a name with too many
   spellings (13 × `Ä`) is accepted.
-- `SubdivisionResolver` no-match message: "(fits no jurisdiction)" when the length fits at least one subdivision
-  (the protected `fitsLength()` hook, read through `Internal\LengthProbe`), else "(wrong length)". Only AU licences and
-  CA health cards still reach it (the other factories have no `fromNumber()` since 1.0).
+- `SubdivisionResolver` no-match message: "(fits no jurisdiction)" when the length fits at least one subdivision,
+  else "(wrong length)". Only the CA health card factory still reaches it: it calls `AbstractHealthCardNumber::
+  fitsLength()`, public and `@internal` since the 1.0 review (CR-009 replaced the `Internal\LengthProbe` reflection
+  call). `HealthCardNumbersTest::testRefusesEveryOtherLength` covers the hook for every class.
 - **Policy:** transliteration tables and override rules change only in a major version (stored overrides are
   re-validated on hydration).
 - `rector.php` (template file) skips a deprecated rule (`PostIncDecToPreIncDecRector`, a Rector warning on every run);
@@ -375,8 +376,11 @@ script classes use `\p{sc=Latin}` / `\p{sc=Cyrillic}` (Script property only); `c
 - **`ElectorKey` clamps** in `birthMonth()`/`birthDay()` leave equivalent Increment/Decrement mutants (as `ChiNumber`).
   The CURP date avoids them: `isoDate()` builds `YYYY-MM-DD` and `parse()` calls `checkdate()` with int casts (a
   removed cast is a `TypeError` under strict types, so CastInt mutants die).
-- **RFC `Ñ`** is multibyte: `Digits::upperCasedOfLength()` uses ASCII `strtoupper()`, so `Rfc::parse()` upper-cases
-  with `mb_strtoupper()` and NFC first; `Mask::keepLastCharacters()` is byte-based and is not used for the RFC.
+- **RFC and clave de elector case (1.0 review CR-001):** never `mb_strtoupper()` a number: full Unicode case mapping
+  rewrites `ß` → `SS`, `ﬁ` → `FI`, `ı` → `I`, `ſ` → `S` (0.x `Rfc` accepted `ßAB800101AB1` as `SSAB800101AB1`).
+  `Digits::composedWithCapitalEnye()` strips, composes (NFC) and maps only `ñ` → `Ñ`; `Digits::upperCasedOfLength()`
+  then upper-cases ASCII with `strtoupper()`; the class pattern refuses everything else. `Mask::keepLastCharacters()`
+  is byte-based and is not used for the RFC.
 
 ## MX state licences (plan 3 Task 6b, 2026-11-16 UTC)
 
@@ -475,13 +479,20 @@ script classes use `\p{sc=Latin}` / `\p{sc=Cyrillic}` (Script property only); `c
   BR-KSA-F-11 (first digit 2, scheme IQA) appear in the SDK v3.4.4 announcement on `zatca1.discourse.group` (poster
   flagged staff/moderator), as warnings; the Schematron itself was not reached. Since 1.0 the first digit only
   routes (ruling S8), neither class refuses another digit.
-- **KR foreigner number with a non-calendar birth date is refused.** No official text on unknown month or day was
-  found; to revisit if an official practice appears. The sex digits (5/7 man, 6/8 woman) are official (법무부 release of
-  2023-03-28), the century split (5, 6 for the 1900s, 7, 8 for the 2000s) is from secondary sources, so since 1.0 the
-  class has no `HasBirthDate` and validates the date with `TwoDigitYearDate` (exists in some century).
-- **KR resident 9/0 (1800s)** is secondary only, while 1-4 are official (국가기록원). The resident class keeps
-  `HasBirthDate` (ruling B4 of 1.0: the split it relies on for every living holder is official); `birthDate()` of a
-  9/0 number and its 1800s date check rest on the secondary reading.
+- **KR foreigner number: ranges only (1.0 review CR-004).** Month 01-12 and day 01-31
+  (`TwoDigitYearDate::inRanges()`); 31 April or 30 February is accepted. The sex digits (5/7 man, 6/8 woman) are
+  official (법무부 release of 2023-03-28), the century split (5, 6 for the 1900s, 7, 8 for the 2000s) is from secondary
+  sources, so since 1.0 the class has no `HasBirthDate`. The MOIS handbook p. 27 footnote gives 5-8 centuries for the
+  **국내거소신고번호**, not this number: analogy only, not applied (ruling).
+- **KR resident 9/0 (1800s) is official** since the 1.0 review: 행정안전부, *2017 주민등록 사무편람* p. 28 (URLs in
+  `docs/sources/KR.md`; a local copy was at `/tmp/claude-1000/mois/m.pdf`, page image `pg-034.png`). `pdftotext` drops
+  the digits inside the Korean sentences ("앞 번호 숫자 자리는 각기 자리씩"); read the page image for exact quotes.
+- **Birth-date rule (1.0 review CR-004, README "Birth dates"):** calendar check only where an official text makes the
+  digits the birth date and binds the issuer to construct them (CN GB 11643, MX CURP, KR resident, IT codice fiscale,
+  GB CHI, ICAO MRZ); ranges only elsewhere (ID NIK, KR foreigner, MX clave de elector and RFC, GB DVLA, CA NS licence,
+  QC NAM). The split of the "binds the issuer" group is this implementer's reading and was flagged to the owner: a
+  strict "no text says impossible dates are never issued" reading would relax the first group too, and CN/CURP/KR
+  resident would then lose `HasBirthDate` (the NIK solution) and the MRZ `expiryDate()` its non-null return.
 - **ID NIK calendar dates are not checked since 1.0** (ruling S8: no official text refuses them). Dukcapil describes
   digits 7-12 as the birth date (woman's day plus 40); only the ranges (day 01-31 / 41-71, month 01-12) are enforced,
   by a regex (`DAY_AND_MONTH`), so `birthDay()` may return 30 with month 2. No `birthDate()` (no century).
@@ -544,3 +555,13 @@ script classes use `\p{sc=Latin}` / `\p{sc=Cyrillic}` (Script property only); `c
 - MRV-A/MRV-B visas (Part 7) are not read.
 - `masked()` output is not a valid MRZ by design.
 - `make infection` crashes on escaped mutants with `<<` in the diff (see the first entry); keep Icao mutants killed.
+
+## 1.0 review (2026-11-23 UTC): declined or deferred items
+
+- **`ext-intl` is not required (CR-010 declined).** The only intl API used is `Normalizer`, which
+  `symfony/polyfill-intl-normalizer` (in `require`) supplies: `php -n -d extension=mbstring` (no intl) runs
+  `ElectorKey::from()` and `Rfc::from()` correctly. Requiring `ext-intl` would refuse installs the package supports.
+  Re-check if another intl class (`IntlChar`, `Transliterator`, `grapheme_*`) is ever used.
+- **No SA routing factory in 1.0 (CR-014 deferred).** Both SA classes accept the same ten digits; callers branch on the
+  first digit. A factory is additive (a minor), and its answer for a first digit other than 1 or 2 needs an exception
+  type that `AmbiguousJurisdictionException` (subdivisions only) does not fit.

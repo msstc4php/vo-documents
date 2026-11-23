@@ -66,7 +66,11 @@ links, guessed zip paths answer 520, and WebFetch gets 403 (the sandbox was not 
 
 - **Two classes**, because the rule quoted names both: `NationalIdentityNumber` (10 digits, first digit 1) and
   `IqamaNumber` (10 digits, first digit 2). The first digit tells the caller which class to use; neither class refuses
-  a number with another first digit (since 1.0; it was "invalid first digit" before).
+  a number with another first digit (since 1.0; it was "invalid first digit" before). So both classes accept the same
+  values and no longer discriminate: `NationalIdentityNumber::tryFrom($n) ?? IqamaNumber::from($n)` types every iqama
+  as a national ID. Callers route on the first digit themselves (README "Limits to know about"; CHANGELOG 1.0.0
+  Upgrading). A routing factory (`1` → national ID, `2` → iqama, anything else ambiguous) is additive and was left for
+  a minor (1.0 review CR-014).
 - **Enforced:** ten digits after removing space, hyphen, NBSP and the ideographic space; fullwidth, Arabic-Indic
   (U+0660-0669) and Extended Arabic-Indic (U+06F0-06F9) digits fold to ASCII (`١٠١٢٣٤٥٦٧٨` is `1012345678`).
 - **Check digit: not enforced.** No government text quotes one; the Luhn claim comes from GitHub issues and validator

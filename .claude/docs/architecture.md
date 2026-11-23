@@ -6,7 +6,7 @@ core.
 | Area | Purpose |
 |---|---|
 | `Contract\`, `Exception\`, `Sex` | Shared interfaces (`HasSex`, `HasBirthDate` (CURP, CN citizen identity and 2023 permanent residence numbers, KR resident number), `Subdivision`, `IssuedBySubdivision`; the documents implement vo-base's `Maskable`), the three exception families, the sex enum (`Female`, `Male`, `Unspecified` for the CURP `X`) |
-| `Internal\` | `@internal` helpers: `Checksum`, `Mask`, `Digits`, `UnicodeText`/`Text`, `NumberFormat` (character class + length range of a licence), `NumberShapes` (several fixed shapes, length derived from the shape: US DL/ID; shares `Digits::upperCasedOfLength()` with `NumberFormat`), `SubdivisionResolver` (one match / none / ambiguous over an enum of subdivisions), `PayloadFields` (codec payload validation; `encodable()` encode guard, `latin()` required ICAO field, `latinOverride()`), `Optional` (`equal()` of two optional value objects), `TwoDigitYearDate` (day/month valid in some century: DVLA, CHI, IT codice fiscale), `Gb11643` (18-character layout shared by the CN citizen number and the 2023 permanent residence number: `normalize()`, birth date, MOD 11-2 check), `KoreanRegistrationNumber` (13 digits of the KR resident and foreigner numbers: birth date and sex from the 7th digit). `Digits::fold()` maps fullwidth digits and letters and Arabic-Indic digits (U+0660-0669, U+06F0-06F9) to ASCII before every number parse, and `SEPARATORS` includes U+3000; `Checksum` gains `verhoeff()` (IN Aadhaar) |
+| `Internal\` | `@internal` helpers: `Checksum`, `Mask`, `Digits`, `UnicodeText`/`Text`, `NumberFormat` (character class + length range of a licence), `NumberShapes` (several fixed shapes, length derived from the shape: US DL/ID; shares `Digits::upperCasedOfLength()` with `NumberFormat`), `SubdivisionResolver` (one match / none / ambiguous over an enum of subdivisions), `PayloadFields` (codec payload validation; `encodable()` encode guard, `latin()` required ICAO field, `latinOverride()`), `Optional` (`equal()` of two optional value objects), `TwoDigitYearDate` (`exists()`: day/month valid in some century: CHI, IT codice fiscale, MRZ; `inRanges()`: month 1-12 and day 1-31 only: DVLA, KR foreigner, MX clave de elector), `Gb11643` (18-character layout shared by the CN citizen number and the 2023 permanent residence number: `normalize()`, birth date, MOD 11-2 check), `KoreanRegistrationNumber` (13 digits of the KR resident and foreigner numbers: birth date and sex from the 7th digit). `Digits::fold()` maps fullwidth digits and letters and Arabic-Indic digits (U+0660-0669, U+06F0-06F9) to ASCII before every number parse, and `SEPARATORS` includes U+3000; `Checksum` gains `verhoeff()` (IN Aadhaar) |
 | `Icao\Mrz\*` | `MachineReadableZone` (abstract; `fromString()` picks `Td1`/`Td2`/`Td3` by length 90/72/88 or by 3/2/2 lines) and the final `Td1`, `Td2`, `Td3`; `@internal` `Internal\MrzLayout`, `MrzField`, `MrzCheckDigit` (7-3-1 weights, `<` = 0), `MrzDocumentNumber` (long-number split). `HasSex` (`<` = `Sex::Unspecified`), not `HasBirthDate`; `Maskable`; re-validated on unserialize by vo-base 1.3. Source notes `docs/sources/ICAO.md` section 5 |
 | `Icao\PersonName` | MRZ-style Latin name (`A-Z`, `-`, `<`; `<<` between primary and secondary), `mrzField()` truncation |
 | `Icao\Transliterator` | National name part → ICAO Latin (`toLatin()` default, `variants()` all spellings) |
@@ -70,7 +70,7 @@ given name), `latinOverride`.
 digits; two plain classes, no `SubdivisionResolver`: the formats never overlap), `NhsNumber` and `HealthAndCareNumber`
 (NHS Modulus 11 verified through the internal `NhsCheckDigit`; H&C range 320000001-399999999), `ChiNumber` (Scotland;
 `HasSex`, `DDMMYY` date validated, check digit format only). `Internal\TwoDigitYearDate` validates a day/month with a
-century-less year (shared by the DVLA and CHI classes). `Name\GB\PersonName($family, ?$given, ?$latin)`: `\p{Latin}`
+century-less year (`exists()` for CHI; DVLA uses `inRanges()` since the 1.0 review). `Name\GB\PersonName($family, ?$given, ?$latin)`: `\p{Latin}`
 parts, override policy `AnyIcaoSpelling` (HMPO writes a documented spelling; kept also without a derived form), `given`
 null for a person with one name (an override's lone `XXX` forename is dropped);
 codec keys `family`, `given`, `latinOverride`.
@@ -123,7 +123,8 @@ result with `number()`/`versionCode()`, not a value object, so no codec and no b
 
 `Document\MX\*` (national, plan 3 Task 6a): `Curp` (`HasBirthDate` + `HasSex`; century from character 17, digit → 19YY,
 `A-J` → 20YY; date validated with `checkdate()`; `birthStateCode()` string; check digit format only), `ElectorKey` (INE
-clave de elector; two-digit year via `TwoDigitYearDate`, `birthStateCode()`/`sexCode()` raw strings, no `HasSex`),
+clave de elector; two-digit year, month/day ranges via `TwoDigitYearDate::inRanges()`, `A-Z`/`Ñ` letters,
+`birthStateCode()`/`sexCode()` raw strings, no `HasSex`),
 `Rfc` (natural person, SAT `t_RFC_PF` regex with `Ñ`/`&`, multibyte-aware `masked()`), `SocialSecurityNumber` (NSS, 11
 digits, format only). No passport class. `Sex::Unspecified` exists for the CURP `X`. MX state licences (plan 3 Task
 6b): `Document\MX\Jurisdiction` (32 cases, ISO 3166-2:MX order, `Cmx` for Mexico City),
@@ -189,7 +190,7 @@ and `Name\IN\Devanagari\*` (own `PersonName` with required Latin form, `\p{sc=De
 letters; the Devanagari digits and the danda are not name characters).
 
 `Document\ID\*` (plan 4): `NationalIdentityNumber` (NIK; `HasSex` with the woman's day +40, `regionCode()`,
-`birthDay()`, `birthMonth()`, `birthYearDigits()`; date validated through `TwoDigitYearDate`), `TaxpayerNumber` (15 or
+`birthDay()`, `birthMonth()`, `birthYearDigits()`; day and month ranges by regex, no calendar), `TaxpayerNumber` (15 or
 16 digits, all zeros refused, `isFifteenDigits()`, `formatted()` for 15 digits), `FamilyCardNumber`.
 `Name\ID\PersonName` is one `FullName` (`wordWithAbbreviationDots()`; nothing enforced from Permendagri 73/2022) plus
 the required Latin form.

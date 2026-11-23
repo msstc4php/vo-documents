@@ -122,7 +122,9 @@ Rules applied:
   is refused (the Instructivo and the Reglas both give `A-J`).
 - **1.0 review (ruling S8):** both CURP refusals rest on RENAPO's own texts in this note (the Instructivo, DOF
   18-06-2018, and the Reglas 2021): `A-J` at 17 (§5.3) and no `Ñ` at 1-4 (§5.1 1.1 substitutes `X`), so both stay.
-- **Century (Review Focus 3):** a digit at 17 → 19YY, a letter → 20YY, as RENAPO states it. The date must exist in that
+- **Century (Review Focus 3):** a digit at 17 → 19YY, a letter → 20YY, as RENAPO states it. Calendar check (1.0 rule,
+  README "Birth dates"): RENAPO's Instructivo is the issuer's own construction procedure and builds positions 5-10
+  from the date of birth. The date must exist in that
   year: 30 February, month 13 and 1900-02-29 (digit at 17) are refused; 2000-02-29 (letter) is accepted. The
   Instructivo gives "0-9 … hasta el 31 de diciembre de 1999" with no lower bound, so a person born before 1900 reads
   as 19YY (the key cannot tell 1899 from 1999).
@@ -160,9 +162,14 @@ Rules applied:
 - 18 characters: `A-Z` or `Ñ` at 1-6 ("primeras letras"; since 1.0, ruling S8: no official text excludes `Ñ`, and
   RENAPO's Ñ → X substitution is a CURP rule, not INE's; `Ñ` stored composed, counted as one character), digits at 7-12 (year, month, day), a letter at 15 (sex), letters
   or digits at 13-14 and 16-18 (no character set is published for the state code or the homoclave).
-- The date has no century: a day that is no date in any century is refused (30 February, month 13, 29 February of a
-  year not divisible by four), as for the IT codice fiscale (`Internal\TwoDigitYearDate`). `birthYearDigits()`,
-  `birthMonth()`, `birthDay()`; no `HasBirthDate`.
+- **Date (1.0 review, ruling CR-004):** only the month 01-12 and the day 01-31 are checked, not the calendar
+  (`Internal\TwoDigitYearDate::inRanges()`): the lineamientos and the glossary say the digits are the birth date but no
+  INE text says a key with a day its month lacks is never issued (30 February and 31 April are accepted; 0.x refused
+  a day that is no date in any century). The date has no century: `birthYearDigits()`, `birthMonth()`, `birthDay()`;
+  no `HasBirthDate`.
+- **Case (1.0 review, CR-001):** ASCII letters and `ñ` are upper-cased, nothing else: full Unicode case mapping would
+  turn `ß` into `SS`, `ﬁ` into `FI`, `ı` into `I`, `ſ` into `S`, letters INE's alphabet does not have, so those inputs
+  are refused. Fullwidth `Ａ`-`Ｚ` fold to ASCII as in every number (`Internal\Digits`).
 - **No `HasSex`, no state mapping:** INE publishes neither the letters of the sex position nor the state codes of the
   key, so `sexCode()` and `birthStateCode()` return the characters as written.
 - Check digit / homoclave: format only (no algorithm published).
@@ -188,6 +195,8 @@ Rules applied:
 
 - The pattern is applied exactly: no calendar check beyond the month and day ranges (`…560230…` passes, as in the XSD),
   no homoclave check (SAT publishes no algorithm). `ñ` is upper-cased to `Ñ`, a decomposed `N` + U+0303 composed (NFC).
+  Only ASCII letters and `ñ` are upper-cased (1.0 review, CR-001): 0.x used full Unicode case mapping and accepted
+  `ßAB800101AB1` as `SSAB800101AB1`; such input is refused since 1.0 (Upgrading note in the CHANGELOG).
 - The generic RFCs `XAXX010101000` / `XEXX010101000` fit the pattern and are accepted.
 - No display form; `masked()` keeps the last four characters (plan default); it counts `Ñ` as one character.
 

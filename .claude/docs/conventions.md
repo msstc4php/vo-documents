@@ -7,6 +7,12 @@
 - Tool configuration is byte-identical to the bundle-standard `php84` templates.
 - Tests: `tests/Unit` (what Infection runs), fixtures in `tests/Fixture`.
 - Use the global `\Normalizer` (ext-intl or symfony/polyfill-intl-normalizer); never import `Symfony\Polyfill\...`
+- Never case-map a number with `mb_strtoupper()`: ASCII `strtoupper()` plus an explicit map of the official non-ASCII
+  letters (`Digits::composedWithCapitalEnye()` for MX `Ñ`), so a character outside the official alphabet is refused,
+  not rewritten.
+- A birth date in a number gets a calendar check only where an official text makes the digits the birth date and
+  binds the issuer to construct them; otherwise `TwoDigitYearDate::inRanges()` (README "Birth dates"). Record the
+  decision with its source in the class's source note.
   (deptrac forbids the Symfony namespace).
 - `Internal\*` helpers are `final` classes with static methods marked `@internal`; `Contract\Subdivision` is an
   interface extending `\BackedEnum` (value = ISO 3166-2 code).
@@ -77,10 +83,10 @@
   `Internal\SubdivisionResolver` with `fromNumber()` (one match, none, or `AmbiguousJurisdictionException`),
   `fromNumberIn()` and `jurisdictionsMatching()`. `docs/sources/<CC>.md` holds the shape table and its "Overlap" table;
   the factory test has every overlap row (the oracle). `classFor()` lists uncovered cases as `=> null`, so a new enum
-  case breaks the `match`. `fromNumber()` exists only when every subdivision is covered (AU licences, CA health
-  cards; owner decision O2 of 1.0): US, CA licences, MX and BR have `fromNumberIn()` and `jurisdictionsMatching()`
-  only (through `SubdivisionResolver::matches()`). The `fitsLength()` hook of the AU and CA health bases is protected
-  and read by `Internal\LengthProbe`, so it is no API of the final classes.
+  case breaks the `match`. `fromNumber()` exists only when every subdivision is covered and some bare number fits one
+  jurisdiction only (CA health cards; owner decision O2 and review CR-006 of 1.0): AU, US, CA licences, MX and BR have
+  `fromNumberIn()` and `jurisdictionsMatching()` only (through `SubdivisionResolver::matches()`). The CA health base
+  exposes `fitsLength()` as public `@internal` for the factory's message; no reflection (review CR-009).
 - **"Format not covered" message:** `fromNumberIn()` for a jurisdiction without a published format throws `Invalid
   <CC>-XX <document> (format not covered).`; `fromNumber()` of an unmatched number says "(fits no jurisdiction)" when
   some jurisdiction has the length, otherwise the length.

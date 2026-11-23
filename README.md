@@ -28,7 +28,8 @@ Not on Packagist yet; register the GitHub repositories:
 ```
 
 Runtime requirements: `msstc4php/vo-base ^1.4`, `ext-mbstring`, `lib-pcre >=10.40` (the `\p{sc=Latin}` script
-syntax of the name classes), `symfony/polyfill-intl-normalizer`. No framework.
+syntax of the name classes), `symfony/polyfill-intl-normalizer` (`ext-intl` is not needed: the polyfill supplies
+`Normalizer`, the only intl API used). No framework.
 vo-base 1.4 maps the abstract `MachineReadableZone`. Since vo-base 1.3, string value objects are validated again on
 `unserialize()`. Composite names serialize as their codec payload and are rebuilt through the codec.
 
@@ -105,7 +106,7 @@ official algorithm is published. A number with the right shape is accepted, neve
 | `Document\CH\DriverLicenceNumber` | Führerausweis, 12 or 15 digits | format only | `faberPin()`, `sequenceNumber()` (12 digits only) | ASTRA Weisungen 2023 |
 | `Document\GB\NationalInsuranceNumber` | NINO, `AB 12 34 56 C` | prefix rules (no check digit exists) | none | HMRC NIM39110 |
 | `Document\GB\PassportNumber` | Passport, 9 digits | format only | none | HMPO Basic Passport Checks |
-| `Document\GB\GreatBritainDriverLicenceNumber` | DVLA licence driver number, 16 characters | date validated; check characters not verified | `HasSex`, birth year digits, month, day | DVLA INS57P |
+| `Document\GB\GreatBritainDriverLicenceNumber` | DVLA licence driver number, 16 characters | month and day ranges (not the calendar); check characters not verified | `HasSex`, birth year digits, month, day | DVLA INS57P |
 | `Document\GB\NorthernIrelandDriverLicenceNumber` | DVA licence driver number, 8 digits | format only | none | nidirect (DVA) |
 | `Document\GB\NhsNumber` | NHS number (England, Wales), 10 digits | checksum verified (Modulus 11) | none | NHS Data Dictionary |
 | `Document\GB\HealthAndCareNumber` | H&C number (Northern Ireland), 10 digits | checksum verified; range 320000001-399999999 | none | NHS Data Dictionary |
@@ -119,7 +120,7 @@ official algorithm is published. A number with the right shape is accepted, neve
 | `Document\US\MedicareBeneficiaryIdentifier` | MBI, `1EG4-TE5-MK73` | CMS position layout (no check digit exists) | none | CMS |
 | `Document\US\DlId\{Al,Az,Co,Ct,Fl,Hi,Ia,Id,Il,In,Ks,Ky,Ma,Md,Me,Mi,Ms,Nd,Ne,Nj,Nm,Ny,Ok,Pa,Ri,Tx,Vt,Wa,Wi,Wy}DlIdNumber` | DL/ID number of 30 states (one class covers a state's licence and ID card where the source says so) | shape only (no check digit verified; HI, KS, MA, NE, VT, WA letters enforced as quoted) | none (the IL, WA, FL and MI name and birth data is not decoded) | state DMV and police publications; USCIS E-Verify RIDE fact sheets |
 | `Document\US\Jurisdiction` | The 50 states and DC (enum, ISO 3166-2:US) | n/a | n/a | ISO 3166-2:US |
-| `Document\US\DlIdNumber`, `Document\US\DlIdNumberFactory` | Interface of the 30 DL/ID classes; factory `fromNumber()` / `fromNumberIn()` / `jurisdictionsMatching()` | n/a | n/a | the DL/ID sources above |
+| `Document\US\DlIdNumber`, `Document\US\DlIdNumberFactory` | Interface of the 30 DL/ID classes; factory `fromNumberIn()` / `jurisdictionsMatching()` | n/a | n/a | the DL/ID sources above |
 | `Document\CA\SocialInsuranceNumber` | SIN, `123 456 789` | format only (no check digit verified: no algorithm published) | `isTemporaryResident()` (first digit 9, ESDC) | ESDC; CRA |
 | `Document\CA\PassportNumber` | Passport, letter + 6 digits + 2 letters (since 2023-05-10) or 2 letters + 6 digits | format only | none | IRCC |
 | `Document\CA\DriverLicence\{Ab,Bc,Ns,On,Qc,Sk}DriverLicenceNumber` | Driver's licence number of 6 jurisdictions (NS and SK also cover the photo ID card): AB `123456-789`, BC and SK 1-8 digits stored zero-padded to 8, NS Master Number `FINCH220867001`, ON 15 alphanumerics, QC `L1531-171274-08` | shape only (no check digit published); NS day and month checked as calendar fields | none (the NS surname and birth fields are not decoded: two-digit year) | Service Alberta RDN; ICBC; Service Nova Scotia; MTO glossary; SAAQ; Government of Saskatchewan, SGI |
@@ -127,8 +128,8 @@ official algorithm is published. A number with the right shape is accepted, neve
 | `Document\CA\Jurisdiction` | The 10 provinces and 3 territories (enum, ISO 3166-2:CA) | n/a | n/a | ISO 3166-2:CA |
 | `Document\CA\DriverLicenceNumber`, `DriverLicenceNumberFactory`, `HealthCardNumber`, `HealthCardNumberFactory` | Interfaces of the 6 licence and 13 health card classes, and their factories | n/a | n/a | the provincial sources above |
 | `Document\MX\Curp` | CURP, 18 characters (`HEGJ561231HDFRRN04`) | RENAPO layout: letters/digits per position, sex `H`/`M`/`X`, character 17 `0-9` (born up to 1999) or `A-J` (from 2000), birth date must exist; check digit format only (algorithm not published) | `HasBirthDate` (century from character 17), `HasSex` (`X` → `Sex::Unspecified`), `birthStateCode()` (RENAPO code, not ISO) | RENAPO Instructivo Normativo (DOF 2018, 2021); RENAPO Reglas 2021; INE DERFE |
-| `Document\MX\ElectorKey` | Clave de elector of the INE voter card, 18 characters | INE layout: 6 letters, `AAMMDD` (day/month valid in some century), 2 state characters, a sex letter, 3 homoclave characters (no check verified) | birth year digits, month, day; `birthStateCode()` and `sexCode()` as written (no value list published) | INE lineamientos 2021; INE glossary |
-| `Document\MX\Rfc` | RFC of a natural person, 13 characters (`HEGJ5612311A2`) | SAT `t_RFC_PF` pattern (`A-Z&Ñ`, month and day ranges, final digit or `A`); homoclave not verified | none | SAT CFDI data types (`tdCFDI.xsd`) |
+| `Document\MX\ElectorKey` | Clave de elector of the INE voter card, 18 characters | INE layout: 6 letters, `AAMMDD` (month 01-12, day 01-31; not the calendar), 2 state characters, a sex letter, 3 homoclave characters (no check verified) | birth year digits, month, day; `birthStateCode()` and `sexCode()` as written (no value list published) | INE lineamientos 2021; INE glossary |
+| `Document\MX\Rfc` | RFC of a natural person, 13 characters (`HEGJ5612311A2`) | SAT `t_RFC_PF` pattern (`A-Z&Ñ`, month and day ranges, final digit or `A`; only ASCII and `ñ` upper-cased); homoclave not verified | none | SAT CFDI data types (`tdCFDI.xsd`) |
 | `Document\MX\SocialSecurityNumber` | NSS (IMSS), 11 digits | format only (check digit algorithm not published) | none | IMSS norm 3000-001-007 |
 | `Document\MX\DriverLicence\MexDriverLicenceNumber` | Licencia de conducir of the Estado de México, 12 digits | format only (no check digit or encoding published) | none | Secretaría de Movilidad del Estado de México, licence validator |
 | `Document\MX\Jurisdiction` | The 32 federal entities (enum, ISO 3166-2:MX) | n/a | n/a | ISO 3166-2:MX |
@@ -153,8 +154,8 @@ official algorithm is published. A number with the right shape is accepted, neve
 | `Document\JP\ResidenceCardNumber` | 在留カード番号, 2 letters + 8 digits + 2 letters | format only | none | 厚生労働省 (島根労働局) filing instructions |
 | `Document\JP\PassportNumber` | Passport, 2 letters + 7 digits | format only | none | 外務省 |
 | `Document\JP\DriverLicenceNumber` | 運転免許証の番号, 12 digits (the マイナ免許証 number has the same layout) | check digit not verified (the notice names "モジュラス11" without weights) | `publicSafetyCommissionCode()` (string, not ISO), `yearSymbol()`, `serialNumber()`, `reissueSymbol()` | 警察庁丁運発第76号 (2025-03-10) |
-| `Document\KR\ResidentRegistrationNumber` | 주민등록번호, 13 digits | birth date must exist in the century of the 7th digit; no check digit verified (random digits since 2020-10) | `HasBirthDate`, `HasSex` | 주민등록법 시행규칙 Art. 2; 국가기록원; 행정안전부 |
-| `Document\KR\ForeignerRegistrationNumber` | 외국인등록번호, 13 digits (7th digit 5-8) | birth date must exist in some century (no official century); no check digit | `HasSex` (법무부: 5 and 7 man, 6 and 8 woman), `birthYearDigits()`, `birthMonth()`, `birthDay()` | 출입국관리법 시행규칙 별표 2; 법무부 release of 2023-03-28 |
+| `Document\KR\ResidentRegistrationNumber` | 주민등록번호, 13 digits | birth date must exist in the century of the 7th digit; no check digit verified (random digits since 2020-10) | `HasBirthDate`, `HasSex` | 주민등록법 시행규칙 Art. 2; 국가기록원; 행정안전부 (2017 주민등록 사무편람 for 9/0) |
+| `Document\KR\ForeignerRegistrationNumber` | 외국인등록번호, 13 digits (7th digit 5-8) | month 01-12, day 01-31 (no official century, not the calendar); no check digit | `HasSex` (법무부: 5 and 7 man, 6 and 8 woman), `birthYearDigits()`, `birthMonth()`, `birthDay()` | 출입국관리법 시행규칙 별표 2; 법무부 release of 2023-03-28 |
 | `Document\KR\MultipleEntryPassportNumber` | Multiple-entry (복수) `M` series: `M` + 8 digits, or `M` + 3 digits + letter + 4 digits (from 2021-12-21) | format only | none | 외교부 여권안내 |
 | `Document\KR\DriverLicenceNumber` | 운전면허번호: 12 digits (from 2014-07-02) or the region name + 10 digits | region name checked against KoROAD's table; no check digit; both forms masked as 12 digits, `********3361` | `regionCode()` (string, not ISO), `formatted()` | 도로교통공단 (KoROAD) |
 | `Document\IN\AadhaarNumber` | Aadhaar, 12 digits | Verhoeff check digit (UIDAI's own paper *recommends* it); no first-digit rule | none; `masked()` is UIDAI's `XXXX XXXX 1234` | UIDAI "A UID Numbering Scheme" (2010) |
@@ -188,7 +189,7 @@ BR RG numbers). `Contract\HasSex` and the `Sex` enum are implemented by the docu
 identity number, the Korean resident and foreigner registration numbers, the Indonesian NIK, the ICAO MRZ);
 `Sex::Unspecified` is the CURP's `X` (RENAPO, non-binary persons) and the MRZ filler `<` (Doc 9303 "< = unspecified"). `Contract\HasBirthDate` is implemented by the Mexican CURP (its 17th
 character gives the century), the Chinese citizen identity number and 2023 permanent residence number (a full
-`YYYYMMDD`) and the Korean resident registration number (the 7th digit gives the century, 국가기록원); the other
+`YYYYMMDD`) and the Korean resident registration number (the 7th digit gives the century: 국가기록원, 행정안전부 사무편람); the other
 encoded birth dates lack an officially stated century, so those classes expose the year digits, month and day instead
 (the NIK, the Korean foreigner registration number: `birthYearDigits()`). The Korean foreigner number refuses a date
 that exists in no century (30 February); the NIK checks only the day and month ranges.
@@ -262,16 +263,14 @@ use MSSTC4PHP\ValueObject\Documents\Document\AU\Jurisdiction;
 
 $licence = DriverLicenceNumberFactory::fromNumberIn('01234567', Jurisdiction::NSW);   // NswDriverLicenceNumber
 DriverLicenceNumberFactory::jurisdictionsMatching('01234567');                       // [ACT, NSW, NT, QLD, TAS, VIC]
-DriverLicenceNumberFactory::fromNumber('01234567');                                  // AmbiguousJurisdictionException
 ```
 
-`fromNumber()` never picks one of several jurisdictions silently: it throws `AmbiguousJurisdictionException`, whose
-message lists the ISO codes in enum order, or `InvalidDocumentNumberException` when none fits ("(fits no jurisdiction)"
-when the length fits some jurisdiction, otherwise the length). `AmbiguousJurisdictionException` extends
-`InvalidValueObjectException` like every input error: the bare number is not a valid input for `fromNumber()`, so a
-caller that catches invalid input catches it too, and `jurisdictions()` tells which `fromNumberIn()` calls would work.
-**With the formats published today every valid number fits two or more jurisdictions, so `fromNumber()` always throws
-for AU**; use `fromNumberIn()` when the issuer is known (see `docs/sources/AU.md`).
+**There is no AU `fromNumber()`:** with the formats published today every valid number fits two or more
+jurisdictions, so a bare number never tells the issuer. Pass the issuer to `fromNumberIn()`; `jurisdictionsMatching()`
+lists the candidates in enum order (see `docs/sources/AU.md`). The CA health card factory keeps `fromNumber()` (some
+numbers fit one province only); it never picks one of several jurisdictions silently: it throws
+`AmbiguousJurisdictionException`, which extends `InvalidValueObjectException` like every input error and whose
+`jurisdictions()` tells which `fromNumberIn()` calls would work, or `InvalidDocumentNumberException` when none fits.
 
 ### US DL/ID numbers and the jurisdiction factory
 
@@ -292,8 +291,9 @@ jurisdictions a number fits: some numbers fit exactly one of them (10 digits: IN
 
 **No `fromNumber()` for a partly covered country** (US and CA licences, MX licences, BR identity cards): a single match
 among the covered jurisdictions does not identify the issuer, and the result would change in a minor release that
-covers one more jurisdiction. Pass the issuer to `fromNumberIn()`. `fromNumber()` returns, additively, once a country is
-fully covered; AU licences and CA health cards are, and keep it.
+covers one more jurisdiction. Pass the issuer to `fromNumberIn()`. `fromNumber()` may return, additively, once a country
+is fully covered and some bare numbers fit one jurisdiction only; CA health cards are, and keep it (AU licences are
+fully covered, but every valid number fits several jurisdictions, so AU has none).
 
 ### Canadian provincial documents
 
@@ -316,7 +316,7 @@ HealthCardNumberFactory::fromNumber('123456789');                      // Ambigu
 ```
 
 The licence factory works like the US one (6 of 13 jurisdictions covered, no `fromNumber()`); the health card factory
-like the AU one (all 13 covered). When `HealthCardNumberFactory::fromNumber()` finds no match and the input
+covers all 13 and keeps `fromNumber()`. When `HealthCardNumberFactory::fromNumber()` finds no match and the input
 is an Ontario card with a version code, its message points to `OnHealthCardNumber::fromCard()` (nothing of the input is
 echoed). BC and SK licence numbers share every shape (1-8 digits, stored padded to 8), so a bare BC or SK number is
 always ambiguous: pass the issuer. All 13 health card formats are published (Ontario's reciprocal-billing table, checked
@@ -610,9 +610,8 @@ Collected from the source notes; each is a deliberate omission with its reason i
   the corporate number (法人番号), and the derivation of a long vowel across a morpheme boundary (井上 is derived `INOE`;
   give the override `INOUE`) (`docs/sources/JP.md`).
 - **KR:** Hanja names, passports other than the multiple-entry `M` series (single-use and emergency 단수·긴급, official,
-  diplomatic and others: no published prefix), the 영주증 and 국내거소신고증 numbers as such, the 법인등록번호 and 사업자등록번호,
-  and a foreigner registration number whose birth date is not a calendar date (refused; an official practice for unknown
-  dates was not found) (`docs/sources/KR.md`).
+  diplomatic and others: no published prefix), the 영주증 and 국내거소신고증 numbers as such, and the 법인등록번호 and
+  사업자등록번호 (`docs/sources/KR.md`).
 - **IN:** the EPIC (voter ID: the ECI text could not be read, legacy series exist), the driving licence number (no
   official text states a structure; the 2+2+4+7 layout is on aggregators only), the Passport Seva file number, the ABHA
   address, the Aadhaar Virtual ID (refused by length), voter-roll serial numbers, the ration card and state-issued
@@ -637,14 +636,13 @@ release may relax them (accept more), never tighten them:
 
 - **IN Aadhaar Verhoeff check:** UIDAI's 2010 paper "recommends" the scheme; enforced, as UIDAI is the issuer
   (`docs/sources/IN.md`).
-- **KR resident registration number, 7th digit 9 or 0:** read as the 1800s from secondary sources only (1-4 are
-  official); the birth date check and `birthDate()` of such a number rest on that reading (`docs/sources/KR.md`).
 - **MX CURP:** `A-J` at position 17 and no `Ñ` at 1-4 follow RENAPO's Instructivo and Reglas; they are listed because
   RENAPO may issue more letters once `A-J` run out (`docs/sources/MX.md`).
 
-Relaxed in 1.0 (no official text supported the refusal): the SA first digit (it only routes now), the ID NIK calendar
-check (only the day and month ranges remain), `Ñ` in the MX clave de elector, and the century of the KR foreigner
-registration number (no `HasBirthDate`; only a date that exists in no century is refused).
+Relaxed in 1.0 (no official text supported the refusal): the SA first digit (it only routes now), the calendar check
+of the ID NIK, the KR foreigner registration number, the MX clave de elector and the GB DVLA driver number (only the
+month and day ranges remain, see "Birth dates" below), `Ñ` in the MX clave de elector, and the century of the KR
+foreigner registration number (no `HasBirthDate`).
 
 ## Limits to know about
 
@@ -655,11 +653,21 @@ registration number (no `HasBirthDate`; only a date that exists in no century is
 - **Aadhaar rests on a thin text:** UIDAI's 2010 paper only *recommends* Verhoeff (`docs/sources/IN.md`); it is
   enforced, as UIDAI is the issuer. The Saudi first-digit rules 1 (national ID) and 2 (iqama) come from a ZATCA staff
   announcement on its developer forum, where they are warnings (`docs/sources/SA.md`); since 1.0 they only route a
-  number to its class and refuse nothing.
+  number to its class and refuse nothing. **Both SA classes accept the same ten digits**, so trying one class first
+  (`NationalIdentityNumber::tryFrom($n) ?? IqamaNumber::from($n)`) cannot tell them apart: branch on the first digit
+  (`1` national ID, `2` iqama) and decide what another first digit means in your context.
 - **Asia, derived Latin names:** only JP derives one (MOFA Hepburn); `井上` (いのうえ) is derived `INOE` and needs the
   override `INOUE`. The other five countries require the Latin form of the passport.
-- **Birth dates:** a KR foreigner number with a birth date that exists in no century is refused (29 February is
-  accepted for a two-digit year divisible by four); an ID NIK is checked for the day and month ranges only.
+- **Birth dates:** a birth date in a number is checked against the calendar only where an official text makes the
+  digits the holder's birth date and binds the issuer to construct them from it: the CN citizen and 2023 permanent
+  residence numbers (GB 11643 §5.1.2, "按GB/T 7408的规定执行"), the MX CURP (RENAPO Instructivo), the KR resident
+  registration number (주민등록법 시행규칙 Art. 2 and the 행정안전부 사무편람), the IT codice fiscale (DM 23 dicembre 1976), the GB
+  CHI number (NHS Data Dictionary, and PHS `chi_check()` refuses an invalid date) and the ICAO MRZ (Doc 9303 Part 3
+  §4.8). Where the year has no century, 29 February is accepted for a two-digit year divisible by four. Everywhere
+  else only the month 01-12 and the day 01-31 are checked (30 February and 31 April are accepted): the ID NIK, the KR
+  foreigner registration number, the MX clave de elector and RFC, the GB DVLA driver number and the CA NS licence and
+  QC health card numbers, whose texts describe the digits but do not say a number with an impossible date is never
+  issued. The decision per class is in its source note.
 - **Format only, check digit not verified:** INN, TFN, Medicare card number, CA SIN, the CA health card numbers other
   than BC and ON, the MX CURP, RFC, NSS and clave de elector, and the BR título de eleitor and CNH registration number.
   No official algorithm is published (FNS says only "по алгоритму, определенному ФНС"; the ATO gives the TFN algorithm
@@ -670,7 +678,9 @@ registration number (no `HasBirthDate`; only a date that exists in no century is
   CNS and the SP RG. Any government body's own publication counts as official (the ANS algorithms for the NIS and CNS);
   another body's intake policy does not (repeated-digit CPFs are accepted).
 - **MX clave de elector letters** (positions 1-6) are `A-Z` or `Ñ` since 1.0: INE says only "primeras letras" and,
-  unlike RENAPO for the CURP, substitutes nothing, so a key with `Ñ` is accepted (`docs/sources/MX.md`).
+  unlike RENAPO for the CURP, substitutes nothing, so a key with `Ñ` is accepted (`docs/sources/MX.md`). The key and
+  the RFC upper-case ASCII letters and `ñ` only; `ß`, `ﬁ`, `ı` and every other character outside the official
+  alphabet are refused, never rewritten.
 - **Americas, shapes that look alike:** a bare BC or SK licence number is always ambiguous in the factory (1-8 digits,
   stored zero-padded to 8: `347631` and `00347631` are one number); a twelve-digit MX licence of another state and an
   RG of another state are reported as MX-MEX and BR-SP, because only those formats are published; US `123456789` fits
@@ -679,8 +689,7 @@ registration number (no `HasBirthDate`; only a date that exists in no century is
 - **ICAO punctuation (MX):** the Mexican name parts accept `/` and `.` (`D/AMICO`, `MA. GUADALUPE`) as RENAPO records
   them, and the ICAO form omits them (`DAMICO`, `MA<GUADALUPE`), as Doc 9303 Part 3 §4.6 prescribes; no other country
   accepts them. A Mexican name with no surname has the given names as its primary identifier.
-- **Unverified spots in the American sources:** the MX clave de elector letters are `A-Z` only, the US SSN accepts the
-  IRM's "never issued" examples, a US passport book accepts any letter (a card number parses as a book number), and the
+- **Unverified spots in the American sources:** the US SSN accepts the IRM's "never issued" examples, a US passport book accepts any letter (a card number parses as a book number), and the
   hosts listed as "re-check" in "Not covered" could not be read on 2026-11-16 UTC.
 - **Not verified against the official PDF:** the 16-digit length of the OMS policy and the FFOMS Order 79 text it is
   checked against (www.ffoms.gov.ru is unreachable from here, the text is quoted from a copy), and the 2 + 7 split of
@@ -738,11 +747,14 @@ Rules for minor releases:
   reported only, by a new `hasValid…(): bool` method; refusing waits for 2.0. See "Rules that may relax" for the
   refusals that rest on a thin text.
 - A minor may accept more (relax a rule, cover a new jurisdiction or document), but only values that fit the frozen
-  `MAX_LENGTH`.
+  `MAX_LENGTH`, and only when that adds no candidate to any factory's frozen candidate set: a relaxation that would
+  make a member of a `fromNumber()` factory match a number it did not match before (so that a number that resolved to
+  one class becomes ambiguous) waits for a major.
 - **Factory candidate sets are frozen per major:** a newly covered jurisdiction gets its class in a minor and joins a
   factory's `fromNumber()` in the next major, so a number that resolves to one class in 1.x keeps resolving to it.
-  `fromNumber()` exists only for fully covered countries (AU licences, CA health cards); it returns, additively, once
-  another country is fully covered.
+  `fromNumber()` exists only where a bare number can identify one jurisdiction of a fully covered country (CA health
+  cards; AU licences are fully covered, but every number fits several jurisdictions); it may be added, additively,
+  once that holds for another country.
 - Enum cases may be added in a minor (a new subdivision, a new `Sex`); give every `match` over a package enum a
   default arm.
 - The package's interfaces (`Name\NationalPersonName`, the per-country document interfaces, `Contract\*`) are
@@ -751,7 +763,9 @@ Rules for minor releases:
 - `masked()` may hide more in a minor, never less.
 - Payloads and serialized names written by 0.x keep loading through 1.x (`latin` as the override key of the names
   that derive their Latin form, `first`/`second` as the ES and MX surnames, the 0.2 PHP object layout); the 0.2 layout
-  is read until 2.0.
+  is read until 2.0. The change is one-way: 0.x cannot read what 1.x writes, so going back to 0.x after 1.x has written
+  payloads is not supported, and stored 0.x text is not rewritten until a new value is written (CHANGELOG, "Upgrading
+  from 0.x").
 
 Not covered: the wording of exception messages (a message never contains the input, its length or any part of it);
 everything in `Internal\` or marked `@internal`; the set of characters a name accepts follows the PCRE Unicode

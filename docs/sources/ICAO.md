@@ -440,7 +440,10 @@ refused. Part 6 note j says the same for TD2 (overflow at positions 29 to 35).
 > (<).
 
 So an unknown part of the birth date is `<<` per year, month or day; the class returns a null `birthDate()` and keeps
-`birthDateDigits()`. The expiry date has no unknown form and must be six digits.
+`birthDateDigits()`. The expiry date has no unknown form and must be six digits. A known date must exist in some
+century (`Internal\TwoDigitYearDate::exists()`): Doc 9303 is the normative specification of the zone and makes the
+field a date, with `<` for an unknown part, so the 1.0 rule (README "Birth dates") keeps the calendar check; relaxing
+it would also make `expiryDate()` unable to return a date.
 
 **Not in Doc 9303:** the century of the two-digit years (the word does not occur in Part 3; the Part 3 Appendix A TD3
 specimen even has the expiry `960108`). Chosen, conservatively and with the caller supplying the reference date (no
