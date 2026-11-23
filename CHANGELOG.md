@@ -43,7 +43,7 @@ more, never less. Not covered: exception message wording, `Internal\` and `@inte
   clave de elector and the GB DVLA driver number; in 0.x all four refused a day their month lacks.
 - `MX\Rfc` and `MX\ElectorKey` upper-case ASCII letters and `ñ` only: `ß`, `ﬁ`, `ı`, `ſ` and every other character
   outside the official alphabet are refused (`Rfc` accepted them in 0.x by full Unicode case mapping, `ßAB800101AB1`
-  as `SSAB800101AB1`).
+  as `SSAB800101AB1`). Fullwidth letters still fold to ASCII first, as for every document number.
 - `fitsLength()` of the CA health card classes is `@internal` (it serves the factory's "(fits no jurisdiction)"
   message); the AU classes have none.
 - Enum cases are named after their code in upper case: the `Jurisdiction` cases of AU, US, CA, MX and BR

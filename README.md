@@ -191,8 +191,8 @@ identity number, the Korean resident and foreigner registration numbers, the Ind
 character gives the century), the Chinese citizen identity number and 2023 permanent residence number (a full
 `YYYYMMDD`) and the Korean resident registration number (the 7th digit gives the century: 국가기록원, 행정안전부 사무편람); the other
 encoded birth dates lack an officially stated century, so those classes expose the year digits, month and day instead
-(the NIK, the Korean foreigner registration number: `birthYearDigits()`). The Korean foreigner number refuses a date
-that exists in no century (30 February); the NIK checks only the day and month ranges.
+(the NIK, the Korean foreigner registration number: `birthYearDigits()`). Both check only the day and month ranges
+(30 February is accepted; see "Birth dates" under "Backward compatibility").
 
 ### Asian documents and names
 
@@ -667,7 +667,8 @@ foreigner registration number (no `HasBirthDate`).
   else only the month 01-12 and the day 01-31 are checked (30 February and 31 April are accepted): the ID NIK, the KR
   foreigner registration number, the MX clave de elector and RFC, the GB DVLA driver number and the CA NS licence and
   QC health card numbers, whose texts describe the digits but do not say a number with an impossible date is never
-  issued. The decision per class is in its source note.
+  issued. The DE pension insurance number checks no date at all (VKVV § 2 field with unpublished rules for an
+  unproven birth date; `birthDateField()` returns it as issued). The decision per class is in its source note.
 - **Format only, check digit not verified:** INN, TFN, Medicare card number, CA SIN, the CA health card numbers other
   than BC and ON, the MX CURP, RFC, NSS and clave de elector, and the BR título de eleitor and CNH registration number.
   No official algorithm is published (FNS says only "по алгоритму, определенному ФНС"; the ATO gives the TFN algorithm
