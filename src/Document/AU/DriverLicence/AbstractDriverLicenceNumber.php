@@ -35,16 +35,6 @@ abstract class AbstractDriverLicenceNumber extends AbstractStringValueObject imp
         return Mask::keepLastCharacters($value, \min(self::MAX_VISIBLE, \intdiv(\strlen($value), 2)));
     }
 
-    /**
-     * Whether the number, with the separators removed, has a length this jurisdiction's format allows.
-     *
-     * Protected, so it is no API of the jurisdiction classes: the factory reads it through `Internal\LengthProbe`.
-     */
-    final protected static function fitsLength(string $number): bool
-    {
-        return static::format()->fitsLength($number);
-    }
-
     abstract protected static function format(): NumberFormat;
 
     #[Override]

@@ -21,7 +21,6 @@ use MSSTC4PHP\ValueObject\Documents\Document\CA\HealthCard\SkHealthCardNumber;
 use MSSTC4PHP\ValueObject\Documents\Document\CA\HealthCard\YtHealthCardNumber;
 use MSSTC4PHP\ValueObject\Documents\Exception\AmbiguousJurisdictionException;
 use MSSTC4PHP\ValueObject\Documents\Exception\InvalidDocumentNumberException;
-use MSSTC4PHP\ValueObject\Documents\Internal\LengthProbe;
 use MSSTC4PHP\ValueObject\Documents\Internal\SubdivisionResolver;
 
 /**
@@ -107,7 +106,7 @@ final class HealthCardNumberFactory
 
     private static function fitsLengthIn(Jurisdiction $jurisdiction, string $number): bool
     {
-        return LengthProbe::fits(self::classFor($jurisdiction), $number);
+        return self::classFor($jurisdiction)::fitsLength($number);
     }
 
     /**

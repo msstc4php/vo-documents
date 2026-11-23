@@ -49,14 +49,6 @@ final readonly class NumberFormat
         return Text::nonEmpty($normalized);
     }
 
-    /**
-     * Whether `$input`, with the separators removed, has a length this format allows.
-     */
-    public function fitsLength(string $input): bool
-    {
-        return $this->allowsLength(Digits::strippedLength($input));
-    }
-
     private function allowsLength(int $length): bool
     {
         return $length >= $this->minLength && $length <= $this->maxLength;

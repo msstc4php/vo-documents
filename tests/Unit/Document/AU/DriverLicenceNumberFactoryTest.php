@@ -15,9 +15,7 @@ use MSSTC4PHP\ValueObject\Documents\Document\AU\DriverLicence\VicDriverLicenceNu
 use MSSTC4PHP\ValueObject\Documents\Document\AU\DriverLicence\WaDriverLicenceNumber;
 use MSSTC4PHP\ValueObject\Documents\Document\AU\DriverLicenceNumberFactory;
 use MSSTC4PHP\ValueObject\Documents\Document\AU\Jurisdiction;
-use MSSTC4PHP\ValueObject\Documents\Exception\AmbiguousJurisdictionException;
 use MSSTC4PHP\ValueObject\Documents\Internal\Digits;
-use MSSTC4PHP\ValueObject\Documents\Internal\LengthProbe;
 use MSSTC4PHP\ValueObject\Documents\Internal\Mask;
 use MSSTC4PHP\ValueObject\Documents\Internal\NumberFormat;
 use MSSTC4PHP\ValueObject\Documents\Internal\SubdivisionResolver;
@@ -33,7 +31,6 @@ use PHPUnit\Framework\TestCase;
  * fits exactly one jurisdiction.
  */
 #[CoversClass(DriverLicenceNumberFactory::class)]
-#[UsesClass(LengthProbe::class)]
 #[UsesClass(AbstractDriverLicenceNumber::class)]
 #[UsesClass(ActDriverLicenceNumber::class)]
 #[UsesClass(NswDriverLicenceNumber::class)]
@@ -44,7 +41,6 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(VicDriverLicenceNumber::class)]
 #[UsesClass(WaDriverLicenceNumber::class)]
 #[UsesClass(Jurisdiction::class)]
-#[UsesClass(AmbiguousJurisdictionException::class)]
 #[UsesClass(Digits::class)]
 #[UsesClass(Mask::class)]
 #[UsesClass(NumberFormat::class)]
@@ -115,69 +111,13 @@ final class DriverLicenceNumberFactoryTest extends TestCase
     }
 
     /**
-     * @return iterable<string, array{string}>
+     * Why there is no `fromNumber()`: no number of the sample set fits exactly one jurisdiction.
      */
-    public static function ambiguousNumbers(): iterable
+    public function testNoNumberFitsExactlyOneJurisdiction(): void
     {
-        foreach (self::matchingJurisdictions() as $label => [$number, $jurisdictions]) {
-            if (\count($jurisdictions) > 1) {
-                yield $label => [$number];
-            }
+        foreach (self::matchingJurisdictions() as $label => [$number]) {
+            self::assertNotCount(1, DriverLicenceNumberFactory::jurisdictionsMatching($number), $label);
         }
-    }
-
-    #[DataProvider('ambiguousNumbers')]
-    public function testNeverPicksOneOfSeveralJurisdictions(string $number): void
-    {
-        try {
-            DriverLicenceNumberFactory::fromNumber($number);
-        } catch (AmbiguousJurisdictionException $exception) {
-            self::assertSame(DriverLicenceNumberFactory::jurisdictionsMatching($number), $exception->jurisdictions());
-            self::assertMessageHidesInput($number, $exception->getMessage());
-
-            return;
-        }
-
-        self::fail('Expected an AmbiguousJurisdictionException.');
-    }
-
-    public function testAmbiguityMessageListsTheIsoCodes(): void
-    {
-        $this->expectException(AmbiguousJurisdictionException::class);
-        $this->expectExceptionMessage('Australian driver licence number fits several jurisdictions: AU-NSW, AU-TAS.');
-
-        DriverLicenceNumberFactory::fromNumber('AB123456');
-    }
-
-    /**
-     * @return iterable<string, array{string, string}>
-     */
-    public static function numbersValidNowhere(): iterable
-    {
-        yield 'eleven digits' => ['12345678901', 'Invalid Australian driver licence number (wrong length).'];
-        yield 'nine characters with a letter, a length some jurisdiction has' => [
-            'A12-345-678',
-            'Invalid Australian driver licence number (fits no jurisdiction).',
-        ];
-        yield 'punctuation at a length every format allows' => [
-            '12345.78',
-            'Invalid Australian driver licence number (fits no jurisdiction).',
-        ];
-        yield 'empty' => ['', 'Invalid Australian driver licence number (wrong length).'];
-        yield 'pasted several times' => [
-            \str_repeat('1234567890 ', 5),
-            'Invalid Australian driver licence number (wrong length).',
-        ];
-    }
-
-    #[DataProvider('numbersValidNowhere')]
-    public function testRefusesANumberValidNowhereWithoutEchoingIt(string $number, string $message): void
-    {
-        self::assertRefusedWithoutEcho(
-            static fn (string $value): mixed => DriverLicenceNumberFactory::fromNumber($value),
-            $number,
-            $message,
-        );
     }
 
     /**
