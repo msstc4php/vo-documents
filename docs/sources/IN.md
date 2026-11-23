@@ -64,6 +64,8 @@ refusal** (a 12-digit number starting with 0 or 1 and a valid check digit is acc
 because it is UIDAI's own publication, but the text only *recommends* it and no later UIDAI text restating it was found
 (the Aadhaar Handbook 2021 says only "12-digit"); flagged to the owner.
 
+- **1.0 review (ruling S8):** the Verhoeff check stays. UIDAI is the issuer of the number, so its own paper is the
+  official text for the scheme it assigns; the check is listed in the README section "Rules that may relax".
 - **Verhoeff:** the dihedral-group tables d, p of Verhoeff's 1969 algorithm (public domain; test vectors `2363`,
   `123451` from the algorithm's published examples).
 - **Masked Aadhaar, UIDAI FAQ:** "Masked Aadhaar number implies replacing of first 8 digits of Aadhaar number with some

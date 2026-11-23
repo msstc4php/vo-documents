@@ -39,6 +39,21 @@ final class ElectorKeyTest extends TestCase
         yield 'lower case and spaces' => ['gmlpjn 561231 09 h 400', 'GMLPJN56123109H400'];
         yield '29 February of a year divisible by four' => ['GMLPJN00022914X401', 'GMLPJN00022914X401'];
         yield 'letters in state and homoclave' => ['GMLPJN561231ABMA0B', 'GMLPJN561231ABMA0B'];
+        yield 'Ñ among the letters (INE says only "primeras letras")' => ['ÑÑLPJN56123109H400', 'ÑÑLPJN56123109H400'];
+        yield 'lower-case ñ' => ['gmñpjn56123109h400', 'GMÑPJN56123109H400'];
+        yield 'decomposed N and tilde' => ["GMN\u{0303}PJN56123109H400", 'GMÑPJN56123109H400'];
+    }
+
+    public function testReadsTheFieldsOfAKeyWithÑ(): void
+    {
+        $key = ElectorKey::from('ÑUÑEZJ56123109H400');
+
+        self::assertSame('56', $key->birthYearDigits());
+        self::assertSame(12, $key->birthMonth());
+        self::assertSame(31, $key->birthDay());
+        self::assertSame('09', $key->birthStateCode());
+        self::assertSame('H', $key->sexCode());
+        self::assertSame('**************H400', $key->masked());
     }
 
     #[DataProvider('validKeys')]
@@ -80,6 +95,9 @@ final class ElectorKeyTest extends TestCase
     {
         yield 'too short' => ['GMLPJN56123109H40', 'Invalid Mexican elector key (wrong length).'];
         yield 'too long' => ['GMLPJN56123109H4001', 'Invalid Mexican elector key (wrong length).'];
+        yield 'too long with Ñ' => ['ÑMLPJN56123109H4001', 'Invalid Mexican elector key (wrong length).'];
+        yield 'Ñ outside the letters' => ['GMLPJN56123109Ñ400', 'Invalid Mexican elector key (invalid character).'];
+        yield 'other accented letter' => ['GMLPJÉ56123109H400', 'Invalid Mexican elector key (invalid character).'];
         yield 'punctuation' => ['GMLPJN56123109H40.', 'Invalid Mexican elector key (invalid character).'];
         yield 'digit among the letters' => ['GMLPJ156123109H400', 'Invalid Mexican elector key (invalid character).'];
         yield 'letter in the date' => ['GMLPJN5612A109H400', 'Invalid Mexican elector key (invalid character).'];

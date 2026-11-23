@@ -360,8 +360,10 @@ script classes use `\p{sc=Latin}` / `\p{sc=Cyrillic}` (Script property only); `c
   `LatinPersonNameBuilder` strips it before transliterating (`DAMICO`, `MA<GUADALUPE`). `Icao\Transliterator` is
   unchanged (still refuses them), so no other country's accepted characters changed. Open: a package-wide re-check of
   other omitted punctuation (U+02BC, the ES `l·l`) was not done.
-- **MX clave de elector positions 1-6 are `A-Z`**: a key with `Ñ` there (INE says only "primeras letras") would be
-  refused; open risk, also in the README limits.
+- **MX clave de elector positions 1-6 accept `Ñ` since 1.0** (INE says only "primeras letras"). `Ñ` is multibyte:
+  `ElectorKey` reads its fields from the 12 ASCII bytes after the letters (`tail()`) and masks by character count,
+  as `Rfc` does. The CURP keeps refusing `Ñ` at 1-4 (RENAPO Reglas §5.1 1.1 substitutes `X`, an official text) and
+  `K`-`Z` at 17 (Instructivo and Reglas: `A-J`).
 - **`ElectorKey` clamps** in `birthMonth()`/`birthDay()` leave equivalent Increment/Decrement mutants (as `ChiNumber`).
   The CURP date avoids them: `isoDate()` builds `YYYY-MM-DD` and `parse()` calls `checkdate()` with int casts (a
   removed cast is a `TypeError` under strict types, so CastInt mutants die).
@@ -463,7 +465,8 @@ script classes use `\p{sc=Latin}` / `\p{sc=Cyrillic}` (Script property only); `c
   as UIDAI's own publication. The first-digit remarks (0 and 1 "could be reserved") are proposals and are not enforced.
 - **SA first-digit rule rests on a ZATCA staff forum announcement.** BR-KSA-F-10 (first digit 1, scheme NAT) and
   BR-KSA-F-11 (first digit 2, scheme IQA) appear in the SDK v3.4.4 announcement on `zatca1.discourse.group` (poster
-  flagged staff/moderator), as warnings; the Schematron itself was not reached. The package refuses instead.
+  flagged staff/moderator), as warnings; the Schematron itself was not reached. Since 1.0 the first digit only
+  routes (ruling S8), neither class refuses another digit.
 - **KR foreigner number with a non-calendar birth date is refused.** No official text on unknown month or day was
   found; to revisit if an official practice appears. The sex digits (5/7 man, 6/8 woman) are official (법무부 release of
   2023-03-28), the century split (5, 6 for the 1900s, 7, 8 for the 2000s) is from secondary sources, so since 1.0 the
@@ -471,9 +474,9 @@ script classes use `\p{sc=Latin}` / `\p{sc=Cyrillic}` (Script property only); `c
 - **KR resident 9/0 (1800s)** is secondary only, while 1-4 are official (국가기록원). The resident class keeps
   `HasBirthDate` (ruling B4 of 1.0: the split it relies on for every living holder is official); `birthDate()` of a
   9/0 number and its 1800s date check rest on the secondary reading.
-- **ID NIK impossible dates are refused per the spec.** Dukcapil describes digits 7-12 as the birth date (woman's day
-  plus 40); an impossible date is no "tanggal lahir". The two-digit year has no published century rule, so 29 February
-  is accepted when the year is divisible by four (`00` included) and there is no `birthDate()`.
+- **ID NIK calendar dates are not checked since 1.0** (ruling S8: no official text refuses them). Dukcapil describes
+  digits 7-12 as the birth date (woman's day plus 40); only the ranges (day 01-31 / 41-71, month 01-12) are enforced,
+  by a regex (`DAY_AND_MONTH`), so `birthDay()` may return 30 with month 2. No `birthDate()` (no century).
 
 ## Asia (plan 4): other quirks
 

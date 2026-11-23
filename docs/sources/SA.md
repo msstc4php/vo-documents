@@ -58,12 +58,15 @@ ruled it counts): "BR-KSA-F-10 (Seller/Buyer ID – Scheme ID = “NAT”) Trigg
 Not exactly 10 digits in length. Contains non-numeric characters. Does not begin with the digit ‘1’." and "BR-KSA-F-11
 (Seller/Buyer ID – Scheme ID = “IQA”) … Does not begin with the digit ‘2’." The standard v1.2 (BR-KSA-14) lists the
 schemes "National ID with "NAT" as schemeID" and "Iqama Number with "IQA" as schemeID" and requires only alphanumerics;
-the digit rules exist only in the announcement. ZATCA reports them as warnings; this package refuses instead. The
+the digit rules exist only in the announcement. ZATCA reports them as warnings. Until 1.0 this package refused
+instead; **since 1.0 the first digit only routes** (ruling S8: a developer-forum post stating a warning is no official
+format rule, and a still-valid number must never be refused), so neither class checks it. The
 primary source, the Schematron of SDK v3.4.4, was not reached: `sandbox.zatca.gov.sa/` answers 200 to `curl` with no
 links, guessed zip paths answer 520, and WebFetch gets 403 (the sandbox was not bypassed).
 
 - **Two classes**, because the rule quoted names both: `NationalIdentityNumber` (10 digits, first digit 1) and
-  `IqamaNumber` (10 digits, first digit 2). A number of the other kind is refused with "invalid first digit".
+  `IqamaNumber` (10 digits, first digit 2). The first digit tells the caller which class to use; neither class refuses
+  a number with another first digit (since 1.0; it was "invalid first digit" before).
 - **Enforced:** ten digits after removing space, hyphen, NBSP and the ideographic space; fullwidth, Arabic-Indic
   (U+0660-0669) and Extended Arabic-Indic (U+06F0-06F9) digits fold to ASCII (`١٠١٢٣٤٥٦٧٨` is `1012345678`).
 - **Check digit: not enforced.** No government text quotes one; the Luhn claim comes from GitHub issues and validator

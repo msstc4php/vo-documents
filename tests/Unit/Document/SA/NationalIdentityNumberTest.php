@@ -16,8 +16,8 @@ use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
 
 /**
- * Expectations follow docs/sources/SA.md "National ID and iqama": 10 digits, the first being 1 (ZATCA BR-KSA-F-10).
- * The numbers are made up for the tests.
+ * Expectations follow docs/sources/SA.md "National ID and iqama": 10 digits; the first digit 1 (ZATCA BR-KSA-F-10)
+ * routes, it is not checked. The numbers are made up for the tests.
  */
 #[CoversClass(NationalIdentityNumber::class)]
 #[CoversClass(AbstractIdentityNumber::class)]
@@ -44,6 +44,8 @@ final class NationalIdentityNumberTest extends TestCase
         yield 'Arabic-Indic digits' => ['١٠١٢٣٤٥٦٧٨', '1012345678'];
         yield 'Extended Arabic-Indic digits' => ['۱۰۱۲۳۴۵۶۷۸', '1012345678'];
         yield 'mixed digit systems' => ["\u{0661}\u{0660}12\u{FF13}\u{0664}\u{FF15}678", '1012345678'];
+        yield 'another first digit: only routes, never refuses (no official rule)' => ['3012345678', '3012345678'];
+        yield 'the first digit of the other class' => ['2012345678', '2012345678'];
         yield 'zeros after the first digit' => ['1000000000', '1000000000'];
     }
 
@@ -68,7 +70,6 @@ final class NationalIdentityNumberTest extends TestCase
     public static function invalidNumbers(): iterable
     {
         $character = 'Invalid Saudi Arabian national identity number (invalid character).';
-        $first = 'Invalid Saudi Arabian national identity number (invalid first digit).';
 
         yield 'empty' => ['', 'Invalid Saudi Arabian national identity number (wrong length).'];
         yield '9 digits' => ['101234567', 'Invalid Saudi Arabian national identity number (wrong length).'];
@@ -83,10 +84,6 @@ final class NationalIdentityNumberTest extends TestCase
             '1012.345.678',
             'Invalid Saudi Arabian national identity number (wrong length).',
         ];
-        yield 'an iqama number' => ['2012345678', $first];
-        yield 'first digit 0' => ['0012345678', $first];
-        yield 'first digit 3' => ['3012345678', $first];
-        yield 'first digit 9' => ['9012345678', $first];
     }
 
     #[DataProvider('invalidNumbers')]

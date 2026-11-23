@@ -54,6 +54,13 @@ final class NationalIdentityNumberTest extends TestCase
         yield '29 February with year 00 (2000)' => ['3171012902000001', '3171012902000001'];
         yield '31 December of a woman (day 71)' => ['3171017112850001', '3171017112850001'];
         yield 'first of January of a woman (day 41)' => ['3171014101850001', '3171014101850001'];
+        yield 'no calendar date, 30 February of a woman: day 70 (no official rule refuses it)' => [
+            '3171017002980001',
+            '3171017002980001',
+        ];
+        yield 'no calendar date, 30 February of a man' => ['3171013002980001', '3171013002980001'];
+        yield 'no calendar date, 29 February 1997' => ['3171012902970001', '3171012902970001'];
+        yield 'no calendar date, 31 April of a man' => ['3171013104980001', '3171013104980001'];
     }
 
     #[DataProvider('validNumbers')]
@@ -120,12 +127,6 @@ final class NationalIdentityNumberTest extends TestCase
             '3171.0115.0598.0001',
             'Invalid Indonesian national identity number (wrong length).',
         ];
-        yield '30 February of a woman: day 70' => ['3171017002980001', $date];
-        yield '30 February of a man' => ['3171013002980001', $date];
-        yield '29 February 1997' => ['3171012902970001', $date];
-        yield '29 February of a woman, 1997 (day 69)' => ['3171016902970001', $date];
-        yield '31 April of a woman: day 71' => ['3171017104980001', $date];
-        yield '31 April of a man' => ['3171013104980001', $date];
         yield 'day 00' => ['3171010005980001', $date];
         yield 'day 40: a woman born on day 0' => ['3171014005980001', $date];
         yield 'day 32' => ['3171013205980001', $date];

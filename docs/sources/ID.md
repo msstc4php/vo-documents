@@ -60,9 +60,11 @@ Administrasi Kependudukan yang biasa disebut SIAK." The same text is Perda Wonos
 
 - **Enforced:** 16 digits; digits 7-12 are `DDMMYY`, a woman's `DD` being day + 40.
 - **Sex:** day 41-71 is a woman (`Sex::Female`), 1-31 a man. A day of 32-40 or above 71 is no day in either coding.
-- **Date validity (decision):** the text says the six digits are the *tanggal, bulan, dan tahun kelahiran*; a day and
-  month that are no calendar date (30 February, 31 April, month 13, day 70 for a woman) are not a birth date, so they
-  are refused, as the brief asks. Real NIKs with an impossible date are not documented either way; flagged to the owner.
+- **Date validity (1.0, ruling S8):** the text says the six digits are the *tanggal, bulan, dan tahun kelahiran* and
+  gives the woman's day + 40; it does not say that a NIK with a day the month lacks is never issued. So only the field
+  ranges of that layout are enforced (day 01-31 for a man, 41-71 for a woman, month 01-12); a day the month does not
+  have (30 February, 31 April) is accepted. Until 1.0 such a NIK was refused; real NIKs with an impossible date are
+  not documented either way.
 - **Century:** none quoted, the year is two digits: no `birthDate()` and no `HasBirthDate`; `birthDay()`,
   `birthMonth()`, `birthYearDigits()` (a string, `00` kept). 29 February is accepted when the two digits are divisible
   by four (`00` as 2000), the package's `TwoDigitYearDate` rule.

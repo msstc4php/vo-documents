@@ -10,7 +10,6 @@ use MSSTC4PHP\ValueObject\Documents\Exception\InvalidDocumentNumberException;
 use MSSTC4PHP\ValueObject\Documents\Internal\Digits;
 use MSSTC4PHP\ValueObject\Documents\Internal\Mask;
 use MSSTC4PHP\ValueObject\Documents\Internal\Text;
-use MSSTC4PHP\ValueObject\Documents\Internal\TwoDigitYearDate;
 use MSSTC4PHP\ValueObject\Documents\Sex;
 use MSSTC4PHP\ValueObject\Support\AbstractStringValueObject;
 use Override;
@@ -19,9 +18,9 @@ use Override;
  * Nomor Induk Kependudukan, the 16 digits Dukcapil describes: "6 digit pertama merupakan kode wilayah" (province,
  * regency or city, district), "6 digit kedua merupakan tanggal, bulan, dan tahun kelahiran" with "khusus untuk
  * perempuan tanggal lahirnya ditambah angka 40", and the last four a serial number issued by SIAK. A woman's day is
- * 41-71, so {@see Sex()} is read from it; a day that is no calendar date (30 February, or 70 for a woman) is refused,
- * as a date that does not exist is no "tanggal lahir". The year has two digits and no century rule is published, so
- * there is no birth date: 29 February is accepted when the two-digit year is divisible by four (`00` included). The
+ * 41-71, so {@see Sex()} is read from it; a day outside 1-31 and 41-71 or a month outside 1-12 is refused, as it fits
+ * neither coding. A day the month does not have (30 February) is accepted: no official text says such a NIK is never
+ * issued (docs/sources/ID.md). The year has two digits and no century rule is published, so there is no birth date. The
  * region code is a plain string, not an ISO 3166-2 guess, and is not checked against the Kemendagri code list. Since
  * July 2024 Korlantas issues the driving-licence number as the NIK, and DJP uses it as the NPWP of an individual
  * resident. No display form is quoted, so there is no `formatted()`; `masked()` keeps the last four digits (no
@@ -35,6 +34,9 @@ final class NationalIdentityNumber extends AbstractStringValueObject implements 
     private const string DOCUMENT = 'Indonesian national identity number';
 
     private const int WOMAN_DAY_OFFSET = 40;
+
+    /** `DDMM`: a man's day 01-31 or a woman's 41-71, then a month 01-12. */
+    private const string DAY_AND_MONTH = '/^(?:0[1-9]|[12][0-9]|3[01]|4[1-9]|[56][0-9]|7[01])(?:0[1-9]|1[0-2])$/D';
 
     /**
      * @return non-empty-string the six digits of the province, regency or city, and district recorded at registration
@@ -86,13 +88,7 @@ final class NationalIdentityNumber extends AbstractStringValueObject implements 
     {
         $digits = Digits::exactly($value, 16, self::DOCUMENT);
 
-        $birthDateExists = TwoDigitYearDate::exists(
-            $this->dayOf($digits),
-            (int) \substr($digits, 8, 2),
-            (int) \substr($digits, 10, 2),
-        );
-
-        if (!$birthDateExists) {
+        if (\preg_match(self::DAY_AND_MONTH, \substr($digits, 6, 4)) !== 1) {
             throw new InvalidDocumentNumberException(\sprintf('Invalid %s (invalid birth date).', self::DOCUMENT));
         }
 

@@ -159,11 +159,11 @@ official algorithm is published. A number with the right shape is accepted, neve
 | `Document\IN\PermanentAccountNumber` | PAN, 10 characters (`BLGPS1234D`) | layout of the Income Tax Department tutorial (`0000` refused); the check letter is not verified | `holderType()` (`PanHolderType`, the 4th character) | Income Tax Department |
 | `Document\IN\PassportNumber` | Passport, 8 characters | length and ASCII letters and digits only | none | MEA passport data page structure |
 | `Document\IN\AbhaNumber` | ABHA number, 14 digits | format only | none | PIB explainer, Ministry of Health and Family Welfare |
-| `Document\ID\NationalIdentityNumber` | NIK, 16 digits (also the driving licence number since July 2024) | birth date must exist (a woman's day plus 40); 29 February when the two-digit year is divisible by four | `HasSex`, `regionCode()` (string, not ISO), `birthDay()`, `birthMonth()`, `birthYearDigits()` | Ditjen Dukcapil |
+| `Document\ID\NationalIdentityNumber` | NIK, 16 digits (also the driving licence number since July 2024) | day 01-31 (a woman's plus 40: 41-71) and month 01-12; the calendar is not checked (no official rule) | `HasSex`, `regionCode()` (string, not ISO), `birthDay()`, `birthMonth()`, `birthYearDigits()` | Ditjen Dukcapil |
 | `Document\ID\TaxpayerNumber` | NPWP, 15 digits (`99.999.999.9-999.999`) or 16 digits; all zeros refused; a 15-digit number and its `0`-prefixed 16-digit form are two values, not `equals()` | format only | `isFifteenDigits()`, `formatted()` (15 digits) | DJP PENG-6/PJ.09/2024; PMK 112/2022 |
 | `Document\ID\FamilyCardNumber` | Nomor Kartu Keluarga, 16 digits | format only | none | Ditjen Dukcapil |
-| `Document\SA\NationalIdentityNumber` | National ID number, 10 digits starting with 1; **also the driving licence number** | first digit 1 (ZATCA BR-KSA-F-10, a warning there, a refusal here); no check digit | none | ZATCA SDK v3.4.4 announcement |
-| `Document\SA\IqamaNumber` | Iqama number, 10 digits starting with 2; **also the driving licence number** | first digit 2 (ZATCA BR-KSA-F-11); no check digit | none | ZATCA SDK v3.4.4 announcement |
+| `Document\SA\NationalIdentityNumber` | National ID number, 10 digits starting with 1; **also the driving licence number** | ten digits; the first digit routes (ZATCA BR-KSA-F-10, a warning there) and is not checked; no check digit | none | ZATCA SDK v3.4.4 announcement |
+| `Document\SA\IqamaNumber` | Iqama number, 10 digits starting with 2; **also the driving licence number** | ten digits; the first digit routes (ZATCA BR-KSA-F-11) and is not checked; no check digit | none | ZATCA SDK v3.4.4 announcement |
 
 Names: `Name\<CC>\FamilyName`, `GivenName` and `PersonName` for DE, FR, IT, ES, NL, CH, GB, TR, US, CA, MX and BR, like
 the RU and AU ones; the Asian ones: see "Asian documents and names" below. Spain's `PersonName` has two surnames
@@ -188,8 +188,8 @@ identity number, the Korean resident and foreigner registration numbers, the Ind
 character gives the century), the Chinese citizen identity number and 2023 permanent residence number (a full
 `YYYYMMDD`) and the Korean resident registration number (the 7th digit gives the century, 국가기록원); the other
 encoded birth dates lack an officially stated century, so those classes expose the year digits, month and day instead
-(the NIK, the Korean foreigner registration number: `birthYearDigits()`), and a date that exists in no century
-(30 February) is refused.
+(the NIK, the Korean foreigner registration number: `birthYearDigits()`). The Korean foreigner number refuses a date
+that exists in no century (30 February); the NIK checks only the day and month ranges.
 
 ### Asian documents and names
 
@@ -625,19 +625,36 @@ Collected from the source notes; each is a deliberate omission with its reason i
 - **AU single names (mononyms)**: the constructor requires a given name (`AU.md`).
 - **AU 8-digit TFNs of non-individuals**: no official format is published (`AU.md`).
 
+## Rules that may relax
+
+Every refusal rests on an official text. These rest on a thin one, or decode a value from a secondary one; a minor
+release may relax them (accept more), never tighten them:
+
+- **IN Aadhaar Verhoeff check:** UIDAI's 2010 paper "recommends" the scheme; enforced, as UIDAI is the issuer
+  (`docs/sources/IN.md`).
+- **KR resident registration number, 7th digit 9 or 0:** read as the 1800s from secondary sources only (1-4 are
+  official); the birth date check and `birthDate()` of such a number rest on that reading (`docs/sources/KR.md`).
+- **MX CURP:** `A-J` at position 17 and no `Ñ` at 1-4 follow RENAPO's Instructivo and Reglas; they are listed because
+  RENAPO may issue more letters once `A-J` run out (`docs/sources/MX.md`).
+
+Relaxed in 1.0 (no official text supported the refusal): the SA first digit (it only routes now), the ID NIK calendar
+check (only the day and month ranges remain), `Ñ` in the MX clave de elector, and the century of the KR foreigner
+registration number (no `HasBirthDate`; only a date that exists in no century is refused).
+
 ## Limits to know about
 
 - **Asia, checksums:** verified are the CN citizen identity number and 2023 permanent residence number (ISO 7064 MOD
   11-2, GB 11643), the JP My Number (総務省令) and the IN Aadhaar (Verhoeff). Format only: every other number of the six
   countries, among them the JP driving licence check digit ("モジュラス11" without weights), the KR registration numbers
   (random digits since 2020-10), the IN PAN check letter and the ID and SA numbers.
-- **Aadhaar and the Saudi first digit rest on thin texts:** UIDAI's 2010 paper only *recommends* Verhoeff, and the
-  first-digit rules 1 (national ID) and 2 (iqama) come from a ZATCA staff announcement on its developer forum, where
-  they are warnings (`docs/sources/IN.md`, `docs/sources/SA.md`). Both are enforced as refusals.
+- **Aadhaar rests on a thin text:** UIDAI's 2010 paper only *recommends* Verhoeff (`docs/sources/IN.md`); it is
+  enforced, as UIDAI is the issuer. The Saudi first-digit rules 1 (national ID) and 2 (iqama) come from a ZATCA staff
+  announcement on its developer forum, where they are warnings (`docs/sources/SA.md`); since 1.0 they only route a
+  number to its class and refuse nothing.
 - **Asia, derived Latin names:** only JP derives one (MOFA Hepburn); `井上` (いのうえ) is derived `INOE` and needs the
   override `INOUE`. The other five countries require the Latin form of the passport.
-- **Birth dates:** a KR foreigner number with a non-calendar birth date and an ID NIK with an impossible date are
-  refused (the NIK as the spec says; 29 February is accepted for a two-digit year divisible by four).
+- **Birth dates:** a KR foreigner number with a birth date that exists in no century is refused (29 February is
+  accepted for a two-digit year divisible by four); an ID NIK is checked for the day and month ranges only.
 - **Format only, check digit not verified:** INN, TFN, Medicare card number, CA SIN, the CA health card numbers other
   than BC and ON, the MX CURP, RFC, NSS and clave de elector, and the BR título de eleitor and CNH registration number.
   No official algorithm is published (FNS says only "по алгоритму, определенному ФНС"; the ATO gives the TFN algorithm
@@ -647,8 +664,8 @@ Collected from the source notes; each is a deliberate omission with its reason i
   fiscale, ES DNI and NIE, NL BSN, CH AHV number, GB NHS and H&C numbers, BC and ON health card numbers, BR CPF, NIS,
   CNS and the SP RG. Any government body's own publication counts as official (the ANS algorithms for the NIS and CNS);
   another body's intake policy does not (repeated-digit CPFs are accepted).
-- **MX clave de elector letters are `A-Z` only** (positions 1-6): INE says only "primeras letras", so whether a key
-  can hold `Ñ` there is unknown; such a key would be refused (`docs/sources/MX.md`).
+- **MX clave de elector letters** (positions 1-6) are `A-Z` or `Ñ` since 1.0: INE says only "primeras letras" and,
+  unlike RENAPO for the CURP, substitutes nothing, so a key with `Ñ` is accepted (`docs/sources/MX.md`).
 - **Americas, shapes that look alike:** a bare BC or SK licence number is always ambiguous in the factory (1-8 digits,
   stored zero-padded to 8: `347631` and `00347631` are one number); a twelve-digit MX licence of another state and an
   RG of another state are reported as MX-MEX and BR-SP, because only those formats are published; US `123456789` fits

@@ -120,6 +120,8 @@ Rules applied:
 
 - 18 characters, `A-Z` at 1-4 and 12-16, digits at 5-10 and 18, `H`/`M`/`X` at 11, `0-9` or `A-J` at 17. A `K`-`Z` at 17
   is refused (the Instructivo and the Reglas both give `A-J`).
+- **1.0 review (ruling S8):** both CURP refusals rest on RENAPO's own texts in this note (the Instructivo, DOF
+  18-06-2018, and the Reglas 2021): `A-J` at 17 (§5.3) and no `Ñ` at 1-4 (§5.1 1.1 substitutes `X`), so both stay.
 - **Century (Review Focus 3):** a digit at 17 → 19YY, a letter → 20YY, as RENAPO states it. The date must exist in that
   year: 30 February, month 13 and 1900-02-29 (digit at 17) are refused; 2000-02-29 (letter) is accepted. The
   Instructivo gives "0-9 … hasta el 31 de diciembre de 1999" with no lower bound, so a person born before 1900 reads
@@ -155,7 +157,8 @@ Votar, tales como la clave de elector, la Clave Única del Registro de Població
 
 Rules applied:
 
-- 18 characters: `A-Z` at 1-6 ("primeras letras"), digits at 7-12 (year, month, day), a letter at 15 (sex), letters
+- 18 characters: `A-Z` or `Ñ` at 1-6 ("primeras letras"; since 1.0, ruling S8: no official text excludes `Ñ`, and
+  RENAPO's Ñ → X substitution is a CURP rule, not INE's; `Ñ` stored composed, counted as one character), digits at 7-12 (year, month, day), a letter at 15 (sex), letters
   or digits at 13-14 and 16-18 (no character set is published for the state code or the homoclave).
 - The date has no century: a day that is no date in any century is refused (30 February, month 13, 29 February of a
   year not divisible by four), as for the IT codice fiscale (`Internal\TwoDigitYearDate`). `birthYearDigits()`,
