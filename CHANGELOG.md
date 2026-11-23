@@ -105,12 +105,12 @@ more, never less. Not covered: exception message wording, `Internal\` and `@inte
 - **Stored payloads change text.** Every composite name is written with the 1.0 keys (`latinOverride` on every name
   that derives its Latin form, also when it is null; `firstSurname`/`secondSurname` for ES and MX). Reading 0.x
   payloads and serialized names keeps working through 1.x (the codecs read `latin` as `latinOverride` and `first`/
-  `second` as the surname keys). A stored row keeps its 0.x text until the application writes a new instance of the
-  name into it: an ORM or ODM flush does not rewrite an unchanged property. Until then, lookups by the stored text
-  miss: an equality query binds the 1.0 text and misses 0.x rows, and a JSON-path or ODM field query on one version's
-  keys (`->>'latin'`, `$.first`, `name.first`) misses the other's rows. Migrate once after upgrading by loading each
-  row and assigning a new instance (the `vo-documents-doctrine` 1.0.0 entry gives a Doctrine example), or rename the
-  keys in the database for JSON-path queries only.
+  `second` as the surname keys). A stored row keeps its 0.x text until it is re-encoded: a flush does not rewrite it
+  (ORM 3 even skips an equal new instance, as its database value is the same 1.0 text). Until then, lookups by the
+  stored text miss: an equality query binds the 1.0 text and misses 0.x rows, and a JSON-path or ODM field query on
+  one version's keys (`->>'latin'`, `$.first`, `name.first`) misses the other's rows. Migrate once after upgrading:
+  decode each stored payload and write it back encoded (the `vo-documents-doctrine` 1.0.0 entry gives the DBAL
+  recipe); a key rename in the database fixes JSON-path queries only.
 - Going back to 0.x once 1.0 payloads exist is not supported: 0.x cannot read the 1.0 keys. Do not run 0.x and 1.x
   side by side on one store. The 0.2 PHP object layout is still read and will be dropped in 2.0.
 - Code that matched exception messages: lengths are no longer reported (`(wrong length)`, `(empty)`), and zeros only

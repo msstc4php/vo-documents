@@ -764,8 +764,7 @@ Rules for minor releases:
 - Payloads and serialized names written by 0.x keep loading through 1.x (`latin` as the override key of the names
   that derive their Latin form, `first`/`second` as the ES and MX surnames, the 0.2 PHP object layout); the 0.2 layout
   is read until 2.0. The change is one-way: 0.x cannot read what 1.x writes, so going back to 0.x after 1.x has written
-  payloads is not supported, and stored 0.x text is not rewritten until a new value is written (CHANGELOG, "Upgrading
-  from 0.x").
+  payloads is not supported, and stored 0.x text stays until it is re-encoded (CHANGELOG, "Upgrading from 0.x").
 
 Not covered: the wording of exception messages (a message never contains the input, its length or any part of it);
 everything in `Internal\` or marked `@internal`; the set of characters a name accepts follows the PCRE Unicode
