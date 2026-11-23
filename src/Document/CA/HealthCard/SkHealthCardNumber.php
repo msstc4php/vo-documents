@@ -23,7 +23,7 @@ final class SkHealthCardNumber extends AbstractHealthCardNumber
     #[Override]
     public function jurisdiction(): Jurisdiction
     {
-        return Jurisdiction::Sk;
+        return Jurisdiction::SK;
     }
 
     #[Override]

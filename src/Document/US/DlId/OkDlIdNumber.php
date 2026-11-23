@@ -23,7 +23,7 @@ final class OkDlIdNumber extends AbstractDlIdNumber
     #[Override]
     public function jurisdiction(): Jurisdiction
     {
-        return Jurisdiction::Ok;
+        return Jurisdiction::OK;
     }
 
     #[Override]

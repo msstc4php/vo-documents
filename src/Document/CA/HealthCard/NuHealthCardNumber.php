@@ -24,7 +24,7 @@ final class NuHealthCardNumber extends AbstractHealthCardNumber
     #[Override]
     public function jurisdiction(): Jurisdiction
     {
-        return Jurisdiction::Nu;
+        return Jurisdiction::NU;
     }
 
     #[Override]

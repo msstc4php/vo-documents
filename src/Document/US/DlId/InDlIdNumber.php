@@ -21,7 +21,7 @@ final class InDlIdNumber extends AbstractDlIdNumber
     #[Override]
     public function jurisdiction(): Jurisdiction
     {
-        return Jurisdiction::In;
+        return Jurisdiction::IN;
     }
 
     #[Override]

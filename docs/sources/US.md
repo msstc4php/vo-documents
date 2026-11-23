@@ -107,7 +107,7 @@ Implemented: `NameSuffix` is a string-backed enum of the 20 AAMVA codes, values 
 American name suffix."). `1ST` and `I` are distinct values (the cardholder's choice; 8 FAM b.(2) lets them change).
 **ICAO form:** the State Department includes the suffix "as part of her/his name" (8 FAM 403.1-5(B) a.), which is the
 case §4.6 names, so the suffix is the last component of the secondary identifier; ordinals become Roman numerals
-(8 FAM c.; §4.6 forbids digits anyway): `NameSuffix::Second->icao()` = `II`. An override must carry the same component
+(8 FAM c.; §4.6 forbids digits anyway): `NameSuffix::SECOND->icao()` = `II`. An override must carry the same component
 (`PENA<<ANNA<LEE<II`); a passport issued without the suffix (dropped by preference, a.) is modelled as a name without
 it.
 

@@ -72,9 +72,9 @@ final class PersonNameTest extends TestCase
         yield 'one name (8 FAM 403.1-3(D))' => ['Teller', null, null, null, 'TELLER'];
         yield 'first name only' => ['Smith', 'John', null, null, 'SMITH<<JOHN'];
         yield 'with middle name' => ['Smith', 'John', 'Michael', null, 'SMITH<<JOHN<MICHAEL'];
-        yield 'with suffix' => ['Smith', 'John', null, NameSuffix::Junior, 'SMITH<<JOHN<JR'];
+        yield 'with suffix' => ['Smith', 'John', null, NameSuffix::JR, 'SMITH<<JOHN<JR'];
         yield 'middle name and suffix' => ['Smith', 'John', 'Michael', NameSuffix::II, 'SMITH<<JOHN<MICHAEL<II'];
-        yield 'ordinal suffix as a Roman numeral' => ["O'Brien", 'José Luis', null, NameSuffix::Third,
+        yield 'ordinal suffix as a Roman numeral' => ["O'Brien", 'José Luis', null, NameSuffix::THIRD,
             'OBRIEN<<JOSE<LUIS<III'];
         yield 'diacritics dropped, hyphen kept' => ['Peña-Ruiz', 'Zoë', null, null, 'PENA-RUIZ<<ZOE'];
         yield 'particles' => ['de la Cruz', 'Ana', 'María', null, 'DE<LA<CRUZ<<ANA<MARIA'];
@@ -107,7 +107,7 @@ final class PersonNameTest extends TestCase
             FamilyName::from('Smith'),
             GivenName::from("Jose\u{0301}"),
             MiddleName::from('Michael'),
-            NameSuffix::Junior,
+            NameSuffix::JR,
         );
 
         self::assertSame('José', $name->given?->value);
@@ -116,7 +116,7 @@ final class PersonNameTest extends TestCase
         self::assertSame('Teller', new PersonName(FamilyName::from('Teller'), null)->full());
         self::assertSame(
             'John Smith 3RD',
-            new PersonName(FamilyName::from('Smith'), GivenName::from('John'), null, NameSuffix::Third)->full(),
+            new PersonName(FamilyName::from('Smith'), GivenName::from('John'), null, NameSuffix::THIRD)->full(),
         );
     }
 
@@ -139,7 +139,7 @@ final class PersonNameTest extends TestCase
             FamilyName::from($family),
             GivenName::from('Anna'),
             null,
-            NameSuffix::Junior,
+            NameSuffix::JR,
             IcaoPersonName::from($latin),
         );
 
@@ -173,8 +173,8 @@ final class PersonNameTest extends TestCase
     public static function partsWithoutAGivenName(): iterable
     {
         yield 'middle name' => [MiddleName::from('Lee'), null, 'middle name without a given name'];
-        yield 'suffix' => [null, NameSuffix::Junior, 'suffix without a given name'];
-        yield 'both' => [MiddleName::from('Lee'), NameSuffix::Junior, 'middle name without a given name'];
+        yield 'suffix' => [null, NameSuffix::JR, 'suffix without a given name'];
+        yield 'both' => [MiddleName::from('Lee'), NameSuffix::JR, 'middle name without a given name'];
     }
 
     #[DataProvider('partsWithoutAGivenName')]
@@ -227,7 +227,7 @@ final class PersonNameTest extends TestCase
                 FamilyName::from('Peña'),
                 GivenName::from('Anna'),
                 MiddleName::from('Lee'),
-                NameSuffix::Second,
+                NameSuffix::SECOND,
                 IcaoPersonName::from($latin),
             ),
             \implode(' ', ['Peña', 'Anna', 'Lee', $latin]),
@@ -241,7 +241,7 @@ final class PersonNameTest extends TestCase
             string $family = 'Möller',
             string $given = 'Anna',
             ?string $middle = 'Lee',
-            ?NameSuffix $suffix = NameSuffix::Junior,
+            ?NameSuffix $suffix = NameSuffix::JR,
             ?string $latin = null,
         ): PersonName => new PersonName(
             FamilyName::from($family),
@@ -262,8 +262,8 @@ final class PersonNameTest extends TestCase
         self::assertFalse($name()->equals($name(middle: null)));
         self::assertFalse($name(middle: null)->equals($name()));
         self::assertFalse($name()->equals($name(suffix: null)));
-        self::assertFalse($name()->equals($name(suffix: NameSuffix::Senior)));
-        self::assertFalse($name(suffix: NameSuffix::II)->equals($name(suffix: NameSuffix::Second)));
+        self::assertFalse($name()->equals($name(suffix: NameSuffix::SR)));
+        self::assertFalse($name(suffix: NameSuffix::II)->equals($name(suffix: NameSuffix::SECOND)));
         self::assertFalse($name()->equals($name(latin: 'MOLLER<<ANNA<LEE<JR')));
         self::assertTrue($name(latin: 'MOLLER<<ANNA<LEE<JR')->equals($name(latin: 'moller<<anna<lee<jr')));
         self::assertFalse($name()->equals(GivenName::from('Anna')));
@@ -287,7 +287,7 @@ final class PersonNameTest extends TestCase
                 FamilyName::from('Smith'),
                 GivenName::from('John'),
                 MiddleName::from('Lee'),
-                NameSuffix::Second,
+                NameSuffix::SECOND,
             )->jsonSerialize(),
         );
     }

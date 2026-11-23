@@ -34,25 +34,25 @@ final class NameSuffixTest extends TestCase
      */
     public static function icaoComponents(): iterable
     {
-        yield 'JR' => [NameSuffix::Junior, 'JR'];
-        yield 'SR' => [NameSuffix::Senior, 'SR'];
-        yield '1ST' => [NameSuffix::First, 'I'];
+        yield 'JR' => [NameSuffix::JR, 'JR'];
+        yield 'SR' => [NameSuffix::SR, 'SR'];
+        yield '1ST' => [NameSuffix::FIRST, 'I'];
         yield 'I' => [NameSuffix::I, 'I'];
-        yield '2ND' => [NameSuffix::Second, 'II'];
+        yield '2ND' => [NameSuffix::SECOND, 'II'];
         yield 'II' => [NameSuffix::II, 'II'];
-        yield '3RD' => [NameSuffix::Third, 'III'];
+        yield '3RD' => [NameSuffix::THIRD, 'III'];
         yield 'III' => [NameSuffix::III, 'III'];
-        yield '4TH' => [NameSuffix::Fourth, 'IV'];
+        yield '4TH' => [NameSuffix::FOURTH, 'IV'];
         yield 'IV' => [NameSuffix::IV, 'IV'];
-        yield '5TH' => [NameSuffix::Fifth, 'V'];
+        yield '5TH' => [NameSuffix::FIFTH, 'V'];
         yield 'V' => [NameSuffix::V, 'V'];
-        yield '6TH' => [NameSuffix::Sixth, 'VI'];
+        yield '6TH' => [NameSuffix::SIXTH, 'VI'];
         yield 'VI' => [NameSuffix::VI, 'VI'];
-        yield '7TH' => [NameSuffix::Seventh, 'VII'];
+        yield '7TH' => [NameSuffix::SEVENTH, 'VII'];
         yield 'VII' => [NameSuffix::VII, 'VII'];
-        yield '8TH' => [NameSuffix::Eighth, 'VIII'];
+        yield '8TH' => [NameSuffix::EIGHTH, 'VIII'];
         yield 'VIII' => [NameSuffix::VIII, 'VIII'];
-        yield '9TH' => [NameSuffix::Ninth, 'IX'];
+        yield '9TH' => [NameSuffix::NINTH, 'IX'];
         yield 'IX' => [NameSuffix::IX, 'IX'];
     }
 
@@ -64,8 +64,8 @@ final class NameSuffixTest extends TestCase
 
     public function testReadsACodeInAnyCase(): void
     {
-        self::assertSame(NameSuffix::Junior, NameSuffix::fromCode(' jr '));
-        self::assertSame(NameSuffix::Third, NameSuffix::fromCode('3rd'));
+        self::assertSame(NameSuffix::JR, NameSuffix::fromCode(' jr '));
+        self::assertSame(NameSuffix::THIRD, NameSuffix::fromCode('3rd'));
         self::assertSame(NameSuffix::IV, NameSuffix::fromCode('IV'));
     }
 

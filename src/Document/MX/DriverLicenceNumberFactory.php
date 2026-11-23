@@ -80,14 +80,14 @@ final class DriverLicenceNumberFactory
     private static function classFor(Jurisdiction $jurisdiction): ?string
     {
         return match ($jurisdiction) {
-            Jurisdiction::Mex => MexDriverLicenceNumber::class,
-            Jurisdiction::Agu, Jurisdiction::Bcn, Jurisdiction::Bcs, Jurisdiction::Cam, Jurisdiction::Chh,
-            Jurisdiction::Chp, Jurisdiction::Cmx, Jurisdiction::Coa, Jurisdiction::Col, Jurisdiction::Dur,
-            Jurisdiction::Gro, Jurisdiction::Gua, Jurisdiction::Hid, Jurisdiction::Jal, Jurisdiction::Mic,
-            Jurisdiction::Mor, Jurisdiction::Nay, Jurisdiction::Nle, Jurisdiction::Oax, Jurisdiction::Pue,
-            Jurisdiction::Que, Jurisdiction::Roo, Jurisdiction::Sin, Jurisdiction::Slp, Jurisdiction::Son,
-            Jurisdiction::Tab, Jurisdiction::Tam, Jurisdiction::Tla, Jurisdiction::Ver, Jurisdiction::Yuc,
-            Jurisdiction::Zac => null,
+            Jurisdiction::MEX => MexDriverLicenceNumber::class,
+            Jurisdiction::AGU, Jurisdiction::BCN, Jurisdiction::BCS, Jurisdiction::CAM, Jurisdiction::CHH,
+            Jurisdiction::CHP, Jurisdiction::CMX, Jurisdiction::COA, Jurisdiction::COL, Jurisdiction::DUR,
+            Jurisdiction::GRO, Jurisdiction::GUA, Jurisdiction::HID, Jurisdiction::JAL, Jurisdiction::MIC,
+            Jurisdiction::MOR, Jurisdiction::NAY, Jurisdiction::NLE, Jurisdiction::OAX, Jurisdiction::PUE,
+            Jurisdiction::QUE, Jurisdiction::ROO, Jurisdiction::SIN, Jurisdiction::SLP, Jurisdiction::SON,
+            Jurisdiction::TAB, Jurisdiction::TAM, Jurisdiction::TLA, Jurisdiction::VER, Jurisdiction::YUC,
+            Jurisdiction::ZAC => null,
         };
     }
 }

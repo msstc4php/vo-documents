@@ -21,7 +21,7 @@ final class KsDlIdNumber extends AbstractDlIdNumber
     #[Override]
     public function jurisdiction(): Jurisdiction
     {
-        return Jurisdiction::Ks;
+        return Jurisdiction::KS;
     }
 
     #[Override]

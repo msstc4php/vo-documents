@@ -67,7 +67,7 @@ final class IdentityCardNumbersTest extends TestCase
 
     public function testTellsItsJurisdiction(): void
     {
-        self::assertSame(Jurisdiction::Sp, SpIdentityCardNumber::from('123456782')->jurisdiction());
+        self::assertSame(Jurisdiction::SP, SpIdentityCardNumber::from('123456782')->jurisdiction());
     }
 
     public function testRefusesEveryOtherLength(): void

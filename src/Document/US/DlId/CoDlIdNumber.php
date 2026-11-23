@@ -19,7 +19,7 @@ final class CoDlIdNumber extends AbstractDlIdNumber
     #[Override]
     public function jurisdiction(): Jurisdiction
     {
-        return Jurisdiction::Co;
+        return Jurisdiction::CO;
     }
 
     #[Override]

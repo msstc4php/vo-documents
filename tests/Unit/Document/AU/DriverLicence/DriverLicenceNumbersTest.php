@@ -87,14 +87,14 @@ final class DriverLicenceNumbersTest extends TestCase
      */
     public static function jurisdictions(): iterable
     {
-        yield 'ACT' => [ActDriverLicenceNumber::class, Jurisdiction::Act, '1234567890'];
-        yield 'NSW' => [NswDriverLicenceNumber::class, Jurisdiction::Nsw, '01234567'];
-        yield 'NT' => [NtDriverLicenceNumber::class, Jurisdiction::Nt, '1564102'];
-        yield 'Qld' => [QldDriverLicenceNumber::class, Jurisdiction::Qld, '123456789'];
-        yield 'SA' => [SaDriverLicenceNumber::class, Jurisdiction::Sa, 'S12345'];
-        yield 'Tas' => [TasDriverLicenceNumber::class, Jurisdiction::Tas, 'A123456'];
-        yield 'Vic' => [VicDriverLicenceNumber::class, Jurisdiction::Vic, '123456789'];
-        yield 'WA' => [WaDriverLicenceNumber::class, Jurisdiction::Wa, '6437772'];
+        yield 'ACT' => [ActDriverLicenceNumber::class, Jurisdiction::ACT, '1234567890'];
+        yield 'NSW' => [NswDriverLicenceNumber::class, Jurisdiction::NSW, '01234567'];
+        yield 'NT' => [NtDriverLicenceNumber::class, Jurisdiction::NT, '1564102'];
+        yield 'Qld' => [QldDriverLicenceNumber::class, Jurisdiction::QLD, '123456789'];
+        yield 'SA' => [SaDriverLicenceNumber::class, Jurisdiction::SA, 'S12345'];
+        yield 'Tas' => [TasDriverLicenceNumber::class, Jurisdiction::TAS, 'A123456'];
+        yield 'Vic' => [VicDriverLicenceNumber::class, Jurisdiction::VIC, '123456789'];
+        yield 'WA' => [WaDriverLicenceNumber::class, Jurisdiction::WA, '6437772'];
     }
 
     /**

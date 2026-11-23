@@ -258,8 +258,8 @@ $jp = new JP\PersonName(
 use MSSTC4PHP\ValueObject\Documents\Document\AU\DriverLicenceNumberFactory;
 use MSSTC4PHP\ValueObject\Documents\Document\AU\Jurisdiction;
 
-$licence = DriverLicenceNumberFactory::fromNumberIn('01234567', Jurisdiction::Nsw);   // NswDriverLicenceNumber
-DriverLicenceNumberFactory::jurisdictionsMatching('01234567');                       // [Act, Nsw, Nt, Qld, Tas, Vic]
+$licence = DriverLicenceNumberFactory::fromNumberIn('01234567', Jurisdiction::NSW);   // NswDriverLicenceNumber
+DriverLicenceNumberFactory::jurisdictionsMatching('01234567');                       // [ACT, NSW, NT, QLD, TAS, VIC]
 DriverLicenceNumberFactory::fromNumber('01234567');                                  // AmbiguousJurisdictionException
 ```
 
@@ -277,10 +277,10 @@ for AU**; use `fromNumberIn()` when the issuer is known (see `docs/sources/AU.md
 use MSSTC4PHP\ValueObject\Documents\Document\US\DlIdNumberFactory;
 use MSSTC4PHP\ValueObject\Documents\Document\US\Jurisdiction;
 
-DlIdNumberFactory::fromNumberIn('123456789', Jurisdiction::Ny);   // NyDlIdNumber
-DlIdNumberFactory::jurisdictionsMatching('Y620-9305-7270');       // [Il], among the covered jurisdictions
+DlIdNumberFactory::fromNumberIn('123456789', Jurisdiction::NY);   // NyDlIdNumber
+DlIdNumberFactory::jurisdictionsMatching('Y620-9305-7270');       // [IL], among the covered jurisdictions
 DlIdNumberFactory::jurisdictionsMatching('123456789');            // 11 states
-DlIdNumberFactory::fromNumberIn('123456789', Jurisdiction::Ca);   // "Invalid US-CA DL/ID number (format not covered)."
+DlIdNumberFactory::fromNumberIn('123456789', Jurisdiction::CA);   // "Invalid US-CA DL/ID number (format not covered)."
 ```
 
 `DlIdNumberFactory` covers the 30 jurisdictions with a published format. The 21 others have no class, and
@@ -301,10 +301,10 @@ use MSSTC4PHP\ValueObject\Documents\Document\CA\HealthCard\OnHealthCardNumber;
 use MSSTC4PHP\ValueObject\Documents\Document\CA\HealthCardNumberFactory;
 use MSSTC4PHP\ValueObject\Documents\Document\CA\Jurisdiction;
 
-DriverLicenceNumberFactory::fromNumberIn('890562', Jurisdiction::Sk);   // SkDriverLicenceNumber, value 00890562
-DriverLicenceNumberFactory::jurisdictionsMatching('L1531-171274-08'); // [Qc], among the covered jurisdictions
-DriverLicenceNumberFactory::jurisdictionsMatching('347631');          // [Bc, Sk]
-DriverLicenceNumberFactory::fromNumberIn('123', Jurisdiction::Mb);     // "Invalid CA-MB driver's licence number (format not covered)."
+DriverLicenceNumberFactory::fromNumberIn('890562', Jurisdiction::SK);   // SkDriverLicenceNumber, value 00890562
+DriverLicenceNumberFactory::jurisdictionsMatching('L1531-171274-08'); // [QC], among the covered jurisdictions
+DriverLicenceNumberFactory::jurisdictionsMatching('347631');          // [BC, SK]
+DriverLicenceNumberFactory::fromNumberIn('123', Jurisdiction::MB);     // "Invalid CA-MB driver's licence number (format not covered)."
 
 $card = OnHealthCardNumber::fromCard('9876543217 YM');                // OnHealthCard
 $card->number();                                                       // OnHealthCardNumber, value 9876543217
@@ -329,9 +329,9 @@ instead of dropping the code: split the printed card with `fromCard()`.
 use MSSTC4PHP\ValueObject\Documents\Document\MX\DriverLicenceNumberFactory;
 use MSSTC4PHP\ValueObject\Documents\Document\MX\Jurisdiction;
 
-DriverLicenceNumberFactory::fromNumberIn('1234 5678 9012', Jurisdiction::Mex);   // MexDriverLicenceNumber, value 123456789012
-DriverLicenceNumberFactory::jurisdictionsMatching('123456789012');              // [Mex], the only covered entity
-DriverLicenceNumberFactory::fromNumberIn('123456789012', Jurisdiction::Cmx);    // "Invalid MX-CMX driver's licence number (format not covered)."
+DriverLicenceNumberFactory::fromNumberIn('1234 5678 9012', Jurisdiction::MEX);   // MexDriverLicenceNumber, value 123456789012
+DriverLicenceNumberFactory::jurisdictionsMatching('123456789012');              // [MEX], the only covered entity
+DriverLicenceNumberFactory::fromNumberIn('123456789012', Jurisdiction::CMX);    // "Invalid MX-CMX driver's licence number (format not covered)."
 ```
 
 Only the Estado de México publishes a number format (its validator's field rule: twelve digits). The other 31
@@ -345,10 +345,10 @@ use MSSTC4PHP\ValueObject\Documents\Document\BR\IdentityCard\SpIdentityCardNumbe
 use MSSTC4PHP\ValueObject\Documents\Document\BR\IdentityCardNumberFactory;
 use MSSTC4PHP\ValueObject\Documents\Document\BR\Jurisdiction;
 
-IdentityCardNumberFactory::fromNumberIn('12.345.678-2', Jurisdiction::Sp);   // SpIdentityCardNumber, value 123456782
-IdentityCardNumberFactory::jurisdictionsMatching('24.681.357-X');            // [Sp], the only covered unit
+IdentityCardNumberFactory::fromNumberIn('12.345.678-2', Jurisdiction::SP);   // SpIdentityCardNumber, value 123456782
+IdentityCardNumberFactory::jurisdictionsMatching('24.681.357-X');            // [SP], the only covered unit
 IdentityCardNumberFactory::jurisdictionsMatching('12.345.678-3');            // [] (wrong SP check character)
-IdentityCardNumberFactory::fromNumberIn('1234567', Jurisdiction::Rj);        // "Invalid BR-RJ identity card number (format not covered)."
+IdentityCardNumberFactory::fromNumberIn('1234567', Jurisdiction::RJ);        // "Invalid BR-RJ identity card number (format not covered)."
 SpIdentityCardNumber::fromNumberAndCheckCharacter('1.234.567', null);         // card without a printed check character: value 012345672
 ```
 

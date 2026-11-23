@@ -14,14 +14,14 @@ use Override;
  */
 enum Jurisdiction: string implements Subdivision
 {
-    case Act = 'AU-ACT';
-    case Nsw = 'AU-NSW';
-    case Nt = 'AU-NT';
-    case Qld = 'AU-QLD';
-    case Sa = 'AU-SA';
-    case Tas = 'AU-TAS';
-    case Vic = 'AU-VIC';
-    case Wa = 'AU-WA';
+    case ACT = 'AU-ACT';
+    case NSW = 'AU-NSW';
+    case NT = 'AU-NT';
+    case QLD = 'AU-QLD';
+    case SA = 'AU-SA';
+    case TAS = 'AU-TAS';
+    case VIC = 'AU-VIC';
+    case WA = 'AU-WA';
 
     #[Override]
     public function isoCode(): string

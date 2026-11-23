@@ -14,19 +14,19 @@ use Override;
  */
 enum Jurisdiction: string implements Subdivision
 {
-    case Ab = 'CA-AB';
-    case Bc = 'CA-BC';
-    case Mb = 'CA-MB';
-    case Nb = 'CA-NB';
-    case Nl = 'CA-NL';
-    case Ns = 'CA-NS';
-    case Nt = 'CA-NT';
-    case Nu = 'CA-NU';
-    case On = 'CA-ON';
-    case Pe = 'CA-PE';
-    case Qc = 'CA-QC';
-    case Sk = 'CA-SK';
-    case Yt = 'CA-YT';
+    case AB = 'CA-AB';
+    case BC = 'CA-BC';
+    case MB = 'CA-MB';
+    case NB = 'CA-NB';
+    case NL = 'CA-NL';
+    case NS = 'CA-NS';
+    case NT = 'CA-NT';
+    case NU = 'CA-NU';
+    case ON = 'CA-ON';
+    case PE = 'CA-PE';
+    case QC = 'CA-QC';
+    case SK = 'CA-SK';
+    case YT = 'CA-YT';
 
     #[Override]
     public function isoCode(): string

@@ -57,7 +57,7 @@ final class DriverLicenceNumbersTest extends TestCase
 
     public function testTellsItsJurisdiction(): void
     {
-        self::assertSame(Jurisdiction::Mex, MexDriverLicenceNumber::from('123456789012')->jurisdiction());
+        self::assertSame(Jurisdiction::MEX, MexDriverLicenceNumber::from('123456789012')->jurisdiction());
     }
 
     public function testRefusesEveryOtherLength(): void

@@ -20,7 +20,7 @@ final class QldDriverLicenceNumber extends AbstractDriverLicenceNumber
     #[Override]
     public function jurisdiction(): Jurisdiction
     {
-        return Jurisdiction::Qld;
+        return Jurisdiction::QLD;
     }
 
     #[Override]

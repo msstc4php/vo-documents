@@ -19,7 +19,7 @@ final class TxDlIdNumber extends AbstractDlIdNumber
     #[Override]
     public function jurisdiction(): Jurisdiction
     {
-        return Jurisdiction::Tx;
+        return Jurisdiction::TX;
     }
 
     #[Override]

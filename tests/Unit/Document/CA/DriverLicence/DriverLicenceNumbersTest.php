@@ -101,12 +101,12 @@ final class DriverLicenceNumbersTest extends TestCase
      */
     public static function jurisdictions(): iterable
     {
-        yield 'AB' => [AbDriverLicenceNumber::class, Jurisdiction::Ab, '123456789'];
-        yield 'BC' => [BcDriverLicenceNumber::class, Jurisdiction::Bc, '31098794'];
-        yield 'NS' => [NsDriverLicenceNumber::class, Jurisdiction::Ns, 'FINCH220867001'];
-        yield 'ON' => [OnDriverLicenceNumber::class, Jurisdiction::On, 'X09152643595718'];
-        yield 'QC' => [QcDriverLicenceNumber::class, Jurisdiction::Qc, 'L153117127408'];
-        yield 'SK' => [SkDriverLicenceNumber::class, Jurisdiction::Sk, '35890562'];
+        yield 'AB' => [AbDriverLicenceNumber::class, Jurisdiction::AB, '123456789'];
+        yield 'BC' => [BcDriverLicenceNumber::class, Jurisdiction::BC, '31098794'];
+        yield 'NS' => [NsDriverLicenceNumber::class, Jurisdiction::NS, 'FINCH220867001'];
+        yield 'ON' => [OnDriverLicenceNumber::class, Jurisdiction::ON, 'X09152643595718'];
+        yield 'QC' => [QcDriverLicenceNumber::class, Jurisdiction::QC, 'L153117127408'];
+        yield 'SK' => [SkDriverLicenceNumber::class, Jurisdiction::SK, '35890562'];
     }
 
     /**

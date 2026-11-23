@@ -20,7 +20,7 @@ final class SaDriverLicenceNumber extends AbstractDriverLicenceNumber
     #[Override]
     public function jurisdiction(): Jurisdiction
     {
-        return Jurisdiction::Sa;
+        return Jurisdiction::SA;
     }
 
     #[Override]

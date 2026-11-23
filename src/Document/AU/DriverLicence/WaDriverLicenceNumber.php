@@ -20,7 +20,7 @@ final class WaDriverLicenceNumber extends AbstractDriverLicenceNumber
     #[Override]
     public function jurisdiction(): Jurisdiction
     {
-        return Jurisdiction::Wa;
+        return Jurisdiction::WA;
     }
 
     #[Override]

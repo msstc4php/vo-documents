@@ -76,48 +76,48 @@ final class HealthCardNumberFactoryTest extends TestCase
     public static function matchingJurisdictions(): iterable
     {
         $nineDigits = [
-            Jurisdiction::Ab,
-            Jurisdiction::Mb,
-            Jurisdiction::Nb,
-            Jurisdiction::Nu,
-            Jurisdiction::Sk,
-            Jurisdiction::Yt,
+            Jurisdiction::AB,
+            Jurisdiction::MB,
+            Jurisdiction::NB,
+            Jurisdiction::NU,
+            Jurisdiction::SK,
+            Jurisdiction::YT,
         ];
 
         yield 'example 1234567' => ['1234567', []];
-        yield 'example 12345678' => ['12345678', [Jurisdiction::Pe]];
+        yield 'example 12345678' => ['12345678', [Jurisdiction::PE]];
         yield 'example 123456789' => ['123456789', $nineDigits];
         yield 'example 123 456 789' => ['123 456 789', $nineDigits];
-        yield 'example 1234567890' => ['1234567890', [Jurisdiction::Ns]];
-        yield 'example 1234567897' => ['1234567897', [Jurisdiction::Ns, Jurisdiction::On]];
-        yield 'example 9876543217 (ON-IHCS)' => ['9876543217', [Jurisdiction::Ns, Jurisdiction::On]];
-        yield 'example 9012372173 (BC-TP)' => ['9012372173', [Jurisdiction::Bc, Jurisdiction::Ns]];
-        yield 'example 9012372174' => ['9012372174', [Jurisdiction::Ns, Jurisdiction::On]];
-        yield 'example 9012372175' => ['9012372175', [Jurisdiction::Ns]];
-        yield 'example 0123456789' => ['0123456789', [Jurisdiction::Ns]];
-        yield 'example 5584486674 (AB-PRG illustration)' => ['5584486674', [Jurisdiction::Ns]];
+        yield 'example 1234567890' => ['1234567890', [Jurisdiction::NS]];
+        yield 'example 1234567897' => ['1234567897', [Jurisdiction::NS, Jurisdiction::ON]];
+        yield 'example 9876543217 (ON-IHCS)' => ['9876543217', [Jurisdiction::NS, Jurisdiction::ON]];
+        yield 'example 9012372173 (BC-TP)' => ['9012372173', [Jurisdiction::BC, Jurisdiction::NS]];
+        yield 'example 9012372174' => ['9012372174', [Jurisdiction::NS, Jurisdiction::ON]];
+        yield 'example 9012372175' => ['9012372175', [Jurisdiction::NS]];
+        yield 'example 0123456789' => ['0123456789', [Jurisdiction::NS]];
+        yield 'example 5584486674 (AB-PRG illustration)' => ['5584486674', [Jurisdiction::NS]];
         yield 'example 5584486674YM' => ['5584486674YM', []];
         yield 'example 9876543217YM (printed ON card)' => ['9876543217YM', []];
         yield 'example 9876543217 ym (printed ON card)' => ['9876543217 ym', []];
         yield 'example 9876543217A (printed ON card)' => ['9876543217A', []];
         yield 'example 9876543217ABC' => ['9876543217ABC', []];
         yield 'example 1234567890AB' => ['1234567890AB', []];
-        yield 'example 123456789012' => ['123456789012', [Jurisdiction::Nl]];
-        yield 'example N1234567' => ['N1234567', [Jurisdiction::Nt]];
-        yield 'example H1234567' => ['H1234567', [Jurisdiction::Nt]];
+        yield 'example 123456789012' => ['123456789012', [Jurisdiction::NL]];
+        yield 'example N1234567' => ['N1234567', [Jurisdiction::NT]];
+        yield 'example H1234567' => ['H1234567', [Jurisdiction::NT]];
         yield 'example A1234567' => ['A1234567', []];
-        yield 'example BOUF 9401 1419' => ['BOUF 9401 1419', [Jurisdiction::Qc]];
-        yield 'example BOUF94511419' => ['BOUF94511419', [Jurisdiction::Qc]];
-        yield 'example YUXJ75021213' => ['YUXJ75021213', [Jurisdiction::Qc]];
+        yield 'example BOUF 9401 1419' => ['BOUF 9401 1419', [Jurisdiction::QC]];
+        yield 'example BOUF94511419' => ['BOUF94511419', [Jurisdiction::QC]];
+        yield 'example YUXJ75021213' => ['YUXJ75021213', [Jurisdiction::QC]];
         yield 'example BOUF94311419 (month 31)' => ['BOUF94311419', []];
         yield 'example BERC920401M2 (temporary NAM)' => ['BERC920401M2', []];
         yield 'overlap: 10 digits passing BC MOD-11 and ON MOD 10' => [
             '9282887125',
-            [Jurisdiction::Bc, Jurisdiction::Ns, Jurisdiction::On],
+            [Jurisdiction::BC, Jurisdiction::NS, Jurisdiction::ON],
         ];
         yield 'overlap: 10 digits passing BC MOD-11 and failing ON MOD 10' => [
             '9555555552',
-            [Jurisdiction::Bc, Jurisdiction::Ns],
+            [Jurisdiction::BC, Jurisdiction::NS],
         ];
         yield 'overlap: 11 digits' => ['12345678901', []];
         yield 'overlap: 13 digits' => ['1234567890123', []];
@@ -204,7 +204,7 @@ final class HealthCardNumberFactoryTest extends TestCase
     public function testRefusesAnOntarioVersionCodeInsteadOfDroppingIt(): void
     {
         self::assertRefusedWithoutEcho(
-            static fn (string $value): mixed => HealthCardNumberFactory::fromNumberIn($value, Jurisdiction::On),
+            static fn (string $value): mixed => HealthCardNumberFactory::fromNumberIn($value, Jurisdiction::ON),
             '9876543217 YM',
             'Invalid CA-ON health card number (version code: use fromCard()).',
         );
@@ -251,19 +251,19 @@ final class HealthCardNumberFactoryTest extends TestCase
      */
     public static function concreteClasses(): iterable
     {
-        yield 'CA-AB' => [Jurisdiction::Ab, AbHealthCardNumber::class, '123456789'];
-        yield 'CA-BC' => [Jurisdiction::Bc, BcHealthCardNumber::class, '9012372173'];
-        yield 'CA-MB' => [Jurisdiction::Mb, MbHealthCardNumber::class, '123456789'];
-        yield 'CA-NB' => [Jurisdiction::Nb, NbHealthCardNumber::class, '123456789'];
-        yield 'CA-NL' => [Jurisdiction::Nl, NlHealthCardNumber::class, '123456789012'];
-        yield 'CA-NS' => [Jurisdiction::Ns, NsHealthCardNumber::class, '9012372173'];
-        yield 'CA-NT' => [Jurisdiction::Nt, NtHealthCardNumber::class, 'T1234567'];
-        yield 'CA-NU' => [Jurisdiction::Nu, NuHealthCardNumber::class, '123456789'];
-        yield 'CA-ON' => [Jurisdiction::On, OnHealthCardNumber::class, '9876543217'];
-        yield 'CA-PE' => [Jurisdiction::Pe, PeHealthCardNumber::class, '12345678'];
-        yield 'CA-QC' => [Jurisdiction::Qc, QcHealthCardNumber::class, 'YUXJ75021213'];
-        yield 'CA-SK' => [Jurisdiction::Sk, SkHealthCardNumber::class, '123456789'];
-        yield 'CA-YT' => [Jurisdiction::Yt, YtHealthCardNumber::class, '123456789'];
+        yield 'CA-AB' => [Jurisdiction::AB, AbHealthCardNumber::class, '123456789'];
+        yield 'CA-BC' => [Jurisdiction::BC, BcHealthCardNumber::class, '9012372173'];
+        yield 'CA-MB' => [Jurisdiction::MB, MbHealthCardNumber::class, '123456789'];
+        yield 'CA-NB' => [Jurisdiction::NB, NbHealthCardNumber::class, '123456789'];
+        yield 'CA-NL' => [Jurisdiction::NL, NlHealthCardNumber::class, '123456789012'];
+        yield 'CA-NS' => [Jurisdiction::NS, NsHealthCardNumber::class, '9012372173'];
+        yield 'CA-NT' => [Jurisdiction::NT, NtHealthCardNumber::class, 'T1234567'];
+        yield 'CA-NU' => [Jurisdiction::NU, NuHealthCardNumber::class, '123456789'];
+        yield 'CA-ON' => [Jurisdiction::ON, OnHealthCardNumber::class, '9876543217'];
+        yield 'CA-PE' => [Jurisdiction::PE, PeHealthCardNumber::class, '12345678'];
+        yield 'CA-QC' => [Jurisdiction::QC, QcHealthCardNumber::class, 'YUXJ75021213'];
+        yield 'CA-SK' => [Jurisdiction::SK, SkHealthCardNumber::class, '123456789'];
+        yield 'CA-YT' => [Jurisdiction::YT, YtHealthCardNumber::class, '123456789'];
     }
 
     /**
@@ -296,7 +296,7 @@ final class HealthCardNumberFactoryTest extends TestCase
     public function testFromNumberInRefusesANumberOfAnotherJurisdiction(): void
     {
         self::assertRefusedWithoutEcho(
-            static fn (string $value): mixed => HealthCardNumberFactory::fromNumberIn($value, Jurisdiction::Bc),
+            static fn (string $value): mixed => HealthCardNumberFactory::fromNumberIn($value, Jurisdiction::BC),
             '9876543217',
             'Invalid CA-BC health card number checksum.',
         );

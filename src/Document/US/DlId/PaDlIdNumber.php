@@ -21,7 +21,7 @@ final class PaDlIdNumber extends AbstractDlIdNumber
     #[Override]
     public function jurisdiction(): Jurisdiction
     {
-        return Jurisdiction::Pa;
+        return Jurisdiction::PA;
     }
 
     #[Override]

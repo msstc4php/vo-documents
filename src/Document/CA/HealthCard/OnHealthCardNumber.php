@@ -53,7 +53,7 @@ final class OnHealthCardNumber extends AbstractHealthCardNumber
     #[Override]
     public function jurisdiction(): Jurisdiction
     {
-        return Jurisdiction::On;
+        return Jurisdiction::ON;
     }
 
     /**

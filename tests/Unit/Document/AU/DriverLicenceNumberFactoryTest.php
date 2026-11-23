@@ -59,47 +59,47 @@ final class DriverLicenceNumberFactoryTest extends TestCase
      */
     public static function matchingJurisdictions(): iterable
     {
-        yield 'one digit' => ['7', [Jurisdiction::Act, Jurisdiction::Nt, Jurisdiction::Vic]];
+        yield 'one digit' => ['7', [Jurisdiction::ACT, Jurisdiction::NT, Jurisdiction::VIC]];
         yield 'six digits' => [
             '000000',
             [
-                Jurisdiction::Act,
-                Jurisdiction::Nsw,
-                Jurisdiction::Nt,
-                Jurisdiction::Sa,
-                Jurisdiction::Tas,
-                Jurisdiction::Vic,
+                Jurisdiction::ACT,
+                Jurisdiction::NSW,
+                Jurisdiction::NT,
+                Jurisdiction::SA,
+                Jurisdiction::TAS,
+                Jurisdiction::VIC,
             ],
         ];
         yield 'seven digits (WA sample)' => [
             '6437772',
             [
-                Jurisdiction::Act,
-                Jurisdiction::Nsw,
-                Jurisdiction::Nt,
-                Jurisdiction::Tas,
-                Jurisdiction::Vic,
-                Jurisdiction::Wa,
+                Jurisdiction::ACT,
+                Jurisdiction::NSW,
+                Jurisdiction::NT,
+                Jurisdiction::TAS,
+                Jurisdiction::VIC,
+                Jurisdiction::WA,
             ],
         ];
         yield 'eight digits (NSW sample)' => [
             '01234567',
             [
-                Jurisdiction::Act,
-                Jurisdiction::Nsw,
-                Jurisdiction::Nt,
-                Jurisdiction::Qld,
-                Jurisdiction::Tas,
-                Jurisdiction::Vic,
+                Jurisdiction::ACT,
+                Jurisdiction::NSW,
+                Jurisdiction::NT,
+                Jurisdiction::QLD,
+                Jurisdiction::TAS,
+                Jurisdiction::VIC,
             ],
         ];
         yield 'nine digits (Qld sample)' => [
             '123 456 789',
-            [Jurisdiction::Act, Jurisdiction::Nt, Jurisdiction::Qld, Jurisdiction::Vic],
+            [Jurisdiction::ACT, Jurisdiction::NT, Jurisdiction::QLD, Jurisdiction::VIC],
         ];
-        yield 'ten digits (ACT sample)' => ['1234567890', [Jurisdiction::Act, Jurisdiction::Nt, Jurisdiction::Vic]];
-        yield 'six characters with a letter' => ['s12345', [Jurisdiction::Nsw, Jurisdiction::Sa, Jurisdiction::Tas]];
-        yield 'eight characters with a letter' => ['AB123456', [Jurisdiction::Nsw, Jurisdiction::Tas]];
+        yield 'ten digits (ACT sample)' => ['1234567890', [Jurisdiction::ACT, Jurisdiction::NT, Jurisdiction::VIC]];
+        yield 'six characters with a letter' => ['s12345', [Jurisdiction::NSW, Jurisdiction::SA, Jurisdiction::TAS]];
+        yield 'eight characters with a letter' => ['AB123456', [Jurisdiction::NSW, Jurisdiction::TAS]];
         yield 'eleven digits' => ['12345678901', []];
         yield 'nine characters with a letter' => ['A12345678', []];
         yield 'empty' => ['', []];
@@ -185,14 +185,14 @@ final class DriverLicenceNumberFactoryTest extends TestCase
      */
     public static function concreteClasses(): iterable
     {
-        yield 'ACT' => [Jurisdiction::Act, ActDriverLicenceNumber::class];
-        yield 'NSW' => [Jurisdiction::Nsw, NswDriverLicenceNumber::class];
-        yield 'NT' => [Jurisdiction::Nt, NtDriverLicenceNumber::class];
-        yield 'Qld' => [Jurisdiction::Qld, QldDriverLicenceNumber::class];
-        yield 'SA' => [Jurisdiction::Sa, SaDriverLicenceNumber::class];
-        yield 'Tas' => [Jurisdiction::Tas, TasDriverLicenceNumber::class];
-        yield 'Vic' => [Jurisdiction::Vic, VicDriverLicenceNumber::class];
-        yield 'WA' => [Jurisdiction::Wa, WaDriverLicenceNumber::class];
+        yield 'ACT' => [Jurisdiction::ACT, ActDriverLicenceNumber::class];
+        yield 'NSW' => [Jurisdiction::NSW, NswDriverLicenceNumber::class];
+        yield 'NT' => [Jurisdiction::NT, NtDriverLicenceNumber::class];
+        yield 'Qld' => [Jurisdiction::QLD, QldDriverLicenceNumber::class];
+        yield 'SA' => [Jurisdiction::SA, SaDriverLicenceNumber::class];
+        yield 'Tas' => [Jurisdiction::TAS, TasDriverLicenceNumber::class];
+        yield 'Vic' => [Jurisdiction::VIC, VicDriverLicenceNumber::class];
+        yield 'WA' => [Jurisdiction::WA, WaDriverLicenceNumber::class];
     }
 
     /**
@@ -202,8 +202,8 @@ final class DriverLicenceNumberFactoryTest extends TestCase
     public function testFromNumberInReturnsTheConcreteClass(Jurisdiction $jurisdiction, string $class): void
     {
         $number = match ($jurisdiction) {
-            Jurisdiction::Qld => '12345678',
-            Jurisdiction::Wa => '6437772',
+            Jurisdiction::QLD => '12345678',
+            Jurisdiction::WA => '6437772',
             default => '123456',
         };
 
@@ -227,7 +227,7 @@ final class DriverLicenceNumberFactoryTest extends TestCase
     public function testFromNumberInRefusesANumberOfAnotherJurisdiction(): void
     {
         self::assertRefusedWithoutEcho(
-            static fn (string $value): mixed => DriverLicenceNumberFactory::fromNumberIn($value, Jurisdiction::Wa),
+            static fn (string $value): mixed => DriverLicenceNumberFactory::fromNumberIn($value, Jurisdiction::WA),
             '01234567',
             'Invalid AU-WA driver licence number (wrong length).',
         );

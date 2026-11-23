@@ -22,7 +22,7 @@ final class HiDlIdNumber extends AbstractDlIdNumber
     #[Override]
     public function jurisdiction(): Jurisdiction
     {
-        return Jurisdiction::Hi;
+        return Jurisdiction::HI;
     }
 
     #[Override]

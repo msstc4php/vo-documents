@@ -44,19 +44,19 @@ final class IdentityCardNumberFactoryTest extends TestCase
     public static function matchingJurisdictions(): iterable
     {
         yield 'example (empty)' => ['', []];
-        yield 'example 12.345.678-2' => ['12.345.678-2', [Jurisdiction::Sp]];
-        yield 'example 123456782' => ['123456782', [Jurisdiction::Sp]];
-        yield 'example 24.681.357-X' => ['24.681.357-X', [Jurisdiction::Sp]];
-        yield 'example 24681357x' => ['24681357x', [Jurisdiction::Sp]];
-        yield 'example 1-2' => ['1-2', [Jurisdiction::Sp]];
-        yield 'example 00000001-2' => ['00000001-2', [Jurisdiction::Sp]];
-        yield 'example 99.999.999-0' => ['99.999.999-0', [Jurisdiction::Sp]];
+        yield 'example 12.345.678-2' => ['12.345.678-2', [Jurisdiction::SP]];
+        yield 'example 123456782' => ['123456782', [Jurisdiction::SP]];
+        yield 'example 24.681.357-X' => ['24.681.357-X', [Jurisdiction::SP]];
+        yield 'example 24681357x' => ['24681357x', [Jurisdiction::SP]];
+        yield 'example 1-2' => ['1-2', [Jurisdiction::SP]];
+        yield 'example 00000001-2' => ['00000001-2', [Jurisdiction::SP]];
+        yield 'example 99.999.999-0' => ['99.999.999-0', [Jurisdiction::SP]];
         yield 'example 12.345.678-3' => ['12.345.678-3', []];
         yield 'example 0-0' => ['0-0', []];
         yield 'example 2' => ['2', []];
         yield 'example 1234567890' => ['1234567890', []];
         yield 'example 12345678A' => ['12345678A', []];
-        yield 'overlap: 2 to 9 characters' => ['1.234.567-2', [Jurisdiction::Sp]];
+        yield 'overlap: 2 to 9 characters' => ['1.234.567-2', [Jurisdiction::SP]];
     }
 
     /**
@@ -120,7 +120,7 @@ final class IdentityCardNumberFactoryTest extends TestCase
      */
     public static function concreteClasses(): iterable
     {
-        yield 'BR-SP' => [Jurisdiction::Sp, SpIdentityCardNumber::class, '12.345.678-2', '123456782'];
+        yield 'BR-SP' => [Jurisdiction::SP, SpIdentityCardNumber::class, '12.345.678-2', '123456782'];
     }
 
     /**
@@ -148,32 +148,32 @@ final class IdentityCardNumberFactoryTest extends TestCase
      */
     public static function notCovered(): iterable
     {
-        yield 'BR-AC' => [Jurisdiction::Ac];
-        yield 'BR-AL' => [Jurisdiction::Al];
-        yield 'BR-AM' => [Jurisdiction::Am];
-        yield 'BR-AP' => [Jurisdiction::Ap];
-        yield 'BR-BA' => [Jurisdiction::Ba];
-        yield 'BR-CE' => [Jurisdiction::Ce];
-        yield 'BR-DF' => [Jurisdiction::Df];
-        yield 'BR-ES' => [Jurisdiction::Es];
-        yield 'BR-GO' => [Jurisdiction::Go];
-        yield 'BR-MA' => [Jurisdiction::Ma];
-        yield 'BR-MG' => [Jurisdiction::Mg];
-        yield 'BR-MS' => [Jurisdiction::Ms];
-        yield 'BR-MT' => [Jurisdiction::Mt];
-        yield 'BR-PA' => [Jurisdiction::Pa];
-        yield 'BR-PB' => [Jurisdiction::Pb];
-        yield 'BR-PE' => [Jurisdiction::Pe];
-        yield 'BR-PI' => [Jurisdiction::Pi];
-        yield 'BR-PR' => [Jurisdiction::Pr];
-        yield 'BR-RJ' => [Jurisdiction::Rj];
-        yield 'BR-RN' => [Jurisdiction::Rn];
-        yield 'BR-RO' => [Jurisdiction::Ro];
-        yield 'BR-RR' => [Jurisdiction::Rr];
-        yield 'BR-RS' => [Jurisdiction::Rs];
-        yield 'BR-SC' => [Jurisdiction::Sc];
-        yield 'BR-SE' => [Jurisdiction::Se];
-        yield 'BR-TO' => [Jurisdiction::To];
+        yield 'BR-AC' => [Jurisdiction::AC];
+        yield 'BR-AL' => [Jurisdiction::AL];
+        yield 'BR-AM' => [Jurisdiction::AM];
+        yield 'BR-AP' => [Jurisdiction::AP];
+        yield 'BR-BA' => [Jurisdiction::BA];
+        yield 'BR-CE' => [Jurisdiction::CE];
+        yield 'BR-DF' => [Jurisdiction::DF];
+        yield 'BR-ES' => [Jurisdiction::ES];
+        yield 'BR-GO' => [Jurisdiction::GO];
+        yield 'BR-MA' => [Jurisdiction::MA];
+        yield 'BR-MG' => [Jurisdiction::MG];
+        yield 'BR-MS' => [Jurisdiction::MS];
+        yield 'BR-MT' => [Jurisdiction::MT];
+        yield 'BR-PA' => [Jurisdiction::PA];
+        yield 'BR-PB' => [Jurisdiction::PB];
+        yield 'BR-PE' => [Jurisdiction::PE];
+        yield 'BR-PI' => [Jurisdiction::PI];
+        yield 'BR-PR' => [Jurisdiction::PR];
+        yield 'BR-RJ' => [Jurisdiction::RJ];
+        yield 'BR-RN' => [Jurisdiction::RN];
+        yield 'BR-RO' => [Jurisdiction::RO];
+        yield 'BR-RR' => [Jurisdiction::RR];
+        yield 'BR-RS' => [Jurisdiction::RS];
+        yield 'BR-SC' => [Jurisdiction::SC];
+        yield 'BR-SE' => [Jurisdiction::SE];
+        yield 'BR-TO' => [Jurisdiction::TO];
     }
 
     #[DataProvider('notCovered')]
@@ -210,7 +210,7 @@ final class IdentityCardNumberFactoryTest extends TestCase
     public function testFromNumberInRefusesANumberOfTheWrongShape(): void
     {
         self::assertRefusedWithoutEcho(
-            static fn (string $value): mixed => IdentityCardNumberFactory::fromNumberIn($value, Jurisdiction::Sp),
+            static fn (string $value): mixed => IdentityCardNumberFactory::fromNumberIn($value, Jurisdiction::SP),
             '12.345.678-3',
             'Invalid BR-SP identity card number checksum.',
         );

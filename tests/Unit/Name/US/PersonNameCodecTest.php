@@ -122,7 +122,7 @@ final class PersonNameCodecTest extends TestCase
             FamilyName::from("O'Brien"),
             GivenName::from('Mary Ann'),
             MiddleName::from('Lee'),
-            NameSuffix::Third,
+            NameSuffix::THIRD,
         );
 
         $payload = $codec->encode($name);
@@ -133,7 +133,7 @@ final class PersonNameCodecTest extends TestCase
         );
         $decoded = $codec->decode($payload);
         self::assertTrue($decoded->equals($name));
-        self::assertSame(NameSuffix::Third, $decoded->suffix);
+        self::assertSame(NameSuffix::THIRD, $decoded->suffix);
     }
 
     public function testRoundTripWithoutOptionalPartsUnchanged(): void
@@ -161,7 +161,7 @@ final class PersonNameCodecTest extends TestCase
             FamilyName::from('Möller'),
             GivenName::from('Anna'),
             null,
-            NameSuffix::Junior,
+            NameSuffix::JR,
             IcaoPersonName::from('MOLLER<<ANNA<JR'),
         );
 

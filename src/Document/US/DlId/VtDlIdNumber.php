@@ -22,7 +22,7 @@ final class VtDlIdNumber extends AbstractDlIdNumber
     #[Override]
     public function jurisdiction(): Jurisdiction
     {
-        return Jurisdiction::Vt;
+        return Jurisdiction::VT;
     }
 
     #[Override]

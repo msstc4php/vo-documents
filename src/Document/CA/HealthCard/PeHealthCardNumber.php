@@ -24,7 +24,7 @@ final class PeHealthCardNumber extends AbstractHealthCardNumber
     #[Override]
     public function jurisdiction(): Jurisdiction
     {
-        return Jurisdiction::Pe;
+        return Jurisdiction::PE;
     }
 
     #[Override]

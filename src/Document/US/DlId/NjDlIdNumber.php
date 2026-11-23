@@ -20,7 +20,7 @@ final class NjDlIdNumber extends AbstractDlIdNumber
     #[Override]
     public function jurisdiction(): Jurisdiction
     {
-        return Jurisdiction::Nj;
+        return Jurisdiction::NJ;
     }
 
     #[Override]

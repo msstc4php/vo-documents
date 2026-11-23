@@ -12,7 +12,8 @@ use MSSTC4PHP\ValueObject\Documents\Exception\InvalidPersonNameException;
  * generation are distinct values, as the cardholder chose them. In the ICAO form the suffix is the last secondary
  * identifier component (Doc 9303 Part 3 §4.6: "represented as components of the secondary identifier(s)" where the
  * State considers it legally part of the name, as 8 FAM 403.1-5(B) does), an ordinal written as its Roman numeral
- * (8 FAM 403.1-5(B) c.: "2nd to II"). See docs/sources/US.md "Name suffix".
+ * (8 FAM 403.1-5(B) c.: "2nd to II"). Case names are the code where it is a PHP name (`JR`, `III`) and the ordinal
+ * in words otherwise (`THIRD` for `3RD`). See docs/sources/US.md "Name suffix".
  *
  * @see https://www.aamva.org/getmedia/99ac7057-0f4d-4461-b0a2-3a5532e1b35c/AAMVA-2020-DLID-Card-Design-Standard.pdf
  *      AAMVA DL/ID Card Design Standard (2020), Table 2 ref. g, Table D.4 ref. i
@@ -20,25 +21,25 @@ use MSSTC4PHP\ValueObject\Documents\Exception\InvalidPersonNameException;
  */
 enum NameSuffix: string
 {
-    case Junior = 'JR';
-    case Senior = 'SR';
-    case First = '1ST';
+    case JR = 'JR';
+    case SR = 'SR';
+    case FIRST = '1ST';
     case I = 'I';
-    case Second = '2ND';
+    case SECOND = '2ND';
     case II = 'II';
-    case Third = '3RD';
+    case THIRD = '3RD';
     case III = 'III';
-    case Fourth = '4TH';
+    case FOURTH = '4TH';
     case IV = 'IV';
-    case Fifth = '5TH';
+    case FIFTH = '5TH';
     case V = 'V';
-    case Sixth = '6TH';
+    case SIXTH = '6TH';
     case VI = 'VI';
-    case Seventh = '7TH';
+    case SEVENTH = '7TH';
     case VII = 'VII';
-    case Eighth = '8TH';
+    case EIGHTH = '8TH';
     case VIII = 'VIII';
-    case Ninth = '9TH';
+    case NINTH = '9TH';
     case IX = 'IX';
 
     /**
@@ -58,15 +59,15 @@ enum NameSuffix: string
     public function icao(): string
     {
         return match ($this) {
-            self::First => self::I->value,
-            self::Second => self::II->value,
-            self::Third => self::III->value,
-            self::Fourth => self::IV->value,
-            self::Fifth => self::V->value,
-            self::Sixth => self::VI->value,
-            self::Seventh => self::VII->value,
-            self::Eighth => self::VIII->value,
-            self::Ninth => self::IX->value,
+            self::FIRST => self::I->value,
+            self::SECOND => self::II->value,
+            self::THIRD => self::III->value,
+            self::FOURTH => self::IV->value,
+            self::FIFTH => self::V->value,
+            self::SIXTH => self::VI->value,
+            self::SEVENTH => self::VII->value,
+            self::EIGHTH => self::VIII->value,
+            self::NINTH => self::IX->value,
             default => $this->value,
         };
     }

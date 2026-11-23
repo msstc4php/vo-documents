@@ -30,7 +30,7 @@ final class WyDlIdNumber extends AbstractDlIdNumber
     #[Override]
     public function jurisdiction(): Jurisdiction
     {
-        return Jurisdiction::Wy;
+        return Jurisdiction::WY;
     }
 
     #[Override]

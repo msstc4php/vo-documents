@@ -21,7 +21,7 @@ final class NeDlIdNumber extends AbstractDlIdNumber
     #[Override]
     public function jurisdiction(): Jurisdiction
     {
-        return Jurisdiction::Ne;
+        return Jurisdiction::NE;
     }
 
     #[Override]

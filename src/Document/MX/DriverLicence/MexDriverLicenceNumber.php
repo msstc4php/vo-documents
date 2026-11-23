@@ -22,7 +22,7 @@ final class MexDriverLicenceNumber extends AbstractDriverLicenceNumber
     #[Override]
     public function jurisdiction(): Jurisdiction
     {
-        return Jurisdiction::Mex;
+        return Jurisdiction::MEX;
     }
 
     #[Override]

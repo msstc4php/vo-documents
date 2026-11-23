@@ -54,7 +54,7 @@ final class DriverLicenceNumberFactoryTest extends TestCase
      */
     public static function matchingJurisdictions(): iterable
     {
-        $bcSk = [Jurisdiction::Bc, Jurisdiction::Sk];
+        $bcSk = [Jurisdiction::BC, Jurisdiction::SK];
 
         yield 'example (empty)' => ['', []];
         yield 'example 1' => ['1', $bcSk];
@@ -65,27 +65,27 @@ final class DriverLicenceNumberFactoryTest extends TestCase
         yield 'example 12345678' => ['12345678', $bcSk];
         yield 'example 31098794' => ['31098794', $bcSk];
         yield 'example 35890562' => ['35890562', $bcSk];
-        yield 'example 123456789' => ['123456789', [Jurisdiction::Ab]];
-        yield 'example 123456-789' => ['123456-789', [Jurisdiction::Ab]];
+        yield 'example 123456789' => ['123456789', [Jurisdiction::AB]];
+        yield 'example 123456-789' => ['123456-789', [Jurisdiction::AB]];
         yield 'example 1234567890' => ['1234567890', []];
-        yield 'example FINCH220867001' => ['FINCH220867001', [Jurisdiction::Ns]];
-        yield 'example FINCH--220867001' => ['FINCH--220867001', [Jurisdiction::Ns]];
-        yield 'example FOY  220867001' => ['FOY  220867001', [Jurisdiction::Ns]];
-        yield 'example finch 220867 001' => ['finch 220867 001', [Jurisdiction::Ns]];
+        yield 'example FINCH220867001' => ['FINCH220867001', [Jurisdiction::NS]];
+        yield 'example FINCH--220867001' => ['FINCH--220867001', [Jurisdiction::NS]];
+        yield 'example FOY  220867001' => ['FOY  220867001', [Jurisdiction::NS]];
+        yield 'example finch 220867 001' => ['finch 220867 001', [Jurisdiction::NS]];
         yield 'example FINCH320867001 (day 32)' => ['FINCH320867001', []];
         yield 'example FINCH221367001 (month 13)' => ['FINCH221367001', []];
-        yield 'example FINCHE220867001' => ['FINCHE220867001', [Jurisdiction::On]];
-        yield 'example L1531-171274-08' => ['L1531-171274-08', [Jurisdiction::Qc]];
-        yield 'example l153117127408' => ['l153117127408', [Jurisdiction::Qc]];
+        yield 'example FINCHE220867001' => ['FINCHE220867001', [Jurisdiction::ON]];
+        yield 'example L1531-171274-08' => ['L1531-171274-08', [Jurisdiction::QC]];
+        yield 'example l153117127408' => ['l153117127408', [Jurisdiction::QC]];
         yield 'example LL53117127408' => ['LL53117127408', []];
         yield 'example LL531171274080 (2 letters + 12 digits)' => ['LL531171274080', []];
-        yield 'example X0915-26435-95718' => ['X0915-26435-95718', [Jurisdiction::On]];
-        yield 'example X09152643595718' => ['X09152643595718', [Jurisdiction::On]];
-        yield 'example ABCDEFGHIJKLMNO' => ['ABCDEFGHIJKLMNO', [Jurisdiction::On]];
+        yield 'example X0915-26435-95718' => ['X0915-26435-95718', [Jurisdiction::ON]];
+        yield 'example X09152643595718' => ['X09152643595718', [Jurisdiction::ON]];
+        yield 'example ABCDEFGHIJKLMNO' => ['ABCDEFGHIJKLMNO', [Jurisdiction::ON]];
         yield 'example X0915264359571' => ['X0915264359571', []];
         yield 'example X091526435957189' => ['X091526435957189', []];
-        yield 'overlap: one letter + valid DDMM + 5 digits' => ['A010100001', [Jurisdiction::Ns]];
-        yield 'overlap: 15 digits' => ['123456789012345', [Jurisdiction::On]];
+        yield 'overlap: one letter + valid DDMM + 5 digits' => ['A010100001', [Jurisdiction::NS]];
+        yield 'overlap: 15 digits' => ['123456789012345', [Jurisdiction::ON]];
         yield 'overlap: 16 digits' => ['1234567890123456', []];
     }
 
@@ -170,12 +170,12 @@ final class DriverLicenceNumberFactoryTest extends TestCase
      */
     public static function concreteClasses(): iterable
     {
-        yield 'CA-AB' => [Jurisdiction::Ab, AbDriverLicenceNumber::class, '123456-789', '123456789'];
-        yield 'CA-BC' => [Jurisdiction::Bc, BcDriverLicenceNumber::class, '347631', '00347631'];
-        yield 'CA-NS' => [Jurisdiction::Ns, NsDriverLicenceNumber::class, 'FINCH--220867001', 'FINCH220867001'];
-        yield 'CA-ON' => [Jurisdiction::On, OnDriverLicenceNumber::class, 'X0915-26435-95718', 'X09152643595718'];
-        yield 'CA-QC' => [Jurisdiction::Qc, QcDriverLicenceNumber::class, 'L1531-171274-08', 'L153117127408'];
-        yield 'CA-SK' => [Jurisdiction::Sk, SkDriverLicenceNumber::class, '890562', '00890562'];
+        yield 'CA-AB' => [Jurisdiction::AB, AbDriverLicenceNumber::class, '123456-789', '123456789'];
+        yield 'CA-BC' => [Jurisdiction::BC, BcDriverLicenceNumber::class, '347631', '00347631'];
+        yield 'CA-NS' => [Jurisdiction::NS, NsDriverLicenceNumber::class, 'FINCH--220867001', 'FINCH220867001'];
+        yield 'CA-ON' => [Jurisdiction::ON, OnDriverLicenceNumber::class, 'X0915-26435-95718', 'X09152643595718'];
+        yield 'CA-QC' => [Jurisdiction::QC, QcDriverLicenceNumber::class, 'L1531-171274-08', 'L153117127408'];
+        yield 'CA-SK' => [Jurisdiction::SK, SkDriverLicenceNumber::class, '890562', '00890562'];
     }
 
     /**
@@ -203,13 +203,13 @@ final class DriverLicenceNumberFactoryTest extends TestCase
      */
     public static function notCovered(): iterable
     {
-        yield 'CA-MB' => [Jurisdiction::Mb];
-        yield 'CA-NB' => [Jurisdiction::Nb];
-        yield 'CA-NL' => [Jurisdiction::Nl];
-        yield 'CA-NT' => [Jurisdiction::Nt];
-        yield 'CA-NU' => [Jurisdiction::Nu];
-        yield 'CA-PE' => [Jurisdiction::Pe];
-        yield 'CA-YT' => [Jurisdiction::Yt];
+        yield 'CA-MB' => [Jurisdiction::MB];
+        yield 'CA-NB' => [Jurisdiction::NB];
+        yield 'CA-NL' => [Jurisdiction::NL];
+        yield 'CA-NT' => [Jurisdiction::NT];
+        yield 'CA-NU' => [Jurisdiction::NU];
+        yield 'CA-PE' => [Jurisdiction::PE];
+        yield 'CA-YT' => [Jurisdiction::YT];
     }
 
     #[DataProvider('notCovered')]
@@ -246,7 +246,7 @@ final class DriverLicenceNumberFactoryTest extends TestCase
     public function testFromNumberInRefusesANumberOfAnotherJurisdiction(): void
     {
         self::assertRefusedWithoutEcho(
-            static fn (string $value): mixed => DriverLicenceNumberFactory::fromNumberIn($value, Jurisdiction::Ab),
+            static fn (string $value): mixed => DriverLicenceNumberFactory::fromNumberIn($value, Jurisdiction::AB),
             '12345678',
             "Invalid CA-AB driver's licence number (wrong length).",
         );

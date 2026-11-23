@@ -27,6 +27,6 @@ enum DriverLicenceCategory: string
     case DE = 'DE';
     case D1E = 'D1E';
     case M = 'M';
-    case Tm = 'Tm';
-    case Tb = 'Tb';
+    case TM = 'Tm';
+    case TB = 'Tb';
 }

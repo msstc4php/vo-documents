@@ -29,7 +29,7 @@ final class JurisdictionTest extends TestCase
 
     public function testIsoCodeIsTheBackingValue(): void
     {
-        self::assertSame(Jurisdiction::Qc, Jurisdiction::from('CA-QC'));
-        self::assertSame('CA-YT', Jurisdiction::Yt->isoCode());
+        self::assertSame(Jurisdiction::QC, Jurisdiction::from('CA-QC'));
+        self::assertSame('CA-YT', Jurisdiction::YT->isoCode());
     }
 }

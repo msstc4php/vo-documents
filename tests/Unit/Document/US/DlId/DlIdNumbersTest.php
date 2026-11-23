@@ -176,36 +176,36 @@ final class DlIdNumbersTest extends TestCase
      */
     public static function jurisdictions(): iterable
     {
-        yield 'AL' => [AlDlIdNumber::class, Jurisdiction::Al, '1234567'];
-        yield 'AZ' => [AzDlIdNumber::class, Jurisdiction::Az, 'A12345678'];
-        yield 'CO' => [CoDlIdNumber::class, Jurisdiction::Co, '123456789'];
-        yield 'CT' => [CtDlIdNumber::class, Jurisdiction::Ct, '123456789'];
-        yield 'FL' => [FlDlIdNumber::class, Jurisdiction::Fl, 'Z123456789010'];
-        yield 'HI' => [HiDlIdNumber::class, Jurisdiction::Hi, 'H12345678'];
-        yield 'IA' => [IaDlIdNumber::class, Jurisdiction::Ia, '123456789'];
-        yield 'ID' => [IdDlIdNumber::class, Jurisdiction::Id, 'AB123456C'];
-        yield 'IL' => [IlDlIdNumber::class, Jurisdiction::Il, 'Y62093057270'];
-        yield 'IN' => [InDlIdNumber::class, Jurisdiction::In, '1234567890'];
-        yield 'KS' => [KsDlIdNumber::class, Jurisdiction::Ks, 'K12345678'];
-        yield 'KY' => [KyDlIdNumber::class, Jurisdiction::Ky, 'C21545427'];
-        yield 'MA' => [MaDlIdNumber::class, Jurisdiction::Ma, 'S12345678'];
-        yield 'MD' => [MdDlIdNumber::class, Jurisdiction::Md, 'A999999999999'];
-        yield 'ME' => [MeDlIdNumber::class, Jurisdiction::Me, '1234567'];
-        yield 'MI' => [MiDlIdNumber::class, Jurisdiction::Mi, 'A123456789012'];
-        yield 'MS' => [MsDlIdNumber::class, Jurisdiction::Ms, '123456789'];
-        yield 'ND' => [NdDlIdNumber::class, Jurisdiction::Nd, 'ABC123456'];
-        yield 'NE' => [NeDlIdNumber::class, Jurisdiction::Ne, 'A12345678'];
-        yield 'NJ' => [NjDlIdNumber::class, Jurisdiction::Nj, 'A12345678901234'];
-        yield 'NM' => [NmDlIdNumber::class, Jurisdiction::Nm, '123456789'];
-        yield 'NY' => [NyDlIdNumber::class, Jurisdiction::Ny, '123456789'];
-        yield 'OK' => [OkDlIdNumber::class, Jurisdiction::Ok, 'A123456789'];
-        yield 'PA' => [PaDlIdNumber::class, Jurisdiction::Pa, '12345678'];
-        yield 'RI' => [RiDlIdNumber::class, Jurisdiction::Ri, '1234567'];
-        yield 'TX' => [TxDlIdNumber::class, Jurisdiction::Tx, '12345678'];
-        yield 'VT' => [VtDlIdNumber::class, Jurisdiction::Vt, '10512345'];
-        yield 'WA' => [WaDlIdNumber::class, Jurisdiction::Wa, 'WDL123456789'];
-        yield 'WI' => [WiDlIdNumber::class, Jurisdiction::Wi, 'H3001987016204'];
-        yield 'WY' => [WyDlIdNumber::class, Jurisdiction::Wy, '123456789'];
+        yield 'AL' => [AlDlIdNumber::class, Jurisdiction::AL, '1234567'];
+        yield 'AZ' => [AzDlIdNumber::class, Jurisdiction::AZ, 'A12345678'];
+        yield 'CO' => [CoDlIdNumber::class, Jurisdiction::CO, '123456789'];
+        yield 'CT' => [CtDlIdNumber::class, Jurisdiction::CT, '123456789'];
+        yield 'FL' => [FlDlIdNumber::class, Jurisdiction::FL, 'Z123456789010'];
+        yield 'HI' => [HiDlIdNumber::class, Jurisdiction::HI, 'H12345678'];
+        yield 'IA' => [IaDlIdNumber::class, Jurisdiction::IA, '123456789'];
+        yield 'ID' => [IdDlIdNumber::class, Jurisdiction::ID, 'AB123456C'];
+        yield 'IL' => [IlDlIdNumber::class, Jurisdiction::IL, 'Y62093057270'];
+        yield 'IN' => [InDlIdNumber::class, Jurisdiction::IN, '1234567890'];
+        yield 'KS' => [KsDlIdNumber::class, Jurisdiction::KS, 'K12345678'];
+        yield 'KY' => [KyDlIdNumber::class, Jurisdiction::KY, 'C21545427'];
+        yield 'MA' => [MaDlIdNumber::class, Jurisdiction::MA, 'S12345678'];
+        yield 'MD' => [MdDlIdNumber::class, Jurisdiction::MD, 'A999999999999'];
+        yield 'ME' => [MeDlIdNumber::class, Jurisdiction::ME, '1234567'];
+        yield 'MI' => [MiDlIdNumber::class, Jurisdiction::MI, 'A123456789012'];
+        yield 'MS' => [MsDlIdNumber::class, Jurisdiction::MS, '123456789'];
+        yield 'ND' => [NdDlIdNumber::class, Jurisdiction::ND, 'ABC123456'];
+        yield 'NE' => [NeDlIdNumber::class, Jurisdiction::NE, 'A12345678'];
+        yield 'NJ' => [NjDlIdNumber::class, Jurisdiction::NJ, 'A12345678901234'];
+        yield 'NM' => [NmDlIdNumber::class, Jurisdiction::NM, '123456789'];
+        yield 'NY' => [NyDlIdNumber::class, Jurisdiction::NY, '123456789'];
+        yield 'OK' => [OkDlIdNumber::class, Jurisdiction::OK, 'A123456789'];
+        yield 'PA' => [PaDlIdNumber::class, Jurisdiction::PA, '12345678'];
+        yield 'RI' => [RiDlIdNumber::class, Jurisdiction::RI, '1234567'];
+        yield 'TX' => [TxDlIdNumber::class, Jurisdiction::TX, '12345678'];
+        yield 'VT' => [VtDlIdNumber::class, Jurisdiction::VT, '10512345'];
+        yield 'WA' => [WaDlIdNumber::class, Jurisdiction::WA, 'WDL123456789'];
+        yield 'WI' => [WiDlIdNumber::class, Jurisdiction::WI, 'H3001987016204'];
+        yield 'WY' => [WyDlIdNumber::class, Jurisdiction::WY, '123456789'];
     }
 
     /**

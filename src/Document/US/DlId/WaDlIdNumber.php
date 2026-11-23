@@ -24,7 +24,7 @@ final class WaDlIdNumber extends AbstractDlIdNumber
     #[Override]
     public function jurisdiction(): Jurisdiction
     {
-        return Jurisdiction::Wa;
+        return Jurisdiction::WA;
     }
 
     #[Override]

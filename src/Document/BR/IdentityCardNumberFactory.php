@@ -79,13 +79,13 @@ final class IdentityCardNumberFactory
     private static function classFor(Jurisdiction $jurisdiction): ?string
     {
         return match ($jurisdiction) {
-            Jurisdiction::Sp => SpIdentityCardNumber::class,
-            Jurisdiction::Ac, Jurisdiction::Al, Jurisdiction::Am, Jurisdiction::Ap, Jurisdiction::Ba,
-            Jurisdiction::Ce, Jurisdiction::Df, Jurisdiction::Es, Jurisdiction::Go, Jurisdiction::Ma,
-            Jurisdiction::Mg, Jurisdiction::Ms, Jurisdiction::Mt, Jurisdiction::Pa, Jurisdiction::Pb,
-            Jurisdiction::Pe, Jurisdiction::Pi, Jurisdiction::Pr, Jurisdiction::Rj, Jurisdiction::Rn,
-            Jurisdiction::Ro, Jurisdiction::Rr, Jurisdiction::Rs, Jurisdiction::Sc, Jurisdiction::Se,
-            Jurisdiction::To => null,
+            Jurisdiction::SP => SpIdentityCardNumber::class,
+            Jurisdiction::AC, Jurisdiction::AL, Jurisdiction::AM, Jurisdiction::AP, Jurisdiction::BA,
+            Jurisdiction::CE, Jurisdiction::DF, Jurisdiction::ES, Jurisdiction::GO, Jurisdiction::MA,
+            Jurisdiction::MG, Jurisdiction::MS, Jurisdiction::MT, Jurisdiction::PA, Jurisdiction::PB,
+            Jurisdiction::PE, Jurisdiction::PI, Jurisdiction::PR, Jurisdiction::RJ, Jurisdiction::RN,
+            Jurisdiction::RO, Jurisdiction::RR, Jurisdiction::RS, Jurisdiction::SC, Jurisdiction::SE,
+            Jurisdiction::TO => null,
         };
     }
 }

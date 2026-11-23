@@ -22,7 +22,7 @@ final class OnDriverLicenceNumber extends AbstractDriverLicenceNumber
     #[Override]
     public function jurisdiction(): Jurisdiction
     {
-        return Jurisdiction::On;
+        return Jurisdiction::ON;
     }
 
     #[Override]

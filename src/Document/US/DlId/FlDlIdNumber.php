@@ -32,7 +32,7 @@ final class FlDlIdNumber extends AbstractDlIdNumber
     #[Override]
     public function jurisdiction(): Jurisdiction
     {
-        return Jurisdiction::Fl;
+        return Jurisdiction::FL;
     }
 
     #[Override]

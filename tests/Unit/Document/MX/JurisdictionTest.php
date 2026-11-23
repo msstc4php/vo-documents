@@ -31,7 +31,7 @@ final class JurisdictionTest extends TestCase
 
     public function testIsoCodeIsTheBackingValue(): void
     {
-        self::assertSame(Jurisdiction::Cmx, Jurisdiction::from('MX-CMX'));
-        self::assertSame('MX-MEX', Jurisdiction::Mex->isoCode());
+        self::assertSame(Jurisdiction::CMX, Jurisdiction::from('MX-CMX'));
+        self::assertSame('MX-MEX', Jurisdiction::MEX->isoCode());
     }
 }

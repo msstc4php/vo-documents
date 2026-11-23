@@ -116,19 +116,19 @@ final class HealthCardNumberFactory
     private static function classFor(Jurisdiction $jurisdiction): string
     {
         return match ($jurisdiction) {
-            Jurisdiction::Ab => AbHealthCardNumber::class,
-            Jurisdiction::Bc => BcHealthCardNumber::class,
-            Jurisdiction::Mb => MbHealthCardNumber::class,
-            Jurisdiction::Nb => NbHealthCardNumber::class,
-            Jurisdiction::Nl => NlHealthCardNumber::class,
-            Jurisdiction::Ns => NsHealthCardNumber::class,
-            Jurisdiction::Nt => NtHealthCardNumber::class,
-            Jurisdiction::Nu => NuHealthCardNumber::class,
-            Jurisdiction::On => OnHealthCardNumber::class,
-            Jurisdiction::Pe => PeHealthCardNumber::class,
-            Jurisdiction::Qc => QcHealthCardNumber::class,
-            Jurisdiction::Sk => SkHealthCardNumber::class,
-            Jurisdiction::Yt => YtHealthCardNumber::class,
+            Jurisdiction::AB => AbHealthCardNumber::class,
+            Jurisdiction::BC => BcHealthCardNumber::class,
+            Jurisdiction::MB => MbHealthCardNumber::class,
+            Jurisdiction::NB => NbHealthCardNumber::class,
+            Jurisdiction::NL => NlHealthCardNumber::class,
+            Jurisdiction::NS => NsHealthCardNumber::class,
+            Jurisdiction::NT => NtHealthCardNumber::class,
+            Jurisdiction::NU => NuHealthCardNumber::class,
+            Jurisdiction::ON => OnHealthCardNumber::class,
+            Jurisdiction::PE => PeHealthCardNumber::class,
+            Jurisdiction::QC => QcHealthCardNumber::class,
+            Jurisdiction::SK => SkHealthCardNumber::class,
+            Jurisdiction::YT => YtHealthCardNumber::class,
         };
     }
 }

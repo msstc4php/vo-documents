@@ -127,19 +127,19 @@ final class HealthCardNumbersTest extends TestCase
      */
     public static function jurisdictions(): iterable
     {
-        yield 'AB' => [AbHealthCardNumber::class, Jurisdiction::Ab, '123456789'];
-        yield 'BC' => [BcHealthCardNumber::class, Jurisdiction::Bc, '9012372173'];
-        yield 'MB' => [MbHealthCardNumber::class, Jurisdiction::Mb, '123456789'];
-        yield 'NB' => [NbHealthCardNumber::class, Jurisdiction::Nb, '123456789'];
-        yield 'NL' => [NlHealthCardNumber::class, Jurisdiction::Nl, '123456789012'];
-        yield 'NS' => [NsHealthCardNumber::class, Jurisdiction::Ns, '1234567890'];
-        yield 'NT' => [NtHealthCardNumber::class, Jurisdiction::Nt, 'N1234567'];
-        yield 'NU' => [NuHealthCardNumber::class, Jurisdiction::Nu, '123456789'];
-        yield 'ON' => [OnHealthCardNumber::class, Jurisdiction::On, '9876543217'];
-        yield 'PE' => [PeHealthCardNumber::class, Jurisdiction::Pe, '12345678'];
-        yield 'QC' => [QcHealthCardNumber::class, Jurisdiction::Qc, 'YUXJ75021213'];
-        yield 'SK' => [SkHealthCardNumber::class, Jurisdiction::Sk, '123456789'];
-        yield 'YT' => [YtHealthCardNumber::class, Jurisdiction::Yt, '123456789'];
+        yield 'AB' => [AbHealthCardNumber::class, Jurisdiction::AB, '123456789'];
+        yield 'BC' => [BcHealthCardNumber::class, Jurisdiction::BC, '9012372173'];
+        yield 'MB' => [MbHealthCardNumber::class, Jurisdiction::MB, '123456789'];
+        yield 'NB' => [NbHealthCardNumber::class, Jurisdiction::NB, '123456789'];
+        yield 'NL' => [NlHealthCardNumber::class, Jurisdiction::NL, '123456789012'];
+        yield 'NS' => [NsHealthCardNumber::class, Jurisdiction::NS, '1234567890'];
+        yield 'NT' => [NtHealthCardNumber::class, Jurisdiction::NT, 'N1234567'];
+        yield 'NU' => [NuHealthCardNumber::class, Jurisdiction::NU, '123456789'];
+        yield 'ON' => [OnHealthCardNumber::class, Jurisdiction::ON, '9876543217'];
+        yield 'PE' => [PeHealthCardNumber::class, Jurisdiction::PE, '12345678'];
+        yield 'QC' => [QcHealthCardNumber::class, Jurisdiction::QC, 'YUXJ75021213'];
+        yield 'SK' => [SkHealthCardNumber::class, Jurisdiction::SK, '123456789'];
+        yield 'YT' => [YtHealthCardNumber::class, Jurisdiction::YT, '123456789'];
     }
 
     /**

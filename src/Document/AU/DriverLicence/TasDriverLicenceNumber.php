@@ -20,7 +20,7 @@ final class TasDriverLicenceNumber extends AbstractDriverLicenceNumber
     #[Override]
     public function jurisdiction(): Jurisdiction
     {
-        return Jurisdiction::Tas;
+        return Jurisdiction::TAS;
     }
 
     #[Override]

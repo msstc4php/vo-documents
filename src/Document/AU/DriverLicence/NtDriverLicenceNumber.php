@@ -20,7 +20,7 @@ final class NtDriverLicenceNumber extends AbstractDriverLicenceNumber
     #[Override]
     public function jurisdiction(): Jurisdiction
     {
-        return Jurisdiction::Nt;
+        return Jurisdiction::NT;
     }
 
     #[Override]

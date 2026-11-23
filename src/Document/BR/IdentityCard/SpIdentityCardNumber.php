@@ -87,7 +87,7 @@ final class SpIdentityCardNumber extends AbstractIdentityCardNumber
     #[Override]
     public function jurisdiction(): Jurisdiction
     {
-        return Jurisdiction::Sp;
+        return Jurisdiction::SP;
     }
 
     #[Override]

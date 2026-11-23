@@ -71,7 +71,7 @@ final class QcHealthCardNumber extends AbstractHealthCardNumber implements HasSe
     #[Override]
     public function jurisdiction(): Jurisdiction
     {
-        return Jurisdiction::Qc;
+        return Jurisdiction::QC;
     }
 
     #[Override]

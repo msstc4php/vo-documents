@@ -48,6 +48,10 @@
   properties assigned in `parse()` fail PHPStan `property.readOnlyAssignNotInConstructor`.
 - Document tests use `Tests\Fixture\RefusesWithoutEchoingInput::assertRefusedWithoutEcho()`: exact message and no three
   consecutive input digits in it (as typed and with separators removed).
+- **Enum case names (1.0):** where the backed value is a code, the case name is that code in upper case (`NSW`, `SP`,
+  `TM` for `Tm`, `JR`); a code that is no PHP name is spelled in upper-case words (`NameSuffix::THIRD` for `3RD`).
+  Enums whose cases name a meaning (`Sex::Female`, `IN\PanHolderType::Individual`) keep PascalCase. Backed values
+  never change.
 - Every enum implementing `Contract\Subdivision` is string-backed with `value === isoCode()`;
   `tests/Unit/Contract/SubdivisionTest.php` scans `src/` and checks new enums automatically.
 - Source lines stay within 120 characters. php-cs-fixer re-joins a call with a single wrapped argument and an arrow

@@ -14,33 +14,33 @@ use Override;
  */
 enum Jurisdiction: string implements Subdivision
 {
-    case Ac = 'BR-AC';
-    case Al = 'BR-AL';
-    case Am = 'BR-AM';
-    case Ap = 'BR-AP';
-    case Ba = 'BR-BA';
-    case Ce = 'BR-CE';
-    case Df = 'BR-DF';
-    case Es = 'BR-ES';
-    case Go = 'BR-GO';
-    case Ma = 'BR-MA';
-    case Mg = 'BR-MG';
-    case Ms = 'BR-MS';
-    case Mt = 'BR-MT';
-    case Pa = 'BR-PA';
-    case Pb = 'BR-PB';
-    case Pe = 'BR-PE';
-    case Pi = 'BR-PI';
-    case Pr = 'BR-PR';
-    case Rj = 'BR-RJ';
-    case Rn = 'BR-RN';
-    case Ro = 'BR-RO';
-    case Rr = 'BR-RR';
-    case Rs = 'BR-RS';
-    case Sc = 'BR-SC';
-    case Se = 'BR-SE';
-    case Sp = 'BR-SP';
-    case To = 'BR-TO';
+    case AC = 'BR-AC';
+    case AL = 'BR-AL';
+    case AM = 'BR-AM';
+    case AP = 'BR-AP';
+    case BA = 'BR-BA';
+    case CE = 'BR-CE';
+    case DF = 'BR-DF';
+    case ES = 'BR-ES';
+    case GO = 'BR-GO';
+    case MA = 'BR-MA';
+    case MG = 'BR-MG';
+    case MS = 'BR-MS';
+    case MT = 'BR-MT';
+    case PA = 'BR-PA';
+    case PB = 'BR-PB';
+    case PE = 'BR-PE';
+    case PI = 'BR-PI';
+    case PR = 'BR-PR';
+    case RJ = 'BR-RJ';
+    case RN = 'BR-RN';
+    case RO = 'BR-RO';
+    case RR = 'BR-RR';
+    case RS = 'BR-RS';
+    case SC = 'BR-SC';
+    case SE = 'BR-SE';
+    case SP = 'BR-SP';
+    case TO = 'BR-TO';
 
     #[Override]
     public function isoCode(): string

@@ -31,7 +31,7 @@ final class BcHealthCardNumber extends AbstractHealthCardNumber
     #[Override]
     public function jurisdiction(): Jurisdiction
     {
-        return Jurisdiction::Bc;
+        return Jurisdiction::BC;
     }
 
     #[Override]

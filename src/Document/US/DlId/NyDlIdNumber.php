@@ -21,7 +21,7 @@ final class NyDlIdNumber extends AbstractDlIdNumber
     #[Override]
     public function jurisdiction(): Jurisdiction
     {
-        return Jurisdiction::Ny;
+        return Jurisdiction::NY;
     }
 
     #[Override]

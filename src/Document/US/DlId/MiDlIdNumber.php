@@ -22,7 +22,7 @@ final class MiDlIdNumber extends AbstractDlIdNumber
     #[Override]
     public function jurisdiction(): Jurisdiction
     {
-        return Jurisdiction::Mi;
+        return Jurisdiction::MI;
     }
 
     #[Override]

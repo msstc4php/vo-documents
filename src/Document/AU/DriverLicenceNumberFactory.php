@@ -86,14 +86,14 @@ final class DriverLicenceNumberFactory
     private static function classFor(Jurisdiction $jurisdiction): string
     {
         return match ($jurisdiction) {
-            Jurisdiction::Act => ActDriverLicenceNumber::class,
-            Jurisdiction::Nsw => NswDriverLicenceNumber::class,
-            Jurisdiction::Nt => NtDriverLicenceNumber::class,
-            Jurisdiction::Qld => QldDriverLicenceNumber::class,
-            Jurisdiction::Sa => SaDriverLicenceNumber::class,
-            Jurisdiction::Tas => TasDriverLicenceNumber::class,
-            Jurisdiction::Vic => VicDriverLicenceNumber::class,
-            Jurisdiction::Wa => WaDriverLicenceNumber::class,
+            Jurisdiction::ACT => ActDriverLicenceNumber::class,
+            Jurisdiction::NSW => NswDriverLicenceNumber::class,
+            Jurisdiction::NT => NtDriverLicenceNumber::class,
+            Jurisdiction::QLD => QldDriverLicenceNumber::class,
+            Jurisdiction::SA => SaDriverLicenceNumber::class,
+            Jurisdiction::TAS => TasDriverLicenceNumber::class,
+            Jurisdiction::VIC => VicDriverLicenceNumber::class,
+            Jurisdiction::WA => WaDriverLicenceNumber::class,
         };
     }
 }

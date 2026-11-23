@@ -42,12 +42,12 @@ final class DriverLicenceNumberFactoryTest extends TestCase
     public static function matchingJurisdictions(): iterable
     {
         yield 'example (empty)' => ['', []];
-        yield 'example 123456789012' => ['123456789012', [Jurisdiction::Mex]];
-        yield 'example 1234 5678 9012' => ['1234 5678 9012', [Jurisdiction::Mex]];
+        yield 'example 123456789012' => ['123456789012', [Jurisdiction::MEX]];
+        yield 'example 1234 5678 9012' => ['1234 5678 9012', [Jurisdiction::MEX]];
         yield 'example 12345678901' => ['12345678901', []];
         yield 'example 1234567890123' => ['1234567890123', []];
         yield 'example 12345678901A' => ['12345678901A', []];
-        yield 'overlap: 12 digits' => ['000000000001', [Jurisdiction::Mex]];
+        yield 'overlap: 12 digits' => ['000000000001', [Jurisdiction::MEX]];
     }
 
     /**
@@ -103,7 +103,7 @@ final class DriverLicenceNumberFactoryTest extends TestCase
      */
     public static function concreteClasses(): iterable
     {
-        yield 'MX-MEX' => [Jurisdiction::Mex, MexDriverLicenceNumber::class, '1234-5678-9012', '123456789012'];
+        yield 'MX-MEX' => [Jurisdiction::MEX, MexDriverLicenceNumber::class, '1234-5678-9012', '123456789012'];
     }
 
     /**
@@ -131,37 +131,37 @@ final class DriverLicenceNumberFactoryTest extends TestCase
      */
     public static function notCovered(): iterable
     {
-        yield 'MX-AGU' => [Jurisdiction::Agu];
-        yield 'MX-BCN' => [Jurisdiction::Bcn];
-        yield 'MX-BCS' => [Jurisdiction::Bcs];
-        yield 'MX-CAM' => [Jurisdiction::Cam];
-        yield 'MX-CHH' => [Jurisdiction::Chh];
-        yield 'MX-CHP' => [Jurisdiction::Chp];
-        yield 'MX-CMX' => [Jurisdiction::Cmx];
-        yield 'MX-COA' => [Jurisdiction::Coa];
-        yield 'MX-COL' => [Jurisdiction::Col];
-        yield 'MX-DUR' => [Jurisdiction::Dur];
-        yield 'MX-GRO' => [Jurisdiction::Gro];
-        yield 'MX-GUA' => [Jurisdiction::Gua];
-        yield 'MX-HID' => [Jurisdiction::Hid];
-        yield 'MX-JAL' => [Jurisdiction::Jal];
-        yield 'MX-MIC' => [Jurisdiction::Mic];
-        yield 'MX-MOR' => [Jurisdiction::Mor];
-        yield 'MX-NAY' => [Jurisdiction::Nay];
-        yield 'MX-NLE' => [Jurisdiction::Nle];
-        yield 'MX-OAX' => [Jurisdiction::Oax];
-        yield 'MX-PUE' => [Jurisdiction::Pue];
-        yield 'MX-QUE' => [Jurisdiction::Que];
-        yield 'MX-ROO' => [Jurisdiction::Roo];
-        yield 'MX-SIN' => [Jurisdiction::Sin];
-        yield 'MX-SLP' => [Jurisdiction::Slp];
-        yield 'MX-SON' => [Jurisdiction::Son];
-        yield 'MX-TAB' => [Jurisdiction::Tab];
-        yield 'MX-TAM' => [Jurisdiction::Tam];
-        yield 'MX-TLA' => [Jurisdiction::Tla];
-        yield 'MX-VER' => [Jurisdiction::Ver];
-        yield 'MX-YUC' => [Jurisdiction::Yuc];
-        yield 'MX-ZAC' => [Jurisdiction::Zac];
+        yield 'MX-AGU' => [Jurisdiction::AGU];
+        yield 'MX-BCN' => [Jurisdiction::BCN];
+        yield 'MX-BCS' => [Jurisdiction::BCS];
+        yield 'MX-CAM' => [Jurisdiction::CAM];
+        yield 'MX-CHH' => [Jurisdiction::CHH];
+        yield 'MX-CHP' => [Jurisdiction::CHP];
+        yield 'MX-CMX' => [Jurisdiction::CMX];
+        yield 'MX-COA' => [Jurisdiction::COA];
+        yield 'MX-COL' => [Jurisdiction::COL];
+        yield 'MX-DUR' => [Jurisdiction::DUR];
+        yield 'MX-GRO' => [Jurisdiction::GRO];
+        yield 'MX-GUA' => [Jurisdiction::GUA];
+        yield 'MX-HID' => [Jurisdiction::HID];
+        yield 'MX-JAL' => [Jurisdiction::JAL];
+        yield 'MX-MIC' => [Jurisdiction::MIC];
+        yield 'MX-MOR' => [Jurisdiction::MOR];
+        yield 'MX-NAY' => [Jurisdiction::NAY];
+        yield 'MX-NLE' => [Jurisdiction::NLE];
+        yield 'MX-OAX' => [Jurisdiction::OAX];
+        yield 'MX-PUE' => [Jurisdiction::PUE];
+        yield 'MX-QUE' => [Jurisdiction::QUE];
+        yield 'MX-ROO' => [Jurisdiction::ROO];
+        yield 'MX-SIN' => [Jurisdiction::SIN];
+        yield 'MX-SLP' => [Jurisdiction::SLP];
+        yield 'MX-SON' => [Jurisdiction::SON];
+        yield 'MX-TAB' => [Jurisdiction::TAB];
+        yield 'MX-TAM' => [Jurisdiction::TAM];
+        yield 'MX-TLA' => [Jurisdiction::TLA];
+        yield 'MX-VER' => [Jurisdiction::VER];
+        yield 'MX-YUC' => [Jurisdiction::YUC];
+        yield 'MX-ZAC' => [Jurisdiction::ZAC];
     }
 
     #[DataProvider('notCovered')]
@@ -198,7 +198,7 @@ final class DriverLicenceNumberFactoryTest extends TestCase
     public function testFromNumberInRefusesANumberOfTheWrongShape(): void
     {
         self::assertRefusedWithoutEcho(
-            static fn (string $value): mixed => DriverLicenceNumberFactory::fromNumberIn($value, Jurisdiction::Mex),
+            static fn (string $value): mixed => DriverLicenceNumberFactory::fromNumberIn($value, Jurisdiction::MEX),
             '12345678',
             "Invalid MX-MEX driver's licence number (wrong length).",
         );
