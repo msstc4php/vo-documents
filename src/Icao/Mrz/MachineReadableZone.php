@@ -7,6 +7,7 @@ namespace MSSTC4PHP\ValueObject\Documents\Icao\Mrz;
 use DateTimeImmutable;
 use DateTimeZone;
 use LogicException;
+use MSSTC4PHP\ValueObject\Contract\ResolvesConcreteClass;
 use MSSTC4PHP\ValueObject\Documents\Contract\HasSex;
 use MSSTC4PHP\ValueObject\Documents\Contract\Maskable;
 use MSSTC4PHP\ValueObject\Documents\Exception\InvalidMrzException;
@@ -44,7 +45,7 @@ use Override;
  * @see https://www.icao.int/sites/default/files/publications/DocSeries/9303_p6_cons_en.pdf Part 6 (TD2)
  * @see docs/sources/ICAO.md "Machine readable zone"
  */
-abstract class MachineReadableZone extends AbstractStringValueObject implements HasSex, Maskable
+abstract class MachineReadableZone extends AbstractStringValueObject implements HasSex, Maskable, ResolvesConcreteClass
 {
     private const int EXPIRY_YEARS_BACK = 84;
 

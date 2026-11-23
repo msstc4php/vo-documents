@@ -50,6 +50,7 @@ use MSSTC4PHP\ValueObject\Documents\Name\TR\PersonNameCodec as TrPersonNameCodec
 use MSSTC4PHP\ValueObject\Documents\Name\US\PersonName as UsPersonName;
 use MSSTC4PHP\ValueObject\Documents\Name\US\PersonNameCodec as UsPersonNameCodec;
 use MSSTC4PHP\ValueObject\Payload\PayloadCodec;
+use MSSTC4PHP\ValueObject\Payload\ProvidesCodecs;
 use MSSTC4PHP\ValueObject\Payload\ValueObjectMapper;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\UsesClass;
@@ -107,6 +108,11 @@ final class CodecsTest extends TestCase
             ],
             \array_map(static fn (PayloadCodec $codec): string => $codec->valueObjectClass(), Codecs::all()),
         );
+    }
+
+    public function testIsTheCodecProviderOfThePackage(): void
+    {
+        self::assertContains(ProvidesCodecs::class, \class_implements(Codecs::class));
     }
 
     public function testMakesTheMapperTreatCompositesAsComposites(): void

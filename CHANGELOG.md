@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.4.0] - unreleased
+
+### Added
+
+- `Icao\Mrz\MachineReadableZone` implements vo-base's `Contract\ResolvesConcreteClass`: every vo-base bridge accepts
+  the abstract type for a column, a property or a parameter and returns the fitting `Td1`, `Td2` or `Td3`.
+- `Codecs` implements vo-base's `Payload\ProvidesCodecs`, so the Symfony bundle registers every composite-name codec
+  from one line (`codec_providers`). README "Bridges" shows the one-place setup for each bridge.
+
+### Changed
+
+- Requires `msstc4php/vo-base ^1.4` (was `^1.3`).
+
 ## [0.3.0] - 2026-11-23
 
 ### Changed

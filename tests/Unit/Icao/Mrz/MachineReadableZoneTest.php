@@ -24,6 +24,7 @@ use MSSTC4PHP\ValueObject\Documents\Internal\UnicodeText;
 use MSSTC4PHP\ValueObject\Documents\Sex;
 use MSSTC4PHP\ValueObject\Exception\InvalidValueObjectException;
 use MSSTC4PHP\ValueObject\I18n\CountryCode;
+use MSSTC4PHP\ValueObject\Payload\ValueObjectMapper;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\UsesClass;
@@ -806,6 +807,33 @@ final class MachineReadableZoneTest extends TestCase
         $this->expectExceptionMessage('A serialized ' . Td3::class . ' must hold its value as a string.');
 
         \unserialize($this->payload(Td3::class, $data));
+    }
+
+    public function testTheMapperTakesTheAbstractTypeAndReturnsTheFittingFormat(): void
+    {
+        $mapper = new ValueObjectMapper();
+
+        self::assertTrue($mapper->supportsUntrusted(MachineReadableZone::class));
+        self::assertSame('string', $mapper->payloadType(MachineReadableZone::class));
+        $payload = $mapper->toPayload(MachineReadableZone::fromString(self::TD3));
+
+        self::assertInstanceOf(Td3::class, $mapper->fromPayload(MachineReadableZone::class, $payload));
+        self::assertInstanceOf(Td2::class, $mapper->fromUntrustedPayload(MachineReadableZone::class, self::TD2));
+        self::assertInstanceOf(Td1::class, $mapper->fromUntrustedPayload(MachineReadableZone::class, self::TD1));
+    }
+
+    public function testTheMapperRefusesWhatNoFormatFits(): void
+    {
+        $this->expectException(InvalidMrzException::class);
+
+        new ValueObjectMapper()->fromUntrustedPayload(MachineReadableZone::class, 'not an MRZ');
+    }
+
+    public function testTheMapperKeepsAConcreteFormatToItself(): void
+    {
+        $this->expectException(InvalidMrzException::class);
+
+        new ValueObjectMapper()->fromUntrustedPayload(Td3::class, self::TD2);
     }
 
     public function testABuiltMrzRefusesUnserializeAndKeepsItsValue(): void

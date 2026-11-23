@@ -27,15 +27,18 @@ use MSSTC4PHP\ValueObject\Documents\Name\SA\PersonNameCodec as SaPersonNameCodec
 use MSSTC4PHP\ValueObject\Documents\Name\TR\PersonNameCodec as TrPersonNameCodec;
 use MSSTC4PHP\ValueObject\Documents\Name\US\PersonNameCodec as UsPersonNameCodec;
 use MSSTC4PHP\ValueObject\Payload\PayloadCodec;
+use MSSTC4PHP\ValueObject\Payload\ProvidesCodecs;
+use Override;
 
 /**
  * Every payload codec of the package, for `new ValueObjectMapper(Codecs::all())`.
  */
-final class Codecs
+final class Codecs implements ProvidesCodecs
 {
     /**
      * @return list<PayloadCodec<ValueObject>>
      */
+    #[Override]
     public static function all(): array
     {
         return [

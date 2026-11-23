@@ -25,10 +25,10 @@ Not on Packagist yet; register the GitHub repositories:
 }
 ```
 
-Runtime requirements: `msstc4php/vo-base ^1.3`, `ext-mbstring`, `lib-pcre >=10.40` (the `\p{sc=Latin}` script
+Runtime requirements: `msstc4php/vo-base ^1.4`, `ext-mbstring`, `lib-pcre >=10.40` (the `\p{sc=Latin}` script
 syntax of the name classes), `symfony/polyfill-intl-normalizer`. No framework.
-vo-base 1.3 is the first release that validates string value objects again on `unserialize()`. Composite names
-serialize as their codec payload and are rebuilt through the codec.
+vo-base 1.4 maps the abstract `MachineReadableZone`. Since vo-base 1.3, string value objects are validated again on
+`unserialize()`. Composite names serialize as their codec payload and are rebuilt through the codec.
 
 ## Document numbers
 
@@ -477,102 +477,62 @@ The storage payload of a composite name stores only the override (`latin: null` 
 ## Bridges
 
 The value objects are plain `vo-base` value objects, so every
-[`vo-base-*`](https://github.com/msstc4php/vo-base#framework-integration) bridge handles them without extra code:
+[`vo-base-*`](https://github.com/msstc4php/vo-base#framework-integration) bridge handles them:
 
 | Need | Where |
 |---|---|
-| Validation, request input, route parameters | Works as is in every vo-base bridge (Symfony bundle, Laravel, Yii 2, CodeIgniter 4, Spiral) |
-| Storage of string numbers and name parts | As is in Laravel (`AsValueObject`), Yii 2 (behavior), CodeIgniter 4 (casts) and Cycle (typecast) |
-| Storage and validation of composite names | Only with a mapper built from `Codecs::all()`, handed to the cast, rule or behavior (next section) |
+| Validation, request input, route parameters | As is in every vo-base bridge (Symfony bundle, Laravel, Yii 2, CodeIgniter 4, Spiral) |
+| Storage of document numbers and name parts | As is in Laravel (`AsValueObject`), Yii 2 (behavior), CodeIgniter 4 (casts) and Cycle (typecast) |
+| Any MRZ format in one column or parameter | Type it `Icao\Mrz\MachineReadableZone`: the fitting `Td1`, `Td2` or `Td3` comes back (vo-base 1.4) |
+| Composite names | Register `Codecs` once per application (next section) |
 | Doctrine ORM / MongoDB ODM | [`msstc4php/vo-documents-doctrine`](https://github.com/msstc4php/vo-documents-doctrine): one type per class, named `vod_<cc>_<snake_name>` |
 
-Typed properties, route parameters and casts must name the concrete class (`NswDriverLicenceNumber`, not the
-`Document\AU\DriverLicenceNumber` interface): the mapper cannot build an interface, so since vo-base 1.1.1 it reports
-it as unsupported (a configuration error, not a 500 on request input). The interface is the type of
+Typed properties, route parameters and casts name a concrete class or `MachineReadableZone`, never an interface such
+as `Document\AU\DriverLicenceNumber`: the mapper cannot build an interface (which state's number would it be?), so it
+reports it as unsupported, a configuration error rather than a 500 on request input. The interface is the type of
 `DriverLicenceNumberFactory` results.
 
 ### Composite names need the codecs
 
 Document numbers and name parts are strings and need nothing. The composite names (`Name\<CC>\PersonName` of every
-country: RU, AU, DE, FR, IT, ES, NL, CH, GB, TR, US, CA, MX, BR, CN, JP, KR, IN, ID, SA, and the Devanagari one of IN:
-21 codecs) are read through a payload codec, so the mapper that the bridge uses must be built with `Codecs::all()`:
+country: RU, AU, DE, FR, IT, ES, NL, CH, GB, TR, US, CA, MX, BR, CN, JP, KR, IN, ID, SA, and the Devanagari one of IN)
+are read through a payload codec. `Codecs` implements vo-base's `Payload\ProvidesCodecs`; give the bridge's mapper its
+codecs once:
 
 ```php
 use MSSTC4PHP\ValueObject\Documents\Codecs;
 use MSSTC4PHP\ValueObject\Payload\ValueObjectMapper;
 
-$mapper = new ValueObjectMapper(Codecs::all());
-```
-
-Binding per bridge. The shared container binding is read by request input and route parameters, by the Yii 2
-validator, and in Spiral by the caster, the interceptor and the checker; some storage and validation classes build
-their own mapper, so give them yours.
-
-```php
-// Laravel: the container binding covers request input and route parameters.
+// Laravel (vo-base-laravel 0.3+): casts, rules, request input and route parameters all read the binding.
 $this->app->singleton(ValueObjectMapper::class, static fn () => new ValueObjectMapper(Codecs::all()));
 
-// Eloquent casts and the validation rule do NOT read it; hand them the mapper.
-final readonly class AsRuPersonName implements Castable
-{
-    public static function castUsing(array $arguments): AsValueObject
-    {
-        return new AsValueObject(PersonName::class, new ValueObjectMapper(Codecs::all()));
-    }
-}
-// casts(): 'name' => AsRuPersonName::class
-// rule:    new ValidValueObject(PersonName::class, mapper: new ValueObjectMapper(Codecs::all()))
+// Yii 2 (vo-base-yii2 0.3+): the validator, the behavior, model values and action parameters.
+Yii::$container->setSingleton(ValueObjectMapper::class, static fn () => new ValueObjectMapper(Codecs::all()));
 
-// Spiral (inside a Bootloader class listed after ValueObjectBootloader; the Cycle typecast reads the same container)
+// CodeIgniter 4 (vo-base-codeigniter4 0.3+), in app/Config/Services.php:
+public static function valueObjectMapper(bool $getShared = true): ValueObjectMapper
+{
+    return $getShared ? static::getSharedInstance('valueObjectMapper') : new ValueObjectMapper(Codecs::all());
+}
+
+// Spiral (a Bootloader listed after ValueObjectBootloader; the Cycle typecast reads the same container)
 public function defineSingletons(): array
 {
     return [ValueObjectMapper::class => static fn () => new ValueObjectMapper(Codecs::all())];
 }
 
-// Yii 2: the container binding covers the validator, ActiveRecord model values and action parameters
-Yii::$container->setSingleton(ValueObjectMapper::class, static fn () => new ValueObjectMapper(Codecs::all()));
-// ValueObjectAttributeBehavior ignores the container; pass the mapper to it:
-'mapper' => new ValueObjectMapper(Codecs::all()),
-```
-
-Imports: `MSSTC4PHP\ValueObject\Documents\Codecs`, `MSSTC4PHP\ValueObject\Payload\ValueObjectMapper`,
-`MSSTC4PHP\ValueObject\Laravel\Casts\AsValueObject`, `MSSTC4PHP\ValueObject\Laravel\Rules\ValidValueObject`.
-
-```yaml
-# Symfony (vo-base-bundle): every PayloadCodec service is autoconfigured and added to the mapper; register the codec
-# of every country, the same list as Codecs::all()
-services:
-    _defaults: { autoconfigure: true }
-    MSSTC4PHP\ValueObject\Documents\Name\RU\PersonNameCodec: ~
-    MSSTC4PHP\ValueObject\Documents\Name\AU\PersonNameCodec: ~
-    MSSTC4PHP\ValueObject\Documents\Name\DE\PersonNameCodec: ~
-    MSSTC4PHP\ValueObject\Documents\Name\FR\PersonNameCodec: ~
-    MSSTC4PHP\ValueObject\Documents\Name\IT\PersonNameCodec: ~
-    MSSTC4PHP\ValueObject\Documents\Name\ES\PersonNameCodec: ~
-    MSSTC4PHP\ValueObject\Documents\Name\NL\PersonNameCodec: ~
-    MSSTC4PHP\ValueObject\Documents\Name\CH\PersonNameCodec: ~
-    MSSTC4PHP\ValueObject\Documents\Name\GB\PersonNameCodec: ~
-    MSSTC4PHP\ValueObject\Documents\Name\TR\PersonNameCodec: ~
-    MSSTC4PHP\ValueObject\Documents\Name\US\PersonNameCodec: ~
-    MSSTC4PHP\ValueObject\Documents\Name\CA\PersonNameCodec: ~
-    MSSTC4PHP\ValueObject\Documents\Name\MX\PersonNameCodec: ~
-    MSSTC4PHP\ValueObject\Documents\Name\BR\PersonNameCodec: ~
-    MSSTC4PHP\ValueObject\Documents\Name\CN\PersonNameCodec: ~
-    MSSTC4PHP\ValueObject\Documents\Name\JP\PersonNameCodec: ~
-    MSSTC4PHP\ValueObject\Documents\Name\KR\PersonNameCodec: ~
-    MSSTC4PHP\ValueObject\Documents\Name\IN\PersonNameCodec: ~
-    MSSTC4PHP\ValueObject\Documents\Name\IN\Devanagari\PersonNameCodec: ~
-    MSSTC4PHP\ValueObject\Documents\Name\ID\PersonNameCodec: ~
-    MSSTC4PHP\ValueObject\Documents\Name\SA\PersonNameCodec: ~
-```
-
-```php
 // Cycle without a container: one typecast per role, with your mapper
 S::TYPECAST_HANDLER => [new ValueObjectTypecast('account', new ValueObjectMapper(Codecs::all())), Typecast::class],
 ```
 
-CodeIgniter 4 calls cast handlers statically with the core's built-in codecs only, so **composite names are not
-supported there** unless the application builds its own mapper; the string classes work.
+```yaml
+# Symfony (vo-base-bundle 2.1+)
+msstc4php_vo_base:
+    codec_providers: ['MSSTC4PHP\ValueObject\Documents\Codecs']
+```
+
+Older bridge releases read the container in fewer places (Laravel casts and rules, the Yii 2 behavior) and
+CodeIgniter 4 before 0.3 had no way to add codecs; pass the mapper to those explicitly or upgrade the bridge.
 
 ## Not covered
 
