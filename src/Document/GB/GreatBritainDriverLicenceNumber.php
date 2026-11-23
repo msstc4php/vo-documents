@@ -19,8 +19,9 @@ use Override;
  * Driver number of a DVLA licence (England, Scotland and Wales), 16 characters, `MORGA 657054 SM 9IJ`: the first five
  * letters of the surname padded with `9` (`MAN99`); the birth date as year decade, month (plus 50 for a woman), day
  * and year unit; the first two initials (`9` for a missing second one); three randomly generated check characters,
- * which are not verified. The date must exist; the year has no century, so there is no `HasBirthDate` and 29 February
- * is accepted when the two-digit year is divisible by four. The licence issue number printed after it is not part of
+ * which are not verified. Only the month 01-12 (51-62 for a woman) and the day 01-31 are checked, not the calendar:
+ * the leaflet does not say a number with a day its month lacks is never issued. The year has no century, so there is no
+ * `HasBirthDate`. The licence issue number printed after it is not part of
  * the number. `masked()` keeps the last four characters of `formatted()` (no official masking rule):
  * `***** ****** *M 9IJ`.
  *
@@ -92,8 +93,7 @@ final class GreatBritainDriverLicenceNumber extends AbstractStringValueObject im
 
         $monthField = (int) \substr($number, 6, 2);
         $month = $monthField > self::FEMALE_MONTH_OFFSET ? $monthField - self::FEMALE_MONTH_OFFSET : $monthField;
-        $year = (int) ($number[5] . $number[10]);
-        if (!TwoDigitYearDate::exists((int) \substr($number, 8, 2), $month, $year)) {
+        if (!TwoDigitYearDate::inRanges((int) \substr($number, 8, 2), $month)) {
             throw new InvalidDocumentNumberException(\sprintf('Invalid %s (invalid birth date).', self::DOCUMENT));
         }
 

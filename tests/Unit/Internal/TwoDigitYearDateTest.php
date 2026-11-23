@@ -38,4 +38,25 @@ final class TwoDigitYearDateTest extends TestCase
     {
         self::assertSame($exists, TwoDigitYearDate::exists($day, $month, $year));
     }
+
+    /**
+     * @return iterable<string, array{int, int, bool}>
+     */
+    public static function ranges(): iterable
+    {
+        yield '1 January' => [1, 1, true];
+        yield '31 December' => [31, 12, true];
+        yield '31 April' => [31, 4, true];
+        yield '31 February' => [31, 2, true];
+        yield 'day 0' => [0, 1, false];
+        yield 'day 32' => [32, 1, false];
+        yield 'month 0' => [1, 0, false];
+        yield 'month 13' => [1, 13, false];
+    }
+
+    #[DataProvider('ranges')]
+    public function testInRanges(int $day, int $month, bool $inRanges): void
+    {
+        self::assertSame($inRanges, TwoDigitYearDate::inRanges($day, $month));
+    }
 }

@@ -10,17 +10,18 @@ use MSSTC4PHP\ValueObject\Documents\Internal\Digits;
 use MSSTC4PHP\ValueObject\Documents\Internal\Text;
 use MSSTC4PHP\ValueObject\Documents\Internal\TwoDigitYearDate;
 use MSSTC4PHP\ValueObject\Support\AbstractStringValueObject;
-use Normalizer;
 use Override;
 
 /**
  * Clave de elector of the INE voter card, 18 characters: six letters of the surnames and name, the birth date
  * `AAMMDD`, two characters of the birth state, one of the sex and three of the internal homoclave (INE lineamientos
- * 2021, glossary of the INE). The year has no century, so there is no `HasBirthDate`; a day that is no date of the
- * month in any century is refused. INE publishes neither the state codes nor the sex letters of the key, so both are
- * plain strings ({@see birthStateCode()}, {@see sexCode()}), not `Sex` or an ISO 3166-2 code; the state accepts any
- * letter or digit, the sex any letter. The six letters may include `Ñ` (INE says only "primeras letras"; unlike the
- * CURP, no INE text substitutes it), stored composed and counted as one character. Format only for the homoclave: the
+ * 2021, glossary of the INE). The year has no century, so there is no `HasBirthDate`; only the month 01-12 and the day
+ * 01-31 are checked, not the calendar: no INE text says a key with a day its month lacks is never issued. INE
+ * publishes neither the state codes nor the sex letters of the key, so both are plain strings ({@see birthStateCode()},
+ * {@see sexCode()}), not `Sex` or an ISO 3166-2 code; the state accepts any letter or digit, the sex any letter. The six
+ * letters are `A-Z` or `Ñ` (INE says only "primeras letras"; unlike the CURP, no INE text substitutes it), stored
+ * composed and counted as one character; `ñ` is upper-cased, no other character is case-mapped (`ß` is refused, not
+ * read as `SS`). Format only for the homoclave: the
  * glossary names a check digit but no algorithm. No display form is published; `masked()` keeps the last four
  * characters (no official masking rule): `**************H400`.
  *
@@ -93,9 +94,8 @@ final class ElectorKey extends AbstractStringValueObject implements Maskable
     #[Override]
     protected function parse(string $value): string
     {
-        $normalized = Normalizer::normalize(\mb_strtoupper(Digits::strip($value), 'UTF-8'), Normalizer::FORM_C);
         $key = Digits::upperCasedOfLength(
-            \is_string($normalized) ? $normalized : '',
+            Digits::composedWithCapitalEnye($value),
             static fn (int $length): bool => $length === self::LENGTH,
             self::DOCUMENT,
         );
@@ -105,7 +105,7 @@ final class ElectorKey extends AbstractStringValueObject implements Maskable
 
         $tail = \substr($key, -self::TAIL_BYTES);
         $day = (int) \substr($tail, 4, 2);
-        if (!TwoDigitYearDate::exists($day, (int) \substr($tail, 2, 2), (int) \substr($tail, 0, 2))) {
+        if (!TwoDigitYearDate::inRanges($day, (int) \substr($tail, 2, 2))) {
             throw new InvalidDocumentNumberException(\sprintf('Invalid %s (invalid birth date).', self::DOCUMENT));
         }
 

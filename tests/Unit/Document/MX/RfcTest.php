@@ -69,6 +69,10 @@ final class RfcTest extends TestCase
         yield 'final letter other than A' => ['HEGJ5612311AB', 'Invalid Mexican RFC (invalid character).'];
         yield 'symbol in the homoclave' => ['HEGJ561231&A2', 'Invalid Mexican RFC (invalid character).'];
         yield 'other accented letter' => ['HÉGJ5612311A2', 'Invalid Mexican RFC (invalid character).'];
+        yield 'sharp s, not read as SS' => ['ßABC5612311A2', 'Invalid Mexican RFC (invalid character).'];
+        yield 'fi ligature, not read as FI' => ["\u{FB01}ABC5612311A2", 'Invalid Mexican RFC (invalid character).'];
+        yield 'dotless i, not read as I' => ["\u{0131}ABC5612311A2", 'Invalid Mexican RFC (invalid character).'];
+        yield 'long s, not read as S' => ["\u{017F}ABC5612311A2", 'Invalid Mexican RFC (invalid character).'];
     }
 
     #[DataProvider('invalidNumbers')]

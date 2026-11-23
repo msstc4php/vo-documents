@@ -46,6 +46,9 @@ final class ForeignerRegistrationNumberTest extends TestCase
         yield '5 with 29 February 00, a date of 2000' => ['0002295123456', Sex::Male, '00', 2, 29];
         yield '8 with a 31 December' => ['9912318123456', Sex::Female, '99', 12, 31];
         yield '5 with 1 January' => ['8501015123456', Sex::Male, '85', 1, 1];
+        yield '5 with 29 February 85 (ranges only, no calendar)' => ['8502295123456', Sex::Male, '85', 2, 29];
+        yield '7 with 30 February' => ['0002307123456', Sex::Male, '00', 2, 30];
+        yield '6 with 31 April' => ['8504316123456', Sex::Female, '85', 4, 31];
     }
 
     #[DataProvider('decoded')]
@@ -106,9 +109,7 @@ final class ForeignerRegistrationNumberTest extends TestCase
         yield 'digit 9' => ['8505059123456', $name . ' (invalid character).'];
         yield 'digit 0' => ['8505050123456', $name . ' (invalid character).'];
         yield 'month 13' => ['8513055123456', $name . ' (invalid birth date).'];
-        yield '29 February of a year not divisible by four' => ['8502295123456', $name . ' (invalid birth date).'];
-        yield '30 February' => ['0002307123456', $name . ' (invalid birth date).'];
-        yield '29 February 02' => ['0202295123456', $name . ' (invalid birth date).'];
+        yield 'day 32' => ['8501325123456', $name . ' (invalid birth date).'];
         yield 'day 0' => ['8505005123456', $name . ' (invalid birth date).'];
         yield 'month 0' => ['8500055123456', $name . ' (invalid birth date).'];
     }

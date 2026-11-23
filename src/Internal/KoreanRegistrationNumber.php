@@ -51,8 +51,8 @@ final class KoreanRegistrationNumber
      * @return non-empty-string 13 ASCII digits
      *
      * @throws InvalidDocumentNumberException on a wrong length, a non-digit, a seventh digit outside `$sevenths` or
-     *                                        a birth date that does not exist: in the century of the seventh digit
-     *                                        where it has one, otherwise in any century ({@see TwoDigitYearDate})
+     *                                        a birth date that does not exist in the century of the seventh digit
+     *                                        where it has one, otherwise a month outside 1-12 or a day outside 1-31
      */
     public static function normalize(string $input, string $document, string $sevenths): string
     {
@@ -64,7 +64,7 @@ final class KoreanRegistrationNumber
 
         $exists = isset(self::CENTURY[$seventh])
             ? \checkdate(self::month($number), self::day($number), self::year($number))
-            : TwoDigitYearDate::exists(self::day($number), self::month($number), (int) \substr($number, 0, 2));
+            : TwoDigitYearDate::inRanges(self::day($number), self::month($number));
         if (!$exists) {
             throw new InvalidDocumentNumberException(\sprintf('Invalid %s (invalid birth date).', $document));
         }

@@ -6,6 +6,7 @@ namespace MSSTC4PHP\ValueObject\Documents\Internal;
 
 use Closure;
 use MSSTC4PHP\ValueObject\Documents\Exception\InvalidDocumentNumberException;
+use Normalizer;
 
 /**
  * Number normalisation. Besides whitespace and the ASCII hyphen, the separators are the hyphen look-alikes a CJK
@@ -115,6 +116,18 @@ final class Digits
     public static function fold(string $input): string
     {
         return \strtr($input, self::FOLD_MAP);
+    }
+
+    /**
+     * Strips the separators and composes (NFC); `ñ` becomes `Ñ`, the one letter beyond ASCII of the MX keys. No other
+     * character is case-mapped (`ß`, `ﬁ`, `ı` stay as they are, for the caller's pattern to refuse): full Unicode case
+     * mapping would turn them into letters the official alphabet has.
+     */
+    public static function composedWithCapitalEnye(string $input): string
+    {
+        $composed = Normalizer::normalize(self::strip($input), Normalizer::FORM_C);
+
+        return \is_string($composed) ? \str_replace('ñ', 'Ñ', $composed) : '';
     }
 
     public static function strip(string $input, string $separators = self::SEPARATORS): string

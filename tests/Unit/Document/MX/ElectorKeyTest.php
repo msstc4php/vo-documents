@@ -42,6 +42,11 @@ final class ElectorKeyTest extends TestCase
         yield 'Ñ among the letters (INE says only "primeras letras")' => ['ÑÑLPJN56123109H400', 'ÑÑLPJN56123109H400'];
         yield 'lower-case ñ' => ['gmñpjn56123109h400', 'GMÑPJN56123109H400'];
         yield 'decomposed N and tilde' => ["GMN\u{0303}PJN56123109H400", 'GMÑPJN56123109H400'];
+        yield 'decomposed n and tilde' => ["gmn\u{0303}pjn56123109h400", 'GMÑPJN56123109H400'];
+        yield 'fullwidth letters fold like every number' => ['ＧＭＬＰＪＮ56123109H400', 'GMLPJN56123109H400'];
+        yield '30 February (ranges only, no calendar)' => ['GMLPJN56023009H400', 'GMLPJN56023009H400'];
+        yield '31 April' => ['GMLPJN56043109H400', 'GMLPJN56043109H400'];
+        yield '29 February 01' => ['GMLPJN01022909H400', 'GMLPJN01022909H400'];
     }
 
     public function testReadsTheFieldsOfAKeyWithÑ(): void
@@ -102,11 +107,15 @@ final class ElectorKeyTest extends TestCase
         yield 'digit among the letters' => ['GMLPJ156123109H400', 'Invalid Mexican elector key (invalid character).'];
         yield 'letter in the date' => ['GMLPJN5612A109H400', 'Invalid Mexican elector key (invalid character).'];
         yield 'digit as sex' => ['GMLPJN561231091400', 'Invalid Mexican elector key (invalid character).'];
-        yield '30 February' => ['GMLPJN56023009H400', 'Invalid Mexican elector key (invalid birth date).'];
-        yield '29 February 02' => ['GMLPJN02022909H400', 'Invalid Mexican elector key (invalid birth date).'];
-        yield '29 February 01' => ['GMLPJN01022909H400', 'Invalid Mexican elector key (invalid birth date).'];
+        yield 'sharp s, not read as SS' => ['ßVLMRA80070501M100', 'Invalid Mexican elector key (invalid character).'];
+        yield 'fi ligature, not read as FI' => ["\u{FB01}VLMRA80070501M100", 'Invalid Mexican elector key (invalid character).'];
+        yield 'dotless i, not read as I' => ["\u{0131}VLMRA80070501M100", 'Invalid Mexican elector key (invalid character).'];
+        yield 'long s, not read as S' => ["\u{017F}VLMRA80070501M100", 'Invalid Mexican elector key (invalid character).'];
+        yield 'mathematical bold A' => ["\u{1D400}VLMRA80070501M100", 'Invalid Mexican elector key (invalid character).'];
         yield 'month 13' => ['GMLPJN56130109H400', 'Invalid Mexican elector key (invalid birth date).'];
+        yield 'month 00' => ['GMLPJN56000109H400', 'Invalid Mexican elector key (invalid birth date).'];
         yield 'day 00' => ['GMLPJN56120009H400', 'Invalid Mexican elector key (invalid birth date).'];
+        yield 'day 32' => ['GMLPJN56123209H400', 'Invalid Mexican elector key (invalid birth date).'];
     }
 
     #[DataProvider('invalidKeys')]

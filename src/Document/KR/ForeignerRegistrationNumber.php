@@ -18,7 +18,8 @@ use Override;
  * 별표 gives the layout as a figure. The sex comes from the seventh digit, as 법무부 says (보도자료 2023-03-28): "외국인등록번호 13자리 중
  * 7번째 숫자가 5․7은 남성, 6․8은 여성". No official text gives the century (5 and 6 for the 1900s, 7 and 8 for the 2000s
  * are quoted from secondary sources only, docs/sources/KR.md), so there is no `HasBirthDate`: {@see birthYearDigits()},
- * {@see birthMonth()} and {@see birthDay()} give the parts, and only a date that exists in no century is refused.
+ * {@see birthMonth()} and {@see birthDay()} give the parts. Only the month 01-12 and the day 01-31 are checked, not the
+ * calendar: no official text says a number with a day its month lacks is never issued.
  * Digits 1-4, 9 and 0 belong to the resident registration number ({@see ResidentRegistrationNumber}) and are refused
  * here. No check digit is verified (none is published); `masked()` keeps the last four digits (no official masking
  * rule).

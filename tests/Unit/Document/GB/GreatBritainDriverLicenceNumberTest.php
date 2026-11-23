@@ -46,6 +46,10 @@ final class GreatBritainDriverLicenceNumberTest extends TestCase
         yield '29 February, year 12' => ['SMITH 102292 JA 1AB', 'SMITH102292JA1AB'];
         yield '29 February, woman' => ['SMITH 852290 JA 1AB', 'SMITH852290JA1AB'];
         yield '31 December, woman' => ['SMITH 862315 JA 1AB', 'SMITH862315JA1AB'];
+        yield '31 April (ranges only, no calendar)' => ['MORGA 604314 SM 9IJ', 'MORGA604314SM9IJ'];
+        yield '30 February' => ['MORGA 602304 SM 9IJ', 'MORGA602304SM9IJ'];
+        yield '29 February, year 21' => ['SMITH 202291 JA 1AB', 'SMITH202291JA1AB'];
+        yield '31 February, woman' => ['SMITH 852315 JA 1AB', 'SMITH852315JA1AB'];
     }
 
     #[DataProvider('validNumbers')]
@@ -124,11 +128,7 @@ final class GreatBritainDriverLicenceNumberTest extends TestCase
         yield 'month 63' => ['MORGA 663054 SM 9IJ', $date];
         yield 'day 00' => ['MORGA 657004 SM 9IJ', $date];
         yield 'day 32' => ['MORGA 657324 SM 9IJ', $date];
-        yield '31 April' => ['MORGA 604314 SM 9IJ', $date];
-        yield '30 February' => ['MORGA 602304 SM 9IJ', $date];
-        yield '29 February of a year not divisible by four' => ['SMITH 702290 JA 1AB', $date];
-        yield '29 February, year 21' => ['SMITH 202291 JA 1AB', $date];
-        yield '29 February, woman, year 85' => ['SMITH 852295 JA 1AB', $date];
+        yield 'day 32, woman' => ['MORGA 662324 SM 9IJ', $date];
         yield 'with the issue number' => [
             'MORGA 657054 SM 9IJ 01',
             'Invalid Great Britain driving licence number (wrong length).',
