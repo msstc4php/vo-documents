@@ -31,6 +31,8 @@ use Override;
  */
 final class Nis extends AbstractStringValueObject implements Maskable
 {
+    public const int MAX_LENGTH = 11;
+
     private const string DOCUMENT = 'Brazilian NIS';
 
     private const array WEIGHTS = [3, 2, 9, 8, 7, 6, 5, 4, 3, 2];

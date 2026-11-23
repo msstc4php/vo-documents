@@ -31,6 +31,8 @@ use Override;
  */
 final class DriverLicenceNumber extends AbstractStringValueObject implements Maskable
 {
+    public const int MAX_LENGTH = 15;
+
     private const string DOCUMENT = 'Korean driving licence number';
 
     /** @var array<string, non-empty-string> region name on a licence issued before 2014-07-02 => region number */

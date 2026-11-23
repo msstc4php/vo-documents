@@ -28,6 +28,8 @@ use Override;
  */
 final class LegacyIdentityCardNumber extends AbstractStringValueObject implements Maskable
 {
+    public const int MAX_LENGTH = 12;
+
     private const string DOCUMENT = 'French identity card number';
 
     private const array DIGITS = [

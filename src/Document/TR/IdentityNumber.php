@@ -25,6 +25,8 @@ use Override;
  */
 final class IdentityNumber extends AbstractStringValueObject implements Maskable
 {
+    public const int MAX_LENGTH = 11;
+
     private const string DOCUMENT = 'Turkish identity number';
 
     #[Override]

@@ -23,6 +23,8 @@ use Override;
  */
 final class SkDriverLicenceNumber extends AbstractDriverLicenceNumber
 {
+    public const int MAX_LENGTH = 8;
+
     private const int LENGTH = 8;
 
     #[Override]

@@ -13,6 +13,8 @@ use Override;
  */
 final class IqamaNumber extends AbstractIdentityNumber
 {
+    public const int MAX_LENGTH = 10;
+
     #[Override]
     protected function document(): string
     {

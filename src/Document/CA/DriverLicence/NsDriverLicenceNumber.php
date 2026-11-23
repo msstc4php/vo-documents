@@ -24,6 +24,8 @@ use Override;
  */
 final class NsDriverLicenceNumber extends AbstractDriverLicenceNumber
 {
+    public const int MAX_LENGTH = 14;
+
     private const int DIGITS = 9;
 
     private const string DAY_MONTH = '/^(?:0[1-9]|[12][0-9]|3[01])(?:0[1-9]|1[0-2])/';

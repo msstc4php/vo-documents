@@ -36,6 +36,8 @@ use Override;
  */
 final class CitizenIdentityNumber extends AbstractStringValueObject implements HasBirthDate, HasSex, Maskable
 {
+    public const int MAX_LENGTH = 18;
+
     private const int SEQUENCE_LAST_DIGIT_INDEX = 16;
 
     private const string DOCUMENT = 'Chinese citizen identity number';

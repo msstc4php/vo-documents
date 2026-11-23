@@ -21,6 +21,8 @@ use Override;
  */
 final class WiDlIdNumber extends AbstractDlIdNumber
 {
+    public const int MAX_LENGTH = 14;
+
     /**
      * @return non-empty-string
      */

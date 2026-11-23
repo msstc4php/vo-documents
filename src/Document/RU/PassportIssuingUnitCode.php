@@ -23,6 +23,8 @@ use Override;
  */
 final class PassportIssuingUnitCode extends AbstractStringValueObject implements Maskable
 {
+    public const int MAX_LENGTH = 6;
+
     private const string DOCUMENT = 'Russian passport issuing unit code';
 
     /**

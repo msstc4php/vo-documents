@@ -22,6 +22,8 @@ use Override;
  */
 final class NorthernIrelandDriverLicenceNumber extends AbstractStringValueObject implements Maskable
 {
+    public const int MAX_LENGTH = 8;
+
     private const string DOCUMENT = 'Northern Ireland driving licence number';
 
     #[Override]

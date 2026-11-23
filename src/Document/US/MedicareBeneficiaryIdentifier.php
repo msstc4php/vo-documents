@@ -25,6 +25,8 @@ use Override;
  */
 final class MedicareBeneficiaryIdentifier extends AbstractStringValueObject implements Maskable
 {
+    public const int MAX_LENGTH = 11;
+
     private const string DOCUMENT = 'American Medicare Beneficiary Identifier';
 
     private const string LETTER = '[ACDEFGHJKMNPQRTUVWXY]';

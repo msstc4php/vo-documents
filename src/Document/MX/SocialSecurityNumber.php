@@ -24,6 +24,8 @@ use Override;
  */
 final class SocialSecurityNumber extends AbstractStringValueObject implements Maskable
 {
+    public const int MAX_LENGTH = 11;
+
     private const string DOCUMENT = 'Mexican social security number';
 
     #[Override]

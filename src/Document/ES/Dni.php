@@ -27,6 +27,8 @@ use Override;
  */
 final class Dni extends AbstractStringValueObject implements Maskable
 {
+    public const int MAX_LENGTH = 9;
+
     private const string DOCUMENT = 'Spanish DNI number';
 
     #[Override]

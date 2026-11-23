@@ -26,6 +26,8 @@ use Override;
  */
 final class AadhaarNumber extends AbstractStringValueObject implements Maskable
 {
+    public const int MAX_LENGTH = 12;
+
     private const string DOCUMENT = 'Aadhaar number';
 
     #[Override]

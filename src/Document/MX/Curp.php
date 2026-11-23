@@ -37,6 +37,8 @@ use Override;
  */
 final class Curp extends AbstractStringValueObject implements HasBirthDate, HasSex, Maskable
 {
+    public const int MAX_LENGTH = 18;
+
     private const string DOCUMENT = 'Mexican CURP';
 
     private const string SHAPE = '/[A-Z]{4}[0-9]{6}[HMX][A-Z]{5}[0-9A-J][0-9]/';

@@ -20,6 +20,8 @@ use Override;
  */
 final class NlHealthCardNumber extends AbstractHealthCardNumber
 {
+    public const int MAX_LENGTH = 12;
+
     #[Override]
     public function jurisdiction(): Jurisdiction
     {

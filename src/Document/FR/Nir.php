@@ -30,6 +30,8 @@ use Override;
  */
 final class Nir extends AbstractStringValueObject implements HasSex, Maskable
 {
+    public const int MAX_LENGTH = 15;
+
     private const string DOCUMENT = 'French NIR';
 
     private const string DIGITS = '0123456789';

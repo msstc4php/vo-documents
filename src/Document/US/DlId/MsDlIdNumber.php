@@ -19,6 +19,8 @@ use Override;
  */
 final class MsDlIdNumber extends AbstractDlIdNumber
 {
+    public const int MAX_LENGTH = 10;
+
     #[Override]
     public function jurisdiction(): Jurisdiction
     {

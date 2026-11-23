@@ -19,6 +19,8 @@ use Override;
  */
 final class OnDriverLicenceNumber extends AbstractDriverLicenceNumber
 {
+    public const int MAX_LENGTH = 15;
+
     #[Override]
     public function jurisdiction(): Jurisdiction
     {

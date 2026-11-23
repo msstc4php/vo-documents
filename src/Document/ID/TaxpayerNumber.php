@@ -30,6 +30,8 @@ use Override;
  */
 final class TaxpayerNumber extends AbstractStringValueObject implements Maskable
 {
+    public const int MAX_LENGTH = 16;
+
     private const string DOCUMENT = 'Indonesian taxpayer number';
 
     private const string SEPARATORS = Digits::SEPARATORS . '.';

@@ -26,6 +26,8 @@ use Override;
  */
 final class Nie extends AbstractStringValueObject implements Maskable
 {
+    public const int MAX_LENGTH = 10;
+
     private const string DOCUMENT = 'Spanish NIE';
 
     private const string INITIALS = 'XYZ';

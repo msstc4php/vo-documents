@@ -22,6 +22,8 @@ use Override;
  */
 final class AbhaNumber extends AbstractStringValueObject implements Maskable
 {
+    public const int MAX_LENGTH = 14;
+
     private const string DOCUMENT = 'ABHA number';
 
     #[Override]

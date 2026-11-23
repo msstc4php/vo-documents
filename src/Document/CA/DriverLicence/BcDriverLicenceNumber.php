@@ -22,6 +22,8 @@ use Override;
  */
 final class BcDriverLicenceNumber extends AbstractDriverLicenceNumber
 {
+    public const int MAX_LENGTH = 8;
+
     private const int LENGTH = 8;
 
     #[Override]

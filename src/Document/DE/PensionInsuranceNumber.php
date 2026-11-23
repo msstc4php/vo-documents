@@ -30,6 +30,8 @@ use Override;
  */
 final class PensionInsuranceNumber extends AbstractStringValueObject implements Maskable
 {
+    public const int MAX_LENGTH = 12;
+
     private const string DOCUMENT = 'German pension insurance number';
 
     private const array WEIGHTS = [2, 1, 2, 5, 7, 1, 2, 1, 2, 1, 2, 1];

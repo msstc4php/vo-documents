@@ -31,6 +31,8 @@ use Override;
  */
 final class NationalIdentityNumber extends AbstractStringValueObject implements HasSex, Maskable
 {
+    public const int MAX_LENGTH = 16;
+
     private const string DOCUMENT = 'Indonesian national identity number';
 
     private const int WOMAN_DAY_OFFSET = 40;

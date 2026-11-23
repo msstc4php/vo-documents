@@ -24,6 +24,8 @@ use Override;
  */
 final class MultipleEntryPassportNumber extends AbstractStringValueObject implements Maskable
 {
+    public const int MAX_LENGTH = 9;
+
     private const string DOCUMENT = 'Korean multiple-entry passport number';
 
     #[Override]

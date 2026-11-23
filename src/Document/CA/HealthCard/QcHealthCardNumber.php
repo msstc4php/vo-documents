@@ -33,6 +33,8 @@ use Override;
  */
 final class QcHealthCardNumber extends AbstractHealthCardNumber implements HasSex
 {
+    public const int MAX_LENGTH = 12;
+
     private const int FEMALE_MONTH_OFFSET = 50;
 
     private const string BIRTH_MONTH_DAY = '/^(?:0[1-9]|1[0-2]|5[1-9]|6[0-2])(?:0[1-9]|[12][0-9]|3[01])$/D';

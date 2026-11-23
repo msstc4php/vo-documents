@@ -23,6 +23,8 @@ use Override;
  */
 final class TaxIdentificationNumber extends AbstractStringValueObject implements Maskable
 {
+    public const int MAX_LENGTH = 11;
+
     private const string DOCUMENT = 'German tax identification number';
 
     #[Override]

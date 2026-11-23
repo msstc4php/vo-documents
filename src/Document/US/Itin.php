@@ -24,6 +24,8 @@ use Override;
  */
 final class Itin extends AbstractStringValueObject implements Maskable
 {
+    public const int MAX_LENGTH = 9;
+
     private const string DOCUMENT = 'American individual taxpayer identification number';
 
     /** The IRS ranges of the fourth and fifth digits, bounds included; two-digit strings compare in order. */

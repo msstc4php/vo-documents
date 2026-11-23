@@ -21,6 +21,8 @@ use Override;
  */
 final class ExitEntryPermitToTaiwanNumber extends AbstractStringValueObject implements Maskable
 {
+    public const int MAX_LENGTH = 9;
+
     private const string DOCUMENT = 'Chinese Taiwan exit-entry permit number';
 
     #[Override]

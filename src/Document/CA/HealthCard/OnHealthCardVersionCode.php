@@ -26,6 +26,8 @@ use Override;
  */
 final class OnHealthCardVersionCode extends AbstractStringValueObject implements Maskable
 {
+    public const int MAX_LENGTH = 2;
+
     private const string DOCUMENT = 'CA-ON health card version code';
 
     #[Override]

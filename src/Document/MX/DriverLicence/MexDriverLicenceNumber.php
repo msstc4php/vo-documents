@@ -19,6 +19,8 @@ use Override;
  */
 final class MexDriverLicenceNumber extends AbstractDriverLicenceNumber
 {
+    public const int MAX_LENGTH = 12;
+
     #[Override]
     public function jurisdiction(): Jurisdiction
     {

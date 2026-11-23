@@ -25,6 +25,8 @@ use Override;
  */
 final class Snils extends AbstractStringValueObject implements Maskable
 {
+    public const int MAX_LENGTH = 11;
+
     private const string DOCUMENT = 'SNILS';
 
     private const int LAST_UNCHECKED_NUMBER = 1001998;

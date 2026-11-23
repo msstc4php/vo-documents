@@ -31,6 +31,8 @@ use Override;
  */
 final class ResidentRegistrationNumber extends AbstractStringValueObject implements HasBirthDate, HasSex, Maskable
 {
+    public const int MAX_LENGTH = 13;
+
     private const string DOCUMENT = 'Korean resident registration number';
 
     #[Override]

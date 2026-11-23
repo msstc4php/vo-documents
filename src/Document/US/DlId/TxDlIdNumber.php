@@ -16,6 +16,8 @@ use Override;
  */
 final class TxDlIdNumber extends AbstractDlIdNumber
 {
+    public const int MAX_LENGTH = 8;
+
     #[Override]
     public function jurisdiction(): Jurisdiction
     {

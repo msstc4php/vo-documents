@@ -22,6 +22,8 @@ use Override;
  */
 final class HealthAndCareNumber extends AbstractStringValueObject implements Maskable
 {
+    public const int MAX_LENGTH = 10;
+
     private const string DOCUMENT = 'Northern Ireland Health and Care number';
 
     private const int FIRST = 320_000_001;

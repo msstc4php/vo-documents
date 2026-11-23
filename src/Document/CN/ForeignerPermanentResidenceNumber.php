@@ -29,6 +29,8 @@ use Override;
  */
 final class ForeignerPermanentResidenceNumber extends AbstractStringValueObject implements HasBirthDate, Maskable
 {
+    public const int MAX_LENGTH = 18;
+
     private const string DOCUMENT = 'Chinese permanent residence card number';
 
     /**

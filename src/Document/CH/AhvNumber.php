@@ -25,6 +25,8 @@ use Override;
  */
 final class AhvNumber extends AbstractStringValueObject implements Maskable
 {
+    public const int MAX_LENGTH = 13;
+
     private const string DOCUMENT = 'Swiss AHV number';
 
     private const string COUNTRY_CODE = '756';

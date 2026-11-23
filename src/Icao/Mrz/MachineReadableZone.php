@@ -52,6 +52,8 @@ use Override;
  */
 abstract class MachineReadableZone extends AbstractStringValueObject implements HasSex, Maskable, ResolvesConcreteClass
 {
+    public const int MAX_LENGTH = 92;
+
     private const int EXPIRY_YEARS_BACK = 84;
 
     private const string CHARACTERS = '/^[A-Z0-9<]+$/D';

@@ -30,6 +30,8 @@ use Override;
  */
 final class OmsPolicyNumber extends AbstractStringValueObject implements Maskable
 {
+    public const int MAX_LENGTH = 16;
+
     private const string DOCUMENT = 'OMS policy number';
 
     /**

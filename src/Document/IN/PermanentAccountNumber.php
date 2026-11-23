@@ -26,6 +26,8 @@ use Override;
  */
 final class PermanentAccountNumber extends AbstractStringValueObject implements Maskable
 {
+    public const int MAX_LENGTH = 10;
+
     private const string DOCUMENT = 'Permanent Account Number';
 
     public function holderType(): PanHolderType

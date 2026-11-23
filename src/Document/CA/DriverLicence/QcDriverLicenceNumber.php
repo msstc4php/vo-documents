@@ -23,6 +23,8 @@ use Override;
  */
 final class QcDriverLicenceNumber extends AbstractDriverLicenceNumber
 {
+    public const int MAX_LENGTH = 13;
+
     /**
      * @return non-empty-string
      */

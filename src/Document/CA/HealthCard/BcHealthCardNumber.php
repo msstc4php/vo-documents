@@ -24,6 +24,8 @@ use Override;
  */
 final class BcHealthCardNumber extends AbstractHealthCardNumber
 {
+    public const int MAX_LENGTH = 10;
+
     private const array WEIGHTS = [0, 2, 4, 8, 5, 10, 9, 7, 3];
 
     private const int MODULUS = 11;

@@ -24,6 +24,8 @@ use Override;
  */
 final class Inn extends AbstractStringValueObject implements Maskable
 {
+    public const int MAX_LENGTH = 12;
+
     private const string DOCUMENT = 'INN';
 
     /**

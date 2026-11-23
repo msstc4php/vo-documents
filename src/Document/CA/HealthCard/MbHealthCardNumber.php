@@ -21,6 +21,8 @@ use Override;
  */
 final class MbHealthCardNumber extends AbstractHealthCardNumber
 {
+    public const int MAX_LENGTH = 9;
+
     #[Override]
     public function jurisdiction(): Jurisdiction
     {

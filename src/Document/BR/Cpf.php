@@ -30,6 +30,8 @@ use Override;
  */
 final class Cpf extends AbstractStringValueObject implements Maskable
 {
+    public const int MAX_LENGTH = 11;
+
     private const string DOCUMENT = 'Brazilian CPF';
 
     private const array FIRST_WEIGHTS = [1, 2, 3, 4, 5, 6, 7, 8, 9];

@@ -30,6 +30,8 @@ use Override;
  */
 final class Cns extends AbstractStringValueObject implements Maskable
 {
+    public const int MAX_LENGTH = 15;
+
     private const string DOCUMENT = 'Brazilian CNS';
 
     private const string ALL_ZEROS = '000000000000000';

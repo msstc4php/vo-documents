@@ -28,6 +28,8 @@ use Override;
  */
 final class IdentityDocumentNumber extends AbstractStringValueObject implements Maskable
 {
+    public const int MAX_LENGTH = 9;
+
     private const string DOCUMENT = 'Dutch passport or identity card number';
 
     private const string LETTERS = 'ABCDEFGHIJKLMNPQRSTUVWXYZ';

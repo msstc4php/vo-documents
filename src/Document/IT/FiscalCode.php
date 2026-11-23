@@ -32,6 +32,8 @@ use Override;
  */
 final class FiscalCode extends AbstractStringValueObject implements HasSex, Maskable
 {
+    public const int MAX_LENGTH = 16;
+
     private const string DOCUMENT = 'Italian fiscal code';
 
     /** Art. 6: a digit, or the letter that replaces it in an omocode. */

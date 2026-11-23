@@ -29,6 +29,8 @@ use Override;
  */
 final class OnHealthCardNumber extends AbstractHealthCardNumber
 {
+    public const int MAX_LENGTH = 10;
+
     private const int DIGITS = 10;
 
     private const string DOCUMENT = 'CA-ON health card number';

@@ -31,6 +31,8 @@ use Override;
  */
 final class ChiNumber extends AbstractStringValueObject implements HasSex, Maskable
 {
+    public const int MAX_LENGTH = 10;
+
     private const string DOCUMENT = 'Scottish CHI number';
 
     #[Override]

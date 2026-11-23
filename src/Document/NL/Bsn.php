@@ -25,6 +25,8 @@ use Override;
  */
 final class Bsn extends AbstractStringValueObject implements Maskable
 {
+    public const int MAX_LENGTH = 9;
+
     private const string DOCUMENT = 'Dutch BSN';
 
     private const array WEIGHTS = [9, 8, 7, 6, 5, 4, 3, 2, -1];

@@ -23,6 +23,8 @@ use Override;
  */
 final class FamilyCardNumber extends AbstractStringValueObject implements Maskable
 {
+    public const int MAX_LENGTH = 16;
+
     private const string DOCUMENT = 'Indonesian family card number';
 
     #[Override]

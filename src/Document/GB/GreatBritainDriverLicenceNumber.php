@@ -30,6 +30,8 @@ use Override;
  */
 final class GreatBritainDriverLicenceNumber extends AbstractStringValueObject implements HasSex, Maskable
 {
+    public const int MAX_LENGTH = 16;
+
     private const string DOCUMENT = 'Great Britain driving licence number';
 
     private const int FEMALE_MONTH_OFFSET = 50;

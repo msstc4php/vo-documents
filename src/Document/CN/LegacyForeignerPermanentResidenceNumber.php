@@ -23,6 +23,8 @@ use Override;
  */
 final class LegacyForeignerPermanentResidenceNumber extends AbstractStringValueObject implements Maskable
 {
+    public const int MAX_LENGTH = 15;
+
     private const string DOCUMENT = 'Chinese legacy permanent residence card number';
 
     /**

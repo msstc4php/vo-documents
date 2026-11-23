@@ -20,6 +20,8 @@ use Override;
  */
 final class AbDriverLicenceNumber extends AbstractDriverLicenceNumber
 {
+    public const int MAX_LENGTH = 9;
+
     /**
      * @return non-empty-string
      */

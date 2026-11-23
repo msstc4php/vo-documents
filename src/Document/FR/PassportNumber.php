@@ -24,6 +24,8 @@ use Override;
  */
 final class PassportNumber extends AbstractStringValueObject implements Maskable
 {
+    public const int MAX_LENGTH = 9;
+
     private const string DOCUMENT = 'French passport number';
 
     private const string DIGITS = '0123456789';

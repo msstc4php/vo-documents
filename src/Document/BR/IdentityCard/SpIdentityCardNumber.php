@@ -34,6 +34,8 @@ use Override;
  */
 final class SpIdentityCardNumber extends AbstractIdentityCardNumber
 {
+    public const int MAX_LENGTH = 9;
+
     private const int MODULUS = 11;
 
     private const int REMAINDER_WRITTEN_X = 10;

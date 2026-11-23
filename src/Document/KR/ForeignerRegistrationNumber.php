@@ -29,6 +29,8 @@ use Override;
  */
 final class ForeignerRegistrationNumber extends AbstractStringValueObject implements HasSex, Maskable
 {
+    public const int MAX_LENGTH = 13;
+
     private const string DOCUMENT = 'Korean foreigner registration number';
 
     /**

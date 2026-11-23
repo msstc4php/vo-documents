@@ -32,6 +32,8 @@ use Override;
  */
 final class ElectorKey extends AbstractStringValueObject implements Maskable
 {
+    public const int MAX_LENGTH = 18;
+
     private const string DOCUMENT = 'Mexican elector key';
 
     private const int LENGTH = 18;

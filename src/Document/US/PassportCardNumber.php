@@ -22,6 +22,8 @@ use Override;
  */
 final class PassportCardNumber extends AbstractStringValueObject implements Maskable
 {
+    public const int MAX_LENGTH = 9;
+
     private const string DOCUMENT = 'American passport card number';
 
     #[Override]

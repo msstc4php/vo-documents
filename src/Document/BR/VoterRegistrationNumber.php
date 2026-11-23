@@ -28,6 +28,8 @@ use Override;
  */
 final class VoterRegistrationNumber extends AbstractStringValueObject implements Maskable
 {
+    public const int MAX_LENGTH = 12;
+
     private const string DOCUMENT = 'Brazilian voter registration number';
 
     private const int LENGTH = 12;

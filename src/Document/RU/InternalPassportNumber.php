@@ -24,6 +24,8 @@ use Override;
  */
 final class InternalPassportNumber extends AbstractStringValueObject implements Maskable
 {
+    public const int MAX_LENGTH = 10;
+
     private const string DOCUMENT = 'Russian internal passport number';
 
     /**

@@ -24,6 +24,8 @@ use Override;
  */
 final class NationalInsuranceNumber extends AbstractStringValueObject implements Maskable
 {
+    public const int MAX_LENGTH = 9;
+
     private const string DOCUMENT = 'British National Insurance number';
 
     private const string EXCLUDED_LETTERS = 'DFIQUV';
