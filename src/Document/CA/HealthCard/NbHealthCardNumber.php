@@ -17,7 +17,7 @@ use Override;
  * @see https://open.alberta.ca/dataset/d79fa4a5-f134-464f-8f49-6787c6408a75/resource/70f56882-e5df-4a80-9035-1d90108c8978/download/hlth-physicians-resource-guide-2024.pdf
  *      Alberta Health, "Physician's Resource Guide 2024", Appendix D (read through the Internet Archive copy of
  *      2026-08-30 UTC)
- * @see docs/sources/CA.md "Health card numbers — per jurisdiction"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/CA.md "Health card numbers — per jurisdiction"
  */
 final class NbHealthCardNumber extends AbstractHealthCardNumber
 {

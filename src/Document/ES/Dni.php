@@ -23,7 +23,7 @@ use Override;
  *      Ministerio del Interior, "Cálculo del dígito de control del NIF/NIE"
  * @see https://www.boe.es/boe/dias/2025/04/02/pdfs/BOE-A-2025-6601.pdf Real Decreto 255/2025, arts. 2.2, 12 a)
  * @see https://www.boe.es/buscar/pdf/2007/BOE-A-2007-15984-consolidado.pdf Real Decreto 1065/2007, art. 19.1
- * @see docs/sources/ES.md "DNI"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/ES.md "DNI"
  */
 final class Dni extends AbstractStringValueObject implements Maskable
 {

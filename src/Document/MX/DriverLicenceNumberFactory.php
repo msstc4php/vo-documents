@@ -16,7 +16,7 @@ use MSSTC4PHP\ValueObject\Documents\Internal\SubdivisionResolver;
  * There is no `fromNumber()`: a jurisdiction without a published format could have issued any number, so a single match
  * among the covered ones does not identify the issuer. It returns once every jurisdiction is covered.
  *
- * @see docs/sources/MX.md "State driving licences — overlap (the factory's test oracle)"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/MX.md "State driving licences — overlap (the factory's test oracle)"
  */
 final class DriverLicenceNumberFactory
 {

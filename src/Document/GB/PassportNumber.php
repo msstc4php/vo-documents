@@ -18,7 +18,7 @@ use Override;
  *
  * @see https://assets.publishing.service.gov.uk/media/6979d8b4128d9c1d09a98c73/2025_BasicPassportChecks_1.1.pdf
  *      HM Passport Office, Basic Passport Checks 1.1, "Numbering"
- * @see docs/sources/GB.md "Passport number"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/GB.md "Passport number"
  */
 final class PassportNumber extends AbstractStringValueObject implements Maskable
 {

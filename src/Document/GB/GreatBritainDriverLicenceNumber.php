@@ -26,7 +26,7 @@ use Override;
  *
  * @see https://assets.publishing.service.gov.uk/media/688c6e8f6c7eb66caea94e04/ins57p-information-on-driving-licences.pdf
  *      DVLA, INS57P "Information on driving licences" (7/25), "How to check your driver number"
- * @see docs/sources/GB.md "Driving licence number, Great Britain"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/GB.md "Driving licence number, Great Britain"
  */
 final class GreatBritainDriverLicenceNumber extends AbstractStringValueObject implements HasSex, Maskable
 {

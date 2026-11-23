@@ -22,7 +22,7 @@ use Override;
  * official masking rule); PAN is written without separators, so there is no `formatted()`.
  *
  * @see https://web.archive.org/web/2025/https://incometaxindia.gov.in/tutorials/1.permanent%20account%20number%20(pan).pdf Income Tax Department
- * @see docs/sources/IN.md "PAN"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/IN.md "PAN"
  */
 final class PermanentAccountNumber extends AbstractStringValueObject implements Maskable
 {

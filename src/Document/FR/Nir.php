@@ -26,7 +26,7 @@ use Override;
  * @see https://www.service-public.gouv.fr/particuliers/vosdroits/F33078 Composition du numéro de Sécurité sociale
  * @see https://www.net-entreprises.fr/media/documentation/dsn-cahier-technique-2026.1.pdf DSN cahier technique
  *      CT2026.1, S21.G00.30.001
- * @see docs/sources/FR.md "NIR"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/FR.md "NIR"
  */
 final class Nir extends AbstractStringValueObject implements HasSex, Maskable
 {

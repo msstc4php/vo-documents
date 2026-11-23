@@ -9,7 +9,7 @@ namespace MSSTC4PHP\ValueObject\Documents\Document\IN;
  * Number (PAN)": "The fourth character of PAN represents the status of the PAN holder"). The backing value is that
  * character.
  *
- * @see docs/sources/IN.md "PAN"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/IN.md "PAN"
  */
 enum PanHolderType: string
 {

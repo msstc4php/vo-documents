@@ -21,7 +21,7 @@ use Override;
  *
  * @see http://www.sat.gob.mx/sitio_internet/cfd/tipoDatos/tdCFDI/tdCFDI.xsd SAT, catálogo de tipos de datos del CFDI,
  *      simpleType t_RFC_PF
- * @see docs/sources/MX.md "RFC"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/MX.md "RFC"
  */
 final class Rfc extends AbstractStringValueObject implements Maskable
 {

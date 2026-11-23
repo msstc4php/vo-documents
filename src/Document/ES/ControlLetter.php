@@ -10,7 +10,7 @@ namespace MSSTC4PHP\ValueObject\Documents\Document\ES;
  *
  * @see https://www.interior.gob.es/opencms/es/servicios-al-ciudadano/tramites-y-gestiones/dni/calculo-del-digito-de-control-del-nif-nie/
  *      Ministerio del Interior, "Cálculo del dígito de control del NIF/NIE"
- * @see docs/sources/ES.md "DNI"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/ES.md "DNI"
  *
  * @internal
  */

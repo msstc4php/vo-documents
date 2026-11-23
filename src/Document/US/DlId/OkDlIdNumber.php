@@ -16,7 +16,7 @@ use Override;
  * @see
  *      https://oklahoma.gov/content/dam/service-oklahoma/intranet/job-resources/sops/a--driver-license/A.01%20-%20Original%20Issuance%20-%20Class%20D%20and%20State%20ID.pdf
  *      Service Oklahoma, SOP A.01
- * @see docs/sources/US.md "DL/ID numbers"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/US.md "DL/ID numbers"
  */
 final class OkDlIdNumber extends AbstractDlIdNumber
 {

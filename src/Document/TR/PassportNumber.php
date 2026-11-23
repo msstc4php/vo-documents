@@ -21,7 +21,7 @@ use Override;
  * @see https://www.consilium.europa.eu/prado/en/TUR-AO-02001/index.html PRADO TUR-AO-02001, biodata page "Numbering"
  *      (read through the Internet Archive copy of 2026-08-18)
  * @see https://www.consilium.europa.eu/prado/en/TUR-AO-03001/index.html PRADO TUR-AO-03001, specimen
- * @see docs/sources/TR.md "Passport number"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/TR.md "Passport number"
  */
 final class PassportNumber extends AbstractStringValueObject implements Maskable
 {

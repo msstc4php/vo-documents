@@ -17,7 +17,7 @@ use Override;
  *      Health, "Province and Territory Codes" (September 2022)
  * @see https://www.ontario.ca/document/ohip-infobulletins-2022/bulletin-220902-northwest-territories-health-service-number
  *      Ontario Ministry of Health, OHIP INFOBulletin 220902
- * @see docs/sources/CA.md "Health card numbers — per jurisdiction"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/CA.md "Health card numbers — per jurisdiction"
  */
 final class NtHealthCardNumber extends AbstractHealthCardNumber
 {

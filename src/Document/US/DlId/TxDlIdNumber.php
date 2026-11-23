@@ -12,7 +12,7 @@ use Override;
  * Texas: "Drivers License or ID Card # (8 digits number)". One numbering for the driver licence and the ID card.
  *
  * @see https://www.dps.texas.gov/apps/driverlicense/dlsearch/dlstatus.aspx Texas DPS, "Where's my license or ID?"
- * @see docs/sources/US.md "DL/ID numbers"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/US.md "DL/ID numbers"
  */
 final class TxDlIdNumber extends AbstractDlIdNumber
 {

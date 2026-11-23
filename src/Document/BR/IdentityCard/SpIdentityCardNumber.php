@@ -30,7 +30,7 @@ use Override;
  *      RG"
  * @see https://www2.ssp.sp.gov.br/AACWEBSTATIC/style/aac.js SSP-SP, `validaFormulario` and `checaRG`
  * @see https://www.planalto.gov.br/ccivil_03/_ato2019-2022/2022/decreto/d10977.htm Decreto nº 10.977/2022, art. 25
- * @see docs/sources/BR.md "RG per state (Task 7b)"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/BR.md "RG per state (Task 7b)"
  */
 final class SpIdentityCardNumber extends AbstractIdentityCardNumber
 {

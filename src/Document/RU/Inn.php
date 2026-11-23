@@ -20,7 +20,7 @@ use Override;
  *
  * @see http://publication.pravo.gov.ru/document/0001202510090011 FNS Order of 26.06.2025 No. ЕД-7-14/559@, §2-§3
  * @see http://publication.pravo.gov.ru/document/0001202512190014 SFR Order of 17.11.2025 No. 1463, ВС.ЕФС-СЗВ-ТД.1.14
- * @see docs/sources/RU.md "INN"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/RU.md "INN"
  */
 final class Inn extends AbstractStringValueObject implements Maskable
 {

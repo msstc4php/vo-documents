@@ -14,7 +14,7 @@ use Override;
  *
  * @see https://www.ksrevenue.gov/pdf/readingdmvreport.pdf Kansas DOR, "How to Read a Driving Record"
  * @see https://www.kdor.ks.gov/Apps/DLStatus/login.aspx Kansas DOR, Driver's License Status Check
- * @see docs/sources/US.md "DL/ID numbers"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/US.md "DL/ID numbers"
  */
 final class KsDlIdNumber extends AbstractDlIdNumber
 {

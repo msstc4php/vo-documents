@@ -22,7 +22,7 @@ use Override;
  *
  * @see https://web.archive.org/web/20100704211109/www.uidai.gov.in/documents/A_UID_Numbering_Scheme.pdf UIDAI
  * @see https://web.archive.org/web/20220811180652/https://www.uidai.gov.in/283-faqs/aadhaar-online-services/e-aadhaar/1887-what-is-masked-aadhaar.html UIDAI FAQ
- * @see docs/sources/IN.md "Aadhaar number"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/IN.md "Aadhaar number"
  */
 final class AadhaarNumber extends AbstractStringValueObject implements Maskable
 {

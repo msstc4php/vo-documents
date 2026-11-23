@@ -16,7 +16,7 @@ use Override;
  *      Health, "Province and Territory Codes" (September 2022)
  * @see https://www.gov.nl.ca/hcs/files/mcp-providers-pim-residents-of-other-provinces.pdf NL Department of Health
  *      & Community Services, MCP Physician Information Manual, "Residents of Other Provinces"
- * @see docs/sources/CA.md "Health card numbers — per jurisdiction"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/CA.md "Health card numbers — per jurisdiction"
  */
 final class NlHealthCardNumber extends AbstractHealthCardNumber
 {

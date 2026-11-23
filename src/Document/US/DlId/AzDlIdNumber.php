@@ -15,7 +15,7 @@ use Override;
  * @see https://www.e-verify.gov/sites/default/files/everify/factsheets/ArizonaRIDEFactSheet.pdf USCIS, E-Verify RIDE
  *      fact sheet "Arizona Driver's License and ID Card Information"
  * @see https://apps.azdot.gov/files/mvd/mvd-forms-lib/99-0121.pdf ADOT MVD, form 99-0121 "Redaction Program"
- * @see docs/sources/US.md "DL/ID numbers"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/US.md "DL/ID numbers"
  */
 final class AzDlIdNumber extends AbstractDlIdNumber
 {

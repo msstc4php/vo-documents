@@ -19,7 +19,7 @@ use Override;
  *
  * @see https://dukcapil.kemendagri.go.id/blog/read/wajib-tahu-nomor-kk-harus-diganti-ketika-kepala-keluarga-meninggal-dunia
  *      Ditjen Dukcapil
- * @see docs/sources/ID.md "Family card number"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/ID.md "Family card number"
  */
 final class FamilyCardNumber extends AbstractStringValueObject implements Maskable
 {

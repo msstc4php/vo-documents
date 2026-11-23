@@ -20,7 +20,7 @@ use Override;
  * @see https://gat.fujian.gov.cn/ztzl/cryjfwwj/flfg_28281/201812/t20181205_4693182.htm 电子往来港澳通行证号码编制规则调整
  *      (source: 国家移民管理局, 2025-10-15)
  * @see https://www.nia.gov.cn/n794014/n1050181/n1050479/c1197066/content.html 出入境证件简明手册
- * @see docs/sources/CN.md "Exit-entry permit to Hong Kong and Macao"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/CN.md "Exit-entry permit to Hong Kong and Macao"
  */
 final class ExitEntryPermitToHongKongMacauNumber extends AbstractStringValueObject implements Maskable
 {

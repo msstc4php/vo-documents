@@ -16,7 +16,7 @@ use Override;
  *
  * @see https://www.alberta.ca/system/files/sa-registrar-decision-notification-01-2024.pdf Service Alberta, RDN 01/2024
  * @see https://www.alberta.ca/system/files/sa-registrar-decision-notification-05-2025.pdf Service Alberta, RDN 05/2025
- * @see docs/sources/CA.md "Driver's licence numbers — per jurisdiction"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/CA.md "Driver's licence numbers — per jurisdiction"
  */
 final class AbDriverLicenceNumber extends AbstractDriverLicenceNumber
 {

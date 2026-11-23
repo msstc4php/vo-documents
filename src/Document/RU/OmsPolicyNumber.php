@@ -26,7 +26,7 @@ use Override;
  * @see https://www.ffoms.gov.ru/upload/iblock/56d/56d1f4edbcb3a5d37d20328a012d4e17.pdf FFOMS Order of 07.04.2011
  *      No. 79 (as amended 05.03.2020), register data table, note 1 (not reachable from the build environment; quoted
  *      from an aggregator copy in RU.md)
- * @see docs/sources/RU.md "OMS policy"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/RU.md "OMS policy"
  */
 final class OmsPolicyNumber extends AbstractStringValueObject implements Maskable
 {

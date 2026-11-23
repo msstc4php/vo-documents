@@ -19,7 +19,7 @@ use Override;
  * four characters (no official masking rule).
  *
  * @see https://www.nia.gov.cn/20231013/2.pdf 国家移民管理局, 附件 2, 表 1 "既往版本永居证号码"
- * @see docs/sources/CN.md "Foreigner's permanent residence ID card"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/CN.md "Foreigner's permanent residence ID card"
  */
 final class LegacyForeignerPermanentResidenceNumber extends AbstractStringValueObject implements Maskable
 {

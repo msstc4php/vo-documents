@@ -17,7 +17,7 @@ use Override;
  * rule).
  *
  * @see https://www.nenkin.go.jp/section/faq/seidozenpan/kisoban/kisonenkinbango/20140807-02.html 日本年金機構
- * @see docs/sources/JP.md "Basic Pension Number"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/JP.md "Basic Pension Number"
  */
 final class BasicPensionNumber extends AbstractStringValueObject implements Maskable
 {

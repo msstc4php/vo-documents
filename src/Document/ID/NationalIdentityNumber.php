@@ -27,7 +27,7 @@ use Override;
  * official masking rule): `************0001`.
  *
  * @see https://dukcapil.kemendagri.go.id/blog/read/yuk-simak-ini-perbedaan-nik-dan-nit Ditjen Dukcapil
- * @see docs/sources/ID.md "NIK"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/ID.md "NIK"
  */
 final class NationalIdentityNumber extends AbstractStringValueObject implements HasSex, Maskable
 {

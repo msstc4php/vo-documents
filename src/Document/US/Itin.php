@@ -20,7 +20,7 @@ use Override;
  * @see https://www.irs.gov/irm/part3/irm_03-013-005 IRM 3.13.5.22 "Individual Taxpayer Identification Number (ITIN)
  *      Format"
  * @see https://www.ecfr.gov/current/title-26/section-301.6109-4 26 CFR 301.6109-4 (TTIN)
- * @see docs/sources/US.md "ITIN"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/US.md "ITIN"
  */
 final class Itin extends AbstractStringValueObject implements Maskable
 {

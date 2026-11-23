@@ -20,7 +20,7 @@ use Override;
  *
  * @see http://reposipot.imss.gob.mx/normatividad/DNMR/Norma/3000-001-007.pdf IMSS, Norma 3000-001-007 (prestaciones
  *      económicas), 5.57 (read through the Internet Archive copy of 2018-08-27)
- * @see docs/sources/MX.md "NSS"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/MX.md "NSS"
  */
 final class SocialSecurityNumber extends AbstractStringValueObject implements Maskable
 {

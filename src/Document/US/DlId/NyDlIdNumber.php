@@ -14,7 +14,7 @@ use Override;
  *
  * @see https://dmv.ny.gov/transaction-message/information-about-transaction-entries NY DMV, "Information about
  *      Transaction Entries"
- * @see docs/sources/US.md "DL/ID numbers"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/US.md "DL/ID numbers"
  */
 final class NyDlIdNumber extends AbstractDlIdNumber
 {

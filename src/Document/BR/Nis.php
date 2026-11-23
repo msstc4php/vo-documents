@@ -27,7 +27,7 @@ use Override;
  *      ANS, "Algoritmos do Aplicativo de Carga" (SIB-XML, 2021-04-06), 7 - PISPASEP
  * @see https://www.gov.br/previdencia/pt-br/outros/imagens/2015/07/rgrva_RegrasValidacao.pdf Ministério da
  *      Previdência (Dataprev), SIPREV Gestão - Cadastros, Regras de Validação, versão 1.14, RV_03
- * @see docs/sources/BR.md "NIS (PIS/PASEP/NIT)"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/BR.md "NIS (PIS/PASEP/NIT)"
  */
 final class Nis extends AbstractStringValueObject implements Maskable
 {

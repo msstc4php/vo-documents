@@ -17,7 +17,7 @@ use Override;
  * @see https://www.e-verify.gov/sites/default/files/everify/factsheets/FloridaRIDEFactSheet.pdf USCIS, E-Verify RIDE
  *      fact sheet "Florida Driver's License and ID Card Information"
  * @see https://mydmvportal.flhsmv.gov/home/en/publicweb/dlcheck FLHSMV, "Driver License Check"
- * @see docs/sources/US.md "DL/ID numbers"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/US.md "DL/ID numbers"
  */
 final class FlDlIdNumber extends AbstractDlIdNumber
 {

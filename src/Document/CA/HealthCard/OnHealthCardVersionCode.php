@@ -22,7 +22,7 @@ use Override;
  *
  * @see https://www.ontario.ca/files/2025-10/moh-ohip-technical-specification-health-card-validation-service-via-electronic-business-services-en-2025-10-08.pdf
  *      Ontario Ministry of Health, "Technical Specification for Health Card Validation (HCV) Service via EBS" v4.6
- * @see docs/sources/CA.md "Health card numbers — per jurisdiction"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/CA.md "Health card numbers — per jurisdiction"
  */
 final class OnHealthCardVersionCode extends AbstractStringValueObject implements Maskable
 {

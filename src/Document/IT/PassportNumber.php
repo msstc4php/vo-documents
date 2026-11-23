@@ -21,7 +21,7 @@ use Override;
  * @see https://www.gazzettaufficiale.it/eli/gu/2010/05/19/115/sg/html Ministero degli affari esteri, DM 23 marzo
  *      2010, n. 303/13 (ordinary passport) and n. 303/14 (temporary passport), art. 1 A) "Numero di serie del
  *      passaporto"
- * @see docs/sources/IT.md "Passport number"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/IT.md "Passport number"
  */
 final class PassportNumber extends AbstractStringValueObject implements Maskable
 {

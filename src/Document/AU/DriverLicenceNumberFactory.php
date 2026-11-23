@@ -23,7 +23,7 @@ use MSSTC4PHP\ValueObject\Documents\Internal\SubdivisionResolver;
  * published formats overlap so much that today every valid number fits two or more jurisdictions (table in AU.md),
  * so callers that know the issuer use {@see fromNumberIn()}.
  *
- * @see docs/sources/AU.md "The jurisdiction factory"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/AU.md "The jurisdiction factory"
  */
 final class DriverLicenceNumberFactory
 {

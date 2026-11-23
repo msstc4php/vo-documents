@@ -17,7 +17,7 @@ use Override;
  *
  * Implemented by this package only; methods may be added in minor releases.
  *
- * @see docs/sources/BR.md "RG per state (Task 7b)"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/BR.md "RG per state (Task 7b)"
  */
 interface IdentityCardNumber extends StringConvertible, ValueObject, Maskable, IssuedBySubdivision
 {

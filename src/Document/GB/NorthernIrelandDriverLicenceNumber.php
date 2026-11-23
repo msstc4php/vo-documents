@@ -18,7 +18,7 @@ use Override;
  *
  * @see https://www.nidirect.gov.uk/articles/photocard-driving-licence-explained nidirect (DVA), "The photocard driving
  *      licence explained", "Driver number (5)"
- * @see docs/sources/GB.md "Driving licence number, Northern Ireland"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/GB.md "Driving licence number, Northern Ireland"
  */
 final class NorthernIrelandDriverLicenceNumber extends AbstractStringValueObject implements Maskable
 {

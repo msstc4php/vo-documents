@@ -14,7 +14,7 @@ use Override;
  * cards"). The class accepts both, so a number does not tell which card it is on.
  *
  * @see https://www.mvtrip.alabama.gov/News/ViewArticle/444 ALEA, "Alabama Driver License Number Changes"
- * @see docs/sources/US.md "DL/ID numbers"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/US.md "DL/ID numbers"
  */
 final class AlDlIdNumber extends AbstractDlIdNumber
 {

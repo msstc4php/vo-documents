@@ -19,7 +19,7 @@ use Override;
  * @see http://publication.pravo.gov.ru/document/0001202105190040 MVD Order of 31.03.2021 No. 186, appendix 12
  *      (MRZ lower line, positions 1-9)
  * @see http://publication.pravo.gov.ru/document/0001202002280021 MVD Order of 31.12.2019 No. 996 (passport with chip)
- * @see docs/sources/RU.md "International passport"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/RU.md "International passport"
  */
 final class InternationalPassportNumber extends AbstractStringValueObject implements Maskable
 {

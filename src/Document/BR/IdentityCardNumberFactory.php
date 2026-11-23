@@ -15,7 +15,7 @@ use MSSTC4PHP\ValueObject\Documents\Internal\SubdivisionResolver;
  * covered)". There is no `fromNumber()`: a unit without a published format could have issued any number, so a single match
  * among the covered ones does not identify the issuer. It returns once every unit is covered.
  *
- * @see docs/sources/BR.md "RG per state — overlap (the factory's test oracle)"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/BR.md "RG per state — overlap (the factory's test oracle)"
  */
 final class IdentityCardNumberFactory
 {

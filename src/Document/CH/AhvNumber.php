@@ -21,7 +21,7 @@ use Override;
  *
  * @see https://sozialversicherungen.admin.ch/de/d/6938/download BSV, Wegleitung über Versicherungsausweis und
  *      individuelles Konto (WL VA/IK), 318.106.02 d, Rz 1201-1202 and Anhang 7
- * @see docs/sources/CH.md "AHV number"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/CH.md "AHV number"
  */
 final class AhvNumber extends AbstractStringValueObject implements Maskable
 {

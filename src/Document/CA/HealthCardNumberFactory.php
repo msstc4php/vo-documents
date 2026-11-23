@@ -31,7 +31,7 @@ use MSSTC4PHP\ValueObject\Documents\Internal\SubdivisionResolver;
  * card's version code (`9876543217 YM`) fits no jurisdiction here, and
  * {@see OnHealthCardNumber::fromCard()} splits it off.
  *
- * @see docs/sources/CA.md "Health card numbers — overlap (the factory's test oracle)"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/CA.md "Health card numbers — overlap (the factory's test oracle)"
  */
 final class HealthCardNumberFactory
 {

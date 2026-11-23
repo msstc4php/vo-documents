@@ -21,7 +21,7 @@ use Override;
  *
  * @see https://rvig.nl/sites/default/files/2025-11/Logisch%20Ontwerp%20BSN%202025.Q4.pdf Logisch Ontwerp BSN
  *      2025.Q4 (Regeling burgerservicenummer, art. 3), § 3.2.1 and § I.2.3, footnote 22
- * @see docs/sources/NL.md "BSN"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/NL.md "BSN"
  */
 final class Bsn extends AbstractStringValueObject implements Maskable
 {

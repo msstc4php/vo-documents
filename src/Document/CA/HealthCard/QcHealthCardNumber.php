@@ -29,7 +29,7 @@ use Override;
  *      gestion de l'identification de l'usager (GIU)" v5.5, element 30100030, REQ-19-53
  * @see https://cdn-contenu.quebec.ca/cdn-contenu/sante/documents/Systeme_et_services_de_sante/regimes-assurance/feuillet_marqueur_X.pdf
  *      Québec MSSS, "Feuillet — carte d'assurance maladie avec le marqueur de genre X"
- * @see docs/sources/CA.md "Health card numbers — per jurisdiction"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/CA.md "Health card numbers — per jurisdiction"
  */
 final class QcHealthCardNumber extends AbstractHealthCardNumber implements HasSex
 {

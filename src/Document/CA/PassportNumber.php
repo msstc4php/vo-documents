@@ -24,7 +24,7 @@ use Override;
  *      Canada document number?"
  * @see https://www.canada.ca/en/immigration-refugees-citizenship/services/canadian-passports/new-passport-features.html
  *      IRCC, "Features of Canada's new passport"
- * @see docs/sources/CA.md "Passport number"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/CA.md "Passport number"
  */
 final class PassportNumber extends AbstractStringValueObject implements Maskable
 {

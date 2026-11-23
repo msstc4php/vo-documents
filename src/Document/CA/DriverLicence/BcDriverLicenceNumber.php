@@ -18,7 +18,7 @@ use Override;
  *      Number Project — Technical information for external stakeholders" v1.1, §5.1, §7
  * @see https://partners.icbc.com/assets/6cjn4yP78X3AOu0g5vLn1y/dln-faqs.pdf ICBC, "Driver's licence number (DLN)
  *      changes" FAQ
- * @see docs/sources/CA.md "Driver's licence numbers — per jurisdiction"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/CA.md "Driver's licence numbers — per jurisdiction"
  */
 final class BcDriverLicenceNumber extends AbstractDriverLicenceNumber
 {

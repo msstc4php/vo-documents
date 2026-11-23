@@ -15,7 +15,7 @@ use Override;
  *
  * @see https://www.cdr.mto.gov.on.ca/assets/files/glossary/Business%20Glossary.pdf MTO Carrier and Driver Records,
  *      "Business Glossary"
- * @see docs/sources/CA.md "Driver's licence numbers — per jurisdiction"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/CA.md "Driver's licence numbers — per jurisdiction"
  */
 final class OnDriverLicenceNumber extends AbstractDriverLicenceNumber
 {

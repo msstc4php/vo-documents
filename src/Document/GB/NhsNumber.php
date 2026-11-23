@@ -20,7 +20,7 @@ use Override;
  *      through the Internet Archive copy of 2025-09-14)
  * @see https://www.datadictionary.nhs.uk/attributes/health_and_care_number.html NHS Data Model and Dictionary, HEALTH
  *      AND CARE NUMBER ("3 3 4 format")
- * @see docs/sources/GB.md "NHS number"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/GB.md "NHS number"
  */
 final class NhsNumber extends AbstractStringValueObject implements Maskable
 {

@@ -19,7 +19,7 @@ use Override;
  *
  * @see http://publication.pravo.gov.ru/Document/View/0001202012310102 MVD Order of 16.11.2020 No. 773, §183.2.2 and the
  *      MRZ structure (lower line, positions 29-42)
- * @see docs/sources/RU.md "Passport issuing unit code"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/RU.md "Passport issuing unit code"
  */
 final class PassportIssuingUnitCode extends AbstractStringValueObject implements Maskable
 {

@@ -20,7 +20,7 @@ use Override;
  * characters (no official masking rule).
  *
  * @see https://www.passport.go.kr/home/kor/onlineExperience/index.do?menuPos=58 외교부 여권안내
- * @see docs/sources/KR.md "Multiple-entry passport number"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/KR.md "Multiple-entry passport number"
  */
 final class MultipleEntryPassportNumber extends AbstractStringValueObject implements Maskable
 {

@@ -26,7 +26,7 @@ use Override;
  * @see https://datasus.saude.gov.br/wp-content/uploads/2019/12/Especificac%CC%A7a%CC%83o-Te%CC%81cnica-para-Integrac%CC%A7a%CC%83o-PIX-PDQ-com-o-Carta%CC%83o-Nacional-de-Sa%C3%BAde.pdf
  *      DATASUS, Especificação Técnica para Integração PIX-PDQ com o Cartão Nacional de Saúde v5, serviço
  *      AuditoriaCadsusPS
- * @see docs/sources/BR.md "CNS"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/BR.md "CNS"
  */
 final class Cns extends AbstractStringValueObject implements Maskable
 {

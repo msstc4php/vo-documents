@@ -22,7 +22,7 @@ use Override;
  * @see https://www.interior.gob.es/opencms/es/servicios-al-ciudadano/tramites-y-gestiones/dni/calculo-del-digito-de-control-del-nif-nie/
  *      Ministerio del Interior, "Cálculo del dígito de control del NIF/NIE"
  * @see https://www.boe.es/boe/dias/2008/07/15/pdfs/A30880-30881.pdf Orden INT/2058/2008, apartado único
- * @see docs/sources/ES.md "NIE"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/ES.md "NIE"
  */
 final class Nie extends AbstractStringValueObject implements Maskable
 {

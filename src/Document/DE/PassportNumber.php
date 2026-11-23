@@ -19,7 +19,7 @@ use Override;
  * @see https://www.gesetze-im-internet.de/pa_g_1986/__4.html PassG § 4 Abs. 2 Satz 2 Nr. 5
  * @see https://www.gesetze-im-internet.de/passv_2007/anlage_11.html PassV Anlage 11 Nr. 9 and Tabelle 1 ("Pass-Nr.",
  *      9 Zeichen)
- * @see docs/sources/DE.md "Reisepass number"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/DE.md "Reisepass number"
  */
 final class PassportNumber extends AbstractStringValueObject implements Maskable
 {

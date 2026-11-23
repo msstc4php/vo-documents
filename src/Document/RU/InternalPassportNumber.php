@@ -20,7 +20,7 @@ use Override;
  *
  * @see http://publication.pravo.gov.ru/document/0001202312290097 Government Decree of 23.12.2023 No. 2267, description
  *      of the blank, §3
- * @see docs/sources/RU.md "Internal passport"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/RU.md "Internal passport"
  */
 final class InternalPassportNumber extends AbstractStringValueObject implements Maskable
 {

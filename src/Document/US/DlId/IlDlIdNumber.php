@@ -16,7 +16,7 @@ use Override;
  *
  * @see https://isp.illinois.gov/LawEnforcement/GetFile/de672e4e-5074-484d-a82f-cbfc20145c54 Illinois State Police,
  *      LEADS Operating Manual, Drivers License
- * @see docs/sources/US.md "DL/ID numbers"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/US.md "DL/ID numbers"
  */
 final class IlDlIdNumber extends AbstractDlIdNumber
 {

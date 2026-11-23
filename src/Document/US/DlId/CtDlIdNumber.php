@@ -13,7 +13,7 @@ use Override;
  * numbering, so the class covers the driver licence only.
  *
  * @see https://portal.ct.gov/dmv/resources/dmv-about-us CT DMV, "About the Department of Motor Vehicles"
- * @see docs/sources/US.md "DL/ID numbers"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/US.md "DL/ID numbers"
  */
 final class CtDlIdNumber extends AbstractDlIdNumber
 {

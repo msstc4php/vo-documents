@@ -21,7 +21,7 @@ use Override;
  *
  * @see https://laws.e-gov.go.jp/law/426M60000008085 行政手続における特定の個人を識別するための番号の利用等に関する法律に規定する
  *      個人番号、個人番号カード、特定個人情報の提供等に関する命令, Art. 5
- * @see docs/sources/JP.md "My Number"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/JP.md "My Number"
  */
 final class MyNumber extends AbstractStringValueObject implements Maskable
 {

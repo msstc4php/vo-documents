@@ -32,7 +32,7 @@ use Override;
  *      §5.1-5.2, Annex A and B
  * @see https://www.gov.cn/zhengce/content/2018-08/19/content_5314865.htm 港澳台居民居住证申领发放办法 (国办发〔2018〕81号),
  *      Art. 3
- * @see docs/sources/CN.md "Citizen identity number"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/CN.md "Citizen identity number"
  */
 final class CitizenIdentityNumber extends AbstractStringValueObject implements HasBirthDate, HasSex, Maskable
 {

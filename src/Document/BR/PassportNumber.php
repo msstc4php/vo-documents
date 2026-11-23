@@ -19,7 +19,7 @@ use Override;
  *
  * @see https://www.gov.br/pf/pt-br/assuntos/passaporte/ajuda/duvidas_/caderneta/caderneta-numero-onde-fica-e Polícia
  *      Federal, "Número do passaporte: onde fica e outras informações a respeito"
- * @see docs/sources/BR.md "Passport number"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/BR.md "Passport number"
  */
 final class PassportNumber extends AbstractStringValueObject implements Maskable
 {

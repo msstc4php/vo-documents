@@ -27,7 +27,7 @@ use Override;
  *
  * @see https://theme.archives.go.kr/next/koreaOfRecord/identityCard.do 국가기록원
  * @see https://www.korea.kr/news/policyNewsView.do?newsId=148872723 행정안전부 2020-05-25
- * @see docs/sources/KR.md "Resident registration number"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/KR.md "Resident registration number"
  */
 final class ResidentRegistrationNumber extends AbstractStringValueObject implements HasBirthDate, HasSex, Maskable
 {

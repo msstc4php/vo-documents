@@ -21,7 +21,7 @@ use Override;
  * @internal extended by this package's jurisdiction classes only, its protected hooks are no API: type-hint
  *           {@see DriverLicenceNumber}
  *
- * @see docs/sources/MX.md "State driving licences (Task 6b)"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/MX.md "State driving licences (Task 6b)"
  */
 abstract class AbstractDriverLicenceNumber extends AbstractStringValueObject implements DriverLicenceNumber
 {

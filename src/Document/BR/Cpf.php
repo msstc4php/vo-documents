@@ -26,7 +26,7 @@ use Override;
  *      Receita Federal, "Por que a Receita Federal é responsável pelo meu CPF?"
  * @see https://www.gov.br/previdencia/pt-br/outros/imagens/2015/07/rgrva_RegrasValidacao.pdf Ministério da
  *      Previdência (Dataprev), SIPREV Gestão - Cadastros, Regras de Validação, versão 1.14, RV_01 (display form)
- * @see docs/sources/BR.md "CPF"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/BR.md "CPF"
  */
 final class Cpf extends AbstractStringValueObject implements Maskable
 {

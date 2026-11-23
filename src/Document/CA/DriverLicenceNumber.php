@@ -16,7 +16,7 @@ use Override;
  *
  * Implemented by this package only; methods may be added in minor releases.
  *
- * @see docs/sources/CA.md "Driver's licence numbers — per jurisdiction"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/CA.md "Driver's licence numbers — per jurisdiction"
  */
 interface DriverLicenceNumber extends StringConvertible, ValueObject, Maskable, IssuedBySubdivision
 {

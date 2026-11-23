@@ -23,7 +23,7 @@ use Override;
  * the last four digits (no official masking rule).
  *
  * @see https://www.npa.go.jp/laws/notification/menkyo20250310_76.pdf 警察庁交通局運転免許課長通達
- * @see docs/sources/JP.md "Driving licence number"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/JP.md "Driving licence number"
  */
 final class DriverLicenceNumber extends AbstractStringValueObject implements Maskable
 {

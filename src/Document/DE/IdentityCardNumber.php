@@ -17,7 +17,7 @@ use Override;
  *
  * @see https://www.gesetze-im-internet.de/pauswg/__2.html PAuswG § 2 Abs. 8
  * @see https://www.gesetze-im-internet.de/pauswv/anlage_3.html PAuswV Anlage 3 Abschnitt 1 Nr. 9
- * @see docs/sources/DE.md "Personalausweis number"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/DE.md "Personalausweis number"
  */
 final class IdentityCardNumber extends AbstractStringValueObject implements Maskable
 {

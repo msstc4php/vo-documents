@@ -24,7 +24,7 @@ use Override;
  * @see NOR INTD0000001C Ministère de l'intérieur, instruction générale relative à la carte nationale d'identité
  *      (2000), rubriques 46 and 55
  * @see https://www.gisti.org/IMG/pdf/norintd0000001c.pdf mirror of NOR INTD0000001C (not an official host)
- * @see docs/sources/FR.md "Carte nationale d'identité"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/FR.md "Carte nationale d'identité"
  */
 final class LegacyIdentityCardNumber extends AbstractStringValueObject implements Maskable
 {

@@ -18,7 +18,7 @@ use Override;
  * official masking rule). The ABHA address (`name@abdm`) is a different identifier.
  *
  * @see https://www.pib.gov.in/PressReleasePage.aspx?PRID=2017129&reg=48&lang=2 PIB
- * @see docs/sources/IN.md "ABHA number"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/IN.md "ABHA number"
  */
 final class AbhaNumber extends AbstractStringValueObject implements Maskable
 {

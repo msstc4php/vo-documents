@@ -23,7 +23,7 @@ use Override;
  *      CONTRAN, Resolução nº 1.020, de 1º de dezembro de 2025, art. 10
  * @see https://www.gov.br/transportes/pt-br/pt-br/assuntos/transito/conteudo-contran/resolucoes/Resolucao88620212.pdf/@@download/file/Resolucao88620212.pdf
  *      CONTRAN, Resolução nº 886, de 13 de dezembro de 2021, art. 4
- * @see docs/sources/BR.md "CNH"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/BR.md "CNH"
  */
 final class DriverLicenceNumber extends AbstractStringValueObject implements Maskable
 {

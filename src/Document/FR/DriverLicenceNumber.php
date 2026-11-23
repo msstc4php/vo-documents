@@ -19,7 +19,7 @@ use Override;
  *
  * @see https://www.plus.transformation.gouv.fr/experiences/4598427_permis-de-conduire France Titres-ANTS: "Votre
  *      numéro de permis de conduire comporte 12 chiffres"
- * @see docs/sources/FR.md "Driving licence number"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/FR.md "Driving licence number"
  */
 final class DriverLicenceNumber extends AbstractStringValueObject implements Maskable
 {

@@ -13,7 +13,7 @@ use Override;
  * licence only.
  *
  * @see https://apps1.web.maine.gov/cgi-bin/bmv/drc/step1.pl Maine BMV, Driver's Record Check Service
- * @see docs/sources/US.md "DL/ID numbers"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/US.md "DL/ID numbers"
  */
 final class MeDlIdNumber extends AbstractDlIdNumber
 {

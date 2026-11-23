@@ -25,7 +25,7 @@ use Override;
  *
  * @see https://law.go.kr/LSW/flDownload.do?flSeq=89453591&bylClsCd=110201 출입국관리법 시행규칙 별표 2
  * @see https://www.moj.go.kr/bbs/moj/182/568998/artclView.do 법무부 보도자료, 2023-03-28
- * @see docs/sources/KR.md "Foreigner registration number"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/KR.md "Foreigner registration number"
  */
 final class ForeignerRegistrationNumber extends AbstractStringValueObject implements HasSex, Maskable
 {

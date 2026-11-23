@@ -22,7 +22,7 @@ use Override;
  *      fedpol, "Pass", box "Ausweisnummer" (Internet Archive copy of 2026-02-14)
  * @see https://media.bs.ch/original_file/f9c82519e56d4de65ec334e1f12a254364907d80/pw-faq-neuer-schweizer-pass-2024-06.pdf
  *      Kanton Basel-Stadt, Passamt, FAQ neuer Schweizer Pass ("Wo finde ich die Ausweisnummer?")
- * @see docs/sources/CH.md "Passport and identity card number"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/CH.md "Passport and identity card number"
  */
 final class IdentityDocumentNumber extends AbstractStringValueObject implements Maskable
 {

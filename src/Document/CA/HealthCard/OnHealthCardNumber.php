@@ -25,7 +25,7 @@ use Override;
  *      "Interface to Health Care Systems Technical Specifications" v6.2, §4.14 "MOD 10 Check Digit"
  * @see https://www.ontario.ca/files/2024-10/moh-health-card-validation-reference-manual-en-2024-10-10.pdf Ontario
  *      Ministry of Health, "Health Card Validation Reference Manual", "Version Codes"
- * @see docs/sources/CA.md "Health card numbers — per jurisdiction"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/CA.md "Health card numbers — per jurisdiction"
  */
 final class OnHealthCardNumber extends AbstractHealthCardNumber
 {

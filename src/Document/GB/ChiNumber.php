@@ -27,7 +27,7 @@ use Override;
  *      COMMUNITY HEALTH INDEX NUMBER (read through the Internet Archive copy of 2025-09-13)
  * @see https://code.publichealthscotland.scot/phsmethods/reference/chi_check.html Public Health Scotland, phsmethods
  *      chi_check()
- * @see docs/sources/GB.md "CHI number, Scotland"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/GB.md "CHI number, Scotland"
  */
 final class ChiNumber extends AbstractStringValueObject implements HasSex, Maskable
 {

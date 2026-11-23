@@ -19,7 +19,7 @@ use Override;
  * (at most 10 characters), so four would show almost half of them. `*** *** 782`.
  *
  * @see https://softwaredevelopers.ato.gov.au/obtainTFNalgorithm ATO, "How to obtain the tax file number algorithm"
- * @see docs/sources/AU.md "Tax file number"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/AU.md "Tax file number"
  */
 final class TaxFileNumber extends AbstractStringValueObject implements Maskable
 {

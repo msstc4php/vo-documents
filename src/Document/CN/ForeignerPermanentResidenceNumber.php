@@ -25,7 +25,7 @@ use Override;
  * official masking rule).
  *
  * @see https://www.nia.gov.cn/20231013/2.pdf 国家移民管理局, 附件 2 "新版外国人永久居留身份证适配性改造要点", 二
- * @see docs/sources/CN.md "Foreigner's permanent residence ID card"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/CN.md "Foreigner's permanent residence ID card"
  */
 final class ForeignerPermanentResidenceNumber extends AbstractStringValueObject implements HasBirthDate, Maskable
 {

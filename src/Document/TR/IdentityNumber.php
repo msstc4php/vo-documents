@@ -21,7 +21,7 @@ use Override;
  * @see https://www.nvi.gov.tr/tokat/tc-kimlik-no-islemleri NVİ, "T.C. Kimlik No İşlemleri", questions 2 and 3
  * @see https://www.mevzuat.gov.tr/MevzuatMetin/3.5.200611081.pdf Nüfus Hizmetleri Kanununun Uygulanmasına İlişkin
  *      Yönetmelik, Madde 4 (p) ("onbir rakamdan oluşan")
- * @see docs/sources/TR.md "T.C. Kimlik No"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/TR.md "T.C. Kimlik No"
  */
 final class IdentityNumber extends AbstractStringValueObject implements Maskable
 {

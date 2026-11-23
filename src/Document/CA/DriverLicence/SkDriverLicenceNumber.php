@@ -19,7 +19,7 @@ use Override;
  *      Government of Saskatchewan, "Identity Validation and Privacy"
  * @see https://www.saskatchewan.ca/-/media/news-archive/2010/november/18/sgi-unveils-new-onepart-drivers-licence/onepart-drivers-licence-backgrounder.pdf
  *      SGI, "Saskatchewan's One-part Driver's Licence" backgrounder
- * @see docs/sources/CA.md "Driver's licence numbers — per jurisdiction"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/CA.md "Driver's licence numbers — per jurisdiction"
  */
 final class SkDriverLicenceNumber extends AbstractDriverLicenceNumber
 {

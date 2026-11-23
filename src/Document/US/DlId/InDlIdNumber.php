@@ -14,7 +14,7 @@ use Override;
  *
  * @see https://www.in.gov/bmv/resources/insurance-agents/electronic-insurance-forms-submission-faqs Indiana BMV,
  *      "Electronic Insurance Forms Submission FAQs"
- * @see docs/sources/US.md "DL/ID numbers"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/US.md "DL/ID numbers"
  */
 final class InDlIdNumber extends AbstractDlIdNumber
 {

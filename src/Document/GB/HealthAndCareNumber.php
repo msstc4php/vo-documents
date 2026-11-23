@@ -18,7 +18,7 @@ use Override;
  *
  * @see https://www.datadictionary.nhs.uk/attributes/health_and_care_number.html NHS Data Model and Dictionary, HEALTH
  *      AND CARE NUMBER (read through the Internet Archive copy of 2025-09-10)
- * @see docs/sources/GB.md "Health and Care number, Northern Ireland"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/GB.md "Health and Care number, Northern Ireland"
  */
 final class HealthAndCareNumber extends AbstractStringValueObject implements Maskable
 {

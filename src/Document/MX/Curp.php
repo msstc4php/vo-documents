@@ -33,7 +33,7 @@ use Override;
  *      (DOF 18-06-2018), modified DOF 18-10-2021 (codigo=5632965)
  * @see https://www.gob.mx/cms/uploads/attachment/file/681698/reglas_para_la_ejecucion_de_los_procedimientos_asignacion_de_la_curp.pdf
  *      Reglas para la ejecución de los procedimientos para la asignación de la CURP (2021-10-22), 5.1-5.3
- * @see docs/sources/MX.md "CURP"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/MX.md "CURP"
  */
 final class Curp extends AbstractStringValueObject implements HasBirthDate, HasSex, Maskable
 {

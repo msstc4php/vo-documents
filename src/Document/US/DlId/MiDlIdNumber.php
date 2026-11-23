@@ -15,7 +15,7 @@ use Override;
  * @see https://www.michigan.gov/sos/faqs/resources/milogin-and-online-accounts Michigan SOS, "MiLogin and online
  *      accounts"
  * @see https://mdhhs-pres-prod.michigan.gov/olmweb/ex/foc/340X1.pdf Michigan FIA, Friend of the Court Manual FOC 340X1
- * @see docs/sources/US.md "DL/ID numbers"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/US.md "DL/ID numbers"
  */
 final class MiDlIdNumber extends AbstractDlIdNumber
 {

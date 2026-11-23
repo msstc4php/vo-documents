@@ -20,7 +20,7 @@ use Override;
  *
  * @see https://www.plus.transformation.gouv.fr/experiences/4124633_passeport France Titres-ANTS: "9 caractères -
  *      (2 chiffres, 2 lettres, 5 chiffres)"
- * @see docs/sources/FR.md "Passport number"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/FR.md "Passport number"
  */
 final class PassportNumber extends AbstractStringValueObject implements Maskable
 {

@@ -16,7 +16,7 @@ use Override;
  *
  * Implemented by this package only; methods may be added in minor releases.
  *
- * @see docs/sources/MX.md "State driving licences (Task 6b)"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/MX.md "State driving licences (Task 6b)"
  */
 interface DriverLicenceNumber extends StringConvertible, ValueObject, Maskable, IssuedBySubdivision
 {

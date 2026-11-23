@@ -22,7 +22,7 @@ use Override;
  * @internal extended by this package's jurisdiction classes only, its protected hooks are no API: type-hint
  *           {@see HealthCardNumber}
  *
- * @see docs/sources/CA.md "Health card numbers — per jurisdiction"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/CA.md "Health card numbers — per jurisdiction"
  */
 abstract class AbstractHealthCardNumber extends AbstractStringValueObject implements HealthCardNumber
 {

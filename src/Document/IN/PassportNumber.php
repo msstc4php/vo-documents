@@ -19,7 +19,7 @@ use Override;
  * official masking rule; the package keeps three of a number of eight characters or fewer).
  *
  * @see https://www.mea.gov.in/Portal/Tender/3234_1/1_corrigendum_dated_26.05.2017-1.pdf MEA, 4.4
- * @see docs/sources/IN.md "Passport number"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/IN.md "Passport number"
  */
 final class PassportNumber extends AbstractStringValueObject implements Maskable
 {

@@ -21,7 +21,7 @@ use Override;
  *
  * @see https://www.nia.gov.cn/n794014/n1050181/n1050479/c1197066/content.html 出入境证件简明手册
  * @see https://www.cac.gov.cn/2017-04/07/c_1120766993.htm 公安部网站, 2017-04-07
- * @see docs/sources/CN.md "Ordinary passport number"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/CN.md "Ordinary passport number"
  */
 final class OrdinaryPassportNumber extends AbstractStringValueObject implements Maskable
 {

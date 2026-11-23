@@ -20,7 +20,7 @@ use Override;
  *      Health, "Teleplan4 Web Record Specifications" v4.8, chapter 1, §1.14.1-1.14.2
  * @see https://files.ontario.ca/moh_1/moh-province-and-territory-codes-2022-09-en-2023-05-15.pdf Ontario Ministry of
  *      Health, "Province and Territory Codes" (September 2022)
- * @see docs/sources/CA.md "Health card numbers — per jurisdiction"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/CA.md "Health card numbers — per jurisdiction"
  */
 final class BcHealthCardNumber extends AbstractHealthCardNumber
 {

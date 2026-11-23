@@ -26,7 +26,7 @@ use Override;
  * @see https://www.gesetze-im-internet.de/vkvv/__2.html VKVV § 2 (Aufbau der Versicherungsnummer)
  * @see https://www.deutsche-rentenversicherung.de/SharedDocs/Glossareintraege/DE/V/versicherungsnummer.html DRV
  *      glossary (display form `65 170839 J 08 8`)
- * @see docs/sources/DE.md "Rentenversicherungsnummer"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/DE.md "Rentenversicherungsnummer"
  */
 final class PensionInsuranceNumber extends AbstractStringValueObject implements Maskable
 {

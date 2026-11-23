@@ -28,7 +28,7 @@ use Override;
  * @see https://www.gazzettaufficiale.it/eli/id/1999/04/27/099A3188/sg DM 23 dicembre 1976 "Sistemi di codificazione
  *      dei soggetti da iscrivere all'anagrafe tributaria", artt. 2-7, reprinted as allegato 2 of the DM 19 aprile 1999
  *      (GU n. 97 del 27-4-1999, S.O. n. 83)
- * @see docs/sources/IT.md "Codice fiscale"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/IT.md "Codice fiscale"
  */
 final class FiscalCode extends AbstractStringValueObject implements HasSex, Maskable
 {

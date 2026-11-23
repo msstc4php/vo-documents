@@ -15,7 +15,7 @@ use Override;
  *
  * @see https://dmv.vermont.gov/sites/dmv/files/documents/Law%20Enforcement%20Changes%202025.pdf Vermont DMV, "Law
  *      Enforcement Changes" (2025), PID Format
- * @see docs/sources/US.md "DL/ID numbers"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/US.md "DL/ID numbers"
  */
 final class VtDlIdNumber extends AbstractDlIdNumber
 {

@@ -13,7 +13,7 @@ use Override;
  *
  * @see https://immi.homeaffairs.gov.au/help-text/eplus/Pages/elp-h3330.aspx Department of Home Affairs, "Australian
  *      driver licence", "South Australia"
- * @see docs/sources/AU.md "Driving licence numbers"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/AU.md "Driving licence numbers"
  */
 final class SaDriverLicenceNumber extends AbstractDriverLicenceNumber
 {

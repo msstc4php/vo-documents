@@ -23,7 +23,7 @@ use Override;
  * @internal extended by this package's jurisdiction classes only, its protected hooks are no API: type-hint
  *           {@see IdentityCardNumber}
  *
- * @see docs/sources/BR.md "RG per state (Task 7b)"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/BR.md "RG per state (Task 7b)"
  */
 abstract class AbstractIdentityCardNumber extends AbstractStringValueObject implements IdentityCardNumber
 {

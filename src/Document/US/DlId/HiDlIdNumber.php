@@ -15,7 +15,7 @@ use Override;
  * @see
  *      https://www4.honolulu.gov/docushare/dsweb/Get/Document-325980/State%20of%20Hawaii%20Driver_s%20License%20Application.pdf
  *      State of Hawaii Driver's License Application
- * @see docs/sources/US.md "DL/ID numbers"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/US.md "DL/ID numbers"
  */
 final class HiDlIdNumber extends AbstractDlIdNumber
 {

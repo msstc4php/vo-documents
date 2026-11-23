@@ -13,7 +13,7 @@ use Override;
  * licence only.
  *
  * @see https://emvc.state.nj.us/mvc/MVC_SUAAV_WS/html/AVSHelp.html NJ MVC, MyMVC AVS help
- * @see docs/sources/US.md "DL/ID numbers"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/US.md "DL/ID numbers"
  */
 final class NjDlIdNumber extends AbstractDlIdNumber
 {

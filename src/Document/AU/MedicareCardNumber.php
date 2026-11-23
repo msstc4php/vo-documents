@@ -21,7 +21,7 @@ use Override;
  *
  * @see https://implementer.digitalhealth.gov.au/namespaces/id/medicare-number/index.html Australian Digital Health
  *      Agency, namespace http://ns.electronichealth.net.au/id/medicare-number
- * @see docs/sources/AU.md "Medicare card number"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/AU.md "Medicare card number"
  */
 final class MedicareCardNumber extends AbstractStringValueObject implements Maskable
 {

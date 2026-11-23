@@ -24,7 +24,7 @@ use Override;
  *      paspoort model 2024, kenmerk 5
  * @see https://www.rijksoverheid.nl/themas/migratie-en-reizen/paspoort-en-identiteitskaart/vraag-en-antwoord/paspoort-en-identiteitskaart/bevat-mijn-paspoortnummer-het-cijfer-0-of-de-letter-o
  *      Rijksoverheid, "Bevat mijn paspoortnummer het cijfer 0 of de letter O?"
- * @see docs/sources/NL.md "Passport and identity card number"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/NL.md "Passport and identity card number"
  */
 final class IdentityDocumentNumber extends AbstractStringValueObject implements Maskable
 {

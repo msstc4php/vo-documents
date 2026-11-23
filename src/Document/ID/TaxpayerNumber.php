@@ -26,7 +26,7 @@ use Override;
  *      DJP, PENG-6/PJ.09/2024
  * @see https://www.pajak.go.id/sites/default/files/2022-07/SP-43%202022%20NPWP%20Format%20Baru%20PMK%20112%202022.pdf
  *      DJP, SP-43/2022
- * @see docs/sources/ID.md "NPWP"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/ID.md "NPWP"
  */
 final class TaxpayerNumber extends AbstractStringValueObject implements Maskable
 {

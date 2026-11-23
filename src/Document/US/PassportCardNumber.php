@@ -18,7 +18,7 @@ use Override;
  *
  * @see https://everify.uscis.gov/ica-docs/cases/appendix/field-definitions/uspassport-and-uspassport-card USCIS,
  *      E-Verify, "U.S. Passport and U.S. Passport Card"
- * @see docs/sources/US.md "Passport card number"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/US.md "Passport card number"
  */
 final class PassportCardNumber extends AbstractStringValueObject implements Maskable
 {

@@ -14,7 +14,7 @@ use Override;
  *
  * @see https://apps.transportation.ky.gov/gdl KYTC, Graduated Driver Licensing eligibility
  * @see https://secure.kentucky.gov/dhronline/Records/MoreInformation Commonwealth of Kentucky, Driving History Records
- * @see docs/sources/US.md "DL/ID numbers"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/US.md "DL/ID numbers"
  */
 final class KyDlIdNumber extends AbstractDlIdNumber
 {

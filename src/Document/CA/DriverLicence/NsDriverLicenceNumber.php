@@ -20,7 +20,7 @@ use Override;
  * quoted as a validation rule. The year has two digits and no century, so the class has no birth accessors.
  *
  * @see https://novascotia.ca/sns/paal/rmv/paal275.asp Service Nova Scotia, Permits Directory, "ID Cards (Photo)"
- * @see docs/sources/CA.md "Driver's licence numbers — per jurisdiction"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/CA.md "Driver's licence numbers — per jurisdiction"
  */
 final class NsDriverLicenceNumber extends AbstractDriverLicenceNumber
 {

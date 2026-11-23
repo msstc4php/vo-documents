@@ -14,7 +14,7 @@ use Override;
  *
  * @see https://www.e-verify.gov/sites/default/files/everify/factsheets/NebraskaRIDEFactSheet.pdf USCIS, E-Verify RIDE
  *      fact sheet "Nebraska Driver's License and ID Card Information"
- * @see docs/sources/US.md "DL/ID numbers"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/US.md "DL/ID numbers"
  */
 final class NeDlIdNumber extends AbstractDlIdNumber
 {

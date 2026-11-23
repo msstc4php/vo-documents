@@ -48,7 +48,7 @@ use Override;
  * @see https://www.icao.int/sites/default/files/publications/DocSeries/9303_p4_cons_en.pdf Part 4 (TD3)
  * @see https://www.icao.int/sites/default/files/publications/DocSeries/9303_p5_cons_en.pdf Part 5 (TD1)
  * @see https://www.icao.int/sites/default/files/publications/DocSeries/9303_p6_cons_en.pdf Part 6 (TD2)
- * @see docs/sources/ICAO.md "Machine readable zone"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/ICAO.md "Machine readable zone"
  */
 abstract class MachineReadableZone extends AbstractStringValueObject implements HasSex, Maskable, ResolvesConcreteClass
 {

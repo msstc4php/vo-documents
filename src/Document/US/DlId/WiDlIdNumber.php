@@ -17,7 +17,7 @@ use Override;
  *      fact sheet "Wisconsin Driver's License and ID Card Information"
  * @see https://wisconsindot.gov/Documents/dmv/shared/manual-mv4000.pdf WisDOT, MV4000 Law Enforcement Officer's
  *      Instruction Manual, field 29
- * @see docs/sources/US.md "DL/ID numbers"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/US.md "DL/ID numbers"
  */
 final class WiDlIdNumber extends AbstractDlIdNumber
 {

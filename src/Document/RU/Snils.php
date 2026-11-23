@@ -20,7 +20,7 @@ use Override;
  *
  * @see http://publication.pravo.gov.ru/document/0001202512190014 SFR Order of 17.11.2025 No. 1463: type
  *      ТипСтраховойНомер, checks ВСЗЛ.ОП.1.1 and ВС.ЕФС-СЗВ-ТД.1.15
- * @see docs/sources/RU.md "SNILS" — the algorithm the check ВСЗЛ.ОП.1.1 names, PFR "Правила проверки документов
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/RU.md "SNILS" — the algorithm the check ВСЗЛ.ОП.1.1 names, PFR "Правила проверки документов
  *      индивидуального (персонифицированного) учета", supplement 2 (information message of the PFR of 21.02.2013), §8
  */
 final class Snils extends AbstractStringValueObject implements Maskable

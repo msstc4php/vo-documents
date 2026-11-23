@@ -15,7 +15,7 @@ use Override;
  * @see https://www.ri.gov/DMV/mvr/citizen/ State of Rhode Island, RI DMV Driver Records
  * @see https://dbr.ri.gov/sites/g/files/xkgbur696/files/documents/divisions/insurance/consumers/IndustryAlert2017-2.pdf
  *      RI DBR, Industry Alert 2017-2
- * @see docs/sources/US.md "DL/ID numbers"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/US.md "DL/ID numbers"
  */
 final class RiDlIdNumber extends AbstractDlIdNumber
 {

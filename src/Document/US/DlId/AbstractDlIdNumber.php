@@ -22,7 +22,7 @@ use Override;
  * @internal extended by this package's jurisdiction classes only, its protected hooks are no API: type-hint
  *           {@see DlIdNumber}
  *
- * @see docs/sources/US.md "DL/ID numbers"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/US.md "DL/ID numbers"
  */
 abstract class AbstractDlIdNumber extends AbstractStringValueObject implements DlIdNumber
 {

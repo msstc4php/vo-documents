@@ -17,7 +17,7 @@ use Override;
  * valid any more. The source defines no check digit and no meaning of the series digits, so the value is validated by
  * its shape only. `masked()` keeps the last four digits of `formatted()` (no official masking rule): `** ** **3456`.
  *
- * @see docs/sources/RU.md "Driving licence" — MVD Order of 13.05.2009 No. 365 (registered by the Ministry of Justice
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/RU.md "Driving licence" — MVD Order of 13.05.2009 No. 365 (registered by the Ministry of Justice
  *      10.07.2009, No. 14302; cited by number, predates the portal), appendix 1 "Описание образца водительского
  *      удостоверения", §8, §10
  */

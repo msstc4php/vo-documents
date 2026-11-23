@@ -22,7 +22,7 @@ use Override;
  *      temporary residents in Canada"
  * @see https://www.canada.ca/en/employment-social-development/programs/ei/ei-list/ei-employers-sin.html ESDC,
  *      "Employer information - Social Insurance Number (SIN)"
- * @see docs/sources/CA.md "Social Insurance Number"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/CA.md "Social Insurance Number"
  */
 final class SocialInsuranceNumber extends AbstractStringValueObject implements Maskable
 {

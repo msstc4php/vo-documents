@@ -15,7 +15,7 @@ use Override;
  * encoding or check digit is published, and no display form, so there is no `formatted()`.
  *
  * @see https://smovilidad.edomex.gob.mx/validacion_de_licencias Secretaría de Movilidad, "Validación de licencias"
- * @see docs/sources/MX.md "State driving licences (Task 6b)"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/MX.md "State driving licences (Task 6b)"
  */
 final class MexDriverLicenceNumber extends AbstractDriverLicenceNumber
 {

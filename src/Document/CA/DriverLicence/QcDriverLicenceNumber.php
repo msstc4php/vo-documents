@@ -19,7 +19,7 @@ use Override;
  *      2024-05-07 UTC)
  * @see https://saaq.gouv.qc.ca/blob/saaq/documents/publications/presentation-quebec-driver-licences.pdf SAAQ,
  *      "Presentation of Québec driver's licences" (read through the Internet Archive copy of 2026-07-18 UTC)
- * @see docs/sources/CA.md "Driver's licence numbers — per jurisdiction"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/CA.md "Driver's licence numbers — per jurisdiction"
  */
 final class QcDriverLicenceNumber extends AbstractDriverLicenceNumber
 {

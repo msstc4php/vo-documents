@@ -13,7 +13,7 @@ use Override;
  *
  * @see https://www.e-verify.gov/sites/default/files/everify/factsheets/NorthDakotaRIDEFactSheet.pdf USCIS, E-Verify
  *      RIDE fact sheet "North Dakota Driver's License and ID Card Information"
- * @see docs/sources/US.md "DL/ID numbers"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/US.md "DL/ID numbers"
  */
 final class NdDlIdNumber extends AbstractDlIdNumber
 {

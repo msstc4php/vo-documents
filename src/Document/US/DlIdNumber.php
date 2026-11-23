@@ -17,7 +17,7 @@ use Override;
  *
  * Implemented by this package only; methods may be added in minor releases.
  *
- * @see docs/sources/US.md "DL/ID numbers"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/US.md "DL/ID numbers"
  */
 interface DlIdNumber extends StringConvertible, ValueObject, Maskable, IssuedBySubdivision
 {

@@ -18,7 +18,7 @@ use Override;
  *
  * @see https://www.oecd.org/content/dam/oecd/en/topics/policy-issue-focus/aeoi/france-tin.pdf France, Information on
  *      Tax Identification Numbers, Sections I and II
- * @see docs/sources/FR.md "Numéro fiscal"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/FR.md "Numéro fiscal"
  */
 final class TaxIdentificationNumber extends AbstractStringValueObject implements Maskable
 {

@@ -19,7 +19,7 @@ use Override;
  *
  * @see https://www.gesetze-im-internet.de/stidv/__1.html StIdV § 1
  * @see https://www.gesetze-im-internet.de/ao_1977/__139b.html AO § 139b
- * @see docs/sources/DE.md "Steuerliche Identifikationsnummer"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/DE.md "Steuerliche Identifikationsnummer"
  */
 final class TaxIdentificationNumber extends AbstractStringValueObject implements Maskable
 {

@@ -24,7 +24,7 @@ use Override;
  *
  * @see https://www.tse.jus.br/legislacao/compilada/res/2021/resolucao-no-23-659-de-26-de-outubro-de-2021 TSE,
  *      Resolução nº 23.659/2021, art. 36 (read through the Internet Archive copy of 2026-11-10)
- * @see docs/sources/BR.md "Título de eleitor"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/BR.md "Título de eleitor"
  */
 final class VoterRegistrationNumber extends AbstractStringValueObject implements Maskable
 {

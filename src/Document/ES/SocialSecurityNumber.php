@@ -20,7 +20,7 @@ use Override;
  * @see https://www.seg-social.es/descarga/es/43234 TGSS, Sistema RED, "Mensaje de Afiliación … Versión 4.0.0",
  *      segment TRA, data 710-730
  * @see https://www.boe.es/buscar/pdf/1997/BOE-A-1997-27151-consolidado.pdf Resolución de 1 de diciembre de 1997
- * @see docs/sources/ES.md "Número de la Seguridad Social"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/ES.md "Número de la Seguridad Social"
  */
 final class SocialSecurityNumber extends AbstractStringValueObject implements Maskable
 {

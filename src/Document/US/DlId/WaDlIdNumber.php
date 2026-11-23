@@ -17,7 +17,7 @@ use Override;
  * @see http://www.dol.wa.gov/realid.html WA DOL, REAL ID information
  * @see https://www.wsp.wa.gov/wp-content/uploads/2023/10/08_licensing.pdf Washington State Patrol, ACCESS Operations
  *      Manual, chapter 8
- * @see docs/sources/US.md "DL/ID numbers"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/US.md "DL/ID numbers"
  */
 final class WaDlIdNumber extends AbstractDlIdNumber
 {

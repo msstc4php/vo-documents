@@ -14,7 +14,7 @@ use Override;
  *
  * @see https://www.pa.gov/agencies/dmv/faqs/driver-licensing-faqs/find-your-drivers-license-photo-id-number PennDOT,
  *      "Where to Find Your Driver's License/Photo ID Number"
- * @see docs/sources/US.md "DL/ID numbers"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/US.md "DL/ID numbers"
  */
 final class PaDlIdNumber extends AbstractDlIdNumber
 {

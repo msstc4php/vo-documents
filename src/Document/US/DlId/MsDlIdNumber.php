@@ -15,7 +15,7 @@ use Override;
  * @see https://www.e-verify.gov/sites/default/files/everify/factsheets/MississippiRIDEFactSheet.pdf USCIS, E-Verify
  *      RIDE fact sheet "Mississippi Driver's License and ID Card Information"
  * @see https://www.sos.ms.gov/adminsearch/ACCode/00000383c.pdf Mississippi Administrative Code, Title 31 Part 1
- * @see docs/sources/US.md "DL/ID numbers"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/US.md "DL/ID numbers"
  */
 final class MsDlIdNumber extends AbstractDlIdNumber
 {

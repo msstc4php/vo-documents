@@ -13,7 +13,7 @@ use Override;
  * the class covers the driver licence only.
  *
  * @see https://secure.mvd.newmexico.gov/RenewalServices/default.aspx NM MVD, Online Driver History Records Service
- * @see docs/sources/US.md "DL/ID numbers"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/US.md "DL/ID numbers"
  */
 final class NmDlIdNumber extends AbstractDlIdNumber
 {

@@ -18,7 +18,7 @@ use Override;
  *
  * @see https://web.archive.org/web/2025/https://www.mofa.go.jp/mofaj/files/100130952.pdf 外務省, 旅券への別名併記の記載方法変更
  * @see https://www.pref.kanagawa.jp/docs/h6d/passport/aboutpass.html 神奈川県, パスポートの読みかた等
- * @see docs/sources/JP.md "Passport number"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/JP.md "Passport number"
  */
 final class PassportNumber extends AbstractStringValueObject implements Maskable
 {

@@ -15,7 +15,7 @@ use Override;
  * @see https://www.e-verify.gov/sites/default/files/everify/factsheets/MarylandRIDEFactSheet.pdf USCIS, E-Verify RIDE
  *      fact sheet "Maryland Driver's License and ID Card Information"
  * @see https://egov.maryland.gov/mva/idvr/support/userguide MDOT MVA, IDVR web user guide
- * @see docs/sources/US.md "DL/ID numbers"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/US.md "DL/ID numbers"
  */
 final class MdDlIdNumber extends AbstractDlIdNumber
 {

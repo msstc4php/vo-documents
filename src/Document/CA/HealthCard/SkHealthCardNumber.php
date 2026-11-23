@@ -16,7 +16,7 @@ use Override;
  *      Health, "Province and Territory Codes" (September 2022)
  * @see https://www.ehealthsask.ca/residents/mysaskhealthrecord/account-support eHealth Saskatchewan,
  *      MySaskHealthRecord "Support for your account"
- * @see docs/sources/CA.md "Health card numbers — per jurisdiction"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/CA.md "Health card numbers — per jurisdiction"
  */
 final class SkHealthCardNumber extends AbstractHealthCardNumber
 {

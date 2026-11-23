@@ -17,7 +17,7 @@ use Override;
  *      Health, "Province and Territory Codes" (September 2022)
  * @see https://www.gov.mb.ca/health/mhsip/health-card-information.html Manitoba Health, Seniors and Long-Term Care,
  *      "Your Manitoba Health Card (Registration Certificate)"
- * @see docs/sources/CA.md "Health card numbers — per jurisdiction"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/CA.md "Health card numbers — per jurisdiction"
  */
 final class MbHealthCardNumber extends AbstractHealthCardNumber
 {

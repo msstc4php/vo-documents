@@ -21,7 +21,7 @@ use Override;
  * @see http://web.archive.org/web/20250623182354/https://www.astra.admin.ch/dam/astra/de/dokumente/dokumente-strassenverkehr/weisungen/fuehrerausweis-kreditkartenformat.pdf.download.pdf/Weisungen%20betreffend%20die%20Ausstellung%20von%20Lernfahr-%20und%20F%C3%BChrerausweisen.pdf
  *      ASTRA, Weisungen betreffend die Ausstellung von Lernfahr- und Führerausweisen, 15 April 2023, Ziffer 5,
  *      Anhang 1 and 2 (Internet Archive copy of 2025-06-23)
- * @see docs/sources/CH.md "Driving licence number"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/CH.md "Driving licence number"
  */
 final class DriverLicenceNumber extends AbstractStringValueObject implements Maskable
 {

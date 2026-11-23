@@ -13,7 +13,7 @@ use Override;
  * license/ID card". One numbering for the driver licence and the ID card.
  *
  * @see https://www.mass.gov/files/documents/2018/03/21/Drivers_Manual.pdf Massachusetts RMV, Driver's Manual (2/2018)
- * @see docs/sources/US.md "DL/ID numbers"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/US.md "DL/ID numbers"
  */
 final class MaDlIdNumber extends AbstractDlIdNumber
 {

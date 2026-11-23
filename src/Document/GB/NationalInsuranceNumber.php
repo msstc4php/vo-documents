@@ -20,7 +20,7 @@ use Override;
  *
  * @see https://www.gov.uk/hmrc-internal-manuals/national-insurance-manual/nim39110 HMRC, National Insurance Manual,
  *      NIM39110
- * @see docs/sources/GB.md "National Insurance number"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/GB.md "National Insurance number"
  */
 final class NationalInsuranceNumber extends AbstractStringValueObject implements Maskable
 {

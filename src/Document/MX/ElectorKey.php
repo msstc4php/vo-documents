@@ -28,7 +28,7 @@ use Override;
  *      Lineamientos para la conformación de la Lista Nominal de Electores Residentes en el Extranjero 2021-2022,
  *      numeral 1, III b)
  * @see https://pautas.ine.mx/transparencia/caap/glosario.html INE, Glosario, "Clave de elector"
- * @see docs/sources/MX.md "Clave de elector"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/MX.md "Clave de elector"
  */
 final class ElectorKey extends AbstractStringValueObject implements Maskable
 {

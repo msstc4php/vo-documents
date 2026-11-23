@@ -27,7 +27,7 @@ use Override;
  * for the earlier form too (`********3361`), so a masked value does not tell the region or the form.
  *
  * @see https://www.koroad.or.kr/kp_web/licNewsView.do?board_code=PRBBS_080&board_num=101697 도로교통공단 면허소식 2014-07-14
- * @see docs/sources/KR.md "Driving licence number"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/KR.md "Driving licence number"
  */
 final class DriverLicenceNumber extends AbstractStringValueObject implements Maskable
 {

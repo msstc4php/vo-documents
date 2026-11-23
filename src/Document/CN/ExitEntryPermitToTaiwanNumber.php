@@ -17,7 +17,7 @@ use Override;
  * (no official masking rule).
  *
  * @see https://www.nia.gov.cn/n794014/n1050181/n1050479/c1197066/content.html 出入境证件简明手册
- * @see docs/sources/CN.md "Exit-entry permit to Taiwan"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/CN.md "Exit-entry permit to Taiwan"
  */
 final class ExitEntryPermitToTaiwanNumber extends AbstractStringValueObject implements Maskable
 {

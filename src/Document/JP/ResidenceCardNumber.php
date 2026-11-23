@@ -17,7 +17,7 @@ use Override;
  * `masked()` keeps the last four characters (no official masking rule).
  *
  * @see https://jsite.mhlw.go.jp/shimane-roudoukyoku/content/contents/001640228.pdf 厚生労働省 島根労働局
- * @see docs/sources/JP.md "Residence card number"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/JP.md "Residence card number"
  */
 final class ResidenceCardNumber extends AbstractStringValueObject implements Maskable
 {

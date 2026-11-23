@@ -16,7 +16,7 @@ use Override;
  *      sheet "Idaho Driver's License and ID Card Information"
  * @see https://itd.idaho.gov/guide/driver-records-and-suspensions/ Idaho Transportation Department, "Driver Records and
  *      Suspensions"
- * @see docs/sources/US.md "DL/ID numbers"
+ * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/US.md "DL/ID numbers"
  */
 final class IdDlIdNumber extends AbstractDlIdNumber
 {
