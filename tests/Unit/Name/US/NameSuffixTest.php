@@ -69,12 +69,22 @@ final class NameSuffixTest extends TestCase
         self::assertSame(NameSuffix::IV, NameSuffix::fromCode('IV'));
     }
 
+    public function testDropsOneTrailingPeriod(): void
+    {
+        self::assertSame(NameSuffix::JR, NameSuffix::fromCode('Jr.'));
+        self::assertSame(NameSuffix::SR, NameSuffix::fromCode(' sr. '));
+        self::assertSame(NameSuffix::SECOND, NameSuffix::fromCode('2nd.'));
+    }
+
     /**
      * @return iterable<string, array{string}>
      */
     public static function invalidCodes(): iterable
     {
-        yield 'period' => ['Jr.'];
+        yield 'two periods' => ['Jr..'];
+        yield 'a period only' => ['.'];
+        yield 'an inner period' => ['J.R'];
+        yield 'a leading period' => ['.JR'];
         yield 'tenth' => ['10TH'];
         yield 'X' => ['X'];
         yield 'title' => ['Esq'];

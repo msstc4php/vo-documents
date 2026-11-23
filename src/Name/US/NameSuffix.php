@@ -43,13 +43,16 @@ enum NameSuffix: string
     case IX = 'IX';
 
     /**
-     * Reads an AAMVA code in any letter case, surrounding spaces ignored (`jr`, ` III `); a period (`Jr.`) is refused.
+     * Reads an AAMVA code in any letter case, surrounding spaces and one trailing period ignored (`jr`, ` III `,
+     * `Jr.`).
      *
      * @throws InvalidPersonNameException when the code is not on the AAMVA list
      */
     public static function fromCode(string $code): self
     {
-        return self::tryFrom(\strtoupper(\trim($code)))
+        $code = \trim($code);
+
+        return self::tryFrom(\strtoupper(\str_ends_with($code, '.') ? \substr($code, 0, -1) : $code))
             ?? throw new InvalidPersonNameException('Invalid American name suffix.');
     }
 

@@ -103,7 +103,7 @@ the name fields of the MRZ." §3.4 (VIZ): "Any prefixes, suffixes or Roman numer
 identifier field."
 
 Implemented: `NameSuffix` is a string-backed enum of the 20 AAMVA codes, values as AAMVA writes them (`JR`, `1ST`,
-`I`, …); `fromCode()` accepts any letter case and surrounding spaces, refuses `Jr.` and anything off the list ("Invalid
+`I`, …); `fromCode()` accepts any letter case and surrounding spaces, one trailing period (`Jr.`, since 1.0), and refuses anything off the list ("Invalid
 American name suffix."). `1ST` and `I` are distinct values (the cardholder's choice; 8 FAM b.(2) lets them change).
 **ICAO form:** the State Department includes the suffix "as part of her/his name" (8 FAM 403.1-5(B) a.), which is the
 case §4.6 names, so the suffix is the last component of the secondary identifier; ordinals become Roman numerals
@@ -452,4 +452,4 @@ form, and six characters (KS). These exercise the single-match branch with real 
 - **ATIN** (`9nn-93-nnnn`) and **IRSN** (IRM 3.13.5.23): not in the plan's candidates; neither passes as an ITIN
   (93 is excluded; the IRSN campus digits listed there, 01-10, 17-19, 28-29, 37-39, 49, 66 and 89, are all outside
   the ITIN ranges) nor as an SSN (area 9xx).
-- **Name suffixes off the AAMVA list** (`Esq`, `X`, `Jr.` with a period) are refused.
+- **Name suffixes off the AAMVA list** (`Esq`, `X`) are refused; `Jr.` with one period reads as `JR` since 1.0.

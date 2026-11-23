@@ -249,7 +249,7 @@ final class PersonNameCodecTest extends TestCase
             'Invalid American middle name (invalid character).',
         ];
         yield 'suffix' => [
-            ['family' => 'Smith', 'given' => 'John', 'suffix' => 'Jr.'],
+            ['family' => 'Smith', 'given' => 'John', 'suffix' => 'Esq'],
             'Invalid American name suffix.',
         ];
         yield 'suffix without a given name' => [
