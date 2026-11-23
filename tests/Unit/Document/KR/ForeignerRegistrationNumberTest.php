@@ -11,6 +11,7 @@ use MSSTC4PHP\ValueObject\Documents\Internal\Digits;
 use MSSTC4PHP\ValueObject\Documents\Internal\KoreanRegistrationNumber;
 use MSSTC4PHP\ValueObject\Documents\Internal\Mask;
 use MSSTC4PHP\ValueObject\Documents\Internal\Text;
+use MSSTC4PHP\ValueObject\Documents\Internal\TwoDigitYearDate;
 use MSSTC4PHP\ValueObject\Documents\Sex;
 use MSSTC4PHP\ValueObject\Documents\Tests\Fixture\RefusesWithoutEchoingInput;
 use MSSTC4PHP\ValueObject\Documents\Tests\Fixture\TamperedValue;
@@ -27,6 +28,7 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(Digits::class)]
 #[UsesClass(Text::class)]
 #[UsesClass(Mask::class)]
+#[UsesClass(TwoDigitYearDate::class)]
 final class ForeignerRegistrationNumberTest extends TestCase
 {
     use RefusesWithoutEchoingInput;
