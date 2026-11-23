@@ -4,6 +4,13 @@
   console formatter reads MRZ strings such as `'<<'` as style tags. `make infection` exits 1 even though the run
   finished. Kill every mutant in files with `<` literals (Icao), or inspect with
   `vendor/bin/infection --show-mutations=0` + `var/infection/infection.json`.
+- **Infection's temp dir is shared**: it writes coverage to `$TMPDIR/infection` (here `/tmp/claude-1000/infection`),
+  so two runs at once (another package, a worktree) crash with "Could not find the XML coverage file". Run each with
+  its own `TMPDIR=… make infection`. A copy of the repository with `vendor/` copied (not symlinked; the vo-base path
+  repository link is relative) runs infection on a commit while the working tree changes.
+- **"This test executed code that is not listed as code to be covered or used"** fails Infection's initial run but
+  not a plain `make test`: it only shows with XML coverage. Check with `XDEBUG_MODE=coverage vendor/bin/phpunit
+  --testsuite=unit --coverage-xml=<dir>` and add the `#[UsesClass]`.
 - **Equivalent mutants in `Icao\PersonName::mrzField()`** came from boundary branches that produce the same output;
   the code was restructured so `cut()` is called unconditionally (a shorter text is returned unchanged). Keep it that
   way rather than adding fast paths.
@@ -96,13 +103,14 @@
   any pattern failure (also a misplaced separator).
 - `LatinSpelling::find()` matches word by word (`IdentifierSpellings`: the variants of each ICAO word, split at spaces
   and hyphens, plus the national separators to rebuild the canonical form), so the cost is the sum of variant counts and
-  the cap (`Transliterator::MAX_VARIANTS` = 4096, the one source; `LatinSpelling` has no cap of its own) is per word: 13
+  the cap (`Transliterator::MAX_VARIANTS` = 4096, private since 1.0, the one source; `LatinSpelling` has no cap of its own) is per word: 13
   × `Jürgen` with an override is accepted; one word with 13 two-way letters (`Ä`) or 8 three-way letters (`Ü` =
   `UE`/`UXX`/`U`) is still refused when an override differs from the derived form. `LatinOverridePolicy::resolve()`
   compares with the derived form **before** computing spellings, so the derived override of a name with too many
   spellings (13 × `Ä`) is accepted.
 - `SubdivisionResolver` no-match message: "(fits no jurisdiction)" when the length fits at least one subdivision
-  (`AbstractDriverLicenceNumber::fitsLength()`, `@internal`), else the length.
+  (the protected `fitsLength()` hook, read through `Internal\LengthProbe`), else "(wrong length)". Only AU licences and
+  CA health cards still reach it (the other factories have no `fromNumber()` since 1.0).
 - **Policy:** transliteration tables and override rules change only in a major version (stored overrides are
   re-validated on hydration).
 - `rector.php` (template file) skips a deprecated rule (`PostIncDecToPreIncDecRector`, a Rector warning on every run);

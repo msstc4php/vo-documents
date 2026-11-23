@@ -5,7 +5,7 @@ core.
 
 | Area | Purpose |
 |---|---|
-| `Contract\`, `Exception\`, `Sex` | Shared interfaces (`HasSex`, `HasBirthDate` (CURP only), `Maskable`, `Subdivision`, `IssuedBySubdivision`), the three exception families, the sex enum (`Female`, `Male`, `Unspecified` for the CURP `X`) |
+| `Contract\`, `Exception\`, `Sex` | Shared interfaces (`HasSex`, `HasBirthDate` (CURP, CN citizen identity and 2023 permanent residence numbers, KR resident number), `Subdivision`, `IssuedBySubdivision`; the documents implement vo-base's `Maskable`), the three exception families, the sex enum (`Female`, `Male`, `Unspecified` for the CURP `X`) |
 | `Internal\` | `@internal` helpers: `Checksum`, `Mask`, `Digits`, `UnicodeText`/`Text`, `NumberFormat` (character class + length range of a licence), `NumberShapes` (several fixed shapes, length derived from the shape: US DL/ID; shares `Digits::upperCasedOfLength()` with `NumberFormat`), `SubdivisionResolver` (one match / none / ambiguous over an enum of subdivisions), `PayloadFields` (codec payload validation; `encodable()` encode guard, `latin()` required ICAO field, `latinOverride()`), `Optional` (`equal()` of two optional value objects), `TwoDigitYearDate` (day/month valid in some century: DVLA, CHI, IT codice fiscale), `Gb11643` (18-character layout shared by the CN citizen number and the 2023 permanent residence number: `normalize()`, birth date, MOD 11-2 check), `KoreanRegistrationNumber` (13 digits of the KR resident and foreigner numbers: birth date and sex from the 7th digit). `Digits::fold()` maps fullwidth digits and letters and Arabic-Indic digits (U+0660-0669, U+06F0-06F9) to ASCII before every number parse, and `SEPARATORS` includes U+3000; `Checksum` gains `verhoeff()` (IN Aadhaar) |
 | `Icao\Mrz\*` | `MachineReadableZone` (abstract; `fromString()` picks `Td1`/`Td2`/`Td3` by length 90/72/88 or by 3/2/2 lines) and the final `Td1`, `Td2`, `Td3`; `@internal` `Internal\MrzLayout`, `MrzField`, `MrzCheckDigit` (7-3-1 weights, `<` = 0), `MrzDocumentNumber` (long-number split). `HasSex` (`<` = `Sex::Unspecified`), not `HasBirthDate`; `Maskable`; re-validated on unserialize by vo-base 1.3. Source notes `docs/sources/ICAO.md` section 5 |
 | `Icao\PersonName` | MRZ-style Latin name (`A-Z`, `-`, `<`; `<<` between primary and secondary), `mrzField()` truncation |
@@ -96,8 +96,9 @@ with `===`. `Name\US\AbstractAmericanNamePart` maps the ʻokina U+02BB to `'` be
 
 `Document\US\*` DL/ID (plan 3 Task 3): `Jurisdiction` (51 cases, ISO 3166-2:US, the states and DC), `DlIdNumber`
 interface, `DlId\AbstractDlIdNumber` (hooks `shapes(): NumberShapes`, `layout()`; final `masked()`/`parse()`/
-`fitsLength()`) + one final `<Abbr>DlIdNumber` per covered jurisdiction (30), `DlIdNumberFactory` on
-`SubdivisionResolver` over the covered cases only; `classFor()` lists the 21 uncovered cases explicitly (`=> null`), so
+(no `fitsLength()` since 1.0)) + one final `<Abbr>DlIdNumber` per covered jurisdiction (30), `DlIdNumberFactory`
+(`fromNumberIn()`, `jurisdictionsMatching()` through `SubdivisionResolver::matches()`, no `fromNumber()`) over the
+covered cases only; `classFor()` lists the 21 uncovered cases explicitly (`=> null`), so
 a new enum case breaks the `match`. FL, WI, WY add `formatted()` (published hyphen layout) and mask in it.
 
 `Document\CA\*` (federal, plan 3 Task 4): `SocialInsuranceNumber` (9 digits, format only; `formatted()`

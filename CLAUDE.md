@@ -34,6 +34,11 @@ Exception messages never contain the input or any part of it.
 
 - `Icao\Mrz\MachineReadableZone` implements `HasSex` (`<` is `Sex::Unspecified`, `X` refused) but not `HasBirthDate` (century unknown); dates take a caller-supplied reference. vo-base `^1.3` re-validates it on unserialize; national names do it through `Internal\ReparsesThroughCodec`.
 - The documents implement vo-base's `Contract\Maskable` (the package's own was removed in 1.0). `MachineReadableZone`
-  implements vo-base 1.4's
-  `ResolvesConcreteClass` (its own `from()` picks the format) and `Codecs` its `ProvidesCodecs` (vo-base `^1.4`).
-- Releasing: tag vo-documents `v0.2.0` (the MRZ) before `vo-documents-doctrine` can pass its minimal CI job.
+  implements vo-base 1.4's `ResolvesConcreteClass` (its own `from()` picks the format) and `Codecs` its
+  `ProvidesCodecs` (vo-base `^1.4`).
+
+## Releasing
+
+1.x follows the README "Backward compatibility" section: no refusal of a value an earlier 1.x accepted, frozen
+`MAX_LENGTH`, payload keys and enum cases. Tag vo-documents first; `vo-documents-doctrine` requires `^1.0` and its
+minimal CI job installs the tagged release.

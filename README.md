@@ -9,6 +9,8 @@ where an official format is published, subnational ones).
 Every format, checksum and table cites its official source on the class (`@see`); the full notes, with quotes and the
 places where the sources disagree with the obvious guess, are in [`docs/sources/`](docs/sources).
 
+Status: stable since 1.0.0; see "Backward compatibility" for what 1.x promises.
+
 ## Install
 
 Not on Packagist yet; register the GitHub repositories:
@@ -20,7 +22,7 @@ Not on Packagist yet; register the GitHub repositories:
         { "type": "vcs", "url": "https://github.com/msstc4php/vo-documents" }
     ],
     "require": {
-        "msstc4php/vo-documents": "^0.1"
+        "msstc4php/vo-documents": "^1.0"
     }
 }
 ```
@@ -710,9 +712,51 @@ registration number (no `HasBirthDate`; only a date that exists in no century is
   override the name is refused. An `AnyIcaoSpelling` override is stored as typed: `SMYTH<JONES<<MARY` and
   `SMYTH-JONES<<MARY` are two values. GB drops the `XXX` passport forename of a person with one name (`SMITH<<XXX` is
   `SMITH`); CA does not (no Passport Program text describes a placeholder).
+- **The accepted name characters depend on the platform's PCRE:** the script classes (`\p{sc=Han}`, `\p{sc=Latin}`, …)
+  follow the Unicode version of the installed PCRE (`lib-pcre >= 10.40`), so a newly assigned code point is accepted
+  once PCRE knows it, and refused on an older build.
 - **The transliteration variant cap (4096) is per ICAO word**, so a long list of given names with umlauts is accepted
   with an override. A single word with more than twelve two-way letters (`Ä` = `AE`/`A`) or more than seven three-way
   letters (`Ü` = `UE`/`UXX`/`U`) is still refused when an override that differs from the derived form is given.
+
+## Backward compatibility
+
+From 1.0.0 on, a breaking change needs 2.0. The 1.x promise covers:
+
+- public classes, methods and their parameter names (named arguments), and return types;
+- the canonical (stored) string of every document number (also its `__toString()` and JSON value), the JSON view
+  keys of the names (`latin` is the full Latin form everywhere) and the codec and `__serialize()` payload keys;
+- enum backed values and case names (`Jurisdiction::NSW`, `NameSuffix::JR`);
+- the public `MAX_LENGTH` of every string value object (in characters) and, in `vo-documents-doctrine`, the type
+  names and column lengths;
+- exception classes and their parents;
+- the MRZ century windows of `birthDate()` and `expiryDate()`.
+
+Rules for minor releases:
+
+- **A minor never refuses a value an earlier 1.x release accepted.** A check that gets an official source later is
+  reported only, by a new `hasValid…(): bool` method; refusing waits for 2.0. See "Rules that may relax" for the
+  refusals that rest on a thin text.
+- A minor may accept more (relax a rule, cover a new jurisdiction or document), but only values that fit the frozen
+  `MAX_LENGTH`.
+- **Factory candidate sets are frozen per major:** a newly covered jurisdiction gets its class in a minor and joins a
+  factory's `fromNumber()` in the next major, so a number that resolves to one class in 1.x keeps resolving to it.
+  `fromNumber()` exists only for fully covered countries (AU licences, CA health cards); it returns, additively, once
+  another country is fully covered.
+- Enum cases may be added in a minor (a new subdivision, a new `Sex`); give every `match` over a package enum a
+  default arm.
+- The package's interfaces (`Name\NationalPersonName`, the per-country document interfaces, `Contract\*`) are
+  implemented by this package only; methods may be added to them in minor releases. Implementing them, or extending
+  an `@internal` base, outside the package is outside the promise.
+- `masked()` may hide more in a minor, never less.
+- Payloads and serialized names written by 0.x keep loading through 1.x (`latin` as the override key of the names
+  that derive their Latin form, `first`/`second` as the ES and MX surnames, the 0.2 PHP object layout); the 0.2 layout
+  is read until 2.0.
+
+Not covered: the wording of exception messages (a message never contains the input, its length or any part of it);
+everything in `Internal\` or marked `@internal`; the set of characters a name accepts follows the PCRE Unicode
+version of the platform (`\p{sc=…}`): a code point assigned in a newer Unicode version is accepted where PCRE knows
+it.
 
 ## Development
 
