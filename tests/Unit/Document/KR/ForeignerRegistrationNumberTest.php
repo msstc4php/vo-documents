@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace MSSTC4PHP\ValueObject\Documents\Tests\Unit\Document\KR;
 
 use LogicException;
+use MSSTC4PHP\ValueObject\Documents\Contract\HasBirthDate;
 use MSSTC4PHP\ValueObject\Documents\Document\KR\ForeignerRegistrationNumber;
 use MSSTC4PHP\ValueObject\Documents\Internal\Digits;
 use MSSTC4PHP\ValueObject\Documents\Internal\KoreanRegistrationNumber;
@@ -32,27 +33,40 @@ final class ForeignerRegistrationNumberTest extends TestCase
     use TamperedValue;
 
     /**
-     * @return iterable<string, array{string, Sex, string}>
+     * @return iterable<string, array{string, Sex, string, int, int}>
      */
     public static function decoded(): iterable
     {
-        yield '5: man, 1900s' => ['8505055123456', Sex::Male, '1985-05-05'];
-        yield '6: woman, 1900s' => ['8505056123456', Sex::Female, '1985-05-05'];
-        yield '7: man, 2000s' => ['0502287123456', Sex::Male, '2005-02-28'];
-        yield '8: woman, 2000s' => ['0002298123456', Sex::Female, '2000-02-29'];
+        yield '5: man' => ['8505055123456', Sex::Male, '85', 5, 5];
+        yield '6: woman' => ['8505066123456', Sex::Female, '85', 5, 6];
+        yield '7: man' => ['0502287123456', Sex::Male, '05', 2, 28];
+        yield '8: woman' => ['0002298123456', Sex::Female, '00', 2, 29];
+        yield '5 with 29 February 00, a date of 2000' => ['0002295123456', Sex::Male, '00', 2, 29];
+        yield '8 with a 31 December' => ['9912318123456', Sex::Female, '99', 12, 31];
     }
 
     #[DataProvider('decoded')]
-    public function testDecodesSexAndCenturyFromTheSeventhDigit(string $input, Sex $sex, string $date): void
-    {
+    public function testDecodesTheSexAndTheBirthDateDigits(
+        string $input,
+        Sex $sex,
+        string $yearDigits,
+        int $month,
+        int $day,
+    ): void {
         $number = ForeignerRegistrationNumber::from($input);
 
         self::assertSame($input, $number->value);
         self::assertSame($input, (string) $number);
         self::assertSame($input, $number->jsonSerialize());
         self::assertSame($sex, $number->sex());
-        self::assertSame($date . ' 00:00:00', $number->birthDate()->format('Y-m-d H:i:s'));
-        self::assertSame('UTC', $number->birthDate()->getTimezone()->getName());
+        self::assertSame($yearDigits, $number->birthYearDigits());
+        self::assertSame($month, $number->birthMonth());
+        self::assertSame($day, $number->birthDay());
+    }
+
+    public function testHasNoBirthDateBecauseNoOfficialTextGivesTheCentury(): void
+    {
+        self::assertNotContains(HasBirthDate::class, \class_implements(ForeignerRegistrationNumber::class));
     }
 
     public function testSeparatorsAndFullwidthDigitsAreFolded(): void
@@ -89,7 +103,10 @@ final class ForeignerRegistrationNumberTest extends TestCase
         yield 'digit 9' => ['8505059123456', $name . ' (invalid character).'];
         yield 'digit 0' => ['8505050123456', $name . ' (invalid character).'];
         yield 'month 13' => ['8513055123456', $name . ' (invalid birth date).'];
-        yield '29 February 1985' => ['8502295123456', $name . ' (invalid birth date).'];
+        yield '29 February of a year not divisible by four' => ['8502295123456', $name . ' (invalid birth date).'];
+        yield '30 February' => ['0002307123456', $name . ' (invalid birth date).'];
+        yield 'day 0' => ['8505005123456', $name . ' (invalid birth date).'];
+        yield 'month 0' => ['8500055123456', $name . ' (invalid birth date).'];
     }
 
     #[DataProvider('invalidNumbers')]
@@ -103,19 +120,20 @@ final class ForeignerRegistrationNumberTest extends TestCase
     }
 
     /**
-     * @return iterable<string, array{string, 'birthDate'|'sex'}>
+     * @return iterable<string, array{string, 'birthDay'|'birthMonth'|'sex'}>
      */
     public static function tamperedValues(): iterable
     {
         yield 'letter as the seventh digit, sex' => ['900101X234567', 'sex'];
-        yield 'letter as the seventh digit, birth date' => ['900101X234567', 'birthDate'];
         yield 'too short, sex' => ['900101', 'sex'];
-        yield 'month 13' => ['9013015234567', 'birthDate'];
-        yield 'day 32' => ['9001325234567', 'birthDate'];
+        yield 'month 13' => ['9013015234567', 'birthMonth'];
+        yield 'month 0' => ['9000015234567', 'birthMonth'];
+        yield 'day 32' => ['9001325234567', 'birthDay'];
+        yield 'day 0' => ['9001005234567', 'birthDay'];
     }
 
     /**
-     * @param 'birthDate'|'sex' $accessor
+     * @param 'birthDay'|'birthMonth'|'sex' $accessor
      */
     #[DataProvider('tamperedValues')]
     public function testATamperedValueFailsWithFixedText(string $value, string $accessor): void
@@ -127,7 +145,8 @@ final class ForeignerRegistrationNumberTest extends TestCase
 
         match ($accessor) {
             'sex' => $number->sex(),
-            'birthDate' => $number->birthDate(),
+            'birthDay' => $number->birthDay(),
+            'birthMonth' => $number->birthMonth(),
         };
     }
 }

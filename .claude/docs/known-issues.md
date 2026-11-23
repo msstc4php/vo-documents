@@ -466,7 +466,11 @@ script classes use `\p{sc=Latin}` / `\p{sc=Cyrillic}` (Script property only); `c
   flagged staff/moderator), as warnings; the Schematron itself was not reached. The package refuses instead.
 - **KR foreigner number with a non-calendar birth date is refused.** No official text on unknown month or day was
   found; to revisit if an official practice appears. The sex digits (5/7 man, 6/8 woman) are official (법무부 release of
-  2023-03-28), the century split (5, 6 for the 1900s, 7, 8 for the 2000s) is from secondary sources.
+  2023-03-28), the century split (5, 6 for the 1900s, 7, 8 for the 2000s) is from secondary sources, so since 1.0 the
+  class has no `HasBirthDate` and validates the date with `TwoDigitYearDate` (exists in some century).
+- **KR resident 9/0 (1800s)** is secondary only, while 1-4 are official (국가기록원). The resident class keeps
+  `HasBirthDate` (ruling B4 of 1.0: the split it relies on for every living holder is official); `birthDate()` of a
+  9/0 number and its 1800s date check rest on the secondary reading.
 - **ID NIK impossible dates are refused per the spec.** Dukcapil describes digits 7-12 as the birth date (woman's day
   plus 40); an impossible date is no "tanggal lahir". The two-digit year has no published century rule, so 29 February
   is accepted when the year is divisible by four (`00` included) and there is no `birthDate()`.

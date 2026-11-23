@@ -81,7 +81,12 @@ no document; the 영주증 and 국내거소신고증 numbers are not described a
 shows an 외국인등록번호 is the same number).
 
 Two classes: the resident class refuses 5-8 and this one refuses 1-4, 9 and 0 (the name must not claim more than it
-covers); the owner confirmed the split. Open question for the owner (no official text read): a foreigner number whose
+covers); the owner confirmed the split.
+
+**1.0 (ruling B4):** the century is not official, so the class no longer implements `HasBirthDate`. It gives
+`birthYearDigits()`, `birthMonth()` and `birthDay()`, and a birth date is refused only when it exists in no century
+(`Internal\TwoDigitYearDate`: 29 February `00` is accepted with any of 5-8; it was refused with 5 or 6 in 0.x). The
+resident class keeps `HasBirthDate`: its digits 1-4 are decoded from an official page; 9 and 0 stay secondary (above). Open question for the owner (no official text read): a foreigner number whose
 birth date is not a calendar date (for instance a registered unknown month or day) is refused here; kept as decided, to
 revisit if an official practice for unknown dates is found. Mask: last 4.
 

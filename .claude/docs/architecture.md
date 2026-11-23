@@ -174,7 +174,9 @@ parts on `AbstractJapaneseNamePart` (`\p{sc=Han}`, kana, `ー`, `〆`). Codec ke
 `givenReading`, `latinOverride` (override only).
 
 `Document\KR\*` (plan 4): `ResidentRegistrationNumber` and `ForeignerRegistrationNumber` (`KoreanRegistrationNumber`;
-`HasBirthDate`, `HasSex`; the resident class refuses 7th digits 5-8, the foreigner class 1-4, 9 and 0),
+`HasSex`; only the resident class is `HasBirthDate`, the foreigner class gives `birthYearDigits()`, `birthMonth()`,
+`birthDay()` since 1.0 (its century is secondary only); the resident class refuses 7th digits 5-8, the foreigner class
+1-4, 9 and 0),
 `MultipleEntryPassportNumber` (`M` series only), `DriverLicenceNumber` (12 digits or the region name + ten
 digits; `regionCode()`/`formatted()` for the numbered form). `Name\KR\PersonName` mirrors CN (Hangul, `·`, hyphen, space
 between words).

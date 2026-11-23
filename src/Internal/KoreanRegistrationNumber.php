@@ -11,9 +11,9 @@ use MSSTC4PHP\ValueObject\Documents\Exception\InvalidDocumentNumberException;
 use MSSTC4PHP\ValueObject\Documents\Sex;
 
 /**
- * The 13 digits of the resident and the foreigner registration number: `YYMMDD` and a digit for the sex and century
- * of the birth date. Which digits belong to which number is the caller's. No check digit is verified (numbers issued
- * since 2020-10 carry random digits after the seventh).
+ * The 13 digits of the resident and the foreigner registration number: `YYMMDD` and a seventh digit for the sex (and,
+ * for a resident, the century) of the birth date. Which digits belong to which number is the caller's. No check digit
+ * is verified (numbers issued since 2020-10 carry random digits after the seventh).
  *
  * @internal
  */
@@ -29,12 +29,16 @@ final class KoreanRegistrationNumber
 
     private const int SEVENTH_DIGIT_INDEX = 6;
 
-    /** Seventh digit => the first year of the birth century and the sex. */
-    private const array SEVENTH_DIGIT = [
-        '9' => [1800, Sex::Male], '0' => [1800, Sex::Female],
-        '1' => [1900, Sex::Male], '2' => [1900, Sex::Female], '5' => [1900, Sex::Male], '6' => [1900, Sex::Female],
-        '3' => [2000, Sex::Male], '4' => [2000, Sex::Female], '7' => [2000, Sex::Male], '8' => [2000, Sex::Female],
+    private const array SEX = [
+        '9' => Sex::Male, '0' => Sex::Female, '1' => Sex::Male, '2' => Sex::Female, '3' => Sex::Male, '4' => Sex::Female,
+        '5' => Sex::Male, '6' => Sex::Female, '7' => Sex::Male, '8' => Sex::Female,
     ];
+
+    /**
+     * Seventh digit => the first year of the birth century, for the resident digits only: no official text gives the
+     * century of the foreigner digits 5-8 (docs/sources/KR.md).
+     */
+    private const array CENTURY = ['9' => 1800, '0' => 1800, '1' => 1900, '2' => 1900, '3' => 2000, '4' => 2000];
 
     private function __construct()
     {
@@ -47,16 +51,21 @@ final class KoreanRegistrationNumber
      * @return non-empty-string 13 ASCII digits
      *
      * @throws InvalidDocumentNumberException on a wrong length, a non-digit, a seventh digit outside `$sevenths` or
-     *                                        a birth date that does not exist
+     *                                        a birth date that does not exist: in the century of the seventh digit
+     *                                        where it has one, otherwise in any century ({@see TwoDigitYearDate})
      */
     public static function normalize(string $input, string $document, string $sevenths): string
     {
         $number = Digits::exactly($input, self::LENGTH, $document);
-        if (!\str_contains($sevenths, $number[self::SEVENTH_DIGIT_INDEX])) {
+        $seventh = $number[self::SEVENTH_DIGIT_INDEX];
+        if (!\str_contains($sevenths, $seventh)) {
             throw new InvalidDocumentNumberException(\sprintf('Invalid %s (invalid character).', $document));
         }
 
-        if (!\checkdate(self::month($number), self::day($number), self::year($number))) {
+        $exists = isset(self::CENTURY[$seventh])
+            ? \checkdate(self::month($number), self::day($number), self::year($number))
+            : TwoDigitYearDate::exists(self::day($number), self::month($number), (int) \substr($number, 0, 2));
+        if (!$exists) {
             throw new InvalidDocumentNumberException(\sprintf('Invalid %s (invalid birth date).', $document));
         }
 
@@ -81,24 +90,56 @@ final class KoreanRegistrationNumber
      */
     public static function sex(string $number): Sex
     {
-        return self::seventhDigit($number)[1];
+        return self::SEX[self::seventhDigit($number)] ?? throw new LogicException(self::NOT_NORMALIZED);
+    }
+
+    /**
+     * @param non-empty-string $number a number {@see normalize()} accepted
+     *
+     * @return non-empty-string the tens and units of the birth year
+     */
+    public static function yearDigits(string $number): string
+    {
+        return Text::nonEmpty(\substr($number, 0, 2));
+    }
+
+    /**
+     * @param non-empty-string $number a number {@see normalize()} accepted
+     *
+     * @return int<1, 12>
+     */
+    public static function birthMonth(string $number): int
+    {
+        $month = self::month($number);
+
+        return $month >= 1 && $month <= 12 ? $month : throw new LogicException(self::NOT_NORMALIZED);
+    }
+
+    /**
+     * @param non-empty-string $number a number {@see normalize()} accepted
+     *
+     * @return int<1, 31>
+     */
+    public static function birthDay(string $number): int
+    {
+        $day = self::day($number);
+
+        return $day >= 1 && $day <= 31 ? $day : throw new LogicException(self::NOT_NORMALIZED);
     }
 
     private static function year(string $number): int
     {
-        return self::seventhDigit($number)[0] + (int) \substr($number, 0, 2);
+        return (self::CENTURY[self::seventhDigit($number)] ?? throw new LogicException(self::NOT_NORMALIZED))
+            + (int) \substr($number, 0, 2);
     }
 
     /**
-     * A stored value is not parsed again on unserialize, so a tampered one fails here with fixed text instead of an
-     * "Undefined array key" warning that would show its digit.
-     *
-     * @return array{int, Sex}
+     * A tampered value (built without parse()) fails with fixed text instead of an "Undefined array key" warning
+     * that would show its digit.
      */
-    private static function seventhDigit(string $number): array
+    private static function seventhDigit(string $number): string
     {
-        return self::SEVENTH_DIGIT[$number[self::SEVENTH_DIGIT_INDEX] ?? '']
-            ?? throw new LogicException(self::NOT_NORMALIZED);
+        return $number[self::SEVENTH_DIGIT_INDEX] ?? throw new LogicException(self::NOT_NORMALIZED);
     }
 
     private static function month(string $number): int
