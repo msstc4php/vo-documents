@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MSSTC4PHP\ValueObject\Documents\Document\JP;
 
-use MSSTC4PHP\ValueObject\Documents\Contract\Maskable;
+use MSSTC4PHP\ValueObject\Contract\Maskable;
 use MSSTC4PHP\ValueObject\Documents\Internal\Mask;
 use MSSTC4PHP\ValueObject\Documents\Internal\NumberShapes;
 use MSSTC4PHP\ValueObject\Documents\Internal\Text;

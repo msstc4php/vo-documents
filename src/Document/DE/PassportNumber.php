@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MSSTC4PHP\ValueObject\Documents\Document\DE;
 
-use MSSTC4PHP\ValueObject\Documents\Contract\Maskable;
+use MSSTC4PHP\ValueObject\Contract\Maskable;
 use MSSTC4PHP\ValueObject\Documents\Internal\Text;
 use MSSTC4PHP\ValueObject\Support\AbstractStringValueObject;
 use Override;

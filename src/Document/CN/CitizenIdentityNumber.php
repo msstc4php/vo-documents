@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace MSSTC4PHP\ValueObject\Documents\Document\CN;
 
 use DateTimeImmutable;
+use MSSTC4PHP\ValueObject\Contract\Maskable;
 use MSSTC4PHP\ValueObject\Documents\Contract\HasBirthDate;
 use MSSTC4PHP\ValueObject\Documents\Contract\HasSex;
-use MSSTC4PHP\ValueObject\Documents\Contract\Maskable;
 use MSSTC4PHP\ValueObject\Documents\Internal\Gb11643;
 use MSSTC4PHP\ValueObject\Documents\Internal\Mask;
 use MSSTC4PHP\ValueObject\Documents\Internal\Text;

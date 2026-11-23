@@ -6,9 +6,9 @@ namespace MSSTC4PHP\ValueObject\Documents\Document\MX;
 
 use DateTimeImmutable;
 use DateTimeZone;
+use MSSTC4PHP\ValueObject\Contract\Maskable;
 use MSSTC4PHP\ValueObject\Documents\Contract\HasBirthDate;
 use MSSTC4PHP\ValueObject\Documents\Contract\HasSex;
-use MSSTC4PHP\ValueObject\Documents\Contract\Maskable;
 use MSSTC4PHP\ValueObject\Documents\Exception\InvalidDocumentNumberException;
 use MSSTC4PHP\ValueObject\Documents\Internal\Mask;
 use MSSTC4PHP\ValueObject\Documents\Internal\NumberFormat;

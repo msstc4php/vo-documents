@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace MSSTC4PHP\ValueObject\Documents\Document\CN;
 
 use DateTimeImmutable;
+use MSSTC4PHP\ValueObject\Contract\Maskable;
 use MSSTC4PHP\ValueObject\Documents\Contract\HasBirthDate;
-use MSSTC4PHP\ValueObject\Documents\Contract\Maskable;
 use MSSTC4PHP\ValueObject\Documents\Exception\InvalidDocumentNumberException;
 use MSSTC4PHP\ValueObject\Documents\Internal\Gb11643;
 use MSSTC4PHP\ValueObject\Documents\Internal\Mask;

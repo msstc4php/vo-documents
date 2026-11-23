@@ -54,7 +54,7 @@ U+202A-202E and U+2066-2069 that a number picks up when pasted from right-to-lef
 folded. Names do not fold: a compatibility character in a name is refused.
 
 `__toString()` and `jsonSerialize()` return the full canonical value. Masking is an explicit, separate call,
-`masked()` (interface `Contract\Maskable`). No masking rule is official unless the class says so; the default keeps the
+`masked()` (vo-base's interface `MSSTC4PHP\ValueObject\Contract\Maskable`). No masking rule is official unless the class says so; the default keeps the
 last four characters, and a number of 8 characters or fewer keeps three (CH identity document, GB Northern Ireland
 licence). The AU classes keep three (their numbers are at most 10 characters long, `docs/sources/AU.md`).
 
@@ -179,7 +179,7 @@ then the given names are the only ICAO identifier, `JUAN`). The Brazilian one is
 both required (CNJ Código Nacional de Normas art. 515-B), each part holding several words with particles in the case
 given (`da Silva`, `Maria da Conceição`).
 
-Contracts: `Contract\Maskable` (every number above and the MRZ; it extends vo-base's `Contract\Maskable`, so every document class is also a core `Maskable`), `Contract\Subdivision` and `Contract\IssuedBySubdivision` (AU,
+Contracts: vo-base's `Contract\Maskable` (every number above and the MRZ; the package's own `Contract\Maskable` of 0.x is removed in 1.0), `Contract\Subdivision` and `Contract\IssuedBySubdivision` (AU,
 US, CA, MX and BR jurisdictions, AU licences, US DL/ID numbers, CA licence and health card numbers, MX licence numbers,
 BR RG numbers). `Contract\HasSex` and the `Sex` enum are implemented by the documents that encode a sex
 (`Nir`, `FiscalCode`, the DVLA licence number, `ChiNumber`, the Québec NAM, the Mexican CURP, the Chinese citizen

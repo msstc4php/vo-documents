@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MSSTC4PHP\ValueObject\Documents\Document\BR;
 
-use MSSTC4PHP\ValueObject\Documents\Contract\Maskable;
+use MSSTC4PHP\ValueObject\Contract\Maskable;
 use MSSTC4PHP\ValueObject\Documents\Exception\InvalidDocumentNumberException;
 use MSSTC4PHP\ValueObject\Documents\Internal\Checksum;
 use MSSTC4PHP\ValueObject\Documents\Internal\Digits;

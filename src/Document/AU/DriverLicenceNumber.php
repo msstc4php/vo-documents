@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace MSSTC4PHP\ValueObject\Documents\Document\AU;
 
+use MSSTC4PHP\ValueObject\Contract\Maskable;
 use MSSTC4PHP\ValueObject\Contract\StringConvertible;
 use MSSTC4PHP\ValueObject\Contract\ValueObject;
 use MSSTC4PHP\ValueObject\Documents\Contract\IssuedBySubdivision;
-use MSSTC4PHP\ValueObject\Documents\Contract\Maskable;
 use Override;
 
 /**
