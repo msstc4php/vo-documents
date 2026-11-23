@@ -126,12 +126,12 @@ final class CitizenIdentityNumberTest extends TestCase
 
         yield 'first-generation number of 15 digits (invalid since 2013-01-01)' => [
             '110105491231002',
-            'Invalid Chinese citizen identity number (15 characters).',
+            'Invalid Chinese citizen identity number (wrong length).',
         ];
-        yield 'too short' => ['11010519491231002', 'Invalid Chinese citizen identity number (17 characters).'];
-        yield 'too long' => ['11010519491231002X0', 'Invalid Chinese citizen identity number (19 characters).'];
-        yield 'far too long' => [\str_repeat('1', 41), 'Invalid Chinese citizen identity number (too long).'];
-        yield 'empty' => ['', 'Invalid Chinese citizen identity number (0 characters).'];
+        yield 'too short' => ['11010519491231002', 'Invalid Chinese citizen identity number (wrong length).'];
+        yield 'too long' => ['11010519491231002X0', 'Invalid Chinese citizen identity number (wrong length).'];
+        yield 'far too long' => [\str_repeat('1', 41), 'Invalid Chinese citizen identity number (wrong length).'];
+        yield 'empty' => ['', 'Invalid Chinese citizen identity number (wrong length).'];
         yield 'X inside the number' => ['1101051949123X0020', $character];
         yield 'X first' => ['X1010519491231002X', $character];
         yield 'another letter as the check character' => ['11010519491231002A', $character];

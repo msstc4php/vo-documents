@@ -63,12 +63,12 @@ final class CnsTest extends TestCase
         yield 'fails both ANS routines' => ['123456789012345', 'Invalid Brazilian CNS checksum.'];
         yield '001 branch with the 000 check digit' => ['100000000060010', 'Invalid Brazilian CNS checksum.'];
         yield 'all zeros (isDvCnsValido)' => ['000000000000000', 'Invalid Brazilian CNS checksum.'];
-        yield 'seven digits, as the DATASUS error message' => ['1111111', 'Invalid Brazilian CNS (7 characters).'];
-        yield 'fourteen digits' => ['70000000000000', 'Invalid Brazilian CNS (14 characters).'];
-        yield 'sixteen digits' => ['7000000000000040', 'Invalid Brazilian CNS (16 characters).'];
-        yield 'dots are no separator' => ['700.0000.0000.0004', 'Invalid Brazilian CNS (18 characters).'];
+        yield 'seven digits, as the DATASUS error message' => ['1111111', 'Invalid Brazilian CNS (wrong length).'];
+        yield 'fourteen digits' => ['70000000000000', 'Invalid Brazilian CNS (wrong length).'];
+        yield 'sixteen digits' => ['7000000000000040', 'Invalid Brazilian CNS (wrong length).'];
+        yield 'dots are no separator' => ['700.0000.0000.0004', 'Invalid Brazilian CNS (wrong length).'];
         yield 'letter' => ['70000000000000A', 'Invalid Brazilian CNS (invalid character).'];
-        yield 'empty' => ['', 'Invalid Brazilian CNS (0 characters).'];
+        yield 'empty' => ['', 'Invalid Brazilian CNS (wrong length).'];
     }
 
     #[DataProvider('invalidNumbers')]

@@ -62,8 +62,8 @@ final class PassportNumberTest extends TestCase
         yield 'three letters' => ['ABC123456', 'Invalid Japanese passport number (invalid character).'];
         yield 'one letter and eight digits' => ['A12345678', 'Invalid Japanese passport number (invalid character).'];
         yield 'letters last' => ['1234567AB', 'Invalid Japanese passport number (invalid character).'];
-        yield 'too short' => ['AB123456', 'Invalid Japanese passport number (8 characters).'];
-        yield 'too long' => ['AB12345678', 'Invalid Japanese passport number (10 characters).'];
+        yield 'too short' => ['AB123456', 'Invalid Japanese passport number (wrong length).'];
+        yield 'too long' => ['AB12345678', 'Invalid Japanese passport number (wrong length).'];
         yield 'non-ASCII letter' => ["\u{00C4}B1234567", 'Invalid Japanese passport number (invalid character).'];
     }
 

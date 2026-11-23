@@ -156,7 +156,7 @@ final class DriverLicenceNumbersTest extends TestCase
             self::assertRefusedWithoutEcho(
                 static fn (string $value): AbstractDriverLicenceNumber => $class::from($value),
                 $input,
-                \sprintf("Invalid %s driver's licence number (%d characters).", $iso, $length),
+                \sprintf("Invalid %s driver's licence number (wrong length).", $iso),
             );
         }
     }
@@ -202,9 +202,9 @@ final class DriverLicenceNumbersTest extends TestCase
         yield 'AB pasted several times' => [
             AbDriverLicenceNumber::class,
             \str_repeat('123456789 ', 5),
-            "Invalid CA-AB driver's licence number (too long).",
+            "Invalid CA-AB driver's licence number (wrong length).",
         ];
-        yield 'BC empty' => [BcDriverLicenceNumber::class, '', "Invalid CA-BC driver's licence number (0 characters)."];
+        yield 'BC empty' => [BcDriverLicenceNumber::class, '', "Invalid CA-BC driver's licence number (wrong length)."];
     }
 
     /**

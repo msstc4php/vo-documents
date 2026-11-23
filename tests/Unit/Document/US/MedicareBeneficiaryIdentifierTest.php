@@ -110,8 +110,8 @@ final class MedicareBeneficiaryIdentifierTest extends TestCase
     {
         $prefix = 'Invalid American Medicare Beneficiary Identifier';
 
-        yield 'ten characters' => ['1EG4TE5MK7', $prefix . ' (10 characters).'];
-        yield 'twelve characters' => ['1EG4TE5MK733', $prefix . ' (12 characters).'];
+        yield 'ten characters' => ['1EG4TE5MK7', $prefix . ' (wrong length).'];
+        yield 'twelve characters' => ['1EG4TE5MK733', $prefix . ' (wrong length).'];
         yield 'HICN-like slash' => ['1EG4/TE5MK7', $prefix . ' (invalid character).'];
     }
 

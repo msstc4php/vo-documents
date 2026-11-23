@@ -54,15 +54,15 @@ final class NorthernIrelandDriverLicenceNumberTest extends TestCase
      */
     public static function invalidNumbers(): iterable
     {
-        yield 'seven digits' => ['1234567', 'Invalid Northern Ireland driving licence number (7 characters).'];
-        yield 'nine digits' => ['123456789', 'Invalid Northern Ireland driving licence number (9 characters).'];
+        yield 'seven digits' => ['1234567', 'Invalid Northern Ireland driving licence number (wrong length).'];
+        yield 'nine digits' => ['123456789', 'Invalid Northern Ireland driving licence number (wrong length).'];
         yield 'Great Britain number' => [
             'MORGA657054SM9IJ',
-            'Invalid Northern Ireland driving licence number (16 characters).',
+            'Invalid Northern Ireland driving licence number (wrong length).',
         ];
         yield 'letter' => ['A1234567', 'Invalid Northern Ireland driving licence number (invalid character).'];
-        yield 'empty' => ['', 'Invalid Northern Ireland driving licence number (0 characters).'];
-        yield 'far too long' => [\str_repeat('1', 50), 'Invalid Northern Ireland driving licence number (too long).'];
+        yield 'empty' => ['', 'Invalid Northern Ireland driving licence number (wrong length).'];
+        yield 'far too long' => [\str_repeat('1', 50), 'Invalid Northern Ireland driving licence number (wrong length).'];
     }
 
     #[DataProvider('invalidNumbers')]

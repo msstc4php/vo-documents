@@ -84,7 +84,7 @@ final class IdentityCardNumbersTest extends TestCase
             self::assertRefusedWithoutEcho(
                 static fn (string $value): AbstractIdentityCardNumber => SpIdentityCardNumber::from($value),
                 $input,
-                \sprintf('Invalid BR-SP identity card number (%d characters).', $length),
+                'Invalid BR-SP identity card number (wrong length).',
             );
         }
     }
@@ -96,7 +96,7 @@ final class IdentityCardNumbersTest extends TestCase
     {
         $character = 'Invalid BR-SP identity card number (invalid character).';
         $checksum = 'Invalid BR-SP identity card number checksum.';
-        $zeros = 'Invalid BR-SP identity card number (zeros only).';
+        $zeros = 'Invalid BR-SP identity card number checksum.';
 
         yield 'wrong check digit' => ['12.345.678-3', $checksum];
         yield 'X where a digit is due' => ['12.345.678-X', $checksum];
@@ -111,7 +111,7 @@ final class IdentityCardNumbersTest extends TestCase
         yield 'zeros only, any check' => ['0000-5', $zeros];
         yield 'pasted several times' => [
             \str_repeat('12.345.678-2 ', 5),
-            'Invalid BR-SP identity card number (too long).',
+            'Invalid BR-SP identity card number (wrong length).',
         ];
     }
 
@@ -221,11 +221,11 @@ final class IdentityCardNumbersTest extends TestCase
         $document = 'Invalid BR-SP identity card number';
 
         yield 'wrong supplied check' => ['12.345.678', '3', $document . ' checksum.'];
-        yield 'zeros only' => ['00000000', null, $document . ' (zeros only).'];
-        yield 'zeros only with a check' => ['0', '0', $document . ' (zeros only).'];
-        yield 'nine digits' => ['123456782', null, $document . ' (9 characters).'];
-        yield 'empty number' => ['', null, $document . ' (0 characters).'];
-        yield 'pasted several times' => [\str_repeat('12.345.678.', 6), null, $document . ' (too long).'];
+        yield 'zeros only' => ['00000000', null, $document . ' checksum.'];
+        yield 'zeros only with a check' => ['0', '0', $document . ' checksum.'];
+        yield 'nine digits' => ['123456782', null, $document . ' (wrong length).'];
+        yield 'empty number' => ['', null, $document . ' (wrong length).'];
+        yield 'pasted several times' => [\str_repeat('12.345.678.', 6), null, $document . ' (wrong length).'];
         yield 'letter in the number' => ['1234567A', null, $document . ' (number field: digits and dots only).'];
         yield 'X in the number' => ['1234567X', '2', $document . ' (number field: digits and dots only).'];
         yield 'hyphen and check digit in the number' => [

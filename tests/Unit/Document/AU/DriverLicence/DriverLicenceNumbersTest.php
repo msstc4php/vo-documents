@@ -146,12 +146,12 @@ final class DriverLicenceNumbersTest extends TestCase
         self::assertRefusedWithoutEcho(
             static fn (string $value): AbstractDriverLicenceNumber => $class::from($value),
             \str_repeat('1', $min - 1),
-            \sprintf('Invalid %s driver licence number (%d characters).', $iso, $min - 1),
+            \sprintf('Invalid %s driver licence number (wrong length).', $iso),
         );
         self::assertRefusedWithoutEcho(
             static fn (string $value): AbstractDriverLicenceNumber => $class::from($value),
             \str_repeat('1', $max + 1),
-            \sprintf('Invalid %s driver licence number (%d characters).', $iso, $max + 1),
+            \sprintf('Invalid %s driver licence number (wrong length).', $iso),
         );
     }
 
@@ -186,7 +186,7 @@ final class DriverLicenceNumbersTest extends TestCase
         yield 'ACT eleven digits' => [
             ActDriverLicenceNumber::class,
             '12345678901',
-            'Invalid AU-ACT driver licence number (11 characters).',
+            'Invalid AU-ACT driver licence number (wrong length).',
         ];
         yield 'ACT letter' => [
             ActDriverLicenceNumber::class,
@@ -196,17 +196,17 @@ final class DriverLicenceNumbersTest extends TestCase
         yield 'ACT empty' => [
             ActDriverLicenceNumber::class,
             '',
-            'Invalid AU-ACT driver licence number (0 characters).',
+            'Invalid AU-ACT driver licence number (wrong length).',
         ];
         yield 'NSW five characters' => [
             NswDriverLicenceNumber::class,
             '12345',
-            'Invalid AU-NSW driver licence number (5 characters).',
+            'Invalid AU-NSW driver licence number (wrong length).',
         ];
         yield 'NSW nine characters' => [
             NswDriverLicenceNumber::class,
             '123456789',
-            'Invalid AU-NSW driver licence number (9 characters).',
+            'Invalid AU-NSW driver licence number (wrong length).',
         ];
         yield 'NSW non-ASCII letter' => [
             NswDriverLicenceNumber::class,
@@ -221,27 +221,27 @@ final class DriverLicenceNumbersTest extends TestCase
         yield 'Qld seven digits' => [
             QldDriverLicenceNumber::class,
             '1234567',
-            'Invalid AU-QLD driver licence number (7 characters).',
+            'Invalid AU-QLD driver licence number (wrong length).',
         ];
         yield 'Qld ten digits' => [
             QldDriverLicenceNumber::class,
             '1234567890',
-            'Invalid AU-QLD driver licence number (10 characters).',
+            'Invalid AU-QLD driver licence number (wrong length).',
         ];
         yield 'SA five characters' => [
             SaDriverLicenceNumber::class,
             'S1234',
-            'Invalid AU-SA driver licence number (5 characters).',
+            'Invalid AU-SA driver licence number (wrong length).',
         ];
         yield 'SA seven characters' => [
             SaDriverLicenceNumber::class,
             'S123456',
-            'Invalid AU-SA driver licence number (7 characters).',
+            'Invalid AU-SA driver licence number (wrong length).',
         ];
         yield 'Tas nine characters' => [
             TasDriverLicenceNumber::class,
             'A12345678',
-            'Invalid AU-TAS driver licence number (9 characters).',
+            'Invalid AU-TAS driver licence number (wrong length).',
         ];
         yield 'Tas other separator' => [
             TasDriverLicenceNumber::class,
@@ -256,12 +256,12 @@ final class DriverLicenceNumbersTest extends TestCase
         yield 'WA six digits' => [
             WaDriverLicenceNumber::class,
             '643777',
-            'Invalid AU-WA driver licence number (6 characters).',
+            'Invalid AU-WA driver licence number (wrong length).',
         ];
         yield 'WA eight digits' => [
             WaDriverLicenceNumber::class,
             '64377721',
-            'Invalid AU-WA driver licence number (8 characters).',
+            'Invalid AU-WA driver licence number (wrong length).',
         ];
         yield 'WA trailing control character' => [
             WaDriverLicenceNumber::class,
@@ -271,7 +271,7 @@ final class DriverLicenceNumbersTest extends TestCase
         yield 'pasted several times' => [
             WaDriverLicenceNumber::class,
             \str_repeat('6437772 ', 6),
-            'Invalid AU-WA driver licence number (too long).',
+            'Invalid AU-WA driver licence number (wrong length).',
         ];
     }
 

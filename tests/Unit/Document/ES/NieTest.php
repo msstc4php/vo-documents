@@ -71,12 +71,12 @@ final class NieTest extends TestCase
         $invalid = 'Invalid Spanish NIE (invalid character).';
         $checksum = 'Invalid Spanish NIE checksum.';
 
-        yield 'eleven characters' => ['X123456789Z', 'Invalid Spanish NIE (11 characters).'];
+        yield 'eleven characters' => ['X123456789Z', 'Invalid Spanish NIE (wrong length).'];
         yield 'pre-2008 layout with Y' => ['Y12345678Z', $invalid];
         yield 'pre-2008 layout, digit last' => ['X123456789', $invalid];
         yield 'pre-2008 layout, letter among the digits' => ['X1234A678Z', $invalid];
         yield 'pre-2008 layout, accented letter last' => ['X12345678É', $invalid];
-        yield 'six digits' => ['X123456L', 'Invalid Spanish NIE (8 characters).'];
+        yield 'six digits' => ['X123456L', 'Invalid Spanish NIE (wrong length).'];
         yield 'initial after Z' => ['W1234567L', $invalid];
         yield 'NIF letter M' => ['M1234567L', $invalid];
         yield 'DNI number' => ['12345678Z', $invalid];
@@ -85,7 +85,7 @@ final class NieTest extends TestCase
         yield 'two initials' => ['XY234567L', $invalid];
         yield 'letter of another initial' => ['Y1234567L', $checksum];
         yield 'wrong letter' => ['X1234567T', $checksum];
-        yield 'empty' => ['', 'Invalid Spanish NIE (0 characters).'];
+        yield 'empty' => ['', 'Invalid Spanish NIE (wrong length).'];
     }
 
     #[DataProvider('invalidNumbers')]

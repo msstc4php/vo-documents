@@ -84,7 +84,7 @@ abstract class AbstractNamePart extends AbstractStringValueObject
         }
 
         if ($length === 0) {
-            throw new InvalidPersonNameException(\sprintf('Invalid %s (0 characters).', $this->label()));
+            throw new InvalidPersonNameException(\sprintf('Invalid %s (empty).', $this->label()));
         }
 
         if ($this->hasCompatibilityCharacter($normalized)) {

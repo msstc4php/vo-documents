@@ -102,7 +102,7 @@ final class NamePartsTest extends TestCase
         yield 'n preceded by apostrophe of Latin Extended-A' => ["\u{0149}t", $compatibility];
         yield 'feminine ordinal indicator' => ["\u{00AA}na", $compatibility];
         yield 'micro sign' => ['Mµller', $compatibility];
-        yield 'empty' => ['  ', 'Invalid Swiss family name (0 characters).'];
+        yield 'empty' => ['  ', 'Invalid Swiss family name (empty).'];
     }
 
     #[DataProvider('invalidFamilyNames')]

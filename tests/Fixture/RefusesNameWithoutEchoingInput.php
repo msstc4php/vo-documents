@@ -14,7 +14,7 @@ trait RefusesNameWithoutEchoingInput
     /**
      * Asserts that `$create()` throws `$exception` with exactly `$expectedMessage`, and that the message holds no word
      * of three or more letters of `$input` (as typed or upper-cased) and no non-ASCII letter of it at all, so no name
-     * part is echoed, however short (`张`, `민준`).
+     * part is echoed, however short (`张`, `민준`), and no number equal to its length.
      *
      * @param Closure(): mixed $create
      * @param class-string<Throwable> $exception
@@ -35,6 +35,11 @@ trait RefusesNameWithoutEchoingInput
                 Assert::assertStringNotContainsString($word, $thrown->getMessage());
                 Assert::assertStringNotContainsString(\mb_strtoupper($word, 'UTF-8'), $thrown->getMessage());
             }
+
+            Assert::assertDoesNotMatchRegularExpression(
+                '/(?<![0-9])' . \mb_strlen($input, 'UTF-8') . '(?![0-9])/',
+                $thrown->getMessage(),
+            );
 
             \preg_match_all('/(?![\x00-\x7F])\p{L}/u', $input, $letters);
             foreach ($letters[0] as $letter) {

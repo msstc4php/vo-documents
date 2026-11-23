@@ -68,14 +68,14 @@ final class IdentityCardNumberTest extends TestCase
     {
         $invalid = 'Invalid German identity card number (invalid character).';
 
-        yield 'eight characters' => ['LZ6311T4', 'Invalid German identity card number (8 characters).'];
+        yield 'eight characters' => ['LZ6311T4', 'Invalid German identity card number (wrong length).'];
         yield 'ten characters (with the MRZ check digit)' => [
             'LZ6311T475',
-            'Invalid German identity card number (10 characters).',
+            'Invalid German identity card number (wrong length).',
         ];
         yield 'provisional card, letter and seven digits' => [
             'A1234567',
-            'Invalid German identity card number (8 characters).',
+            'Invalid German identity card number (wrong length).',
         ];
         yield 'digit zero' => ['LZ6301T47', $invalid];
         yield 'letter O' => ['LZ63O1T47', $invalid];
@@ -85,7 +85,7 @@ final class IdentityCardNumberTest extends TestCase
         yield 'letter Q' => ['LQ6311T47', $invalid];
         yield 'letter S' => ['LS6311T47', $invalid];
         yield 'umlaut' => ['LÜ6311T47', $invalid];
-        yield 'empty' => ['', 'Invalid German identity card number (0 characters).'];
+        yield 'empty' => ['', 'Invalid German identity card number (wrong length).'];
     }
 
     #[DataProvider('invalidNumbers')]

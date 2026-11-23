@@ -193,7 +193,7 @@ final class HealthCardNumbersTest extends TestCase
             self::assertRefusedWithoutEcho(
                 static fn (string $value): AbstractHealthCardNumber => $class::from($value),
                 $input,
-                \sprintf('Invalid %s health card number (%d characters).', $iso, $length),
+                \sprintf('Invalid %s health card number (wrong length).', $iso),
             );
         }
     }
@@ -232,7 +232,7 @@ final class HealthCardNumbersTest extends TestCase
         yield 'ON three-letter version code' => [
             OnHealthCardNumber::class,
             '9876543217ABC',
-            'Invalid CA-ON health card number (13 characters).',
+            'Invalid CA-ON health card number (wrong length).',
         ];
         yield 'QC temporary NAM' => [QcHealthCardNumber::class, 'BERC920401M2', 'Invalid CA-QC ' . $character];
         yield 'QC three letters' => [QcHealthCardNumber::class, 'BOU194011419', 'Invalid CA-QC ' . $character];
@@ -247,9 +247,9 @@ final class HealthCardNumbersTest extends TestCase
         yield 'SK pasted several times' => [
             SkHealthCardNumber::class,
             \str_repeat('123456789 ', 5),
-            'Invalid CA-SK health card number (too long).',
+            'Invalid CA-SK health card number (wrong length).',
         ];
-        yield 'PE empty' => [PeHealthCardNumber::class, '', 'Invalid CA-PE health card number (0 characters).'];
+        yield 'PE empty' => [PeHealthCardNumber::class, '', 'Invalid CA-PE health card number (wrong length).'];
     }
 
     /**

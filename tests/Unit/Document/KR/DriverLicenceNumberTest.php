@@ -136,19 +136,19 @@ final class DriverLicenceNumberTest extends TestCase
     {
         $name = 'Invalid Korean driving licence number';
 
-        yield 'empty' => ['', $name . ' (0 characters).'];
-        yield 'ten digits, no region' => ['9525593361', $name . ' (10 characters).'];
-        yield 'eleven digits' => ['11952559336', $name . ' (11 characters).'];
-        yield 'thirteen digits' => ['1195255933611', $name . ' (13 characters).'];
-        yield 'far too long' => [\str_repeat('1', 41), $name . ' (too long).'];
+        yield 'empty' => ['', $name . ' (wrong length).'];
+        yield 'ten digits, no region' => ['9525593361', $name . ' (wrong length).'];
+        yield 'eleven digits' => ['11952559336', $name . ' (wrong length).'];
+        yield 'thirteen digits' => ['1195255933611', $name . ' (wrong length).'];
+        yield 'far too long' => [\str_repeat('1', 41), $name . ' (wrong length).'];
         yield 'a letter' => ['11952559336A', $name . ' (invalid character).'];
         yield 'unknown region name' => ['세종9525593361', $name . ' (invalid character).'];
-        yield 'region name and nine digits' => ['서울952559336', $name . ' (11 characters).'];
-        yield 'region name and eleven digits' => ['서울95255933611', $name . ' (13 characters).'];
-        yield 'region name only' => ['서울', $name . ' (2 characters).'];
+        yield 'region name and nine digits' => ['서울952559336', $name . ' (wrong length).'];
+        yield 'region name and eleven digits' => ['서울95255933611', $name . ' (wrong length).'];
+        yield 'region name only' => ['서울', $name . ' (wrong length).'];
         yield 'region name in Latin' => ['SE9525593361', $name . ' (invalid character).'];
-        yield 'three-letter region name' => ['서울시9525593361', $name . ' (13 characters).'];
-        yield 'a character before the region name' => ['가서울9525593361', $name . ' (13 characters).'];
+        yield 'three-letter region name' => ['서울시9525593361', $name . ' (wrong length).'];
+        yield 'a character before the region name' => ['가서울9525593361', $name . ' (wrong length).'];
         yield 'region name after the digits' => ['9525593361서울', $name . ' (invalid character).'];
     }
 

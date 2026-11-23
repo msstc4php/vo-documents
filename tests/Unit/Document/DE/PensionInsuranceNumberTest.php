@@ -146,15 +146,15 @@ final class PensionInsuranceNumberTest extends TestCase
         yield 'serial changed' => ['65230701J018', $checksum];
         yield 'letter changed' => ['65230701K008', $checksum];
         yield 'area number changed' => ['66230701J008', $checksum];
-        yield 'eleven characters' => ['65230701J00', 'Invalid German pension insurance number (11 characters).'];
-        yield 'thirteen characters' => ['65230701J0088', 'Invalid German pension insurance number (13 characters).'];
+        yield 'eleven characters' => ['65230701J00', 'Invalid German pension insurance number (wrong length).'];
+        yield 'thirteen characters' => ['65230701J0088', 'Invalid German pension insurance number (wrong length).'];
         yield 'digit at the letter position' => ['652307011008', $invalid];
         yield 'letter in the birth date' => ['6523070JJ008', $invalid];
         yield 'letter in the area number' => ['J5230701J008', $invalid];
         yield 'letter in the serial' => ['65230701J0J8', $invalid];
         yield 'letter as the check digit' => ['65230701J00J', $invalid];
         yield 'umlaut at the letter position' => ['65230701Ä008', $invalid];
-        yield 'empty' => ['', 'Invalid German pension insurance number (0 characters).'];
+        yield 'empty' => ['', 'Invalid German pension insurance number (wrong length).'];
     }
 
     #[DataProvider('invalidNumbers')]

@@ -64,9 +64,9 @@ final class InnTest extends TestCase
      */
     public static function invalidNumbers(): iterable
     {
-        yield 'zeros only' => ['000000000000', 'Invalid INN (zeros only).'];
-        yield 'organisation INN length' => ['7707083893', 'Invalid INN (10 characters).'];
-        yield 'too long' => ['5001007322590', 'Invalid INN (13 characters).'];
+        yield 'zeros only' => ['000000000000', 'Invalid INN checksum.'];
+        yield 'organisation INN length' => ['7707083893', 'Invalid INN (wrong length).'];
+        yield 'too long' => ['5001007322590', 'Invalid INN (wrong length).'];
         yield 'letters' => ['50010073225O', 'Invalid INN (invalid character).'];
     }
 

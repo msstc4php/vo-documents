@@ -66,9 +66,9 @@ final class MedicareCardNumberTest extends TestCase
     {
         yield 'with the individual reference number' => [
             '3189 97702 1 1',
-            'Invalid Medicare card number (11 characters).',
+            'Invalid Medicare card number (wrong length).',
         ];
-        yield 'nine digits' => ['3189 97702', 'Invalid Medicare card number (9 characters).'];
+        yield 'nine digits' => ['3189 97702', 'Invalid Medicare card number (wrong length).'];
         yield 'letter' => ['3189 97702 I', 'Invalid Medicare card number (invalid character).'];
     }
 

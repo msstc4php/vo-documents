@@ -84,7 +84,7 @@ final class NamePartsTest extends TestCase
         yield 'double hyphen' => ['Jean--Pierre', $invalid];
         yield 'trailing hyphen' => ['Jean-', $invalid];
         yield 'fullwidth' => ["\u{FF2A}ean", 'Invalid French given name (compatibility character).'];
-        yield 'empty' => ['  ', 'Invalid French given name (0 characters).'];
+        yield 'empty' => ['  ', 'Invalid French given name (empty).'];
     }
 
     #[DataProvider('invalidGivenNames')]

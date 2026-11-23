@@ -101,11 +101,11 @@ final class VoterRegistrationNumberTest extends TestCase
         yield 'state code 99' => ['123456789912', $state];
         yield 'four digits, no running number' => [
             '0191',
-            'Invalid Brazilian voter registration number (4 characters).',
+            'Invalid Brazilian voter registration number (wrong length).',
         ];
-        yield 'thirteen digits' => ['1234567801912', 'Invalid Brazilian voter registration number (13 characters).'];
+        yield 'thirteen digits' => ['1234567801912', 'Invalid Brazilian voter registration number (wrong length).'];
         yield 'letter' => ['12345678019A', 'Invalid Brazilian voter registration number (invalid character).'];
-        yield 'empty' => ['', 'Invalid Brazilian voter registration number (0 characters).'];
+        yield 'empty' => ['', 'Invalid Brazilian voter registration number (wrong length).'];
     }
 
     #[DataProvider('invalidNumbers')]

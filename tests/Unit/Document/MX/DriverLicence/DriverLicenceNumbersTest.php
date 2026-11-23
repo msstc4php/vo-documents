@@ -72,7 +72,7 @@ final class DriverLicenceNumbersTest extends TestCase
             self::assertRefusedWithoutEcho(
                 static fn (string $value): AbstractDriverLicenceNumber => MexDriverLicenceNumber::from($value),
                 $input,
-                \sprintf("Invalid MX-MEX driver's licence number (%d characters).", $length),
+                "Invalid MX-MEX driver's licence number (wrong length).",
             );
         }
     }
@@ -89,7 +89,7 @@ final class DriverLicenceNumbersTest extends TestCase
         yield 'other separator' => ['123456.78901', $character];
         yield 'pasted several times' => [
             \str_repeat('123456789012 ', 5),
-            "Invalid MX-MEX driver's licence number (too long).",
+            "Invalid MX-MEX driver's licence number (wrong length).",
         ];
     }
 

@@ -63,9 +63,9 @@ final class DriverLicenceNumberTest extends TestCase
         yield 'letter in a check digit' => ['1234567890A', $character];
         yield 'letter in the first check digit' => ['123456789A1', $character];
         yield 'symbol' => ['12345678#01', $character];
-        yield 'ten characters' => ['1234567890', 'Invalid Brazilian driving licence number (10 characters).'];
-        yield 'twelve characters' => ['123456789012', 'Invalid Brazilian driving licence number (12 characters).'];
-        yield 'empty' => ['', 'Invalid Brazilian driving licence number (0 characters).'];
+        yield 'ten characters' => ['1234567890', 'Invalid Brazilian driving licence number (wrong length).'];
+        yield 'twelve characters' => ['123456789012', 'Invalid Brazilian driving licence number (wrong length).'];
+        yield 'empty' => ['', 'Invalid Brazilian driving licence number (wrong length).'];
     }
 
     #[DataProvider('invalidNumbers')]

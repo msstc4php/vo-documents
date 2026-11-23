@@ -76,7 +76,7 @@ final class NamePartsTest extends TestCase
         yield 'digit' => ['John2', 'Invalid Australian given name (invalid character).'];
         yield 'leading hyphen' => ['-John', 'Invalid Australian given name (invalid character).'];
         yield 'two separators in a row' => ["Mary-'Anne", 'Invalid Australian given name (invalid character).'];
-        yield 'empty' => ['', 'Invalid Australian given name (0 characters).'];
+        yield 'empty' => ['', 'Invalid Australian given name (empty).'];
     }
 
     #[DataProvider('invalidGivenNames')]

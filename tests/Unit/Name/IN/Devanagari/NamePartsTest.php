@@ -88,7 +88,7 @@ final class NamePartsTest extends TestCase
      */
     public static function invalidNames(): iterable
     {
-        yield 'empty' => ['', '0 characters'];
+        yield 'empty' => ['', 'empty'];
         yield 'too long' => [\str_repeat("\u{0905}", 101), 'too long'];
         yield 'Latin' => ['Rajesh', 'invalid character'];
         yield 'Latin among Devanagari' => ["राजे\u{0073}", 'invalid character'];

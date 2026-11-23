@@ -342,7 +342,7 @@ ISO 3166-2:RU. None does:
 | Plan | Source | Implemented |
 |---|---|---|
 | `Inn::taxOfficeCode()` = first 4 digits | since 01.01.2026 NN = FNS directorate, YY = FNS index (ЕД-7-14/559@) | `taxAuthorityRegionCode()` (2 digits) |
-| SNILS rule wording | PFR §8 "mod 101, last two digits" | same function; zeros only refused (SFR 1.15) |
+| SNILS rule wording | PFR §8 "mod 101, last two digits" | same function; zeros only refused (SFR 1.15), reported as "checksum" since 1.0 |
 | INN checksum "per source" | the algorithm is not published | not verified; format only |
 | DL "older series with Cyrillic letters only if still recognised" | Order 365 §8: valid until expiry; all expired by 2021 | digits only |
 | `Region` | no published ISO mapping | not created |

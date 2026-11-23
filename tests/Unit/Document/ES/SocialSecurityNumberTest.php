@@ -60,11 +60,11 @@ final class SocialSecurityNumberTest extends TestCase
      */
     public static function invalidNumbers(): iterable
     {
-        yield 'eleven digits' => ['28123456784', 'Invalid Spanish social security number (11 characters).'];
-        yield 'thirteen digits' => ['2812345678401', 'Invalid Spanish social security number (13 characters).'];
-        yield 'slashes' => ['28/12345678/40', 'Invalid Spanish social security number (14 characters).'];
+        yield 'eleven digits' => ['28123456784', 'Invalid Spanish social security number (wrong length).'];
+        yield 'thirteen digits' => ['2812345678401', 'Invalid Spanish social security number (wrong length).'];
+        yield 'slashes' => ['28/12345678/40', 'Invalid Spanish social security number (wrong length).'];
         yield 'letter' => ['28123456784A', 'Invalid Spanish social security number (invalid character).'];
-        yield 'empty' => ['', 'Invalid Spanish social security number (0 characters).'];
+        yield 'empty' => ['', 'Invalid Spanish social security number (wrong length).'];
     }
 
     #[DataProvider('invalidNumbers')]

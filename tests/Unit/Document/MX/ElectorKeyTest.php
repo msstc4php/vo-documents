@@ -78,8 +78,8 @@ final class ElectorKeyTest extends TestCase
      */
     public static function invalidKeys(): iterable
     {
-        yield 'too short' => ['GMLPJN56123109H40', 'Invalid Mexican elector key (17 characters).'];
-        yield 'too long' => ['GMLPJN56123109H4001', 'Invalid Mexican elector key (19 characters).'];
+        yield 'too short' => ['GMLPJN56123109H40', 'Invalid Mexican elector key (wrong length).'];
+        yield 'too long' => ['GMLPJN56123109H4001', 'Invalid Mexican elector key (wrong length).'];
         yield 'punctuation' => ['GMLPJN56123109H40.', 'Invalid Mexican elector key (invalid character).'];
         yield 'digit among the letters' => ['GMLPJ156123109H400', 'Invalid Mexican elector key (invalid character).'];
         yield 'letter in the date' => ['GMLPJN5612A109H400', 'Invalid Mexican elector key (invalid character).'];

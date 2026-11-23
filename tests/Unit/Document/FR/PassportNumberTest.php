@@ -59,10 +59,10 @@ final class PassportNumberTest extends TestCase
     {
         $invalid = 'Invalid French passport number (invalid character).';
 
-        yield 'eight characters' => ['12AB3456', 'Invalid French passport number (8 characters).'];
+        yield 'eight characters' => ['12AB3456', 'Invalid French passport number (wrong length).'];
         yield 'ten characters (with the MRZ check digit)' => [
             '12AB345671',
-            'Invalid French passport number (10 characters).',
+            'Invalid French passport number (wrong length).',
         ];
         yield 'letter in the first pair' => ['1AAB34567', $invalid];
         yield 'letter first' => ['A2AB34567', $invalid];
@@ -72,7 +72,7 @@ final class PassportNumberTest extends TestCase
         yield 'letter in the last five' => ['12AB3456C', $invalid];
         yield 'letter fifth' => ['12ABC4567', $invalid];
         yield 'accented letter' => ['12ÉB34567', $invalid];
-        yield 'empty' => ['', 'Invalid French passport number (0 characters).'];
+        yield 'empty' => ['', 'Invalid French passport number (wrong length).'];
     }
 
     #[DataProvider('invalidNumbers')]

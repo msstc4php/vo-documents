@@ -185,7 +185,7 @@ final class DriverLicenceNumberFactoryTest extends TestCase
     {
         $noJurisdiction = "Invalid Canadian driver's licence number (fits no jurisdiction).";
 
-        yield 'empty' => ['', "Invalid Canadian driver's licence number (0 characters)."];
+        yield 'empty' => ['', "Invalid Canadian driver's licence number (wrong length)."];
         yield 'ten digits, an NS length' => ['1234567890', $noJurisdiction];
         yield 'NS layout, day 32' => ['FINCH320867001', $noJurisdiction];
         yield 'NS layout, month 13' => ['FINCH221367001', $noJurisdiction];
@@ -193,11 +193,11 @@ final class DriverLicenceNumberFactoryTest extends TestCase
         yield 'fourteen alphanumerics' => ['X0915264359571', $noJurisdiction];
         yield 'sixteen alphanumerics' => [
             'X091526435957189',
-            "Invalid Canadian driver's licence number (16 characters).",
+            "Invalid Canadian driver's licence number (wrong length).",
         ];
         yield 'pasted several times' => [
             \str_repeat('123456789 ', 5),
-            "Invalid Canadian driver's licence number (too long).",
+            "Invalid Canadian driver's licence number (wrong length).",
         ];
     }
 
@@ -294,7 +294,7 @@ final class DriverLicenceNumberFactoryTest extends TestCase
         self::assertRefusedWithoutEcho(
             static fn (string $value): mixed => DriverLicenceNumberFactory::fromNumberIn($value, Jurisdiction::Ab),
             '12345678',
-            "Invalid CA-AB driver's licence number (8 characters).",
+            "Invalid CA-AB driver's licence number (wrong length).",
         );
     }
 

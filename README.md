@@ -43,8 +43,8 @@ Snils::tryFrom('112-233-445-96');         // null (checksum)
 ```
 
 `from()` throws a subclass of `InvalidValueObjectException` (`InvalidDocumentNumberException`) for invalid input. The
-message names the document and the length or the reason ("Invalid SNILS (14 characters).", "Invalid SNILS
-checksum."); **it never contains the input or any part of it**.
+message names the document and a fixed reason ("Invalid SNILS (wrong length).", "Invalid SNILS checksum.");
+**it never contains the input or any part of it, not even its length**.
 
 A number typed on a CJK or Arabic keyboard reads as the ASCII one: every document number folds fullwidth digits and
 letters (`１２３`, `Ｘ`; letters are upper-cased) and Arabic-Indic digits (U+0660-0669, U+06F0-06F9) to ASCII, and
@@ -360,7 +360,7 @@ NFC-normalised, trimmed, has inner whitespace runs collapsed to one space, and
 keeps its letter case. Limits: 100 characters per part. Russian parts accept only the 33 Russian letters; a Cyrillic
 name typed with Latin look-alikes (Latin `a`, `o`, `e`, `c`) is refused. A compatibility character (its NFKC form
 differs: fullwidth `Ｓｍｉｔｈ`, `ª`, the ligature `ﬁ`) is refused in every country, because it would be a second stored
-spelling of the same name; the ones an ICAO table lists itself (`Ĳ`, `Ŀ`) are kept. Messages say "(0 characters)" for
+spelling of the same name; the ones an ICAO table lists itself (`Ĳ`, `Ŀ`) are kept. Messages say "(empty)" for
 an empty part, "(too long)" for one over 100 characters, "(compatibility character)", or "(invalid character)" for a
 letter or separator that is not allowed where it stands.
 

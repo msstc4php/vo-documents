@@ -65,14 +65,14 @@ final class PassportNumberTest extends TestCase
     {
         $invalid = 'Invalid German passport number (invalid character).';
 
-        yield 'eight characters' => ['LZ6311T4', 'Invalid German passport number (8 characters).'];
+        yield 'eight characters' => ['LZ6311T4', 'Invalid German passport number (wrong length).'];
         yield 'ten characters (with the MRZ check digit)' => [
             'LZ6311T475',
-            'Invalid German passport number (10 characters).',
+            'Invalid German passport number (wrong length).',
         ];
         yield 'provisional passport, letter and seven digits' => [
             'A1234567',
-            'Invalid German passport number (8 characters).',
+            'Invalid German passport number (wrong length).',
         ];
         yield 'digit zero' => ['LZ6301T47', $invalid];
         yield 'letter O' => ['LZ63O1T47', $invalid];
@@ -82,7 +82,7 @@ final class PassportNumberTest extends TestCase
         yield 'letter Q' => ['LQ6311T47', $invalid];
         yield 'letter S' => ['LS6311T47', $invalid];
         yield 'umlaut' => ['LÜ6311T47', $invalid];
-        yield 'empty' => ['', 'Invalid German passport number (0 characters).'];
+        yield 'empty' => ['', 'Invalid German passport number (wrong length).'];
     }
 
     #[DataProvider('invalidNumbers')]

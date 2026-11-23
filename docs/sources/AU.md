@@ -116,8 +116,8 @@ Implemented (`Document\AU\DriverLicence\<Abbrev>DriverLicenceNumber`, all `Docum
 - "Alphanumeric" is taken literally: an all-letter or all-digit value of the stated length is accepted.
 - `masked()` (no official rule): every character but the last `min(3, ⌊length / 2⌋)` becomes `*`
   (`1234567890` → `*******890`, `01234567` → `*****567`, `12` → `*2`, `7` → `*`). See "Masking rule" below.
-- Messages: "Invalid AU-NSW driver licence number (9 characters)." — the ISO 3166-2 code, the document name and the
-  character count after normalisation ("(too long)" above 40) when the length is wrong, or "Invalid AU-NSW driver
+- Messages: "Invalid AU-NSW driver licence number (wrong length)." — the ISO 3166-2 code, the document name and a
+  fixed reason (1.0: no character count) when the length is wrong, or "Invalid AU-NSW driver
   licence number (invalid character)." when the length fits but a character is outside the jurisdiction's set
   (`Internal\NumberFormat`).
 
@@ -138,7 +138,7 @@ The formats overlap so much that **no number fits exactly one jurisdiction**:
 | anything else | none |
 
 So `fromNumber()` throws `AmbiguousJurisdictionException` (message: ISO codes only) or `InvalidDocumentNumberException`
-("Invalid Australian driver licence number (N characters).") for every real input today; its single-match branch
+("Invalid Australian driver licence number (wrong length).") for every real input today; its single-match branch
 exists for the pattern later plans copy and would only be reached if a format changed. Callers that know the issuing
 jurisdiction use `fromNumberIn()`. The resolution (parse once per jurisdiction, one match → it, none → invalid,
 several → ambiguous in enum order) is the generic `Internal\SubdivisionResolver`, tested with fixtures; the factory

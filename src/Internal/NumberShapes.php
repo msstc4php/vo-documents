@@ -49,8 +49,7 @@ final readonly class NumberShapes
      *
      * @return non-empty-string
      *
-     * @throws InvalidDocumentNumberException "(N characters)" for a length no shape has (up to
-     *                                        Digits::MAX_REPORTED_LENGTH characters, "(too long)" above it),
+     * @throws InvalidDocumentNumberException "(wrong length)" for a length no shape has,
      *                                        "(invalid character)" for a length some shape has but no shape matches
      */
     public function parse(string $input, string $document): string

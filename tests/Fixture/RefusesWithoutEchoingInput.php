@@ -14,7 +14,8 @@ trait RefusesWithoutEchoingInput
      * Asserts that `$create($input)` throws the expected message, that the message holds no three consecutive digits
      * of the input (as typed or with the separators removed), no run of three or more digits at all, so a character
      * count can never pass for part of the input, and no run of three or more letters of the input (as typed or
-     * upper-cased: `vo-documents` upper-cases letters).
+     * upper-cased: `vo-documents` upper-cases letters), and no number equal to the input's length (as typed or with the
+     * separators removed).
      *
      * @param Closure(string): mixed $create
      */
@@ -27,11 +28,20 @@ trait RefusesWithoutEchoingInput
             self::assertMessageHidesInput($input, $exception->getMessage());
             Assert::assertDoesNotMatchRegularExpression('/[0-9]{3}/', $exception->getMessage());
             self::assertMessageHidesLetters($input, $exception->getMessage());
+            self::assertMessageHidesLength($input, $exception->getMessage());
 
             return;
         }
 
         Assert::fail('Expected an InvalidDocumentNumberException.');
+    }
+
+    private static function assertMessageHidesLength(string $input, string $message): void
+    {
+        $lengths = [\mb_strlen($input, 'UTF-8'), \mb_strlen((string) \preg_replace('/[^\p{L}\p{N}]+/u', '', $input), 'UTF-8')];
+        foreach (\array_unique($lengths) as $length) {
+            Assert::assertDoesNotMatchRegularExpression('/(?<![0-9])' . $length . '(?![0-9])/', $message);
+        }
     }
 
     private static function assertMessageHidesLetters(string $input, string $message): void

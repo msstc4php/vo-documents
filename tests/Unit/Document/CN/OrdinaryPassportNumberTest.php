@@ -75,9 +75,9 @@ final class OrdinaryPassportNumberTest extends TestCase
         yield 'digit first' => ['112345678', $character];
         yield 'G with a letter second' => ['GA1234567', $character];
         yield 'punctuation' => ['E1234567.', $character];
-        yield 'eight characters' => ['E1234567', 'Invalid Chinese ordinary passport number (8 characters).'];
-        yield 'ten characters' => ['EA00000011', 'Invalid Chinese ordinary passport number (10 characters).'];
-        yield 'far too long' => [\str_repeat('E', 41), 'Invalid Chinese ordinary passport number (too long).'];
+        yield 'eight characters' => ['E1234567', 'Invalid Chinese ordinary passport number (wrong length).'];
+        yield 'ten characters' => ['EA00000011', 'Invalid Chinese ordinary passport number (wrong length).'];
+        yield 'far too long' => [\str_repeat('E', 41), 'Invalid Chinese ordinary passport number (wrong length).'];
     }
 
     #[DataProvider('invalidNumbers')]

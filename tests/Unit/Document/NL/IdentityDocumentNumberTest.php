@@ -64,16 +64,16 @@ final class IdentityDocumentNumberTest extends TestCase
     {
         $invalid = 'Invalid Dutch passport or identity card number (invalid character).';
 
-        yield 'eight characters' => ['SPECI202', 'Invalid Dutch passport or identity card number (8 characters).'];
-        yield 'ten characters' => ['SPECI20245', 'Invalid Dutch passport or identity card number (10 characters).'];
+        yield 'eight characters' => ['SPECI202', 'Invalid Dutch passport or identity card number (wrong length).'];
+        yield 'ten characters' => ['SPECI20245', 'Invalid Dutch passport or identity card number (wrong length).'];
         yield 'letter O' => ['SPOCI2024', $invalid];
         yield 'letter O first' => ['OPECI2024', $invalid];
         yield 'digit first' => ['1PECI2024', $invalid];
         yield 'digit second' => ['S1ECI2024', $invalid];
         yield 'letter last' => ['SPECI202A', $invalid];
         yield 'umlaut' => ['SPÄCI2024', $invalid];
-        yield 'empty' => ['', 'Invalid Dutch passport or identity card number (0 characters).'];
-        yield 'far too long' => [\str_repeat('A', 50), 'Invalid Dutch passport or identity card number (too long).'];
+        yield 'empty' => ['', 'Invalid Dutch passport or identity card number (wrong length).'];
+        yield 'far too long' => [\str_repeat('A', 50), 'Invalid Dutch passport or identity card number (wrong length).'];
     }
 
     #[DataProvider('invalidNumbers')]

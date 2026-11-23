@@ -54,10 +54,10 @@ final class DriverLicenceNumberTest extends TestCase
      */
     public static function invalidNumbers(): iterable
     {
-        yield 'eleven digits' => ['13017510234', 'Invalid French driving licence number (11 characters).'];
-        yield 'pre-1975 alphanumeric number' => ['AB1234', 'Invalid French driving licence number (6 characters).'];
+        yield 'eleven digits' => ['13017510234', 'Invalid French driving licence number (wrong length).'];
+        yield 'pre-1975 alphanumeric number' => ['AB1234', 'Invalid French driving licence number (wrong length).'];
         yield 'letter' => ['13017510234A', 'Invalid French driving licence number (invalid character).'];
-        yield 'empty' => ['', 'Invalid French driving licence number (0 characters).'];
+        yield 'empty' => ['', 'Invalid French driving licence number (wrong length).'];
     }
 
     #[DataProvider('invalidNumbers')]

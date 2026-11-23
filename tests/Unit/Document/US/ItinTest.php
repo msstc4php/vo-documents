@@ -80,7 +80,7 @@ final class ItinTest extends TestCase
         ];
         yield 'ten digits' => [
             '912-70-12345',
-            'Invalid American individual taxpayer identification number (10 characters).',
+            'Invalid American individual taxpayer identification number (wrong length).',
         ];
     }
 

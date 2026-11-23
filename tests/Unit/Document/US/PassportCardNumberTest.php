@@ -58,8 +58,8 @@ final class PassportCardNumberTest extends TestCase
         yield 'another letter (a book number)' => ['A12345678', $character];
         yield 'nine digits' => ['123456789', $character];
         yield 'letter among the digits' => ['C1234567X', $character];
-        yield 'eight characters' => ['C1234567', 'Invalid American passport card number (8 characters).'];
-        yield 'ten characters' => ['C123456789', 'Invalid American passport card number (10 characters).'];
+        yield 'eight characters' => ['C1234567', 'Invalid American passport card number (wrong length).'];
+        yield 'ten characters' => ['C123456789', 'Invalid American passport card number (wrong length).'];
     }
 
     #[DataProvider('invalidNumbers')]

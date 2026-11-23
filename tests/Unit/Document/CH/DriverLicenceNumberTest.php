@@ -77,16 +77,16 @@ final class DriverLicenceNumberTest extends TestCase
     {
         $invalid = 'Invalid Swiss driving licence number (invalid character).';
 
-        yield 'eleven digits' => ['12345678900', 'Invalid Swiss driving licence number (11 characters).'];
-        yield 'thirteen digits' => ['1234567890041', 'Invalid Swiss driving licence number (13 characters).'];
-        yield 'fourteen digits' => ['00123456789003', 'Invalid Swiss driving licence number (14 characters).'];
-        yield 'sixteen digits' => ['0000123456789003', 'Invalid Swiss driving licence number (16 characters).'];
+        yield 'eleven digits' => ['12345678900', 'Invalid Swiss driving licence number (wrong length).'];
+        yield 'thirteen digits' => ['1234567890041', 'Invalid Swiss driving licence number (wrong length).'];
+        yield 'fourteen digits' => ['00123456789003', 'Invalid Swiss driving licence number (wrong length).'];
+        yield 'sixteen digits' => ['0000123456789003', 'Invalid Swiss driving licence number (wrong length).'];
         yield 'letter' => ['12345678900A', $invalid];
         yield 'letter in the 2003 layout' => ['00012345678900A', $invalid];
         yield 'multibyte letter' => ["12345678900\u{00E9}", $invalid];
-        yield 'dot' => ['123.456789004', 'Invalid Swiss driving licence number (13 characters).'];
-        yield 'empty' => ['', 'Invalid Swiss driving licence number (0 characters).'];
-        yield 'far too long' => [\str_repeat('1', 50), 'Invalid Swiss driving licence number (too long).'];
+        yield 'dot' => ['123.456789004', 'Invalid Swiss driving licence number (wrong length).'];
+        yield 'empty' => ['', 'Invalid Swiss driving licence number (wrong length).'];
+        yield 'far too long' => [\str_repeat('1', 50), 'Invalid Swiss driving licence number (wrong length).'];
     }
 
     #[DataProvider('invalidNumbers')]

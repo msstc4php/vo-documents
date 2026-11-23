@@ -84,10 +84,10 @@ final class DriverLicenceNumberTest extends TestCase
     {
         $document = 'Invalid Japanese driving licence number';
 
-        yield 'eleven digits' => ['30191234567', $document . ' (11 characters).'];
-        yield 'thirteen digits' => ['3019123456700', $document . ' (13 characters).'];
+        yield 'eleven digits' => ['30191234567', $document . ' (wrong length).'];
+        yield 'thirteen digits' => ['3019123456700', $document . ' (wrong length).'];
         yield 'letter' => ['30191234567O', $document . ' (invalid character).'];
-        yield 'empty' => ['', $document . ' (0 characters).'];
+        yield 'empty' => ['', $document . ' (wrong length).'];
     }
 
     #[DataProvider('invalidNumbers')]

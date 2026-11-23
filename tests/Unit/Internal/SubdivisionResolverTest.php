@@ -73,7 +73,7 @@ final class SubdivisionResolverTest extends TestCase
     public function testRefusesANumberValidNowhereWithItsLengthWhenNoSubdivisionHasThatLength(): void
     {
         $this->expectException(InvalidDocumentNumberException::class);
-        $this->expectExceptionMessage('Invalid Test licence number (3 characters).');
+        $this->expectExceptionMessage('Invalid Test licence number (wrong length).');
 
         $this->resolver()->resolve(' X-12 ');
     }

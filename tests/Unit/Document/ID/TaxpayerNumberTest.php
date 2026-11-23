@@ -93,17 +93,17 @@ final class TaxpayerNumberTest extends TestCase
         yield 'the same split over two lines' => ["00.000.000.0-\n000.000", $placeholder];
         yield 'the 16-digit "no number" DJP prints' => ['0000000000000000', $placeholder];
         yield 'the 16 zeros with spaces' => ['0000 0000 0000 0000', $placeholder];
-        yield 'empty' => ['', 'Invalid Indonesian taxpayer number (0 characters).'];
-        yield '14 digits' => ['01234567890100', 'Invalid Indonesian taxpayer number (14 characters).'];
-        yield '17 digits' => ['31710115059800011', 'Invalid Indonesian taxpayer number (17 characters).'];
+        yield 'empty' => ['', 'Invalid Indonesian taxpayer number (wrong length).'];
+        yield '14 digits' => ['01234567890100', 'Invalid Indonesian taxpayer number (wrong length).'];
+        yield '17 digits' => ['31710115059800011', 'Invalid Indonesian taxpayer number (wrong length).'];
         yield '9 digits, the old form of a 9-digit NPWP' => [
             '012345678',
-            'Invalid Indonesian taxpayer number (9 characters).',
+            'Invalid Indonesian taxpayer number (wrong length).',
         ];
-        yield 'far too long' => [\str_repeat('1', 41), 'Invalid Indonesian taxpayer number (too long).'];
+        yield 'far too long' => [\str_repeat('1', 41), 'Invalid Indonesian taxpayer number (wrong length).'];
         yield 'letter in 15' => ['01234567890100X', $character];
         yield 'letter in 16' => ['317101150598000X', $character];
-        yield 'comma' => ['01,234,567,8,901,000', 'Invalid Indonesian taxpayer number (20 characters).'];
+        yield 'comma' => ['01,234,567,8,901,000', 'Invalid Indonesian taxpayer number (wrong length).'];
         yield 'comma in a 15-digit body' => ['01234567,8901000', $character];
     }
 

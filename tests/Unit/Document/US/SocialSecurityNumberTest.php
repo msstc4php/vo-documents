@@ -74,10 +74,10 @@ final class SocialSecurityNumberTest extends TestCase
         yield 'group 00' => ['123-00-4567', 'Invalid American Social Security number (group number).'];
         yield 'serial 0000' => ['123-45-0000', 'Invalid American Social Security number (serial number).'];
         yield 'letter' => ['123-45-678X', 'Invalid American Social Security number (invalid character).'];
-        yield 'eight digits' => ['123-45-678', 'Invalid American Social Security number (8 characters).'];
-        yield 'slash' => ['123/45/6789', 'Invalid American Social Security number (11 characters).'];
-        yield 'empty' => ['', 'Invalid American Social Security number (0 characters).'];
-        yield 'far too long' => [\str_repeat('1', 50), 'Invalid American Social Security number (too long).'];
+        yield 'eight digits' => ['123-45-678', 'Invalid American Social Security number (wrong length).'];
+        yield 'slash' => ['123/45/6789', 'Invalid American Social Security number (wrong length).'];
+        yield 'empty' => ['', 'Invalid American Social Security number (wrong length).'];
+        yield 'far too long' => [\str_repeat('1', 50), 'Invalid American Social Security number (wrong length).'];
     }
 
     #[DataProvider('invalidNumbers')]

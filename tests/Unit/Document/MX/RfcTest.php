@@ -58,9 +58,9 @@ final class RfcTest extends TestCase
      */
     public static function invalidNumbers(): iterable
     {
-        yield 'legal person, 12 characters' => ['ABC5612311A2', 'Invalid Mexican RFC (12 characters).'];
-        yield 'too long' => ['HEGJ5612311A23', 'Invalid Mexican RFC (14 characters).'];
-        yield 'empty' => ['', 'Invalid Mexican RFC (0 characters).'];
+        yield 'legal person, 12 characters' => ['ABC5612311A2', 'Invalid Mexican RFC (wrong length).'];
+        yield 'too long' => ['HEGJ5612311A23', 'Invalid Mexican RFC (wrong length).'];
+        yield 'empty' => ['', 'Invalid Mexican RFC (wrong length).'];
         yield 'digit among the letters' => ['HEG15612311A2', 'Invalid Mexican RFC (invalid character).'];
         yield 'month 13' => ['HEGJ5613311A2', 'Invalid Mexican RFC (invalid character).'];
         yield 'month 00' => ['HEGJ5600311A2', 'Invalid Mexican RFC (invalid character).'];

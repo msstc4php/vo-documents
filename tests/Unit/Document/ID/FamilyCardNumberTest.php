@@ -62,10 +62,10 @@ final class FamilyCardNumberTest extends TestCase
      */
     public static function invalidNumbers(): iterable
     {
-        yield 'empty' => ['', 'Invalid Indonesian family card number (0 characters).'];
-        yield '15 digits' => ['317101010123000', 'Invalid Indonesian family card number (15 characters).'];
-        yield '17 digits' => ['31710101012300011', 'Invalid Indonesian family card number (17 characters).'];
-        yield 'far too long' => [\str_repeat('1', 41), 'Invalid Indonesian family card number (too long).'];
+        yield 'empty' => ['', 'Invalid Indonesian family card number (wrong length).'];
+        yield '15 digits' => ['317101010123000', 'Invalid Indonesian family card number (wrong length).'];
+        yield '17 digits' => ['31710101012300011', 'Invalid Indonesian family card number (wrong length).'];
+        yield 'far too long' => [\str_repeat('1', 41), 'Invalid Indonesian family card number (wrong length).'];
         yield 'letter' => ['317101010123000X', 'Invalid Indonesian family card number (invalid character).'];
     }
 

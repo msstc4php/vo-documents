@@ -31,7 +31,7 @@ final class DriverLicenceNumberFactory
     /**
      * @throws AmbiguousJurisdictionException<Jurisdiction> when several jurisdictions match, listed in enum order
      * @throws InvalidDocumentNumberException when none matches: "(fits no jurisdiction)" if the length fits a
-     *                                        jurisdiction, otherwise the length
+     *                                        jurisdiction, otherwise "(wrong length)"
      */
     public static function fromNumber(string $number): DriverLicenceNumber
     {

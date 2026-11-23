@@ -70,11 +70,11 @@ final class LegacyForeignerPermanentResidenceNumberTest extends TestCase
         yield 'letter among the digits' => ['KAZ11009012310A', $character];
         yield 'fourteen characters' => [
             'KAZ11009012310',
-            'Invalid Chinese legacy permanent residence card number (14 characters).',
+            'Invalid Chinese legacy permanent residence card number (wrong length).',
         ];
         yield 'sixteen characters' => [
             'KAZ1100901231051',
-            'Invalid Chinese legacy permanent residence card number (16 characters).',
+            'Invalid Chinese legacy permanent residence card number (wrong length).',
         ];
     }
 

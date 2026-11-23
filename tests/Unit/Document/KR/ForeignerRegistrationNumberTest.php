@@ -80,9 +80,9 @@ final class ForeignerRegistrationNumberTest extends TestCase
     {
         $name = 'Invalid Korean foreigner registration number';
 
-        yield 'empty' => ['', $name . ' (0 characters).'];
-        yield '12 digits' => ['850505512345', $name . ' (12 characters).'];
-        yield '14 digits' => ['85050551234567', $name . ' (14 characters).'];
+        yield 'empty' => ['', $name . ' (wrong length).'];
+        yield '12 digits' => ['850505512345', $name . ' (wrong length).'];
+        yield '14 digits' => ['85050551234567', $name . ' (wrong length).'];
         yield 'a letter' => ['85050551234X6', $name . ' (invalid character).'];
         yield 'resident digit 1' => ['8505051123456', $name . ' (invalid character).'];
         yield 'resident digit 4' => ['8505054123456', $name . ' (invalid character).'];

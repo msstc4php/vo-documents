@@ -76,10 +76,10 @@ final class MyNumberTest extends TestCase
         yield 'number digit changed' => ['123456788018', 'Invalid My Number checksum.'];
         yield 'check 0 where the remainder gives 8' => ['123456789010', 'Invalid My Number checksum.'];
         yield 'check 1 where the remainder is 1' => ['123456789001', 'Invalid My Number checksum.'];
-        yield 'too short' => ['12345678901', 'Invalid My Number (11 characters).'];
-        yield 'too long' => ['1234567890180', 'Invalid My Number (13 characters).'];
+        yield 'too short' => ['12345678901', 'Invalid My Number (wrong length).'];
+        yield 'too long' => ['1234567890180', 'Invalid My Number (wrong length).'];
         yield 'letter' => ['12345678901O', 'Invalid My Number (invalid character).'];
-        yield 'empty' => ['', 'Invalid My Number (0 characters).'];
+        yield 'empty' => ['', 'Invalid My Number (wrong length).'];
     }
 
     #[DataProvider('invalidNumbers')]

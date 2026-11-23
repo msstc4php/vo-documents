@@ -60,8 +60,8 @@ final class DriverLicenceNumberTest extends TestCase
      */
     public static function invalidNumbers(): iterable
     {
-        yield 'too short' => ['99 99 12345', 'Invalid Russian driving licence number (9 characters).'];
-        yield 'too long' => ['99 99 1234567', 'Invalid Russian driving licence number (11 characters).'];
+        yield 'too short' => ['99 99 12345', 'Invalid Russian driving licence number (wrong length).'];
+        yield 'too long' => ['99 99 1234567', 'Invalid Russian driving licence number (wrong length).'];
         yield '1999 form with Cyrillic series' => [
             '77 АВ 123456',
             'Invalid Russian driving licence number (invalid character).',

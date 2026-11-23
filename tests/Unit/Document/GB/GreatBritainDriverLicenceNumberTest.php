@@ -131,18 +131,18 @@ final class GreatBritainDriverLicenceNumberTest extends TestCase
         yield '29 February, woman, year 85' => ['SMITH 852295 JA 1AB', $date];
         yield 'with the issue number' => [
             'MORGA 657054 SM 9IJ 01',
-            'Invalid Great Britain driving licence number (18 characters).',
+            'Invalid Great Britain driving licence number (wrong length).',
         ];
         yield 'seventeen characters' => [
             'MORGA 657054 SM 9IJ 0',
-            'Invalid Great Britain driving licence number (17 characters).',
+            'Invalid Great Britain driving licence number (wrong length).',
         ];
         yield 'fifteen characters' => [
             'MORGA 657054 SM 9I',
-            'Invalid Great Britain driving licence number (15 characters).',
+            'Invalid Great Britain driving licence number (wrong length).',
         ];
-        yield 'empty' => ['', 'Invalid Great Britain driving licence number (0 characters).'];
-        yield 'far too long' => [\str_repeat('A', 50), 'Invalid Great Britain driving licence number (too long).'];
+        yield 'empty' => ['', 'Invalid Great Britain driving licence number (wrong length).'];
+        yield 'far too long' => [\str_repeat('A', 50), 'Invalid Great Britain driving licence number (wrong length).'];
     }
 
     #[DataProvider('invalidNumbers')]

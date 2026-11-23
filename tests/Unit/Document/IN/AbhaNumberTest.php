@@ -63,12 +63,12 @@ final class AbhaNumberTest extends TestCase
     {
         $name = 'Invalid ABHA number';
 
-        yield 'thirteen digits' => ['9112345678901', $name . ' (13 characters).'];
-        yield 'fifteen digits' => ['911234567890123', $name . ' (15 characters).'];
-        yield 'twelve digits (an Aadhaar)' => ['234567890124', $name . ' (12 characters).'];
-        yield 'far too long' => [\str_repeat('9', 41), $name . ' (too long).'];
+        yield 'thirteen digits' => ['9112345678901', $name . ' (wrong length).'];
+        yield 'fifteen digits' => ['911234567890123', $name . ' (wrong length).'];
+        yield 'twelve digits (an Aadhaar)' => ['234567890124', $name . ' (wrong length).'];
+        yield 'far too long' => [\str_repeat('9', 41), $name . ' (wrong length).'];
         yield 'letter' => ['9112345678901A', $name . ' (invalid character).'];
-        yield 'ABHA address' => ['name@abdm', $name . ' (9 characters).'];
+        yield 'ABHA address' => ['name@abdm', $name . ' (wrong length).'];
         yield 'Devanagari digits' => [
             "\u{096F}\u{0967}\u{0967}\u{0968}\u{0969}\u{096A}\u{096B}\u{096C}\u{096D}\u{096E}\u{096F}\u{0966}" .
                 "\u{0967}\u{0968}",

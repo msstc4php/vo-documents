@@ -56,7 +56,7 @@ final class Snils extends AbstractStringValueObject implements Maskable
         $number = \substr($digits, 0, 9);
 
         if ($digits === '00000000000') {
-            throw new InvalidDocumentNumberException(\sprintf('Invalid %s (zeros only).', self::DOCUMENT));
+            throw new InvalidDocumentNumberException(\sprintf('Invalid %s checksum.', self::DOCUMENT));
         }
 
         if ((int) $number > self::LAST_UNCHECKED_NUMBER) {

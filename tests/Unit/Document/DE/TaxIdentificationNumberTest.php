@@ -59,10 +59,10 @@ final class TaxIdentificationNumberTest extends TestCase
      */
     public static function invalidNumbers(): iterable
     {
-        yield 'ten digits' => ['1234567890', 'Invalid German tax identification number (10 characters).'];
-        yield 'twelve digits' => ['123456789012', 'Invalid German tax identification number (12 characters).'];
+        yield 'ten digits' => ['1234567890', 'Invalid German tax identification number (wrong length).'];
+        yield 'twelve digits' => ['123456789012', 'Invalid German tax identification number (wrong length).'];
         yield 'letter' => ['1234567890X', 'Invalid German tax identification number (invalid character).'];
-        yield 'empty' => ['', 'Invalid German tax identification number (0 characters).'];
+        yield 'empty' => ['', 'Invalid German tax identification number (wrong length).'];
     }
 
     #[DataProvider('invalidNumbers')]

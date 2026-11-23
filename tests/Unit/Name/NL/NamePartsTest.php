@@ -95,7 +95,7 @@ final class NamePartsTest extends TestCase
 
         yield 'fullwidth' => ["\u{FF22}erg", $compatibility];
         yield 'n preceded by apostrophe of table 5.2' => ["\u{0149}t", $compatibility];
-        yield 'empty' => ['  ', 'Invalid Dutch family name (0 characters).'];
+        yield 'empty' => ['  ', 'Invalid Dutch family name (empty).'];
     }
 
     #[DataProvider('invalidFamilyNames')]

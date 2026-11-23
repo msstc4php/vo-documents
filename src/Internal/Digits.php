@@ -20,11 +20,6 @@ final class Digits
         . "\u{FF0D}\u{FF70}\u{30FC}\u{2010}\u{2011}\u{2212}"
         . "\u{200E}\u{200F}\u{061C}\u{202A}\u{202B}\u{202C}\u{202D}\u{202E}\u{2066}\u{2067}\u{2068}\u{2069}";
 
-    /**
-     * Above this the message says "too long": a count of 100 or more would be a three-digit run.
-     */
-    public const int MAX_REPORTED_LENGTH = 40;
-
     private const array FOLD_MAP = [
         "\u{FF10}" => '0',
         "\u{FF11}" => '1',
@@ -137,10 +132,8 @@ final class Digits
      *
      * @return non-empty-string
      *
-     * @throws InvalidDocumentNumberException "(N characters)" for a wrong length of up to
-     *                                        Digits::MAX_REPORTED_LENGTH characters, "(too long)" above it,
-     *                                        "(invalid character)" for a right length with
-     *                                        a character other than a digit
+     * @throws InvalidDocumentNumberException "(wrong length)", or "(invalid character)" for a right length with a
+     *                                        character other than a digit
      */
     public static function exactly(string $input, int $length, string $document): string
     {
@@ -160,7 +153,7 @@ final class Digits
     public static function exactlyStripped(string $digits, int $length, string $document): string
     {
         if (self::length($digits) !== $length) {
-            throw self::invalidLength($digits, $document);
+            throw self::invalidLength($document);
         }
 
         if (\strspn($digits, '0123456789') !== $length) {
@@ -183,7 +176,7 @@ final class Digits
     {
         $normalized = \strtoupper(self::strip($input));
         if (!$allowsLength(self::length($normalized))) {
-            throw self::invalidLength($normalized, $document);
+            throw self::invalidLength($document);
         }
 
         return $normalized;
@@ -198,18 +191,13 @@ final class Digits
     }
 
     /**
-     * @param string $normalized the input with the separators removed
+     * The message names no length: not even the count of characters of the input is reported.
+     *
      * @param non-empty-string $document the document's name in the exception message
      */
-    public static function invalidLength(string $normalized, string $document): InvalidDocumentNumberException
+    public static function invalidLength(string $document): InvalidDocumentNumberException
     {
-        $count = self::length($normalized);
-
-        return new InvalidDocumentNumberException(
-            $count > self::MAX_REPORTED_LENGTH
-                ? \sprintf('Invalid %s (too long).', $document)
-                : \sprintf('Invalid %s (%d characters).', $document, $count),
-        );
+        return new InvalidDocumentNumberException(\sprintf('Invalid %s (wrong length).', $document));
     }
 
     /**

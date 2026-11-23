@@ -111,14 +111,14 @@ final class NationalIdentityNumberTest extends TestCase
         $character = 'Invalid Indonesian national identity number (invalid character).';
         $date = 'Invalid Indonesian national identity number (invalid birth date).';
 
-        yield 'empty' => ['', 'Invalid Indonesian national identity number (0 characters).'];
-        yield '15 digits' => ['317101150598000', 'Invalid Indonesian national identity number (15 characters).'];
-        yield '17 digits' => ['31710115059800011', 'Invalid Indonesian national identity number (17 characters).'];
-        yield 'far too long' => [\str_repeat('1', 41), 'Invalid Indonesian national identity number (too long).'];
+        yield 'empty' => ['', 'Invalid Indonesian national identity number (wrong length).'];
+        yield '15 digits' => ['317101150598000', 'Invalid Indonesian national identity number (wrong length).'];
+        yield '17 digits' => ['31710115059800011', 'Invalid Indonesian national identity number (wrong length).'];
+        yield 'far too long' => [\str_repeat('1', 41), 'Invalid Indonesian national identity number (wrong length).'];
         yield 'letter' => ['317101150598000X', $character];
         yield 'full stop is no separator' => [
             '3171.0115.0598.0001',
-            'Invalid Indonesian national identity number (19 characters).',
+            'Invalid Indonesian national identity number (wrong length).',
         ];
         yield '30 February of a woman: day 70' => ['3171017002980001', $date];
         yield '30 February of a man' => ['3171013002980001', $date];

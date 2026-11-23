@@ -62,9 +62,9 @@ final class PassportNumberTest extends TestCase
     {
         $name = 'Invalid Indian passport number';
 
-        yield 'seven characters' => ['J123400', $name . ' (7 characters).'];
-        yield 'nine characters' => ['J12340021', $name . ' (9 characters).'];
-        yield 'far too long' => [\str_repeat('J', 41), $name . ' (too long).'];
+        yield 'seven characters' => ['J123400', $name . ' (wrong length).'];
+        yield 'nine characters' => ['J12340021', $name . ' (wrong length).'];
+        yield 'far too long' => [\str_repeat('J', 41), $name . ' (wrong length).'];
         yield 'punctuation' => ['J123400.', $name . ' (invalid character).'];
         yield 'Latin-1 letter' => ["J123400\u{00C9}", $name . ' (invalid character).'];
         yield 'Devanagari digit' => ["J123400\u{0968}", $name . ' (invalid character).'];

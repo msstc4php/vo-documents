@@ -82,8 +82,8 @@ final class DniTest extends TestCase
         $invalid = 'Invalid Spanish DNI number (invalid character).';
         $checksum = 'Invalid Spanish DNI number checksum.';
 
-        yield 'seven digits and a letter' => ['1234567L', 'Invalid Spanish DNI number (8 characters).'];
-        yield 'ten characters' => ['123456789Z', 'Invalid Spanish DNI number (10 characters).'];
+        yield 'seven digits and a letter' => ['1234567L', 'Invalid Spanish DNI number (wrong length).'];
+        yield 'ten characters' => ['123456789Z', 'Invalid Spanish DNI number (wrong length).'];
         yield 'digit in last place' => ['123456789', $invalid];
         yield 'letter among the digits' => ['1234A678Z', $invalid];
         yield 'NIE initial' => ['X1234567L', $invalid];
@@ -92,8 +92,8 @@ final class DniTest extends TestCase
         yield 'wrong letter' => ['12345678A', $checksum];
         yield 'letter outside the table' => ['12345678I', $checksum];
         yield 'transposed digits' => ['21345678Z', $checksum];
-        yield 'empty' => ['', 'Invalid Spanish DNI number (0 characters).'];
-        yield 'far too long' => [\str_repeat('1', 50), 'Invalid Spanish DNI number (too long).'];
+        yield 'empty' => ['', 'Invalid Spanish DNI number (wrong length).'];
+        yield 'far too long' => [\str_repeat('1', 50), 'Invalid Spanish DNI number (wrong length).'];
     }
 
     #[DataProvider('invalidNumbers')]

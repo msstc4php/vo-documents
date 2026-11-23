@@ -73,13 +73,13 @@ final class IqamaNumberTest extends TestCase
         $character = 'Invalid Saudi Arabian iqama number (invalid character).';
         $first = 'Invalid Saudi Arabian iqama number (invalid first digit).';
 
-        yield 'empty' => ['', 'Invalid Saudi Arabian iqama number (0 characters).'];
-        yield '9 digits' => ['201234567', 'Invalid Saudi Arabian iqama number (9 characters).'];
-        yield '11 digits' => ['20123456789', 'Invalid Saudi Arabian iqama number (11 characters).'];
-        yield 'far too long' => ['2' . \str_repeat('0', 41), 'Invalid Saudi Arabian iqama number (too long).'];
+        yield 'empty' => ['', 'Invalid Saudi Arabian iqama number (wrong length).'];
+        yield '9 digits' => ['201234567', 'Invalid Saudi Arabian iqama number (wrong length).'];
+        yield '11 digits' => ['20123456789', 'Invalid Saudi Arabian iqama number (wrong length).'];
+        yield 'far too long' => ['2' . \str_repeat('0', 41), 'Invalid Saudi Arabian iqama number (wrong length).'];
         yield 'letter' => ['201234567X', $character];
         yield 'Arabic letter' => ["201234567\u{0639}", $character];
-        yield 'full stop is no separator' => ['2012.345.678', 'Invalid Saudi Arabian iqama number (12 characters).'];
+        yield 'full stop is no separator' => ['2012.345.678', 'Invalid Saudi Arabian iqama number (wrong length).'];
         yield 'a national ID number' => ['1012345678', $first];
         yield 'first digit 0' => ['0012345678', $first];
         yield 'first digit 3' => ['3012345678', $first];

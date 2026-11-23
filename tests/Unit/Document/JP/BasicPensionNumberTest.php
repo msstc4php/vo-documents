@@ -61,8 +61,8 @@ final class BasicPensionNumberTest extends TestCase
      */
     public static function invalidNumbers(): iterable
     {
-        yield 'nine digits' => ['123456789', 'Invalid Basic Pension Number (9 characters).'];
-        yield 'eleven digits' => ['12345678901', 'Invalid Basic Pension Number (11 characters).'];
+        yield 'nine digits' => ['123456789', 'Invalid Basic Pension Number (wrong length).'];
+        yield 'eleven digits' => ['12345678901', 'Invalid Basic Pension Number (wrong length).'];
         yield 'letter' => ['123456789A', 'Invalid Basic Pension Number (invalid character).'];
     }
 

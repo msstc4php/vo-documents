@@ -67,10 +67,10 @@ final class IdentityDocumentNumberTest extends TestCase
         yield 'letter I' => ['S1AI0A00', $invalid];
         yield 'umlaut' => ["S1\u{00C4}00A00", $invalid];
         yield 'slash' => ['S1A00/00', $invalid];
-        yield 'seven characters' => ['S1A00A0', 'Invalid Swiss passport or identity card number (7 characters).'];
-        yield 'nine characters' => ['S1A00A001', 'Invalid Swiss passport or identity card number (9 characters).'];
-        yield 'empty' => ['', 'Invalid Swiss passport or identity card number (0 characters).'];
-        yield 'far too long' => [\str_repeat('A1', 30), 'Invalid Swiss passport or identity card number (too long).'];
+        yield 'seven characters' => ['S1A00A0', 'Invalid Swiss passport or identity card number (wrong length).'];
+        yield 'nine characters' => ['S1A00A001', 'Invalid Swiss passport or identity card number (wrong length).'];
+        yield 'empty' => ['', 'Invalid Swiss passport or identity card number (wrong length).'];
+        yield 'far too long' => [\str_repeat('A1', 30), 'Invalid Swiss passport or identity card number (wrong length).'];
     }
 
     #[DataProvider('invalidNumbers')]

@@ -75,12 +75,12 @@ final class BsnTest extends TestCase
         yield 'transposed digits' => ['999990086', $checksum];
         yield 'eight digits failing' => ['12345678', $checksum];
         yield 'negative sum' => ['000000009', $checksum];
-        yield 'seven digits' => ['1234567', 'Invalid Dutch BSN (7 characters).'];
-        yield 'ten digits' => ['9999900680', 'Invalid Dutch BSN (10 characters).'];
+        yield 'seven digits' => ['1234567', 'Invalid Dutch BSN (wrong length).'];
+        yield 'ten digits' => ['9999900680', 'Invalid Dutch BSN (wrong length).'];
         yield 'letter' => ['99999006A', 'Invalid Dutch BSN (invalid character).'];
         yield 'dot' => ['9999.9006', 'Invalid Dutch BSN (invalid character).'];
-        yield 'empty' => ['', 'Invalid Dutch BSN (0 characters).'];
-        yield 'far too long' => [\str_repeat('9', 50), 'Invalid Dutch BSN (too long).'];
+        yield 'empty' => ['', 'Invalid Dutch BSN (wrong length).'];
+        yield 'far too long' => [\str_repeat('9', 50), 'Invalid Dutch BSN (wrong length).'];
     }
 
     #[DataProvider('invalidNumbers')]

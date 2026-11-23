@@ -68,9 +68,9 @@ final class HealthAndCareNumberTest extends TestCase
         yield 'just above the range' => ['400 000 0007', $range];
         yield 'England and Wales NHS number' => ['943 476 5919', $range];
         yield 'last digit changed' => ['320 000 0016', 'Invalid Northern Ireland Health and Care number checksum.'];
-        yield 'nine digits' => ['320 000 001', 'Invalid Northern Ireland Health and Care number (9 characters).'];
+        yield 'nine digits' => ['320 000 001', 'Invalid Northern Ireland Health and Care number (wrong length).'];
         yield 'letter' => ['320 000 001X', 'Invalid Northern Ireland Health and Care number (invalid character).'];
-        yield 'empty' => ['', 'Invalid Northern Ireland Health and Care number (0 characters).'];
+        yield 'empty' => ['', 'Invalid Northern Ireland Health and Care number (wrong length).'];
     }
 
     #[DataProvider('invalidNumbers')]

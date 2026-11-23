@@ -65,8 +65,8 @@ final class PassportBookNumberTest extends TestCase
         yield 'letter not first' => ['1A2345678', $character];
         yield 'letter last' => ['A1234567B', $character];
         yield 'non-ASCII digit' => ["A1234567\u{0969}", $character];
-        yield 'seven characters' => ['A123456', 'Invalid American passport book number (7 characters).'];
-        yield 'ten characters' => ['A123456789', 'Invalid American passport book number (10 characters).'];
+        yield 'seven characters' => ['A123456', 'Invalid American passport book number (wrong length).'];
+        yield 'ten characters' => ['A123456789', 'Invalid American passport book number (wrong length).'];
     }
 
     #[DataProvider('invalidNumbers')]

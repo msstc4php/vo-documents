@@ -96,7 +96,7 @@ final class NamePartsTest extends TestCase
         ];
         yield 'fullwidth' => ["\u{FF2A}osé", 'Invalid Spanish given name (compatibility character).'];
         yield 'ordinal indicator' => ["Mar\u{00AA}", 'Invalid Spanish given name (compatibility character).'];
-        yield 'empty' => ['  ', 'Invalid Spanish given name (0 characters).'];
+        yield 'empty' => ['  ', 'Invalid Spanish given name (empty).'];
     }
 
     #[DataProvider('invalidGivenNames')]

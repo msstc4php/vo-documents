@@ -278,7 +278,7 @@ final class DlIdNumbersTest extends TestCase
             self::assertRefusedWithoutEcho(
                 static fn (string $value): AbstractDlIdNumber => $class::from($value),
                 $input,
-                \sprintf('Invalid %s DL/ID number (%d characters).', $iso, $length),
+                \sprintf('Invalid %s DL/ID number (wrong length).', $iso),
             );
         }
     }
@@ -445,9 +445,9 @@ final class DlIdNumbersTest extends TestCase
         yield 'NY pasted several times' => [
             NyDlIdNumber::class,
             \str_repeat('123456789 ', 5),
-            'Invalid US-NY DL/ID number (too long).',
+            'Invalid US-NY DL/ID number (wrong length).',
         ];
-        yield 'NY empty' => [NyDlIdNumber::class, '', 'Invalid US-NY DL/ID number (0 characters).'];
+        yield 'NY empty' => [NyDlIdNumber::class, '', 'Invalid US-NY DL/ID number (wrong length).'];
     }
 
     /**

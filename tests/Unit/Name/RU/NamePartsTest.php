@@ -89,7 +89,7 @@ final class NamePartsTest extends TestCase
             'Иван- Петров',
             'Invalid Russian family name (invalid character).',
         ];
-        yield 'empty' => [FamilyName::class, '  ', 'Invalid Russian family name (0 characters).'];
+        yield 'empty' => [FamilyName::class, '  ', 'Invalid Russian family name (empty).'];
         yield 'Ukrainian Ї' => [GivenName::class, 'Їржи', 'Invalid Russian given name (invalid character).'];
         yield 'Cyrillic І' => [GivenName::class, 'Іван', 'Invalid Russian given name (invalid character).'];
         yield 'apostrophe in a given name' => [

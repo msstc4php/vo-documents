@@ -73,11 +73,11 @@ final class AadhaarNumberTest extends TestCase
     {
         $name = 'Invalid Aadhaar number';
 
-        yield 'empty' => ['', $name . ' (0 characters).'];
-        yield 'eleven digits' => ['23456789012', $name . ' (11 characters).'];
-        yield 'thirteen digits' => ['2345678901240', $name . ' (13 characters).'];
-        yield 'virtual ID length' => ['2345678901234567', $name . ' (16 characters).'];
-        yield 'far too long' => [\str_repeat('2', 41), $name . ' (too long).'];
+        yield 'empty' => ['', $name . ' (wrong length).'];
+        yield 'eleven digits' => ['23456789012', $name . ' (wrong length).'];
+        yield 'thirteen digits' => ['2345678901240', $name . ' (wrong length).'];
+        yield 'virtual ID length' => ['2345678901234567', $name . ' (wrong length).'];
+        yield 'far too long' => [\str_repeat('2', 41), $name . ' (wrong length).'];
         yield 'letter' => ['23456789012A', $name . ' (invalid character).'];
         yield 'punctuation' => ['23456789012.', $name . ' (invalid character).'];
         yield 'Devanagari digits are not folded' => [

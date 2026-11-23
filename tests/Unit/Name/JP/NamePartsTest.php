@@ -79,7 +79,7 @@ final class NamePartsTest extends TestCase
         $characters = 'Invalid Japanese family name (invalid character).';
         $compatibility = 'Invalid Japanese family name (compatibility character).';
 
-        yield 'empty' => ['', 'Invalid Japanese family name (0 characters).'];
+        yield 'empty' => ['', 'Invalid Japanese family name (empty).'];
         yield 'too long' => [\str_repeat('佐', 101), 'Invalid Japanese family name (too long).'];
         yield 'Latin' => ['Sato', $characters];
         yield 'Latin among kanji' => ['佐a', $characters];
@@ -151,7 +151,7 @@ final class NamePartsTest extends TestCase
     {
         $characters = 'Invalid Japanese family name reading (invalid character).';
 
-        yield 'empty' => ['', 'Invalid Japanese family name reading (0 characters).'];
+        yield 'empty' => ['', 'Invalid Japanese family name reading (empty).'];
         yield 'too long' => [\str_repeat('さ', 101), 'Invalid Japanese family name reading (too long).'];
         yield 'kanji' => ['佐藤', $characters];
         yield 'iteration mark 々' => ['さ々', $characters];

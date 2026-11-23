@@ -75,7 +75,7 @@ final class NamePartsTest extends TestCase
         yield 'slash' => ['Ana/Maria', $character];
         yield 'Cyrillic' => ['Иван', $character];
         yield 'fullwidth' => ["\u{FF2A}oão", 'Invalid Brazilian given name (compatibility character).'];
-        yield 'empty' => ['  ', 'Invalid Brazilian given name (0 characters).'];
+        yield 'empty' => ['  ', 'Invalid Brazilian given name (empty).'];
     }
 
     #[DataProvider('invalidGivenNames')]

@@ -68,9 +68,9 @@ final class MultipleEntryPassportNumberTest extends TestCase
         yield 'another series letter' => ['G12345678', $name . ' (invalid character).'];
         yield 'D series' => ['D123A4567', $name . ' (invalid character).'];
         yield 'punctuation' => ['M1234567.', $name . ' (invalid character).'];
-        yield 'eight characters' => ['M1234567', $name . ' (8 characters).'];
-        yield 'ten characters' => ['M123A45678', $name . ' (10 characters).'];
-        yield 'far too long' => [\str_repeat('M', 41), $name . ' (too long).'];
+        yield 'eight characters' => ['M1234567', $name . ' (wrong length).'];
+        yield 'ten characters' => ['M123A45678', $name . ' (wrong length).'];
+        yield 'far too long' => [\str_repeat('M', 41), $name . ' (wrong length).'];
     }
 
     #[DataProvider('invalidNumbers')]

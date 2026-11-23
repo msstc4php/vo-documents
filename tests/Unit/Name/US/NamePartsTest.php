@@ -78,7 +78,7 @@ final class NamePartsTest extends TestCase
         yield 'period of an initial' => ['J.', 'Invalid American given name (invalid character).'];
         yield 'hyphen with spaces' => ['Mary - Ann', 'Invalid American given name (invalid character).'];
         yield 'fullwidth' => ["\u{FF2A}ohn", 'Invalid American given name (compatibility character).'];
-        yield 'empty' => ['  ', 'Invalid American given name (0 characters).'];
+        yield 'empty' => ['  ', 'Invalid American given name (empty).'];
         yield 'too long' => [\str_repeat('a', 101), 'Invalid American given name (too long).'];
     }
 

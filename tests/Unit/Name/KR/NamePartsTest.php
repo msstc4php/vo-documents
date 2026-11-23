@@ -66,7 +66,7 @@ final class NamePartsTest extends TestCase
     {
         $characters = 'Invalid Korean family name (invalid character).';
 
-        yield 'empty' => ['', 'Invalid Korean family name (0 characters).'];
+        yield 'empty' => ['', 'Invalid Korean family name (empty).'];
         yield 'too long' => [\str_repeat('김', 101), 'Invalid Korean family name (too long).'];
         yield 'Latin' => ['Kim', $characters];
         yield 'Latin among Hangul' => ['김a', $characters];

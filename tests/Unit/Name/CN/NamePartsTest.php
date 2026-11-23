@@ -65,8 +65,8 @@ final class NamePartsTest extends TestCase
     {
         $characters = 'Invalid Chinese family name (invalid character).';
 
-        yield 'empty' => ['', 'Invalid Chinese family name (0 characters).'];
-        yield 'blank' => ['  ', 'Invalid Chinese family name (0 characters).'];
+        yield 'empty' => ['', 'Invalid Chinese family name (empty).'];
+        yield 'blank' => ['  ', 'Invalid Chinese family name (empty).'];
         yield 'too long' => [\str_repeat('张', 101), 'Invalid Chinese family name (too long).'];
         yield 'Latin letters' => ['Zhang', $characters];
         yield 'Latin among Han' => ['张a', $characters];

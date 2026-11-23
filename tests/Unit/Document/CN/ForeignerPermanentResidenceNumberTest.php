@@ -82,9 +82,9 @@ final class ForeignerPermanentResidenceNumberTest extends TestCase
     {
         $document = 'Invalid Chinese permanent residence card number';
 
-        yield 'old 15-character form' => ['KAZ110090123105', $document . ' (15 characters).'];
-        yield 'too short' => ['93268219850101001', $document . ' (17 characters).'];
-        yield 'too long' => ['9326821985010100170', $document . ' (19 characters).'];
+        yield 'old 15-character form' => ['KAZ110090123105', $document . ' (wrong length).'];
+        yield 'too short' => ['93268219850101001', $document . ' (wrong length).'];
+        yield 'too long' => ['9326821985010100170', $document . ' (wrong length).'];
         yield 'first digit 8 with a valid check' => ['822682198501010011', $document . ' (invalid character).'];
         yield 'first digit 1 with a valid check' => ['11010519491231002X', $document . ' (invalid character).'];
         yield 'letter inside' => ['93268219850101A017', $document . ' (invalid character).'];

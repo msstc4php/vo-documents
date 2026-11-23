@@ -86,9 +86,9 @@ final class CurpTest extends TestCase
      */
     public static function invalidCodes(): iterable
     {
-        yield 'too short' => ['HEGJ561231HDFRRN0', 'Invalid Mexican CURP (17 characters).'];
-        yield 'too long' => ['HEGJ561231HDFRRN045', 'Invalid Mexican CURP (19 characters).'];
-        yield 'far too long' => [\str_repeat('A', 41), 'Invalid Mexican CURP (too long).'];
+        yield 'too short' => ['HEGJ561231HDFRRN0', 'Invalid Mexican CURP (wrong length).'];
+        yield 'too long' => ['HEGJ561231HDFRRN045', 'Invalid Mexican CURP (wrong length).'];
+        yield 'far too long' => [\str_repeat('A', 41), 'Invalid Mexican CURP (wrong length).'];
         yield 'punctuation' => ['HEGJ561231HDFRRN0.', 'Invalid Mexican CURP (invalid character).'];
         yield 'digit among the name letters' => ['HEG1561231HDFRRN04', 'Invalid Mexican CURP (invalid character).'];
         yield 'letter in the date' => ['HEGJ56123AHDFRRN04', 'Invalid Mexican CURP (invalid character).'];

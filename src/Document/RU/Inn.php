@@ -58,7 +58,7 @@ final class Inn extends AbstractStringValueObject implements Maskable
         $digits = Digits::exactly($value, 12, self::DOCUMENT);
 
         if ($digits === '000000000000') {
-            throw new InvalidDocumentNumberException(\sprintf('Invalid %s (zeros only).', self::DOCUMENT));
+            throw new InvalidDocumentNumberException(\sprintf('Invalid %s checksum.', self::DOCUMENT));
         }
 
         return $digits;

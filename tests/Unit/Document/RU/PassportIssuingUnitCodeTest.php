@@ -60,8 +60,8 @@ final class PassportIssuingUnitCodeTest extends TestCase
      */
     public static function invalidNumbers(): iterable
     {
-        yield 'too short' => ['772-07', 'Invalid Russian passport issuing unit code (5 characters).'];
-        yield 'too long' => ['772-0789', 'Invalid Russian passport issuing unit code (7 characters).'];
+        yield 'too short' => ['772-07', 'Invalid Russian passport issuing unit code (wrong length).'];
+        yield 'too long' => ['772-0789', 'Invalid Russian passport issuing unit code (wrong length).'];
         yield 'letters' => ['77A-078', 'Invalid Russian passport issuing unit code (invalid character).'];
     }
 

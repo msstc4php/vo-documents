@@ -141,9 +141,9 @@ final class NamePartsTest extends TestCase
         $character = 'Invalid Saudi Arabian given name (invalid character).';
         $compatibility = 'Invalid Saudi Arabian given name (compatibility character).';
 
-        yield 'empty' => ['', 'Invalid Saudi Arabian given name (0 characters).'];
-        yield 'blank' => [" \u{00A0}\t", 'Invalid Saudi Arabian given name (0 characters).'];
-        yield 'only tatweel' => ["\u{0640}\u{0640}", 'Invalid Saudi Arabian given name (0 characters).'];
+        yield 'empty' => ['', 'Invalid Saudi Arabian given name (empty).'];
+        yield 'blank' => [" \u{00A0}\t", 'Invalid Saudi Arabian given name (empty).'];
+        yield 'only tatweel' => ["\u{0640}\u{0640}", 'Invalid Saudi Arabian given name (empty).'];
         yield 'too long' => [\str_repeat('ع', 101), 'Invalid Saudi Arabian given name (too long).'];
         yield 'Latin' => ['Mohammed', $character];
         yield 'Arabic and Latin in one name' => ['محمد Ali', $character];

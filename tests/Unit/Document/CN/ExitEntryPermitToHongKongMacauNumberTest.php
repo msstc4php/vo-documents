@@ -75,11 +75,11 @@ final class ExitEntryPermitToHongKongMacauNumberTest extends TestCase
         yield 'punctuation' => ['C1234567.', $character];
         yield 'eight characters' => [
             'C1234567',
-            'Invalid Chinese Hong Kong and Macao exit-entry permit number (8 characters).',
+            'Invalid Chinese Hong Kong and Macao exit-entry permit number (wrong length).',
         ];
         yield 'ten characters' => [
             'CA00000011',
-            'Invalid Chinese Hong Kong and Macao exit-entry permit number (10 characters).',
+            'Invalid Chinese Hong Kong and Macao exit-entry permit number (wrong length).',
         ];
     }
 

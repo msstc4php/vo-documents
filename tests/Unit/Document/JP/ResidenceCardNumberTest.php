@@ -73,8 +73,8 @@ final class ResidenceCardNumberTest extends TestCase
         yield 'digits only' => ['123456789012', $document . ' (invalid character).'];
         yield 'letters only' => ['ABCDEFGHIJKL', $document . ' (invalid character).'];
         yield 'one trailing letter' => ['AB123456789C', $document . ' (invalid character).'];
-        yield 'seven digits' => ['AB1234567CD', $document . ' (11 characters).'];
-        yield 'nine digits' => ['AB123456789CD', $document . ' (13 characters).'];
+        yield 'seven digits' => ['AB1234567CD', $document . ' (wrong length).'];
+        yield 'nine digits' => ['AB123456789CD', $document . ' (wrong length).'];
         yield 'non-ASCII letter' => ["\u{00C4}B12345678CD", $document . ' (invalid character).'];
     }
 

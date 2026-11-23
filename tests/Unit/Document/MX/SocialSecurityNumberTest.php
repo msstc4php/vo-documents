@@ -41,8 +41,8 @@ final class SocialSecurityNumberTest extends TestCase
      */
     public static function invalidNumbers(): iterable
     {
-        yield 'ten digits' => ['1234567890', 'Invalid Mexican social security number (10 characters).'];
-        yield 'twelve digits' => ['123456789012', 'Invalid Mexican social security number (12 characters).'];
+        yield 'ten digits' => ['1234567890', 'Invalid Mexican social security number (wrong length).'];
+        yield 'twelve digits' => ['123456789012', 'Invalid Mexican social security number (wrong length).'];
         yield 'letter' => ['1234567890A', 'Invalid Mexican social security number (invalid character).'];
     }
 

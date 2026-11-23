@@ -65,14 +65,14 @@ final class NisTest extends TestCase
     {
         yield "ten digits, the eSocial manual's rejected sample" => [
             '1800474420',
-            'Invalid Brazilian NIS (10 characters).',
+            'Invalid Brazilian NIS (wrong length).',
         ];
         yield 'wrong check digit' => ['11816788890', 'Invalid Brazilian NIS checksum.'];
         yield 'base digit changed' => ['11816788983', 'Invalid Brazilian NIS checksum.'];
         yield 'remainder 1 written as 10 minus one' => ['10000000139', 'Invalid Brazilian NIS checksum.'];
-        yield 'twelve digits' => ['118167888930', 'Invalid Brazilian NIS (12 characters).'];
+        yield 'twelve digits' => ['118167888930', 'Invalid Brazilian NIS (wrong length).'];
         yield 'letter' => ['1181678889X', 'Invalid Brazilian NIS (invalid character).'];
-        yield 'empty' => ['', 'Invalid Brazilian NIS (0 characters).'];
+        yield 'empty' => ['', 'Invalid Brazilian NIS (wrong length).'];
     }
 
     #[DataProvider('invalidNumbers')]

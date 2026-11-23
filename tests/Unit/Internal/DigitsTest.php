@@ -125,28 +125,28 @@ final class DigitsTest extends TestCase
     public function testExactlyRefusesAnotherLengthWithTheCharacterCount(): void
     {
         $this->expectException(InvalidDocumentNumberException::class);
-        $this->expectExceptionMessage('Invalid test number (3 characters).');
+        $this->expectExceptionMessage('Invalid test number (wrong length).');
 
         Digits::exactly('123', 4, 'test number');
     }
 
     public function testExactlyReportsTheCountUpToTheCap(): void
     {
-        $this->expectExceptionMessage('Invalid test number (40 characters).');
+        $this->expectExceptionMessage('Invalid test number (wrong length).');
 
         Digits::exactly(\str_repeat('1', 40), 4, 'test number');
     }
 
-    public function testExactlySaysTooLongAboveTheCap(): void
+    public function testExactlyNamesNoLengthForAnyInput(): void
     {
-        $this->expectExceptionMessage('Invalid test number (too long).');
+        $this->expectExceptionMessage('Invalid test number (wrong length).');
 
         Digits::exactly(\str_repeat('1', 41), 4, 'test number');
     }
 
     public function testExactlyCountsMultibyteCharactersOnce(): void
     {
-        $this->expectExceptionMessage('Invalid test number (5 characters).');
+        $this->expectExceptionMessage('Invalid test number (wrong length).');
 
         Digits::exactly('12ЗО3', 4, 'test number');
     }
@@ -172,7 +172,7 @@ final class DigitsTest extends TestCase
 
     public function testExactlyRefusesEmptyInput(): void
     {
-        $this->expectExceptionMessage('Invalid test number (0 characters).');
+        $this->expectExceptionMessage('Invalid test number (wrong length).');
 
         Digits::exactly(' - ', 1, 'test number');
     }
@@ -184,11 +184,9 @@ final class DigitsTest extends TestCase
         Digits::exactly("1234\u{0000}", 4, 'test number');
     }
 
-    public function testInvalidLengthGivesTheCountOrTooLong(): void
+    public function testInvalidLengthNamesNoLength(): void
     {
-        self::assertSame('Invalid X (3 characters).', Digits::invalidLength('A1é', 'X')->getMessage());
-        self::assertSame('Invalid X (40 characters).', Digits::invalidLength(\str_repeat('1', 40), 'X')->getMessage());
-        self::assertSame('Invalid X (too long).', Digits::invalidLength(\str_repeat('1', 41), 'X')->getMessage());
+        self::assertSame('Invalid X (wrong length).', Digits::invalidLength('X')->getMessage());
     }
 
     public function testUpperCasedOfLengthStripsUpperCasesAsciiOnlyAndPassesTheCharacterCount(): void
@@ -207,7 +205,7 @@ final class DigitsTest extends TestCase
     public function testUpperCasedOfLengthRefusesALengthTheCallerRefuses(): void
     {
         $this->expectException(InvalidDocumentNumberException::class);
-        $this->expectExceptionMessage('Invalid X (2 characters).');
+        $this->expectExceptionMessage('Invalid X (wrong length).');
 
         Digits::upperCasedOfLength('a-b', static fn (int $length): bool => $length !== 2, 'X');
     }

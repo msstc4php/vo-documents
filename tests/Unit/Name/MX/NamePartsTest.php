@@ -94,7 +94,7 @@ final class NamePartsTest extends TestCase
         yield 'trailing slash' => ['Juan/', 'Invalid Mexican given name (invalid character).'];
         yield 'two slashes' => ['Juan//José', 'Invalid Mexican given name (invalid character).'];
         yield 'other punctuation' => ['Juan, José', 'Invalid Mexican given name (invalid character).'];
-        yield 'empty' => ['  ', 'Invalid Mexican given name (0 characters).'];
+        yield 'empty' => ['  ', 'Invalid Mexican given name (empty).'];
     }
 
     #[DataProvider('invalidParts')]

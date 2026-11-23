@@ -80,7 +80,7 @@ final class FullNameTest extends TestCase
             'Ｂｕｄｉ',
             'Invalid Indonesian full name (compatibility character).',
         ];
-        yield 'empty' => ['   ', 'Invalid Indonesian full name (0 characters).'];
+        yield 'empty' => ['   ', 'Invalid Indonesian full name (empty).'];
         yield 'over the length cap' => [
             \str_repeat('a', 101),
             'Invalid Indonesian full name (too long).',

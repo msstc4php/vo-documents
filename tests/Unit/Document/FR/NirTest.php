@@ -113,10 +113,10 @@ final class NirTest extends TestCase
     {
         $document = 'Invalid French NIR';
 
-        yield 'thirteen digits, no key' => ['1211277131232', $document . ' (13 characters).'];
-        yield 'fourteen digits' => ['12112771312325', $document . ' (14 characters).'];
-        yield 'sixteen characters' => ['1211277131232500', $document . ' (16 characters).'];
-        yield 'empty' => ['', $document . ' (0 characters).'];
+        yield 'thirteen digits, no key' => ['1211277131232', $document . ' (wrong length).'];
+        yield 'fourteen digits' => ['12112771312325', $document . ' (wrong length).'];
+        yield 'sixteen characters' => ['1211277131232500', $document . ' (wrong length).'];
+        yield 'empty' => ['', $document . ' (wrong length).'];
         yield 'letter C' => ['12112771312C250', $document . ' (invalid character).'];
         yield 'A outside the department' => ['A21127713123250', $document . ' (invalid character).'];
         yield 'B in the key' => ['1211277131232B0', $document . ' (invalid character).'];

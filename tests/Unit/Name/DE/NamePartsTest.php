@@ -69,7 +69,7 @@ final class NamePartsTest extends TestCase
         yield 'digit' => ['Jürgen2', 'Invalid German given name (invalid character).'];
         yield 'trailing hyphen' => ['Hans-', 'Invalid German given name (invalid character).'];
         yield 'fullwidth' => ["\u{FF2A}an", 'Invalid German given name (compatibility character).'];
-        yield 'empty' => ['  ', 'Invalid German given name (0 characters).'];
+        yield 'empty' => ['  ', 'Invalid German given name (empty).'];
     }
 
     #[DataProvider('invalidGivenNames')]

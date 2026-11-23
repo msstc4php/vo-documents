@@ -83,16 +83,16 @@ final class DriverLicenceNumberFactoryTest extends TestCase
      */
     public static function numbersValidNowhere(): iterable
     {
-        yield 'empty' => ['', "Invalid Mexican driver's licence number (0 characters)."];
-        yield 'eleven digits' => ['12345678901', "Invalid Mexican driver's licence number (11 characters)."];
-        yield 'thirteen digits' => ['1234567890123', "Invalid Mexican driver's licence number (13 characters)."];
+        yield 'empty' => ['', "Invalid Mexican driver's licence number (wrong length)."];
+        yield 'eleven digits' => ['12345678901', "Invalid Mexican driver's licence number (wrong length)."];
+        yield 'thirteen digits' => ['1234567890123', "Invalid Mexican driver's licence number (wrong length)."];
         yield 'twelve characters with a letter' => [
             '12345678901A',
             "Invalid Mexican driver's licence number (fits no jurisdiction).",
         ];
         yield 'pasted several times' => [
             \str_repeat('123456789012 ', 5),
-            "Invalid Mexican driver's licence number (too long).",
+            "Invalid Mexican driver's licence number (wrong length).",
         ];
     }
 
@@ -208,7 +208,7 @@ final class DriverLicenceNumberFactoryTest extends TestCase
         self::assertRefusedWithoutEcho(
             static fn (string $value): mixed => DriverLicenceNumberFactory::fromNumberIn($value, Jurisdiction::Mex),
             '12345678',
-            "Invalid MX-MEX driver's licence number (8 characters).",
+            "Invalid MX-MEX driver's licence number (wrong length).",
         );
     }
 

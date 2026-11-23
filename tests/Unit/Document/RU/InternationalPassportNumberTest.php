@@ -60,10 +60,10 @@ final class InternationalPassportNumberTest extends TestCase
      */
     public static function invalidNumbers(): iterable
     {
-        yield 'too short' => ['75 123456', 'Invalid Russian international passport number (8 characters).'];
+        yield 'too short' => ['75 123456', 'Invalid Russian international passport number (wrong length).'];
         yield 'internal passport length' => [
             '45 08 123456',
-            'Invalid Russian international passport number (10 characters).',
+            'Invalid Russian international passport number (wrong length).',
         ];
         yield 'letters' => ['75 123456A', 'Invalid Russian international passport number (invalid character).'];
     }

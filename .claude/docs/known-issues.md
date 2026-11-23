@@ -49,7 +49,7 @@
   reachable official host. Owner rule: a checksum is computed only when its algorithm is quoted from an official source.
 - Sub-national pattern (copy for US/CA/BR): `Document\<CC>\Jurisdiction` enum, `DriverLicenceNumber` interface with a
   covariant `jurisdiction()`, an abstract base per country with `static format(): Internal\NumberFormat` (character
-  class + length range; messages "(N characters)" / "(invalid character)") and shared `masked()`/`parse()`, one final
+  class + length range; messages "(wrong length)" / "(invalid character)") and shared `masked()`/`parse()`, one final
   class per jurisdiction, a factory with an exhaustive enum → class `match` delegating to
   `Internal\SubdivisionResolver`.
 - National name codecs validate payloads through `Internal\PayloadFields` (closed key set, string fields, one shape
@@ -90,7 +90,7 @@
   the ones an ICAO table lists itself (`Transliterator::lists()`: today `Ĳ`/`ĳ` and `Ŀ`/`ŀ` of 6.A), which keep their
   table spelling (`Ĳsselmeer` → `IJSSELMEER`). The Transliterator is built only for a compatibility character, so
   tests of ordinary parts need no `UsesClass` for it.
-- Name part messages: "(N characters)" for empty or > 100, "(compatibility character)", "(invalid character)" for
+- Name part messages: "(empty)", "(too long)" for > 100, "(compatibility character)", "(invalid character)" for
   any pattern failure (also a misplaced separator).
 - `LatinSpelling::find()` matches word by word (`IdentifierSpellings`: the variants of each ICAO word, split at spaces
   and hyphens, plus the national separators to rebuild the canonical form), so the cost is the sum of variant counts and

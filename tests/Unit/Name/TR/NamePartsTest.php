@@ -95,7 +95,7 @@ final class NamePartsTest extends TestCase
         yield 'Cyrillic' => ['Иван', 'Invalid Turkish given name (invalid character).'];
         yield 'digit' => ['Ayşe2', 'Invalid Turkish given name (invalid character).'];
         yield 'fullwidth' => ["\u{FF21}yşe", 'Invalid Turkish given name (compatibility character).'];
-        yield 'empty' => ['  ', 'Invalid Turkish given name (0 characters).'];
+        yield 'empty' => ['  ', 'Invalid Turkish given name (empty).'];
     }
 
     #[DataProvider('invalidGivenNames')]

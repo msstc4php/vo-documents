@@ -63,10 +63,10 @@ final class TaxIdentificationNumberTest extends TestCase
 
         yield 'first digit 4' => ['4023217600053', $firstDigit];
         yield 'first digit 9' => ['9023217600053', $firstDigit];
-        yield 'twelve digits' => ['302321760005', 'Invalid French tax identification number (12 characters).'];
-        yield 'fourteen digits' => ['30232176000531', 'Invalid French tax identification number (14 characters).'];
+        yield 'twelve digits' => ['302321760005', 'Invalid French tax identification number (wrong length).'];
+        yield 'fourteen digits' => ['30232176000531', 'Invalid French tax identification number (wrong length).'];
         yield 'letter' => ['30232176000A3', 'Invalid French tax identification number (invalid character).'];
-        yield 'empty' => ['', 'Invalid French tax identification number (0 characters).'];
+        yield 'empty' => ['', 'Invalid French tax identification number (wrong length).'];
     }
 
     #[DataProvider('invalidNumbers')]

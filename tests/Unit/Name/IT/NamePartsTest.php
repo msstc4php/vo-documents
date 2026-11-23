@@ -70,7 +70,7 @@ final class NamePartsTest extends TestCase
         yield 'trailing hyphen' => ['Gian-', 'Invalid Italian given name (invalid character).'];
         yield 'fullwidth' => ["\u{FF27}ino", 'Invalid Italian given name (compatibility character).'];
         yield 'comma between given names' => ['Maria, Luisa', 'Invalid Italian given name (invalid character).'];
-        yield 'empty' => ['  ', 'Invalid Italian given name (0 characters).'];
+        yield 'empty' => ['  ', 'Invalid Italian given name (empty).'];
     }
 
     #[DataProvider('invalidGivenNames')]

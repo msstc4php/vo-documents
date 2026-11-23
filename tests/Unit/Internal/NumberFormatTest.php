@@ -37,14 +37,14 @@ final class NumberFormatTest extends TestCase
      */
     public static function invalidInputs(): iterable
     {
-        yield 'below the minimum' => ['1', 'Invalid X (1 characters).'];
-        yield 'above the maximum' => ['1234', 'Invalid X (4 characters).'];
-        yield 'empty' => ['', 'Invalid X (0 characters).'];
-        yield 'far too long' => [\str_repeat('1', 41), 'Invalid X (too long).'];
+        yield 'below the minimum' => ['1', 'Invalid X (wrong length).'];
+        yield 'above the maximum' => ['1234', 'Invalid X (wrong length).'];
+        yield 'empty' => ['', 'Invalid X (wrong length).'];
+        yield 'far too long' => [\str_repeat('1', 41), 'Invalid X (wrong length).'];
         yield 'letter at the right length' => ['12A', 'Invalid X (invalid character).'];
         yield 'letter first' => ['A12', 'Invalid X (invalid character).'];
         yield 'multibyte letter counted once' => ['12É', 'Invalid X (invalid character).'];
-        yield 'multibyte letter beyond the length' => ['123É', 'Invalid X (4 characters).'];
+        yield 'multibyte letter beyond the length' => ['123É', 'Invalid X (wrong length).'];
         yield 'trailing line feed is a separator, control character is not' => [
             "12\x01",
             'Invalid X (invalid character).',

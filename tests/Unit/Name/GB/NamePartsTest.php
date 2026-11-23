@@ -72,7 +72,7 @@ final class NamePartsTest extends TestCase
         yield 'full stop' => ['J.', 'Invalid British given name (invalid character).'];
         yield 'leading apostrophe' => ["'Mary", 'Invalid British given name (invalid character).'];
         yield 'fullwidth' => ["\u{FF2A}ohn", 'Invalid British given name (compatibility character).'];
-        yield 'empty' => ['  ', 'Invalid British given name (0 characters).'];
+        yield 'empty' => ['  ', 'Invalid British given name (empty).'];
     }
 
     #[DataProvider('invalidGivenNames')]

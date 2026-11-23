@@ -58,15 +58,15 @@ final class PassportNumberTest extends TestCase
      */
     public static function invalidNumbers(): iterable
     {
-        yield 'seven digits' => ['U1234567', 'Invalid Turkish passport number (8 characters).'];
-        yield 'nine digits' => ['U123456789', 'Invalid Turkish passport number (10 characters).'];
+        yield 'seven digits' => ['U1234567', 'Invalid Turkish passport number (wrong length).'];
+        yield 'nine digits' => ['U123456789', 'Invalid Turkish passport number (wrong length).'];
         yield 'no letter' => ['123456789', 'Invalid Turkish passport number (invalid character).'];
         yield 'two letters' => ['UA2345678', 'Invalid Turkish passport number (invalid character).'];
         yield 'letter at the end' => ['12345678U', 'Invalid Turkish passport number (invalid character).'];
         yield 'dotted capital I' => ["\u{0130}12345678", 'Invalid Turkish passport number (invalid character).'];
         yield 'sign' => ['U1234567#', 'Invalid Turkish passport number (invalid character).'];
-        yield 'empty' => ['', 'Invalid Turkish passport number (0 characters).'];
-        yield 'far too long' => ['U' . \str_repeat('1', 50), 'Invalid Turkish passport number (too long).'];
+        yield 'empty' => ['', 'Invalid Turkish passport number (wrong length).'];
+        yield 'far too long' => ['U' . \str_repeat('1', 50), 'Invalid Turkish passport number (wrong length).'];
     }
 
     #[DataProvider('invalidNumbers')]

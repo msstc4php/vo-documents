@@ -64,8 +64,8 @@ final class OmsPolicyNumberTest extends TestCase
     {
         yield 'control digit changed' => ['7700000000123454', 'Invalid OMS policy number checksum.'];
         yield 'number digit changed' => ['7700000000133453', 'Invalid OMS policy number checksum.'];
-        yield 'too short' => ['770000000012345', 'Invalid OMS policy number (15 characters).'];
-        yield 'too long' => ['77000000001234530', 'Invalid OMS policy number (17 characters).'];
+        yield 'too short' => ['770000000012345', 'Invalid OMS policy number (wrong length).'];
+        yield 'too long' => ['77000000001234530', 'Invalid OMS policy number (wrong length).'];
         yield 'letters' => ['770000000012345O', 'Invalid OMS policy number (invalid character).'];
     }
 

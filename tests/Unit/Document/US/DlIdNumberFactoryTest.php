@@ -345,19 +345,19 @@ final class DlIdNumberFactoryTest extends TestCase
      */
     public static function numbersValidNowhere(): iterable
     {
-        yield 'five digits' => ['12345', 'Invalid American DL/ID number (5 characters).'];
-        yield 'eleven digits' => ['12345678901', 'Invalid American DL/ID number (11 characters).'];
-        yield 'sixteen digits' => ['1234567890123456', 'Invalid American DL/ID number (16 characters).'];
+        yield 'five digits' => ['12345', 'Invalid American DL/ID number (wrong length).'];
+        yield 'eleven digits' => ['12345678901', 'Invalid American DL/ID number (wrong length).'];
+        yield 'sixteen digits' => ['1234567890123456', 'Invalid American DL/ID number (wrong length).'];
         yield 'thirteen digits, a length FL, MD and MI have' => [
             '1234567890123',
             'Invalid American DL/ID number (fits no jurisdiction).',
         ];
         yield 'MD customer ID' => ['MD12345678900', 'Invalid American DL/ID number (fits no jurisdiction).'];
         yield 'seven digits + B' => ['1234567B', 'Invalid American DL/ID number (fits no jurisdiction).'];
-        yield 'empty' => ['', 'Invalid American DL/ID number (0 characters).'];
+        yield 'empty' => ['', 'Invalid American DL/ID number (wrong length).'];
         yield 'pasted several times' => [
             \str_repeat('123456789 ', 5),
-            'Invalid American DL/ID number (too long).',
+            'Invalid American DL/ID number (wrong length).',
         ];
     }
 
@@ -491,7 +491,7 @@ final class DlIdNumberFactoryTest extends TestCase
         self::assertRefusedWithoutEcho(
             static fn (string $value): mixed => DlIdNumberFactory::fromNumberIn($value, Jurisdiction::Ny),
             '12345678',
-            'Invalid US-NY DL/ID number (8 characters).',
+            'Invalid US-NY DL/ID number (wrong length).',
         );
     }
 

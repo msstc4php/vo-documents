@@ -41,14 +41,14 @@ final class NumberShapesTest extends TestCase
      */
     public static function invalidInputs(): iterable
     {
-        yield 'length between the shapes' => ['1234', 'Invalid X (4 characters).'];
-        yield 'below every shape' => ['12', 'Invalid X (2 characters).'];
-        yield 'above every shape' => ['123456', 'Invalid X (6 characters).'];
-        yield 'empty' => ['', 'Invalid X (0 characters).'];
-        yield 'far too long' => [\str_repeat('1', 41), 'Invalid X (too long).'];
+        yield 'length between the shapes' => ['1234', 'Invalid X (wrong length).'];
+        yield 'below every shape' => ['12', 'Invalid X (wrong length).'];
+        yield 'above every shape' => ['123456', 'Invalid X (wrong length).'];
+        yield 'empty' => ['', 'Invalid X (wrong length).'];
+        yield 'far too long' => [\str_repeat('1', 41), 'Invalid X (wrong length).'];
         yield 'shapes are not mixed across lengths' => ['A1234', 'Invalid X (invalid character).'];
         yield 'no shape of that length matches' => ['AB1', 'Invalid X (invalid character).'];
-        yield 'a shape is anchored at the end' => ["123\x00", 'Invalid X (4 characters).'];
+        yield 'a shape is anchored at the end' => ["123\x00", 'Invalid X (wrong length).'];
         yield 'multibyte letter counted once' => ['12É', 'Invalid X (invalid character).'];
         yield 'alternation is anchored as a whole' => ['1234A', 'Invalid X (invalid character).'];
     }

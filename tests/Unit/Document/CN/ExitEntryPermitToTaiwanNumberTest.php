@@ -65,8 +65,8 @@ final class ExitEntryPermitToTaiwanNumberTest extends TestCase
         yield 'another prefix' => ['C12345678', $character];
         yield 'digit first' => ['112345678', $character];
         yield 'letter inside' => ['L1234A678', $character];
-        yield 'eight characters' => ['L1234567', 'Invalid Chinese Taiwan exit-entry permit number (8 characters).'];
-        yield 'ten characters' => ['L123456789', 'Invalid Chinese Taiwan exit-entry permit number (10 characters).'];
+        yield 'eight characters' => ['L1234567', 'Invalid Chinese Taiwan exit-entry permit number (wrong length).'];
+        yield 'ten characters' => ['L123456789', 'Invalid Chinese Taiwan exit-entry permit number (wrong length).'];
     }
 
     #[DataProvider('invalidNumbers')]

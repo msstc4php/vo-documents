@@ -1,7 +1,9 @@
 # Conventions
 
 - MRZ: tests use the Doc 9303 Appendix A specimens (`docs/sources/ICAO.md` 5.6); long numbers and unknown birth dates have no specimen, so their check digits come from an independent script and are labelled so.
-- Exception messages name the document and the length or reason, never the input.
+- Exception messages name the document and a fixed reason, never the input or anything derived from it (no length,
+  no count, no echoed fragment; global ruling G2 of the 1.0 release). Fixed reasons: `(wrong length)`, `(too long)`
+  (names above `MAX_LENGTH`), `(empty)`, `(invalid character)`, `checksum`.
 - Tool configuration is byte-identical to the bundle-standard `php84` templates.
 - Tests: `tests/Unit` (what Infection runs), fixtures in `tests/Fixture`.
 - Use the global `\Normalizer` (ext-intl or symfony/polyfill-intl-normalizer); never import `Symfony\Polyfill\...`
@@ -13,7 +15,7 @@
 - Official sources are cited with publication.pravo.gov.ru (RU) or the gazette when the portal has no entry; aggregator
   copies (garant, legalacts) only as "quoted from" in the source note.
 - A national name part extends `Name\AbstractNamePart` (hooks: `letters()`, `word()`, `innerSeparators()`, `label()`);
-  message `Invalid <label> (<n> characters).`; allowed separators per part come from the country's source note (RU:
+  message `Invalid <label> (empty).` or `(too long)`; allowed separators per part come from the country's source note (RU:
   given names and patronymics have no apostrophe).
 - A composite name is a `final readonly` class with public part properties, its codec stores only an explicit Latin
   override (`latin: null` otherwise) and is listed in `Codecs::all()`. A Latin-script family + given name extends
@@ -34,7 +36,7 @@
 - A document number VO parses with `Internal\Digits::exactly($input, $length, $label)` (`exactlyStripped()` when the
   separators are already removed; strips `Digits::SEPARATORS`: space, `-`, tab, CR/LF, NBSP, U+2007, U+202F, U+3000
   and the hyphen look-alikes U+FF0D, U+FF70, U+30FC, U+2010, U+2011, U+2212; message
-  `Invalid <label> (<n> characters).`, or `(too long)` above `Digits::MAX_REPORTED_LENGTH` = 40; right length with a
+  `Invalid <label> (wrong length).` whatever the length; right length with a
   non-digit: `(invalid character)`), then its checksum where an official algorithm exists (`Invalid <label>
   checksum.`). The label is a `private const string DOCUMENT` per class, used in every message. `masked()` keeps the
   last 4 characters (`Mask::keepLastDigits(formatted(), 4)`) unless the source note records an official rule; a number
@@ -55,7 +57,7 @@
   compact stored value (`*****2345`). Letters are masked with `Mask::keepLastCharacters()` before the layout is
   applied; digit-only layouts use `Mask::keepLastDigits(formatted(), n)`.
 - A sub-national number with several shapes (US DL/ID) uses `Internal\NumberShapes(shape, …)` (length derived from the
-  atoms `A`, `9`, `[...]`, `{n}`; anything else is an `InvalidArgumentException`): wrong length → `(N characters)`, a
+  atoms `A`, `9`, `[...]`, `{n}`; anything else is an `InvalidArgumentException`): wrong length → `(wrong length)`, a
   length some shape has but no match → `(invalid character)`. One class per jurisdiction, even where the licence and ID
   card have different shapes (AL, IL): the class accepts the union and its doc says which is which. `fromNumberIn()`
   for a jurisdiction with no published format throws `Invalid US-XX DL/ID number (format not covered).`; the factory's
@@ -125,7 +127,7 @@
   (Hokkaido has five commissions, KoROAD names are not ISO). No `Jurisdiction` enum for Asia.
 - **Masks keep 3 characters of a value of 8 or fewer** (IN passport `*****002`), 4 otherwise; KR licences mask both
   forms as the 12-digit number (`********3361`). The CN mask keeps the sex digit (owner's ruling, CR-023).
-- **Name length messages** say "(0 characters)" or "(too long)" (above `MAX_LENGTH`); a raw input over 10 000 bytes is
+- **Name length messages** say "(empty)" or "(too long)" (above `MAX_LENGTH`); a raw input over 10 000 bytes is
   refused before NFC so a huge string is never normalised.
 - **Line length is 120 characters in `src/` and `tests/`** (the rule of the style commit of plan 4). A URL in an `@see`
   cannot be wrapped and is exempt; a long `\u{...}` string is split with `.` concatenation.

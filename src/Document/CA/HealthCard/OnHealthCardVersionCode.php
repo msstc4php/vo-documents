@@ -37,7 +37,7 @@ final class OnHealthCardVersionCode extends AbstractStringValueObject implements
     /**
      * @return non-empty-string
      *
-     * @throws InvalidDocumentNumberException "(N characters)" for other than one or two characters, "(invalid
+     * @throws InvalidDocumentNumberException "(wrong length)" for other than one or two characters, "(invalid
      *                                        character)" for anything but a letter
      */
     #[Override]

@@ -217,9 +217,9 @@ final class HealthCardNumberFactoryTest extends TestCase
         $onHint = 'Invalid Canadian health card number (fits no jurisdiction; an Ontario card with a version code:'
             . ' use OnHealthCardNumber::fromCard()).';
 
-        yield 'seven digits' => ['1234567', 'Invalid Canadian health card number (7 characters).'];
+        yield 'seven digits' => ['1234567', 'Invalid Canadian health card number (wrong length).'];
         yield 'eleven digits, an ON length' => ['12345678901', $noJurisdiction];
-        yield 'thirteen characters' => ['9876543217ABC', 'Invalid Canadian health card number (13 characters).'];
+        yield 'thirteen characters' => ['9876543217ABC', 'Invalid Canadian health card number (wrong length).'];
         yield 'AB illustration with version code' => ['5584486674YM', $noJurisdiction];
         yield 'printed ON card with a version code' => ['9876543217 YM', $onHint];
         yield 'printed ON card with one letter' => ['9876543217A', $onHint];
@@ -227,10 +227,10 @@ final class HealthCardNumberFactoryTest extends TestCase
         yield 'letter outside the NT set' => ['A1234567', $noJurisdiction];
         yield 'QC month 31' => ['BOUF94311419', $noJurisdiction];
         yield 'QC temporary NAM' => ['BERC920401M2', $noJurisdiction];
-        yield 'empty' => ['', 'Invalid Canadian health card number (0 characters).'];
+        yield 'empty' => ['', 'Invalid Canadian health card number (wrong length).'];
         yield 'pasted several times' => [
             \str_repeat('123456789 ', 5),
-            'Invalid Canadian health card number (too long).',
+            'Invalid Canadian health card number (wrong length).',
         ];
     }
 

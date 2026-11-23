@@ -99,19 +99,19 @@ final class IdentityCardNumberFactoryTest extends TestCase
     {
         $noJurisdiction = 'Invalid Brazilian identity card number (fits no jurisdiction).';
 
-        yield 'empty' => ['', 'Invalid Brazilian identity card number (0 characters).'];
+        yield 'empty' => ['', 'Invalid Brazilian identity card number (wrong length).'];
         yield 'wrong check digit' => ['12.345.678-3', $noJurisdiction];
         yield 'zeros only' => ['0-0', $noJurisdiction];
-        yield 'one character' => ['2', 'Invalid Brazilian identity card number (1 characters).'];
-        yield 'ten digits' => ['1234567890', 'Invalid Brazilian identity card number (10 characters).'];
+        yield 'one character' => ['2', 'Invalid Brazilian identity card number (wrong length).'];
+        yield 'ten digits' => ['1234567890', 'Invalid Brazilian identity card number (wrong length).'];
         yield 'ten characters with dots' => [
             '1.234.567.890',
-            'Invalid Brazilian identity card number (10 characters).',
+            'Invalid Brazilian identity card number (wrong length).',
         ];
         yield 'letter as check' => ['12345678A', $noJurisdiction];
         yield 'pasted several times' => [
             \str_repeat('12.345.678-2 ', 5),
-            'Invalid Brazilian identity card number (too long).',
+            'Invalid Brazilian identity card number (wrong length).',
         ];
     }
 

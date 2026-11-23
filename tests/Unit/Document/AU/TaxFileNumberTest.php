@@ -62,10 +62,10 @@ final class TaxFileNumberTest extends TestCase
      */
     public static function invalidNumbers(): iterable
     {
-        yield 'eight digits' => ['12 345 678', 'Invalid Australian tax file number (8 characters).'];
-        yield 'ten digits' => ['123 456 7820', 'Invalid Australian tax file number (10 characters).'];
+        yield 'eight digits' => ['12 345 678', 'Invalid Australian tax file number (wrong length).'];
+        yield 'ten digits' => ['123 456 7820', 'Invalid Australian tax file number (wrong length).'];
         yield 'letter' => ['123 456 78O', 'Invalid Australian tax file number (invalid character).'];
-        yield 'empty' => ['', 'Invalid Australian tax file number (0 characters).'];
+        yield 'empty' => ['', 'Invalid Australian tax file number (wrong length).'];
     }
 
     #[DataProvider('invalidNumbers')]

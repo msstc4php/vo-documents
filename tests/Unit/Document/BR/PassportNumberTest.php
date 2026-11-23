@@ -66,9 +66,9 @@ final class PassportNumberTest extends TestCase
         yield 'three letters' => ['CSA65436', $character];
         yield 'eight digits' => ['12265436', $character];
         yield 'letter at the end' => ['CS26543A', $character];
-        yield 'seven characters' => ['CS26543', 'Invalid Brazilian passport number (7 characters).'];
-        yield 'nine characters' => ['CS2654361', 'Invalid Brazilian passport number (9 characters).'];
-        yield 'empty' => ['', 'Invalid Brazilian passport number (0 characters).'];
+        yield 'seven characters' => ['CS26543', 'Invalid Brazilian passport number (wrong length).'];
+        yield 'nine characters' => ['CS2654361', 'Invalid Brazilian passport number (wrong length).'];
+        yield 'empty' => ['', 'Invalid Brazilian passport number (wrong length).'];
     }
 
     #[DataProvider('invalidNumbers')]

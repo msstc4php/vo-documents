@@ -74,11 +74,11 @@ final class NhsNumberTest extends TestCase
         yield 'eleven, but check digit 1' => ['100 000 0061', $checksum];
         yield 'ten is never issued (0)' => ['123 456 7890', $checksum];
         yield 'ten is never issued (1)' => ['123 456 7891', $checksum];
-        yield 'nine digits' => ['943 476 591', 'Invalid NHS number (9 characters).'];
-        yield 'eleven digits' => ['943 476 59190', 'Invalid NHS number (11 characters).'];
+        yield 'nine digits' => ['943 476 591', 'Invalid NHS number (wrong length).'];
+        yield 'eleven digits' => ['943 476 59190', 'Invalid NHS number (wrong length).'];
         yield 'letter' => ['943 476 591X', 'Invalid NHS number (invalid character).'];
-        yield 'empty' => ['', 'Invalid NHS number (0 characters).'];
-        yield 'far too long' => [\str_repeat('9', 50), 'Invalid NHS number (too long).'];
+        yield 'empty' => ['', 'Invalid NHS number (wrong length).'];
+        yield 'far too long' => [\str_repeat('9', 50), 'Invalid NHS number (wrong length).'];
     }
 
     #[DataProvider('invalidNumbers')]

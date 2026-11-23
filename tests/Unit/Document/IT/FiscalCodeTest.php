@@ -138,10 +138,10 @@ final class FiscalCodeTest extends TestCase
         $invalid = 'Invalid Italian fiscal code (invalid character).';
         $day = 'Invalid Italian fiscal code (invalid birth day).';
 
-        yield 'fifteen characters' => ['RSSMRA80A01H501', 'Invalid Italian fiscal code (15 characters).'];
-        yield 'seventeen characters' => ['RSSMRA80A01H501UX', 'Invalid Italian fiscal code (17 characters).'];
-        yield 'eleven-digit provisional number' => ['12345678903', 'Invalid Italian fiscal code (11 characters).'];
-        yield 'empty' => ['', 'Invalid Italian fiscal code (0 characters).'];
+        yield 'fifteen characters' => ['RSSMRA80A01H501', 'Invalid Italian fiscal code (wrong length).'];
+        yield 'seventeen characters' => ['RSSMRA80A01H501UX', 'Invalid Italian fiscal code (wrong length).'];
+        yield 'eleven-digit provisional number' => ['12345678903', 'Invalid Italian fiscal code (wrong length).'];
+        yield 'empty' => ['', 'Invalid Italian fiscal code (wrong length).'];
         yield 'digit in the surname' => [self::withCheck('R1SMRA80A01H501'), $invalid];
         yield 'digit in the name' => [self::withCheck('RSSMR180A01H501'), $invalid];
         yield 'letter outside the omocodia table in the year' => [self::withCheck('RSSMRA8AA01H501'), $invalid];

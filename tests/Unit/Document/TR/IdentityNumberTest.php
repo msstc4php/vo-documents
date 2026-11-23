@@ -56,11 +56,11 @@ final class IdentityNumberTest extends TestCase
      */
     public static function invalidNumbers(): iterable
     {
-        yield 'ten digits' => ['1234567890', 'Invalid Turkish identity number (10 characters).'];
-        yield 'twelve digits' => ['123456789012', 'Invalid Turkish identity number (12 characters).'];
+        yield 'ten digits' => ['1234567890', 'Invalid Turkish identity number (wrong length).'];
+        yield 'twelve digits' => ['123456789012', 'Invalid Turkish identity number (wrong length).'];
         yield 'letter' => ['1234567890A', 'Invalid Turkish identity number (invalid character).'];
-        yield 'empty' => ['', 'Invalid Turkish identity number (0 characters).'];
-        yield 'far too long' => [\str_repeat('1', 50), 'Invalid Turkish identity number (too long).'];
+        yield 'empty' => ['', 'Invalid Turkish identity number (wrong length).'];
+        yield 'far too long' => [\str_repeat('1', 50), 'Invalid Turkish identity number (wrong length).'];
     }
 
     #[DataProvider('invalidNumbers')]

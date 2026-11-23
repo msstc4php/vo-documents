@@ -40,7 +40,7 @@ final readonly class SubdivisionResolver
      *
      * @throws AmbiguousJurisdictionException<TSubdivision> when several subdivisions match, listed in the given order
      * @throws InvalidDocumentNumberException when none matches: "(fits no jurisdiction)" when the length fits at least
-     *                                        one subdivision, otherwise the length
+     *                                        one subdivision, otherwise "(wrong length)"
      */
     public function resolve(string $number): ValueObject
     {
@@ -76,7 +76,7 @@ final readonly class SubdivisionResolver
             }
         }
 
-        return Digits::invalidLength(Digits::strip($number), $document);
+        return Digits::invalidLength($document);
     }
 
     /**

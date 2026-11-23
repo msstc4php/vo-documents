@@ -88,11 +88,11 @@ final class NationalInsuranceNumberTest extends TestCase
         yield 'PP999999P' => ['PP 99 99 99 P', $character];
         yield 'digit in the prefix' => ['A1 23 45 67 C', $character];
         yield 'letter among the digits' => ['AB 12 3X 56 C', $character];
-        yield 'slash' => ['AB/123456C', 'Invalid British National Insurance number (10 characters).'];
-        yield 'without suffix' => ['AB 12 34 56', 'Invalid British National Insurance number (8 characters).'];
-        yield 'TRN' => ['11 a1 11 11', 'Invalid British National Insurance number (8 characters).'];
-        yield 'empty' => ['', 'Invalid British National Insurance number (0 characters).'];
-        yield 'far too long' => [\str_repeat('A', 50), 'Invalid British National Insurance number (too long).'];
+        yield 'slash' => ['AB/123456C', 'Invalid British National Insurance number (wrong length).'];
+        yield 'without suffix' => ['AB 12 34 56', 'Invalid British National Insurance number (wrong length).'];
+        yield 'TRN' => ['11 a1 11 11', 'Invalid British National Insurance number (wrong length).'];
+        yield 'empty' => ['', 'Invalid British National Insurance number (wrong length).'];
+        yield 'far too long' => [\str_repeat('A', 50), 'Invalid British National Insurance number (wrong length).'];
     }
 
     #[DataProvider('invalidNumbers')]

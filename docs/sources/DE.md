@@ -197,7 +197,7 @@ Encoded data, and what the package does with it:
 | 12 | check digit | verified | — |
 
 Implemented: 12 characters `[0-9]{8}[A-Z][0-9]{3}` after separators are removed and letters upper-cased (input
-`65 230701 J 00 8`, `65230701j008`). Messages: length "(N characters)", wrong character class at a position
+`65 230701 J 00 8`, `65230701j008`). Messages: length "(wrong length)", wrong character class at a position
 "(invalid character)", checksum "Invalid German pension insurance number checksum.". `masked()` keeps the last four
 characters, laid out like `formatted()`: `** ****** J 00 8` (the initial and the serial are among the last four; no
 official masking rule).

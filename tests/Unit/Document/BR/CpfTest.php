@@ -93,12 +93,12 @@ final class CpfTest extends TestCase
         yield 'first check digit wrong' => ['280.012.389-48', $checksum];
         yield 'remainder 10 written as 1' => ['100.000.001-18', $checksum];
         yield 'base digit changed' => ['280.012.398-38', $checksum];
-        yield 'ten digits' => ['280.012.389-3', 'Invalid Brazilian CPF (10 characters).'];
-        yield 'twelve digits' => ['280.012.389-380', 'Invalid Brazilian CPF (12 characters).'];
+        yield 'ten digits' => ['280.012.389-3', 'Invalid Brazilian CPF (wrong length).'];
+        yield 'twelve digits' => ['280.012.389-380', 'Invalid Brazilian CPF (wrong length).'];
         yield 'letter' => ['280.012.389-3A', 'Invalid Brazilian CPF (invalid character).'];
-        yield 'slash' => ['280.012.389/38', 'Invalid Brazilian CPF (12 characters).'];
-        yield 'empty' => ['', 'Invalid Brazilian CPF (0 characters).'];
-        yield 'far too long' => [\str_repeat('1', 50), 'Invalid Brazilian CPF (too long).'];
+        yield 'slash' => ['280.012.389/38', 'Invalid Brazilian CPF (wrong length).'];
+        yield 'empty' => ['', 'Invalid Brazilian CPF (wrong length).'];
+        yield 'far too long' => [\str_repeat('1', 50), 'Invalid Brazilian CPF (wrong length).'];
     }
 
     #[DataProvider('invalidNumbers')]

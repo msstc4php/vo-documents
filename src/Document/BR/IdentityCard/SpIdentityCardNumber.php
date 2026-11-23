@@ -110,7 +110,7 @@ final class SpIdentityCardNumber extends AbstractIdentityCardNumber
     {
         $digits = \substr($normalized, 0, -1);
         if (\ltrim($digits, '0') === '') {
-            throw new InvalidDocumentNumberException(\sprintf('Invalid %s (zeros only).', $document));
+            throw new InvalidDocumentNumberException(\sprintf('Invalid %s checksum.', $document));
         }
 
         if (self::checkCharacter($digits) !== \substr($normalized, -1)) {

@@ -70,18 +70,18 @@ final class NationalIdentityNumberTest extends TestCase
         $character = 'Invalid Saudi Arabian national identity number (invalid character).';
         $first = 'Invalid Saudi Arabian national identity number (invalid first digit).';
 
-        yield 'empty' => ['', 'Invalid Saudi Arabian national identity number (0 characters).'];
-        yield '9 digits' => ['101234567', 'Invalid Saudi Arabian national identity number (9 characters).'];
-        yield '11 digits' => ['10123456789', 'Invalid Saudi Arabian national identity number (11 characters).'];
+        yield 'empty' => ['', 'Invalid Saudi Arabian national identity number (wrong length).'];
+        yield '9 digits' => ['101234567', 'Invalid Saudi Arabian national identity number (wrong length).'];
+        yield '11 digits' => ['10123456789', 'Invalid Saudi Arabian national identity number (wrong length).'];
         yield 'far too long' => [
             '1' . \str_repeat('0', 41),
-            'Invalid Saudi Arabian national identity number (too long).',
+            'Invalid Saudi Arabian national identity number (wrong length).',
         ];
         yield 'letter' => ['101234567X', $character];
         yield 'Arabic letter' => ["101234567\u{0639}", $character];
         yield 'full stop is no separator' => [
             '1012.345.678',
-            'Invalid Saudi Arabian national identity number (12 characters).',
+            'Invalid Saudi Arabian national identity number (wrong length).',
         ];
         yield 'an iqama number' => ['2012345678', $first];
         yield 'first digit 0' => ['0012345678', $first];

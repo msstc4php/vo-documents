@@ -69,7 +69,7 @@ final class NamePartsTest extends TestCase
         yield 'Canadian syllabics' => ["\u{1403}\u{14C4}\u{1483}", 'Invalid Canadian given name (invalid character).'];
         yield 'full stop' => ['J.', 'Invalid Canadian given name (invalid character).'];
         yield 'fullwidth' => ["\u{FF2A}ean", 'Invalid Canadian given name (compatibility character).'];
-        yield 'empty' => ['  ', 'Invalid Canadian given name (0 characters).'];
+        yield 'empty' => ['  ', 'Invalid Canadian given name (empty).'];
     }
 
     #[DataProvider('invalidGivenNames')]

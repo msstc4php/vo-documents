@@ -89,10 +89,10 @@ final class OnHealthCardTest extends TestCase
         $document = 'Invalid CA-ON health card number';
 
         yield 'wrong check digit' => ['9876543218YM', $document . ' checksum.'];
-        yield 'three letters' => ['9876543217ABC', $document . ' (13 characters).'];
+        yield 'three letters' => ['9876543217ABC', $document . ' (wrong length).'];
         yield 'digit as version code' => ['98765432171', $document . ' (invalid character).'];
         yield 'leading zero' => ['0123456789', $document . ' (invalid character).'];
-        yield 'empty' => ['', $document . ' (0 characters).'];
+        yield 'empty' => ['', $document . ' (wrong length).'];
     }
 
     #[DataProvider('refusedCards')]
@@ -132,8 +132,8 @@ final class OnHealthCardTest extends TestCase
     {
         $document = 'Invalid CA-ON health card version code';
 
-        yield 'empty' => ['', $document . ' (0 characters).'];
-        yield 'three letters' => ['ABC', $document . ' (3 characters).'];
+        yield 'empty' => ['', $document . ' (wrong length).'];
+        yield 'three letters' => ['ABC', $document . ' (wrong length).'];
         yield 'digit' => ['1', $document . ' (invalid character).'];
         yield 'letter and digit' => ['A1', $document . ' (invalid character).'];
         yield 'non-ASCII letter' => ['É', $document . ' (invalid character).'];

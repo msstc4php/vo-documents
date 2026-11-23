@@ -92,10 +92,10 @@ final class ChiNumberTest extends TestCase
         yield '30 February' => ['3002961234', $date];
         yield '29 February, year 01' => ['2902011234', $date];
         yield '31 June' => ['3106451234', $date];
-        yield 'nine digits (leading zero lost)' => ['101456719', 'Invalid Scottish CHI number (9 characters).'];
-        yield 'eleven digits' => ['12034567190', 'Invalid Scottish CHI number (11 characters).'];
+        yield 'nine digits (leading zero lost)' => ['101456719', 'Invalid Scottish CHI number (wrong length).'];
+        yield 'eleven digits' => ['12034567190', 'Invalid Scottish CHI number (wrong length).'];
         yield 'letter' => ['120345671X', 'Invalid Scottish CHI number (invalid character).'];
-        yield 'empty' => ['', 'Invalid Scottish CHI number (0 characters).'];
+        yield 'empty' => ['', 'Invalid Scottish CHI number (wrong length).'];
     }
 
     #[DataProvider('invalidNumbers')]

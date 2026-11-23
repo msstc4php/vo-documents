@@ -81,11 +81,11 @@ final class LegacyIdentityCardNumberTest extends TestCase
     {
         yield 'thirteen digits (with the MRZ check digit)' => [
             '8806923023451',
-            'Invalid French identity card number (13 characters).',
+            'Invalid French identity card number (wrong length).',
         ];
         yield 'nine-character 2021 card number' => [
             'X4RTBPFW4',
-            'Invalid French identity card number (9 characters).',
+            'Invalid French identity card number (wrong length).',
         ];
         yield 'letter other than the Corsican A/B' => [
             '88062C102345',
@@ -104,10 +104,10 @@ final class LegacyIdentityCardNumberTest extends TestCase
             '88069A102345',
             'Invalid French identity card number (invalid character).',
         ];
-        yield 'eleven digits' => ['88069230234', 'Invalid French identity card number (11 characters).'];
+        yield 'eleven digits' => ['88069230234', 'Invalid French identity card number (wrong length).'];
         yield 'B first' => ['B80692302345', 'Invalid French identity card number (invalid character).'];
         yield 'B at the end' => ['88069230234B', 'Invalid French identity card number (invalid character).'];
-        yield 'empty' => ['', 'Invalid French identity card number (0 characters).'];
+        yield 'empty' => ['', 'Invalid French identity card number (wrong length).'];
     }
 
     #[DataProvider('invalidNumbers')]

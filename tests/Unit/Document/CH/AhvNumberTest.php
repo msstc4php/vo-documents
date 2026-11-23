@@ -73,13 +73,13 @@ final class AhvNumberTest extends TestCase
         yield 'transposed digits' => ['756.3047.5090.62', $checksum];
         yield 'UPI handbook illustration row' => ['756.1234.5678.90', $checksum];
         yield 'another country code' => ['757.3047.5009.62', 'Invalid Swiss AHV number (country code).'];
-        yield 'old eleven-digit number' => ['123.45.678.901', 'Invalid Swiss AHV number (11 characters).'];
-        yield 'twelve digits' => ['756.3047.5009.6', 'Invalid Swiss AHV number (12 characters).'];
-        yield 'fourteen digits' => ['756.3047.5009.621', 'Invalid Swiss AHV number (14 characters).'];
+        yield 'old eleven-digit number' => ['123.45.678.901', 'Invalid Swiss AHV number (wrong length).'];
+        yield 'twelve digits' => ['756.3047.5009.6', 'Invalid Swiss AHV number (wrong length).'];
+        yield 'fourteen digits' => ['756.3047.5009.621', 'Invalid Swiss AHV number (wrong length).'];
         yield 'letter' => ['756.3047.5009.6A', 'Invalid Swiss AHV number (invalid character).'];
         yield 'slash' => ['756/304750096', 'Invalid Swiss AHV number (invalid character).'];
-        yield 'empty' => ['', 'Invalid Swiss AHV number (0 characters).'];
-        yield 'far too long' => [\str_repeat('7', 50), 'Invalid Swiss AHV number (too long).'];
+        yield 'empty' => ['', 'Invalid Swiss AHV number (wrong length).'];
+        yield 'far too long' => [\str_repeat('7', 50), 'Invalid Swiss AHV number (wrong length).'];
     }
 
     #[DataProvider('invalidNumbers')]

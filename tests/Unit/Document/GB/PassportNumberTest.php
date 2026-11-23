@@ -54,12 +54,12 @@ final class PassportNumberTest extends TestCase
      */
     public static function invalidNumbers(): iterable
     {
-        yield 'eight digits' => ['12345678', 'Invalid British passport number (8 characters).'];
-        yield 'ten digits' => ['1234567890', 'Invalid British passport number (10 characters).'];
-        yield 'thin-film serial number' => ['ABC1234X', 'Invalid British passport number (8 characters).'];
+        yield 'eight digits' => ['12345678', 'Invalid British passport number (wrong length).'];
+        yield 'ten digits' => ['1234567890', 'Invalid British passport number (wrong length).'];
+        yield 'thin-film serial number' => ['ABC1234X', 'Invalid British passport number (wrong length).'];
         yield 'letter' => ['A12345678', 'Invalid British passport number (invalid character).'];
-        yield 'empty' => ['', 'Invalid British passport number (0 characters).'];
-        yield 'far too long' => [\str_repeat('1', 50), 'Invalid British passport number (too long).'];
+        yield 'empty' => ['', 'Invalid British passport number (wrong length).'];
+        yield 'far too long' => [\str_repeat('1', 50), 'Invalid British passport number (wrong length).'];
     }
 
     #[DataProvider('invalidNumbers')]

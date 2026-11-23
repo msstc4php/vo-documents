@@ -60,10 +60,10 @@ final class PassportNumberTest extends TestCase
     {
         $invalid = 'Invalid Italian passport number (invalid character).';
 
-        yield 'eight characters' => ['YA123456', 'Invalid Italian passport number (8 characters).'];
+        yield 'eight characters' => ['YA123456', 'Invalid Italian passport number (wrong length).'];
         yield 'ten characters (with the MRZ check digit)' => [
             'YA12345671',
-            'Invalid Italian passport number (10 characters).',
+            'Invalid Italian passport number (wrong length).',
         ];
         yield 'one letter' => ['Y12345678', $invalid];
         yield 'digit first' => ['1A1234567', $invalid];
@@ -71,7 +71,7 @@ final class PassportNumberTest extends TestCase
         yield 'letter last' => ['YA123456B', $invalid];
         yield 'digits only' => ['123456789', $invalid];
         yield 'accented letter' => ['YÀ1234567', $invalid];
-        yield 'empty' => ['', 'Invalid Italian passport number (0 characters).'];
+        yield 'empty' => ['', 'Invalid Italian passport number (wrong length).'];
     }
 
     #[DataProvider('invalidNumbers')]

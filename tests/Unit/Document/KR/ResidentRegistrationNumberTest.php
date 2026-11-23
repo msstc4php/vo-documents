@@ -103,10 +103,10 @@ final class ResidentRegistrationNumberTest extends TestCase
     {
         $name = 'Invalid Korean resident registration number';
 
-        yield 'empty' => ['', $name . ' (0 characters).'];
-        yield '12 digits' => ['900101123456', $name . ' (12 characters).'];
-        yield '14 digits' => ['90010112345678', $name . ' (14 characters).'];
-        yield 'far too long' => [\str_repeat('1', 41), $name . ' (too long).'];
+        yield 'empty' => ['', $name . ' (wrong length).'];
+        yield '12 digits' => ['900101123456', $name . ' (wrong length).'];
+        yield '14 digits' => ['90010112345678', $name . ' (wrong length).'];
+        yield 'far too long' => [\str_repeat('1', 41), $name . ' (wrong length).'];
         yield 'a letter' => ['90010112345A7', $name . ' (invalid character).'];
         yield 'punctuation' => ['900101.123456', $name . ' (invalid character).'];
         yield 'foreigner digit 5' => ['9001015234567', $name . ' (invalid character).'];

@@ -27,7 +27,7 @@ final class IdentityCardNumberFactory
     /**
      * @throws AmbiguousJurisdictionException<Jurisdiction> when several units match, listed in enum order
      * @throws InvalidDocumentNumberException when none matches: "(fits no jurisdiction)" if the length fits a unit,
-     *                                        otherwise the length
+     *                                        otherwise "(wrong length)"
      */
     public static function fromNumber(string $number): IdentityCardNumber
     {

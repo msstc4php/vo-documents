@@ -97,9 +97,9 @@ final class PermanentAccountNumberTest extends TestCase
     {
         $name = 'Invalid Permanent Account Number';
 
-        yield 'nine characters' => ['BLGPS1234', $name . ' (9 characters).'];
-        yield 'eleven characters' => ['BLGPS1234DD', $name . ' (11 characters).'];
-        yield 'far too long' => [\str_repeat('B', 41), $name . ' (too long).'];
+        yield 'nine characters' => ['BLGPS1234', $name . ' (wrong length).'];
+        yield 'eleven characters' => ['BLGPS1234DD', $name . ' (wrong length).'];
+        yield 'far too long' => [\str_repeat('B', 41), $name . ' (wrong length).'];
         yield 'fourth character is not a holder type' => ['BLGZS1234D', $name . ' (invalid character).'];
         yield 'fourth character K' => ['BLGKS1234D', $name . ' (invalid character).'];
         yield 'digit among the series' => ['B1GPS1234D', $name . ' (invalid character).'];
