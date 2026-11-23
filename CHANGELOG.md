@@ -1,6 +1,6 @@
 # Changelog
 
-## [1.0.0] - unreleased
+## [1.0.0] - 2026-11-23
 
 First stable release: from here on a breaking change needs 2.0.
 
