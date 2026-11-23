@@ -150,6 +150,10 @@ final class PayloadFieldsTest extends TestCase
             PayloadFields::upgraded(['family' => 'A', 'latinOverride' => 'B'], PayloadFields::LEGACY_LATIN_OVERRIDE, 'Shape.'),
         );
         self::assertSame(
+            ['b2' => 2],
+            PayloadFields::upgraded(['b1' => 2], ['a1' => 'a2', 'b1' => 'b2'], 'Shape.'),
+        );
+        self::assertSame(
             ['b2' => 2, 'a2' => 1],
             PayloadFields::upgraded(['a1' => 1, 'b1' => 2], ['b1' => 'b2', 'a1' => 'a2'], 'Shape.'),
         );
