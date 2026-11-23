@@ -11,6 +11,10 @@ use LogicException;
  */
 final class Text
 {
+    private function __construct()
+    {
+    }
+
     /**
      * Types a stored, already validated value for PHPStan.
      *

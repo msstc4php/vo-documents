@@ -15,6 +15,10 @@ final class MrzCheckDigit
 {
     private const array WEIGHTS = [7, 3, 1];
 
+    private function __construct()
+    {
+    }
+
     public static function of(string $data): int
     {
         $sum = 0;

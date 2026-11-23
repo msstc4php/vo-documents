@@ -11,6 +11,10 @@ use MSSTC4PHP\ValueObject\Contract\ValueObject;
  */
 final class Optional
 {
+    private function __construct()
+    {
+    }
+
     /**
      * Whether two optional parts are both absent or equal.
      */

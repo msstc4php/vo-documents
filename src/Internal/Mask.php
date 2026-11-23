@@ -11,6 +11,10 @@ use LogicException;
  */
 final class Mask
 {
+    private function __construct()
+    {
+    }
+
     /**
      * @param non-empty-string $formatted
      * @param int<0, max> $visible

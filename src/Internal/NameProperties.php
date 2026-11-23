@@ -18,6 +18,10 @@ final class NameProperties
     /** @var array<class-string, list<ReflectionProperty>> */
     private static array $byClass = [];
 
+    private function __construct()
+    {
+    }
+
     /**
      * @param class-string $class
      *

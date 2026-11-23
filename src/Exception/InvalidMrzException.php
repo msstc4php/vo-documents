@@ -6,6 +6,6 @@ namespace MSSTC4PHP\ValueObject\Documents\Exception;
 
 use MSSTC4PHP\ValueObject\Exception\InvalidValueObjectException;
 
-class InvalidMrzException extends InvalidValueObjectException
+final class InvalidMrzException extends InvalidValueObjectException
 {
 }

@@ -18,6 +18,10 @@ use MSSTC4PHP\ValueObject\Documents\Icao\PersonName as IcaoPersonName;
  */
 final class LatinSpelling
 {
+    private function __construct()
+    {
+    }
+
     /**
      * @param IdentifierSpellings|null $secondary null for a name without secondary identifiers
      */

@@ -23,6 +23,10 @@ final class SerialNumberFormat
 
     private const int LENGTH = 9;
 
+    private function __construct()
+    {
+    }
+
     /**
      * @param non-empty-string $document the document's name in the exception message
      *

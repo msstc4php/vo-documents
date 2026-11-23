@@ -16,6 +16,10 @@ final class NhsCheckDigit
 {
     private const array WEIGHTS = [10, 9, 8, 7, 6, 5, 4, 3, 2];
 
+    private function __construct()
+    {
+    }
+
     /**
      * @param non-empty-string $digits ten ASCII digits
      */

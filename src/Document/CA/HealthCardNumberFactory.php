@@ -37,6 +37,10 @@ final class HealthCardNumberFactory
     private const string HINT = 'Invalid Canadian health card number (fits no jurisdiction; '
         . 'an Ontario card with a version code: use OnHealthCardNumber::fromCard()).';
 
+    private function __construct()
+    {
+    }
+
     /**
      * @throws AmbiguousJurisdictionException<Jurisdiction> when several jurisdictions match, listed in enum order
      * @throws InvalidDocumentNumberException when none matches: "(fits no jurisdiction)" if the length fits a

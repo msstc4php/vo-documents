@@ -23,6 +23,10 @@ final class Gb11643
 
     private const int BIRTH_DATE_OFFSET = 6;
 
+    private function __construct()
+    {
+    }
+
     /**
      * @param non-empty-string $document the document's name in the exception message
      *

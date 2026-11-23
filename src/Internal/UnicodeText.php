@@ -12,6 +12,10 @@ use Normalizer;
  */
 final class UnicodeText
 {
+    private function __construct()
+    {
+    }
+
     public static function normalizeName(string $input): string
     {
         $composed = Normalizer::normalize($input, Normalizer::FORM_C);

@@ -48,6 +48,10 @@ use MSSTC4PHP\ValueObject\Documents\Internal\SubdivisionResolver;
  */
 final class DlIdNumberFactory
 {
+    private function __construct()
+    {
+    }
+
     /**
      * @throws AmbiguousJurisdictionException<Jurisdiction> when several jurisdictions match, listed in enum order
      * @throws InvalidDocumentNumberException when none matches: "(fits no jurisdiction)" if the length fits a

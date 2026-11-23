@@ -42,6 +42,10 @@ final class Checksum
         [7, 0, 4, 6, 9, 1, 3, 2, 5, 8],
     ];
 
+    private function __construct()
+    {
+    }
+
     /**
      * Whether the last digit of `$digits` is the Verhoeff check digit of the digits before it.
      */

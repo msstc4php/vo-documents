@@ -14,6 +14,10 @@ final class TwoDigitYearDate
 {
     private const array DAYS_IN_MONTH = [1 => 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 
+    private function __construct()
+    {
+    }
+
     public static function exists(int $day, int $month, int $yearDigits): bool
     {
         if (!isset(self::DAYS_IN_MONTH[$month])) {

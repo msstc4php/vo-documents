@@ -36,6 +36,10 @@ final class KoreanRegistrationNumber
         '3' => [2000, Sex::Male], '4' => [2000, Sex::Female], '7' => [2000, Sex::Male], '8' => [2000, Sex::Female],
     ];
 
+    private function __construct()
+    {
+    }
+
     /**
      * @param non-empty-string $document the document's name in the exception message
      * @param non-empty-string $sevenths the digits the seventh position may hold

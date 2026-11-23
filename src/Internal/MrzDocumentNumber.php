@@ -14,6 +14,10 @@ namespace MSSTC4PHP\ValueObject\Documents\Internal;
  */
 final class MrzDocumentNumber
 {
+    private function __construct()
+    {
+    }
+
     /**
      * @param string $principal the nine characters of the document number field
      * @param string $check the character in the check digit position

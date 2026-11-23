@@ -35,6 +35,10 @@ use Override;
  */
 final class Codecs implements ProvidesCodecs
 {
+    private function __construct()
+    {
+    }
+
     /**
      * @return list<PayloadCodec<ValueObject>>
      */

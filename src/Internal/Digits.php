@@ -110,6 +110,10 @@ final class Digits
         "\u{FF5A}" => 'Z',
     ];
 
+    private function __construct()
+    {
+    }
+
     /**
      * Fullwidth letters are upper-cased. Names do not fold: they refuse compatibility characters.
      */

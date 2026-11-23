@@ -18,6 +18,10 @@ use MSSTC4PHP\ValueObject\Exception\InvalidPayloadException;
  */
 final class PayloadFields
 {
+    private function __construct()
+    {
+    }
+
     /**
      * @param array<array-key, mixed> $payload
      * @param non-empty-list<non-empty-string> $keys

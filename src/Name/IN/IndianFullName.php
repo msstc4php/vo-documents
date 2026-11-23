@@ -14,6 +14,10 @@ use MSSTC4PHP\ValueObject\Documents\Name\AbstractNamePart;
  */
 final class IndianFullName
 {
+    private function __construct()
+    {
+    }
+
     /**
      * @return non-empty-string
      */

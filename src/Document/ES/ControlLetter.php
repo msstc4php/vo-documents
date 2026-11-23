@@ -18,6 +18,10 @@ final class ControlLetter
 {
     private const string LETTERS = 'TRWAGMYFPDXBNJZSQVHLCKE';
 
+    private function __construct()
+    {
+    }
+
     /**
      * @param string $digits at most eight ASCII digits
      *
