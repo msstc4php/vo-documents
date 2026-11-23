@@ -7,6 +7,7 @@ namespace MSSTC4PHP\ValueObject\Documents\Name\IN\Devanagari;
 use MSSTC4PHP\ValueObject\Contract\ValueObject;
 use MSSTC4PHP\ValueObject\Documents\Icao\PersonName as IcaoPersonName;
 use MSSTC4PHP\ValueObject\Documents\Internal\Optional;
+use MSSTC4PHP\ValueObject\Documents\Internal\ReparsesThroughCodec;
 use MSSTC4PHP\ValueObject\Documents\Name\IN\IndianFullName;
 use MSSTC4PHP\ValueObject\Documents\Name\PersonName as NationalPersonName;
 use MSSTC4PHP\ValueObject\Documents\Name\RequiredLatin\AbstractRequiredLatinPersonName;
@@ -21,6 +22,8 @@ use Override;
  */
 final readonly class PersonName implements NationalPersonName
 {
+    use ReparsesThroughCodec;
+
     public function __construct(
         public GivenName $given,
         public ?Surname $surname,
@@ -63,5 +66,11 @@ final readonly class PersonName implements NationalPersonName
             'surname' => $this->surname?->value,
             'latin' => $this->latin->value,
         ];
+    }
+
+    #[Override]
+    protected static function payloadCodec(): PersonNameCodec
+    {
+        return new PersonNameCodec();
     }
 }

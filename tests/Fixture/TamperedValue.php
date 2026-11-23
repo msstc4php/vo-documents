@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace MSSTC4PHP\ValueObject\Documents\Tests\Fixture;
 
 use MSSTC4PHP\ValueObject\Support\AbstractStringValueObject;
-use PHPUnit\Framework\Assert;
+use ReflectionClass;
+use ReflectionProperty;
 
 trait TamperedValue
 {
     /**
-     * Unserializes `$class` holding `$value` without parsing it, as vo-base does for any serialized string.
+     * Builds `$class` holding `$value` without parsing it: the state that reflection, a hydrator or vo-base before 1.3
+     * (which restored a serialized `value` unchecked) can produce.
      *
      * @template TValue of AbstractStringValueObject
      *
@@ -20,10 +22,8 @@ trait TamperedValue
      */
     private static function tampered(string $class, string $value): AbstractStringValueObject
     {
-        $object = \unserialize(
-            \sprintf('O:%d:"%s":1:{s:5:"value";s:%d:"%s";}', \strlen($class), $class, \strlen($value), $value),
-        );
-        Assert::assertInstanceOf($class, $object);
+        $object = new ReflectionClass($class)->newInstanceWithoutConstructor();
+        new ReflectionProperty($object, 'value')->setValue($object, $value);
 
         return $object;
     }

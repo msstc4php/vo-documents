@@ -16,7 +16,6 @@ use MSSTC4PHP\ValueObject\Documents\Internal\MrzCheckDigit;
 use MSSTC4PHP\ValueObject\Documents\Internal\MrzDocumentNumber;
 use MSSTC4PHP\ValueObject\Documents\Internal\MrzField;
 use MSSTC4PHP\ValueObject\Documents\Internal\MrzLayout;
-use MSSTC4PHP\ValueObject\Documents\Internal\ReparsesOnUnserialize;
 use MSSTC4PHP\ValueObject\Documents\Internal\Text;
 use MSSTC4PHP\ValueObject\Documents\Internal\TwoDigitYearDate;
 use MSSTC4PHP\ValueObject\Documents\Sex;
@@ -47,8 +46,6 @@ use Override;
  */
 abstract class MachineReadableZone extends AbstractStringValueObject implements HasSex, Maskable
 {
-    use ReparsesOnUnserialize;
-
     private const int EXPIRY_YEARS_BACK = 84;
 
     private const string CHARACTERS = '/^[A-Z0-9<]+$/D';

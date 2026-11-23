@@ -45,4 +45,10 @@ final readonly class PersonName extends AbstractFamilyGivenPersonName
     {
         return new AnyIcaoSpelling();
     }
+
+    #[Override]
+    protected static function payloadCodec(): PersonNameCodec
+    {
+        return new PersonNameCodec();
+    }
 }

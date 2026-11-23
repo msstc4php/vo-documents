@@ -6,6 +6,7 @@ namespace MSSTC4PHP\ValueObject\Documents\Name\ID;
 
 use MSSTC4PHP\ValueObject\Contract\ValueObject;
 use MSSTC4PHP\ValueObject\Documents\Icao\PersonName as IcaoPersonName;
+use MSSTC4PHP\ValueObject\Documents\Internal\ReparsesThroughCodec;
 use MSSTC4PHP\ValueObject\Documents\Internal\Text;
 use MSSTC4PHP\ValueObject\Documents\Name\PersonName as NationalPersonName;
 use MSSTC4PHP\ValueObject\Documents\Name\RequiredLatin\AbstractRequiredLatinPersonName;
@@ -20,6 +21,8 @@ use Override;
  */
 final readonly class PersonName implements NationalPersonName
 {
+    use ReparsesThroughCodec;
+
     public function __construct(
         public FullName $name,
         private IcaoPersonName $latin,
@@ -54,5 +57,11 @@ final readonly class PersonName implements NationalPersonName
     public function jsonSerialize(): array
     {
         return ['name' => $this->name->value, 'latin' => $this->latin->value];
+    }
+
+    #[Override]
+    protected static function payloadCodec(): PersonNameCodec
+    {
+        return new PersonNameCodec();
     }
 }

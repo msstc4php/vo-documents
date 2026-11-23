@@ -12,6 +12,7 @@ use MSSTC4PHP\ValueObject\Documents\Internal\Mask;
 use MSSTC4PHP\ValueObject\Documents\Internal\NumberShapes;
 use MSSTC4PHP\ValueObject\Documents\Internal\Text;
 use MSSTC4PHP\ValueObject\Documents\Tests\Fixture\RefusesWithoutEchoingInput;
+use MSSTC4PHP\ValueObject\Documents\Tests\Fixture\TamperedValue;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\UsesClass;
@@ -29,6 +30,7 @@ use PHPUnit\Framework\TestCase;
 final class PermanentAccountNumberTest extends TestCase
 {
     use RefusesWithoutEchoingInput;
+    use TamperedValue;
 
     /**
      * @return iterable<string, array{string, string, PanHolderType}>
@@ -75,9 +77,7 @@ final class PermanentAccountNumberTest extends TestCase
 
     public function testATamperedHolderLetterIsNotEchoed(): void
     {
-        $serialized = \serialize(PermanentAccountNumber::from('BLGPS1234D'));
-        $tampered = \unserialize(\str_replace('BLGPS1234D', 'BLGES1234D', $serialized));
-        self::assertInstanceOf(PermanentAccountNumber::class, $tampered);
+        $tampered = self::tampered(PermanentAccountNumber::class, 'BLGES1234D');
 
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('Holder type letter validated by parse().');

@@ -7,6 +7,7 @@ namespace MSSTC4PHP\ValueObject\Documents\Name\RequiredLatin;
 use MSSTC4PHP\ValueObject\Contract\ValueObject;
 use MSSTC4PHP\ValueObject\Documents\Icao\PersonName as IcaoPersonName;
 use MSSTC4PHP\ValueObject\Documents\Internal\Optional;
+use MSSTC4PHP\ValueObject\Documents\Internal\ReparsesThroughCodec;
 use MSSTC4PHP\ValueObject\Documents\Internal\Text;
 use MSSTC4PHP\ValueObject\Documents\Name\AbstractNamePart;
 use MSSTC4PHP\ValueObject\Documents\Name\LatinOverridePolicy;
@@ -32,6 +33,8 @@ use Override;
  */
 abstract readonly class AbstractRequiredLatinPersonName implements PersonName
 {
+    use ReparsesThroughCodec;
+
     /**
      * @param TFamily $family
      * @param TGiven|null $given

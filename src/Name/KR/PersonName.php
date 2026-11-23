@@ -29,4 +29,10 @@ final readonly class PersonName extends AbstractRequiredLatinPersonName
     {
         return '';
     }
+
+    #[Override]
+    protected static function payloadCodec(): PersonNameCodec
+    {
+        return new PersonNameCodec();
+    }
 }

@@ -486,8 +486,8 @@ script classes use `\p{sc=Latin}` / `\p{sc=Cyrillic}` (Script property only); `c
   the Internet Archive copy); the details and dates are in the source notes.
 - **Equivalent mutants left by the code review of plan 4.** Removing the `D` flag of the KR licence regex is not
   detectable (`Digits::strip()` removes a trailing `\n` first); the flag stays (CR-026, defence in depth).
-- **Enum `from()` echoes its input.** A backed enum's `ValueError` contains the value, and vo-base does not re-run
-  `parse()` on unserialize, so accessors use `tryFrom() ?? throw new LogicException(<fixed text>)` (PAN
+- **Enum `from()` echoes its input.** A backed enum's `ValueError` contains the value, and a hydrator or reflection can
+  build an unparsed instance (vo-base before 1.3 did on unserialize), so accessors use `tryFrom() ?? throw new LogicException(<fixed text>)` (PAN
   `holderType()`, KR `regionCode()`); a tampered serialized value then fails without echo. The same holds for table
   lookups and dates: `KoreanRegistrationNumber::seventhDigit()` and `Gb11643::birthDate()` throw a fixed-text
   `LogicException` (a raw `DateTimeImmutable` message would quote the date string). Tests build tampered objects
@@ -507,9 +507,15 @@ script classes use `\p{sc=Latin}` / `\p{sc=Cyrillic}` (Script property only); `c
 - **No `HasBirthDate` on `MachineReadableZone`; `HasSex` yes.** Two-digit years have no century (`birthDate(DateTimeImmutable $today)`: most
   recent past century; `expiryDate($reference)`: year in [reference - 84, reference + 15], wave 3 ruling CR-016). `<` is `Sex::Unspecified` (Doc 9303
   "< = unspecified", CR-015); `X` is refused (VIZ only). The century rules are this package's, not Doc 9303's (`docs/sources/ICAO.md` 5.4).
-- **Serialization:** `MachineReadableZone` uses `Internal\ReparsesOnUnserialize` (copied from vo-finance, but throws vo-base
-  `InvalidValueObjectException` for a payload without a string value and ignores other keys). A forged `Td3` holding `HELLO` or another
-  format now throws instead of hitting undefined offsets. Any new string VO that caches state or is Maskable should use it.
+- **Serialization (0.3.0):** vo-base `^1.3` re-runs `parse()` on unserialize for every string VO, so `MachineReadableZone` and
+  the document numbers need nothing (0.2.0's `Internal\ReparsesOnUnserialize` is gone). A forged `Td3` holding `HELLO` throws.
+  National names use `Internal\ReparsesThroughCodec`: the codec payload is the serialized form, `decode()` rebuilds the name
+  (the derived Latin form is never restored), and `Internal\NameProperties` copies the state over by reflection. 0.2 payloads
+  (PHP default layout) are read into an unchecked instance, encoded and decoded. Every final name class implements
+  `payloadCodec()`; a new national name must too, and gets a sample in `Tests\Unit\Name\SerializationTest::payloads()`.
+- `Tests\Fixture\TamperedValue` builds an unparsed instance with `newInstanceWithoutConstructor()` and
+  `ReflectionProperty::setValue()` (it initializes a readonly property from outside its class); `unserialize()` cannot
+  produce one on vo-base 1.3.
 - `from()` on a concrete class filters the formats by `is_a($class, static::class)` before building, so `Td3::from($td2)` is "Invalid ICAO MRZ.";
   the `instanceof static` guard after `detect()` is only for PHPStan (an equivalent mutant if Infection reports it).
 - **Long document numbers (TD1, TD2).** The nine principal characters are followed by `<` instead of a check digit; the overflow runs from the

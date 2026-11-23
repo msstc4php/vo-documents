@@ -8,6 +8,7 @@ use MSSTC4PHP\ValueObject\Contract\ValueObject;
 use MSSTC4PHP\ValueObject\Documents\Exception\InvalidPersonNameException;
 use MSSTC4PHP\ValueObject\Documents\Icao\PersonName as IcaoPersonName;
 use MSSTC4PHP\ValueObject\Documents\Internal\Optional;
+use MSSTC4PHP\ValueObject\Documents\Internal\ReparsesThroughCodec;
 use MSSTC4PHP\ValueObject\Documents\Name\AnyIcaoSpelling;
 use MSSTC4PHP\ValueObject\Documents\Name\PersonName as NationalPersonName;
 use Override;
@@ -23,6 +24,8 @@ use Override;
  */
 final readonly class PersonName implements NationalPersonName
 {
+    use ReparsesThroughCodec;
+
     private IcaoPersonName $effective;
 
     private ?IcaoPersonName $override;
@@ -100,5 +103,11 @@ final readonly class PersonName implements NationalPersonName
             'givenReading' => $this->givenReading->value,
             'effectiveLatin' => $this->effective->value,
         ];
+    }
+
+    #[Override]
+    protected static function payloadCodec(): PersonNameCodec
+    {
+        return new PersonNameCodec();
     }
 }

@@ -84,4 +84,10 @@ final readonly class PersonName extends AbstractLatinPersonName
             'Invalid Indian person name (the Latin form is not a transliteration of the name).',
         );
     }
+
+    #[Override]
+    protected static function payloadCodec(): PersonNameCodec
+    {
+        return new PersonNameCodec();
+    }
 }

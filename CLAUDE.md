@@ -15,7 +15,7 @@ Local install against the sibling `../vo-base`: `COMPOSER=composer-local.json co
 
 `composer-local.json` is gitignored. Create it from `composer-ci.json`: copy the file and add a path repository with
 `{"type": "path", "url": "../vo-base", "options": {"symlink": true}}` before the VCS entry, and require
-`msstc4php/vo-base` as `dev-main as 1.2.0`.
+`msstc4php/vo-base` as `dev-main as 1.3.0`.
 
 - `COMPOSER=composer-local.json make check`, `make test`, `make infection`, `make fix`.
 
@@ -32,6 +32,6 @@ Exception messages never contain the input or any part of it.
 
 ## MRZ gotchas
 
-- `Icao\Mrz\MachineReadableZone` implements `HasSex` (`<` is `Sex::Unspecified`, `X` refused) but not `HasBirthDate` (century unknown); dates take a caller-supplied reference. It uses `Internal\ReparsesOnUnserialize` (vo-base does not re-validate on unserialize).
-- `Contract\Maskable` extends vo-base's `Contract\Maskable` (vo-base `^1.2`).
+- `Icao\Mrz\MachineReadableZone` implements `HasSex` (`<` is `Sex::Unspecified`, `X` refused) but not `HasBirthDate` (century unknown); dates take a caller-supplied reference. vo-base `^1.3` re-validates it on unserialize; national names do it through `Internal\ReparsesThroughCodec`.
+- `Contract\Maskable` extends vo-base's `Contract\Maskable` (vo-base `^1.3`).
 - Releasing: tag vo-documents `v0.2.0` (the MRZ) before `vo-documents-doctrine` can pass its minimal CI job.

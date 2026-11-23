@@ -7,6 +7,7 @@ namespace MSSTC4PHP\ValueObject\Documents\Name\SA;
 use MSSTC4PHP\ValueObject\Contract\ValueObject;
 use MSSTC4PHP\ValueObject\Documents\Icao\PersonName as IcaoPersonName;
 use MSSTC4PHP\ValueObject\Documents\Internal\Optional;
+use MSSTC4PHP\ValueObject\Documents\Internal\ReparsesThroughCodec;
 use MSSTC4PHP\ValueObject\Documents\Internal\Text;
 use MSSTC4PHP\ValueObject\Documents\Name\PersonName as NationalPersonName;
 use MSSTC4PHP\ValueObject\Documents\Name\RequiredLatin\AbstractRequiredLatinPersonName;
@@ -28,6 +29,8 @@ use Override;
  */
 final readonly class PersonName implements NationalPersonName
 {
+    use ReparsesThroughCodec;
+
     public function __construct(
         public GivenName $given,
         public ?FatherName $father,
@@ -83,5 +86,11 @@ final readonly class PersonName implements NationalPersonName
             'family' => $this->family?->value,
             'latin' => $this->latin->value,
         ];
+    }
+
+    #[Override]
+    protected static function payloadCodec(): PersonNameCodec
+    {
+        return new PersonNameCodec();
     }
 }

@@ -110,6 +110,12 @@ final readonly class PersonName extends AbstractLatinPersonName
         );
     }
 
+    #[Override]
+    protected static function payloadCodec(): PersonNameCodec
+    {
+        return new PersonNameCodec();
+    }
+
     /**
      * @return list<string> empty for a person with one name
      */

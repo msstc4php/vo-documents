@@ -18,7 +18,6 @@ use MSSTC4PHP\ValueObject\Documents\Internal\MrzCheckDigit;
 use MSSTC4PHP\ValueObject\Documents\Internal\MrzDocumentNumber;
 use MSSTC4PHP\ValueObject\Documents\Internal\MrzField;
 use MSSTC4PHP\ValueObject\Documents\Internal\MrzLayout;
-use MSSTC4PHP\ValueObject\Documents\Internal\ReparsesOnUnserialize;
 use MSSTC4PHP\ValueObject\Documents\Internal\Text;
 use MSSTC4PHP\ValueObject\Documents\Internal\TwoDigitYearDate;
 use MSSTC4PHP\ValueObject\Documents\Internal\UnicodeText;
@@ -26,7 +25,6 @@ use MSSTC4PHP\ValueObject\Documents\Sex;
 use MSSTC4PHP\ValueObject\Exception\InvalidValueObjectException;
 use MSSTC4PHP\ValueObject\I18n\CountryCode;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\CoversTrait;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
@@ -36,7 +34,6 @@ use ReflectionClass;
 #[CoversClass(Td1::class)]
 #[CoversClass(Td2::class)]
 #[CoversClass(Td3::class)]
-#[CoversTrait(ReparsesOnUnserialize::class)]
 #[UsesClass(PersonName::class)]
 #[UsesClass(UnicodeText::class)]
 #[UsesClass(MrzCheckDigit::class)]
@@ -806,7 +803,7 @@ final class MachineReadableZoneTest extends TestCase
     public function testAPayloadWithoutAStringValueIsRefused(array $data): void
     {
         $this->expectException(InvalidValueObjectException::class);
-        $this->expectExceptionMessage('A serialized value object must hold its value, as a string.');
+        $this->expectExceptionMessage('A serialized ' . Td3::class . ' must hold its value as a string.');
 
         \unserialize($this->payload(Td3::class, $data));
     }

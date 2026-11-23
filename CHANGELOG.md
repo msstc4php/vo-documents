@@ -1,5 +1,27 @@
 # Changelog
 
+## [0.3.0] - unreleased
+
+### Changed
+
+- Every national `PersonName` (all 21 classes of `Codecs::all()`) serializes as its codec payload (for example
+  `family`, `given`, `latin`) and is rebuilt through the codec's `decode()` on `unserialize()`, so the parts are
+  validated again and the Latin form is derived again (`Internal\ReparsesThroughCodec`). Before, PHP's default layout
+  restored the private Latin form as stored: a forged serialized string could give a name a `latin()` that does not
+  belong to its parts, and a missing property left the object half built. A forged Latin override now throws
+  `InvalidPersonNameException`, a payload of the wrong shape vo-base `InvalidPayloadException`.
+- Names serialized by 0.2 still load: their properties are read, encoded and decoded the same way (a stored Latin form
+  is derived again, never trusted). A 0.2 payload with a missing or mistyped property throws vo-base
+  `InvalidValueObjectException` ("A serialized <class> is malformed."); keys of properties the class does not have are
+  ignored. Payloads in the new format follow the codec's shape exactly, as `decode()` does.
+- Names serialized by 0.3 do not load on 0.2 or 0.1, which would restore a half-built object without an error: empty
+  caches, sessions and queues that hold serialized names before downgrading, and do not run 0.2 and 0.3 side by side on
+  the same store.
+- Requires `msstc4php/vo-base ^1.3` (was `^1.2`). vo-base 1.3 runs `parse()` again on `unserialize()` for every
+  string, int and float value object, so `Internal\ReparsesOnUnserialize` is removed and `Icao\Mrz\MachineReadableZone`
+  relies on the base. A payload without a string value now fails with vo-base's message "A serialized <class> must
+  hold its value as a string." instead of "A serialized value object must hold its value, as a string."
+
 ## [0.2.0] - 2026-11-22
 
 ### Added

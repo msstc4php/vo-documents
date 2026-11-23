@@ -25,9 +25,10 @@ Not on Packagist yet; register the GitHub repositories:
 }
 ```
 
-Runtime requirements: `msstc4php/vo-base ^1.2`, `ext-mbstring`, `lib-pcre >=10.40` (the `\p{sc=Latin}` script
+Runtime requirements: `msstc4php/vo-base ^1.3`, `ext-mbstring`, `lib-pcre >=10.40` (the `\p{sc=Latin}` script
 syntax of the name classes), `symfony/polyfill-intl-normalizer`. No framework.
-vo-base 1.2 is the first release with the core `Contract\Maskable` that `Contract\Maskable` here extends.
+vo-base 1.3 is the first release that validates string value objects again on `unserialize()`. Composite names
+serialize as their codec payload and are rebuilt through the codec.
 
 ## Document numbers
 

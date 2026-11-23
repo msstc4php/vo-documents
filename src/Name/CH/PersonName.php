@@ -43,4 +43,10 @@ final readonly class PersonName extends AbstractFamilyGivenPersonName
             'Invalid Swiss person name (the Latin form is not a transliteration of the name).',
         );
     }
+
+    #[Override]
+    protected static function payloadCodec(): PersonNameCodec
+    {
+        return new PersonNameCodec();
+    }
 }
