@@ -73,8 +73,10 @@
   `Internal\SubdivisionResolver` with `fromNumber()` (one match, none, or `AmbiguousJurisdictionException`),
   `fromNumberIn()` and `jurisdictionsMatching()`. `docs/sources/<CC>.md` holds the shape table and its "Overlap" table;
   the factory test has every overlap row (the oracle). `classFor()` lists uncovered cases as `=> null`, so a new enum
-  case breaks the `match`. With one covered subdivision (MX, BR) `fromNumber()` reports other states' numbers as that
-  state: say so in the docs.
+  case breaks the `match`. `fromNumber()` exists only when every subdivision is covered (AU licences, CA health
+  cards; owner decision O2 of 1.0): US, CA licences, MX and BR have `fromNumberIn()` and `jurisdictionsMatching()`
+  only (through `SubdivisionResolver::matches()`). The `fitsLength()` hook of the AU and CA health bases is protected
+  and read by `Internal\LengthProbe`, so it is no API of the final classes.
 - **"Format not covered" message:** `fromNumberIn()` for a jurisdiction without a published format throws `Invalid
   <CC>-XX <document> (format not covered).`; `fromNumber()` of an unmatched number says "(fits no jurisdiction)" when
   some jurisdiction has the length, otherwise the length.

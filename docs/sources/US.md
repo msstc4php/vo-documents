@@ -374,6 +374,10 @@ licence and ID-card shapes (AL and IL included), so the IL ID card has its own r
 | `WDL` + 9 alphanumerics; or the WA PIC layout | US-WA |
 | anything else (e.g. 1–5, 11–16 digits; 7 digits + `B`) | none |
 
+**Since 1.0 the factory has no `fromNumber()`** (owner decision O2: the country is not fully covered, so a single
+match does not identify the issuer); the `fromNumber()` results below are the pre-1.0 behaviour and now describe a
+single-element `jurisdictionsMatching()`.
+
 Worked examples (verified against the shapes above). Inputs are shown after normalisation. "1" means `fromNumber()`
 returns that class; "≥ 2" throws `AmbiguousJurisdictionException` with exactly these codes in this order; "0" throws
 `InvalidDocumentNumberException`.

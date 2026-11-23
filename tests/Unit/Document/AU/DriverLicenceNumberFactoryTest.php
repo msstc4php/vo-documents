@@ -17,6 +17,7 @@ use MSSTC4PHP\ValueObject\Documents\Document\AU\DriverLicenceNumberFactory;
 use MSSTC4PHP\ValueObject\Documents\Document\AU\Jurisdiction;
 use MSSTC4PHP\ValueObject\Documents\Exception\AmbiguousJurisdictionException;
 use MSSTC4PHP\ValueObject\Documents\Internal\Digits;
+use MSSTC4PHP\ValueObject\Documents\Internal\LengthProbe;
 use MSSTC4PHP\ValueObject\Documents\Internal\Mask;
 use MSSTC4PHP\ValueObject\Documents\Internal\NumberFormat;
 use MSSTC4PHP\ValueObject\Documents\Internal\SubdivisionResolver;
@@ -32,6 +33,7 @@ use PHPUnit\Framework\TestCase;
  * fits exactly one jurisdiction.
  */
 #[CoversClass(DriverLicenceNumberFactory::class)]
+#[UsesClass(LengthProbe::class)]
 #[UsesClass(AbstractDriverLicenceNumber::class)]
 #[UsesClass(ActDriverLicenceNumber::class)]
 #[UsesClass(NswDriverLicenceNumber::class)]

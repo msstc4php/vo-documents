@@ -35,9 +35,9 @@ abstract class AbstractDriverLicenceNumber extends AbstractStringValueObject imp
     /**
      * Whether the number, with the separators removed, has a length this jurisdiction's format allows.
      *
-     * @internal for {@see \MSSTC4PHP\ValueObject\Documents\Document\AU\DriverLicenceNumberFactory}
+     * Protected, so it is no API of the jurisdiction classes: the factory reads it through `Internal\LengthProbe`.
      */
-    final public static function fitsLength(string $number): bool
+    final protected static function fitsLength(string $number): bool
     {
         return static::format()->fitsLength($number);
     }

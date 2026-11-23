@@ -6,15 +6,14 @@ namespace MSSTC4PHP\ValueObject\Documents\Document\BR;
 
 use MSSTC4PHP\ValueObject\Documents\Document\BR\IdentityCard\AbstractIdentityCardNumber;
 use MSSTC4PHP\ValueObject\Documents\Document\BR\IdentityCard\SpIdentityCardNumber;
-use MSSTC4PHP\ValueObject\Documents\Exception\AmbiguousJurisdictionException;
 use MSSTC4PHP\ValueObject\Documents\Exception\InvalidDocumentNumberException;
 use MSSTC4PHP\ValueObject\Documents\Internal\SubdivisionResolver;
 
 /**
- * Builds the RG number of the unit a bare number belongs to, and never picks one of several. Only the units with a
- * published format are matched. Today only BR-SP is covered, so {@see fromNumber()} assigns every number that fits
- * its shape (one to eight digits and the SP check character) to BR-SP, whichever state issued it; callers that know
- * the issuer must use {@see fromNumberIn()}, which refuses the 26 other units with "(format not covered)".
+ * Builds the RG number of a given unit and lists the covered units a bare number fits. Only the units with a published
+ * format are matched (today BR-SP alone); {@see fromNumberIn()} refuses the 26 other units with "(format not
+ * covered)". There is no `fromNumber()`: a unit without a published format could have issued any number, so a single match
+ * among the covered ones does not identify the issuer. It returns once every unit is covered.
  *
  * @see docs/sources/BR.md "RG per state — overlap (the factory's test oracle)"
  */
@@ -22,16 +21,6 @@ final class IdentityCardNumberFactory
 {
     private function __construct()
     {
-    }
-
-    /**
-     * @throws AmbiguousJurisdictionException<Jurisdiction> when several units match, listed in enum order
-     * @throws InvalidDocumentNumberException when none matches: "(fits no jurisdiction)" if the length fits a unit,
-     *                                        otherwise "(wrong length)"
-     */
-    public static function fromNumber(string $number): IdentityCardNumber
-    {
-        return self::resolver()->resolve(self::withoutDots($number));
     }
 
     /**
@@ -48,7 +37,7 @@ final class IdentityCardNumberFactory
      */
     public static function jurisdictionsMatching(string $number): array
     {
-        return self::resolver()->matching(self::withoutDots($number));
+        return SubdivisionResolver::matches(self::coveredJurisdictions(), self::tryIn(...), self::withoutDots($number));
     }
 
     /**
@@ -74,27 +63,9 @@ final class IdentityCardNumberFactory
         return $covered;
     }
 
-    /**
-     * @return SubdivisionResolver<Jurisdiction, IdentityCardNumber>
-     */
-    private static function resolver(): SubdivisionResolver
-    {
-        return new SubdivisionResolver(
-            'Brazilian identity card',
-            self::coveredJurisdictions(),
-            self::tryIn(...),
-            self::fitsLengthIn(...),
-        );
-    }
-
     private static function tryIn(Jurisdiction $jurisdiction, string $number): ?IdentityCardNumber
     {
         return self::coveredClassFor($jurisdiction)::tryFrom($number);
-    }
-
-    private static function fitsLengthIn(Jurisdiction $jurisdiction, string $number): bool
-    {
-        return self::coveredClassFor($jurisdiction)::fitsLength($number);
     }
 
     /**

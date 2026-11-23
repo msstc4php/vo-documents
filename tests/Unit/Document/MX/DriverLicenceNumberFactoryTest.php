@@ -71,7 +71,9 @@ final class DriverLicenceNumberFactoryTest extends TestCase
     #[DataProvider('singleMatches')]
     public function testReturnsTheOnlyMatchingJurisdiction(string $number, string $value): void
     {
-        $licence = DriverLicenceNumberFactory::fromNumber($number);
+        $matches = DriverLicenceNumberFactory::jurisdictionsMatching($number);
+        self::assertCount(1, $matches);
+        $licence = DriverLicenceNumberFactory::fromNumberIn($number, $matches[0]);
 
         self::assertInstanceOf(MexDriverLicenceNumber::class, $licence);
         self::assertSame($value, (string) $licence);
@@ -79,31 +81,21 @@ final class DriverLicenceNumberFactoryTest extends TestCase
     }
 
     /**
-     * @return iterable<string, array{string, string}>
+     * @return iterable<string, array{string}>
      */
     public static function numbersValidNowhere(): iterable
     {
-        yield 'empty' => ['', "Invalid Mexican driver's licence number (wrong length)."];
-        yield 'eleven digits' => ['12345678901', "Invalid Mexican driver's licence number (wrong length)."];
-        yield 'thirteen digits' => ['1234567890123', "Invalid Mexican driver's licence number (wrong length)."];
-        yield 'twelve characters with a letter' => [
-            '12345678901A',
-            "Invalid Mexican driver's licence number (fits no jurisdiction).",
-        ];
-        yield 'pasted several times' => [
-            \str_repeat('123456789012 ', 5),
-            "Invalid Mexican driver's licence number (wrong length).",
-        ];
+        yield 'empty' => [''];
+        yield 'eleven digits' => ['12345678901'];
+        yield 'thirteen digits' => ['1234567890123'];
+        yield 'twelve characters with a letter' => ['12345678901A'];
+        yield 'pasted several times' => [\str_repeat('123456789012 ', 5)];
     }
 
     #[DataProvider('numbersValidNowhere')]
-    public function testRefusesANumberValidNowhereWithoutEchoingIt(string $number, string $message): void
+    public function testANumberValidNowhereMatchesNoJurisdiction(string $number): void
     {
-        self::assertRefusedWithoutEcho(
-            static fn (string $value): mixed => DriverLicenceNumberFactory::fromNumber($value),
-            $number,
-            $message,
-        );
+        self::assertSame([], DriverLicenceNumberFactory::jurisdictionsMatching($number));
     }
 
     /**

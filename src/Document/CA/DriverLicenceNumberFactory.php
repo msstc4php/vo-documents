@@ -11,14 +11,15 @@ use MSSTC4PHP\ValueObject\Documents\Document\CA\DriverLicence\NsDriverLicenceNum
 use MSSTC4PHP\ValueObject\Documents\Document\CA\DriverLicence\OnDriverLicenceNumber;
 use MSSTC4PHP\ValueObject\Documents\Document\CA\DriverLicence\QcDriverLicenceNumber;
 use MSSTC4PHP\ValueObject\Documents\Document\CA\DriverLicence\SkDriverLicenceNumber;
-use MSSTC4PHP\ValueObject\Documents\Exception\AmbiguousJurisdictionException;
 use MSSTC4PHP\ValueObject\Documents\Exception\InvalidDocumentNumberException;
 use MSSTC4PHP\ValueObject\Documents\Internal\SubdivisionResolver;
 
 /**
- * Builds the driver's licence number of the jurisdiction a bare number belongs to, and never picks one of several:
- * every number of 1-8 digits fits both BC and SK (overlap table in CA.md), so callers that know the issuer use
- * {@see fromNumberIn()}. Only the 6 jurisdictions with a published format are matched; the other 7 have no class.
+ * Builds the driver's licence number of a given jurisdiction and lists the covered jurisdictions a bare number fits
+ * (every number of 1-8 digits fits both BC and SK, overlap table in CA.md). Only the 6 jurisdictions with a published
+ * format are matched; the other 7 have no class and {@see fromNumberIn()} refuses them.
+ * There is no `fromNumber()`: a jurisdiction without a published format could have issued any number, so a single
+ * match among the covered ones does not identify the issuer. It returns once every jurisdiction is covered.
  *
  * @see docs/sources/CA.md "Driver's licence numbers — overlap (the factory's test oracle)"
  */
@@ -26,16 +27,6 @@ final class DriverLicenceNumberFactory
 {
     private function __construct()
     {
-    }
-
-    /**
-     * @throws AmbiguousJurisdictionException<Jurisdiction> when several jurisdictions match, listed in enum order
-     * @throws InvalidDocumentNumberException when none matches: "(fits no jurisdiction)" if the length fits a
-     *                                        jurisdiction, otherwise "(wrong length)"
-     */
-    public static function fromNumber(string $number): DriverLicenceNumber
-    {
-        return self::resolver()->resolve($number);
     }
 
     /**
@@ -52,7 +43,7 @@ final class DriverLicenceNumberFactory
      */
     public static function jurisdictionsMatching(string $number): array
     {
-        return self::resolver()->matching($number);
+        return SubdivisionResolver::matches(self::coveredJurisdictions(), self::tryIn(...), $number);
     }
 
     /**
@@ -70,27 +61,9 @@ final class DriverLicenceNumberFactory
         return $covered;
     }
 
-    /**
-     * @return SubdivisionResolver<Jurisdiction, DriverLicenceNumber>
-     */
-    private static function resolver(): SubdivisionResolver
-    {
-        return new SubdivisionResolver(
-            "Canadian driver's licence",
-            self::coveredJurisdictions(),
-            self::tryIn(...),
-            self::fitsLengthIn(...),
-        );
-    }
-
     private static function tryIn(Jurisdiction $jurisdiction, string $number): ?DriverLicenceNumber
     {
         return self::coveredClassFor($jurisdiction)::tryFrom($number);
-    }
-
-    private static function fitsLengthIn(Jurisdiction $jurisdiction, string $number): bool
-    {
-        return self::coveredClassFor($jurisdiction)::fitsLength($number);
     }
 
     /**

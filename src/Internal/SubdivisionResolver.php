@@ -64,7 +64,25 @@ final readonly class SubdivisionResolver
      */
     public function matching(string $number): array
     {
-        return \array_map(static fn (array $match): Subdivision => $match[0], $this->parseAll($number));
+        return self::matches($this->subdivisions, $this->tryParse, $number);
+    }
+
+    /**
+     * The subdivisions whose number `$number` is, without a resolver: for the factories that only list matches.
+     *
+     * @template TListed of Subdivision
+     *
+     * @param list<TListed> $subdivisions in the order matches are reported
+     * @param Closure(TListed, string): ?ValueObject $tryParse
+     *
+     * @return list<TListed> in the given order
+     */
+    public static function matches(array $subdivisions, Closure $tryParse, string $number): array
+    {
+        return \array_values(\array_filter(
+            $subdivisions,
+            static fn (Subdivision $subdivision): bool => $tryParse($subdivision, $number) !== null,
+        ));
     }
 
     private function noMatch(string $number): InvalidDocumentNumberException

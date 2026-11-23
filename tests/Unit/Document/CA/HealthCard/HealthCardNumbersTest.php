@@ -21,6 +21,7 @@ use MSSTC4PHP\ValueObject\Documents\Document\CA\HealthCard\YtHealthCardNumber;
 use MSSTC4PHP\ValueObject\Documents\Document\CA\Jurisdiction;
 use MSSTC4PHP\ValueObject\Documents\Internal\Checksum;
 use MSSTC4PHP\ValueObject\Documents\Internal\Digits;
+use MSSTC4PHP\ValueObject\Documents\Internal\LengthProbe;
 use MSSTC4PHP\ValueObject\Documents\Internal\Mask;
 use MSSTC4PHP\ValueObject\Documents\Internal\NumberShapes;
 use MSSTC4PHP\ValueObject\Documents\Internal\Text;
@@ -50,6 +51,7 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(QcHealthCardNumber::class)]
 #[CoversClass(SkHealthCardNumber::class)]
 #[CoversClass(YtHealthCardNumber::class)]
+#[UsesClass(LengthProbe::class)]
 #[UsesClass(Jurisdiction::class)]
 #[UsesClass(Checksum::class)]
 #[UsesClass(Digits::class)]
@@ -185,7 +187,7 @@ final class HealthCardNumbersTest extends TestCase
         $iso = $class::from($this->sampleOf($class))->jurisdiction()->isoCode();
         for ($length = 0; $length <= self::LONGEST_TRIED; $length++) {
             $input = \str_repeat('1', $length);
-            self::assertSame(\in_array($length, $lengths, true), $class::fitsLength($input));
+            self::assertSame(\in_array($length, $lengths, true), LengthProbe::fits($class, $input));
             if (\in_array($length, $lengths, true)) {
                 continue;
             }

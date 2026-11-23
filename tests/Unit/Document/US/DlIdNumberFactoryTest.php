@@ -262,44 +262,6 @@ final class DlIdNumberFactoryTest extends TestCase
     }
 
     /**
-     * @return iterable<string, array{string}>
-     */
-    public static function ambiguousNumbers(): iterable
-    {
-        foreach (self::matchingJurisdictions() as $label => [$number, $jurisdictions]) {
-            if (\count($jurisdictions) > 1) {
-                yield $label => [$number];
-            }
-        }
-    }
-
-    #[DataProvider('ambiguousNumbers')]
-    public function testNeverPicksOneOfSeveralJurisdictions(string $number): void
-    {
-        try {
-            DlIdNumberFactory::fromNumber($number);
-        } catch (AmbiguousJurisdictionException $exception) {
-            self::assertSame(DlIdNumberFactory::jurisdictionsMatching($number), $exception->jurisdictions());
-            self::assertMessageHidesInput($number, $exception->getMessage());
-
-            return;
-        }
-
-        self::fail('Expected an AmbiguousJurisdictionException.');
-    }
-
-    public function testNineDigitsListTheElevenJurisdictions(): void
-    {
-        $this->expectException(AmbiguousJurisdictionException::class);
-        $this->expectExceptionMessage(
-            'American DL/ID number fits several jurisdictions: US-AZ, US-CO, US-CT, US-IA, US-ID, US-KS, US-MS, '
-            . 'US-NM, US-NY, US-OK, US-WY.',
-        );
-
-        DlIdNumberFactory::fromNumber('123456789');
-    }
-
-    /**
      * @return iterable<string, array{string, class-string<AbstractDlIdNumber>}>
      */
     public static function singleMatches(): iterable
@@ -334,41 +296,33 @@ final class DlIdNumberFactoryTest extends TestCase
     #[DataProvider('singleMatches')]
     public function testReturnsTheOnlyMatchingJurisdiction(string $number, string $class): void
     {
-        $licence = DlIdNumberFactory::fromNumber($number);
+        $matches = DlIdNumberFactory::jurisdictionsMatching($number);
+        self::assertCount(1, $matches);
+        $licence = DlIdNumberFactory::fromNumberIn($number, $matches[0]);
 
         self::assertInstanceOf($class, $licence);
         self::assertTrue($class::from($number)->equals($licence));
     }
 
     /**
-     * @return iterable<string, array{string, string}>
+     * @return iterable<string, array{string}>
      */
     public static function numbersValidNowhere(): iterable
     {
-        yield 'five digits' => ['12345', 'Invalid American DL/ID number (wrong length).'];
-        yield 'eleven digits' => ['12345678901', 'Invalid American DL/ID number (wrong length).'];
-        yield 'sixteen digits' => ['1234567890123456', 'Invalid American DL/ID number (wrong length).'];
-        yield 'thirteen digits, a length FL, MD and MI have' => [
-            '1234567890123',
-            'Invalid American DL/ID number (fits no jurisdiction).',
-        ];
-        yield 'MD customer ID' => ['MD12345678900', 'Invalid American DL/ID number (fits no jurisdiction).'];
-        yield 'seven digits + B' => ['1234567B', 'Invalid American DL/ID number (fits no jurisdiction).'];
-        yield 'empty' => ['', 'Invalid American DL/ID number (wrong length).'];
-        yield 'pasted several times' => [
-            \str_repeat('123456789 ', 5),
-            'Invalid American DL/ID number (wrong length).',
-        ];
+        yield 'five digits' => ['12345'];
+        yield 'eleven digits' => ['12345678901'];
+        yield 'sixteen digits' => ['1234567890123456'];
+        yield 'thirteen digits, a length FL, MD and MI have' => ['1234567890123'];
+        yield 'MD customer ID' => ['MD12345678900'];
+        yield 'seven digits + B' => ['1234567B'];
+        yield 'empty' => [''];
+        yield 'pasted several times' => [\str_repeat('123456789 ', 5)];
     }
 
     #[DataProvider('numbersValidNowhere')]
-    public function testRefusesANumberValidNowhereWithoutEchoingIt(string $number, string $message): void
+    public function testANumberValidNowhereMatchesNoJurisdiction(string $number): void
     {
-        self::assertRefusedWithoutEcho(
-            static fn (string $value): mixed => DlIdNumberFactory::fromNumber($value),
-            $number,
-            $message,
-        );
+        self::assertSame([], DlIdNumberFactory::jurisdictionsMatching($number));
     }
 
     /**

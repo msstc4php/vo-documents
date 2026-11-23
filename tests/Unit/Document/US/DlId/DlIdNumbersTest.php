@@ -270,7 +270,6 @@ final class DlIdNumbersTest extends TestCase
         $iso = $class::from($this->sampleOf($class))->jurisdiction()->isoCode();
         for ($length = 0; $length <= self::LONGEST_TRIED; $length++) {
             $input = \str_repeat('1', $length);
-            self::assertSame(\in_array($length, $lengths, true), $class::fitsLength($input));
             if (\in_array($length, $lengths, true)) {
                 continue;
             }

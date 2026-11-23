@@ -36,9 +36,9 @@ abstract class AbstractHealthCardNumber extends AbstractStringValueObject implem
     /**
      * Whether the number, with the separators removed, has a length one of this jurisdiction's shapes has.
      *
-     * @internal for {@see \MSSTC4PHP\ValueObject\Documents\Document\CA\HealthCardNumberFactory}
+     * Protected, so it is no API of the jurisdiction classes: the factory reads it through `Internal\LengthProbe`.
      */
-    final public static function fitsLength(string $number): bool
+    final protected static function fitsLength(string $number): bool
     {
         return static::shapes()->fitsLength($number);
     }

@@ -101,46 +101,10 @@ final class DriverLicenceNumberFactoryTest extends TestCase
     /**
      * @return iterable<string, array{string}>
      */
-    public static function ambiguousNumbers(): iterable
-    {
-        foreach (self::matchingJurisdictions() as $label => [$number, $jurisdictions]) {
-            if (\count($jurisdictions) > 1) {
-                yield $label => [$number];
-            }
-        }
-    }
-
-    #[DataProvider('ambiguousNumbers')]
-    public function testNeverPicksOneOfSeveralJurisdictions(string $number): void
-    {
-        try {
-            DriverLicenceNumberFactory::fromNumber($number);
-        } catch (AmbiguousJurisdictionException $exception) {
-            self::assertSame(DriverLicenceNumberFactory::jurisdictionsMatching($number), $exception->jurisdictions());
-            self::assertMessageHidesInput($number, $exception->getMessage());
-
-            return;
-        }
-
-        self::fail('Expected an AmbiguousJurisdictionException.');
-    }
-
-    /**
-     * @return iterable<string, array{string}>
-     */
     public static function bcAndSkNumbers(): iterable
     {
         yield 'eight digits' => ['12345678'];
         yield 'ICBC integer example' => ['347631'];
-    }
-
-    #[DataProvider('bcAndSkNumbers')]
-    public function testDigitsUpToEightListBritishColumbiaAndSaskatchewan(string $number): void
-    {
-        $this->expectException(AmbiguousJurisdictionException::class);
-        $this->expectExceptionMessage("Canadian driver's licence number fits several jurisdictions: CA-BC, CA-SK.");
-
-        DriverLicenceNumberFactory::fromNumber($number);
     }
 
     /**
@@ -171,7 +135,9 @@ final class DriverLicenceNumberFactoryTest extends TestCase
     #[DataProvider('singleMatches')]
     public function testReturnsTheOnlyMatchingJurisdiction(string $number, string $class, string $value): void
     {
-        $licence = DriverLicenceNumberFactory::fromNumber($number);
+        $matches = DriverLicenceNumberFactory::jurisdictionsMatching($number);
+        self::assertCount(1, $matches);
+        $licence = DriverLicenceNumberFactory::fromNumberIn($number, $matches[0]);
 
         self::assertInstanceOf($class, $licence);
         self::assertSame($value, (string) $licence);
@@ -179,36 +145,24 @@ final class DriverLicenceNumberFactoryTest extends TestCase
     }
 
     /**
-     * @return iterable<string, array{string, string}>
+     * @return iterable<string, array{string}>
      */
     public static function numbersValidNowhere(): iterable
     {
-        $noJurisdiction = "Invalid Canadian driver's licence number (fits no jurisdiction).";
-
-        yield 'empty' => ['', "Invalid Canadian driver's licence number (wrong length)."];
-        yield 'ten digits, an NS length' => ['1234567890', $noJurisdiction];
-        yield 'NS layout, day 32' => ['FINCH320867001', $noJurisdiction];
-        yield 'NS layout, month 13' => ['FINCH221367001', $noJurisdiction];
-        yield 'two letters + 12 digits' => ['LL53117127408', $noJurisdiction];
-        yield 'fourteen alphanumerics' => ['X0915264359571', $noJurisdiction];
-        yield 'sixteen alphanumerics' => [
-            'X091526435957189',
-            "Invalid Canadian driver's licence number (wrong length).",
-        ];
-        yield 'pasted several times' => [
-            \str_repeat('123456789 ', 5),
-            "Invalid Canadian driver's licence number (wrong length).",
-        ];
+        yield 'empty' => [''];
+        yield 'ten digits, an NS length' => ['1234567890'];
+        yield 'NS layout, day 32' => ['FINCH320867001'];
+        yield 'NS layout, month 13' => ['FINCH221367001'];
+        yield 'two letters + 12 digits' => ['LL53117127408'];
+        yield 'fourteen alphanumerics' => ['X0915264359571'];
+        yield 'sixteen alphanumerics' => ['X091526435957189'];
+        yield 'pasted several times' => [\str_repeat('123456789 ', 5)];
     }
 
     #[DataProvider('numbersValidNowhere')]
-    public function testRefusesANumberValidNowhereWithoutEchoingIt(string $number, string $message): void
+    public function testANumberValidNowhereMatchesNoJurisdiction(string $number): void
     {
-        self::assertRefusedWithoutEcho(
-            static fn (string $value): mixed => DriverLicenceNumberFactory::fromNumber($value),
-            $number,
-            $message,
-        );
+        self::assertSame([], DriverLicenceNumberFactory::jurisdictionsMatching($number));
     }
 
     /**

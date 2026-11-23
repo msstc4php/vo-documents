@@ -28,16 +28,6 @@ abstract class AbstractDriverLicenceNumber extends AbstractStringValueObject imp
         return Mask::keepLastCharacters(Text::nonEmpty($this->value), 4);
     }
 
-    /**
-     * Whether the number, with the separators removed, has a length one of this entity's shapes has.
-     *
-     * @internal for {@see \MSSTC4PHP\ValueObject\Documents\Document\MX\DriverLicenceNumberFactory}
-     */
-    final public static function fitsLength(string $number): bool
-    {
-        return static::shapes()->fitsLength($number);
-    }
-
     abstract protected static function shapes(): NumberShapes;
 
     #[Override]

@@ -75,8 +75,6 @@ final class IdentityCardNumbersTest extends TestCase
         for ($length = 0; $length <= self::LONGEST_TRIED; $length++) {
             $input = \str_repeat('1', $length);
             $fits = $length >= 2 && $length <= 9;
-            self::assertSame($fits, SpIdentityCardNumber::fitsLength($input));
-            self::assertSame($fits, SpIdentityCardNumber::fitsLength(\implode('.', \str_split($input))));
             if ($fits) {
                 continue;
             }

@@ -25,6 +25,7 @@ use MSSTC4PHP\ValueObject\Documents\Document\CA\Jurisdiction;
 use MSSTC4PHP\ValueObject\Documents\Exception\AmbiguousJurisdictionException;
 use MSSTC4PHP\ValueObject\Documents\Internal\Checksum;
 use MSSTC4PHP\ValueObject\Documents\Internal\Digits;
+use MSSTC4PHP\ValueObject\Documents\Internal\LengthProbe;
 use MSSTC4PHP\ValueObject\Documents\Internal\Mask;
 use MSSTC4PHP\ValueObject\Documents\Internal\NumberShapes;
 use MSSTC4PHP\ValueObject\Documents\Internal\SubdivisionResolver;
@@ -40,6 +41,7 @@ use PHPUnit\Framework\TestCase;
  * example and one input per overlap-table row not already among them.
  */
 #[CoversClass(HealthCardNumberFactory::class)]
+#[UsesClass(LengthProbe::class)]
 #[UsesClass(AbstractHealthCardNumber::class)]
 #[UsesClass(AbHealthCardNumber::class)]
 #[UsesClass(BcHealthCardNumber::class)]

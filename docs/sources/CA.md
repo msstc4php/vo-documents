@@ -260,6 +260,10 @@ Decisions in this table:
 | 15 alphanumerics | CA-ON |
 | anything else (empty, 10-14 or 16+ digits, the NS layout with a bad day or month, 2+ letters + 12 digits) | none |
 
+**Since 1.0 the factory has no `fromNumber()`** (owner decision O2: the country is not fully covered, so a single
+match does not identify the issuer); the `fromNumber()` results below are the pre-1.0 behaviour and now describe a
+single-element `jurisdictionsMatching()`.
+
 Worked examples (verified by the script below). "1" means `fromNumber()` returns that class; "≥ 2" throws
 `AmbiguousJurisdictionException` with exactly these codes in this order; "0" throws `InvalidDocumentNumberException`.
 

@@ -35,16 +35,6 @@ abstract class AbstractIdentityCardNumber extends AbstractStringValueObject impl
         return Mask::keepLastCharacters($value, \min(self::VISIBLE, $significant - 1));
     }
 
-    /**
-     * Whether the number, with the separators and dots removed, has a length one of this unit's shapes has.
-     *
-     * @internal for {@see \MSSTC4PHP\ValueObject\Documents\Document\BR\IdentityCardNumberFactory}
-     */
-    final public static function fitsLength(string $number): bool
-    {
-        return static::shapes()->fitsLength(self::withoutDots($number));
-    }
-
     abstract protected static function shapes(): NumberShapes;
 
     /**
@@ -62,13 +52,13 @@ abstract class AbstractIdentityCardNumber extends AbstractStringValueObject impl
     {
         $document = $this->jurisdiction()->isoCode() . ' identity card number';
 
-        return $this->stored(static::shapes()->parse(self::withoutDots($value), $document), $document);
+        return $this->stored(static::shapes()->parse($this->withoutDots($value), $document), $document);
     }
 
     /**
      * The printed form `12.345.678-9` separates groups with dots, as the CPF does.
      */
-    private static function withoutDots(string $number): string
+    private function withoutDots(string $number): string
     {
         return \str_replace('.', '', $number);
     }

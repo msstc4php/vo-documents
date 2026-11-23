@@ -35,14 +35,15 @@ use MSSTC4PHP\ValueObject\Documents\Document\US\DlId\VtDlIdNumber;
 use MSSTC4PHP\ValueObject\Documents\Document\US\DlId\WaDlIdNumber;
 use MSSTC4PHP\ValueObject\Documents\Document\US\DlId\WiDlIdNumber;
 use MSSTC4PHP\ValueObject\Documents\Document\US\DlId\WyDlIdNumber;
-use MSSTC4PHP\ValueObject\Documents\Exception\AmbiguousJurisdictionException;
 use MSSTC4PHP\ValueObject\Documents\Exception\InvalidDocumentNumberException;
 use MSSTC4PHP\ValueObject\Documents\Internal\SubdivisionResolver;
 
 /**
- * Builds the DL/ID number of the jurisdiction a bare number belongs to, and never picks one of several: plain 7-9
- * digit numbers fit many states (overlap table in US.md), so callers that know the issuer use {@see fromNumberIn()}.
- * Only the 30 jurisdictions with a published format are matched; the other 21 have no class.
+ * Builds the DL/ID number of a given jurisdiction and lists the covered jurisdictions a bare number fits (plain 7-9
+ * digit numbers fit many states, overlap table in US.md). Only the 30 jurisdictions with a published format are
+ * matched; the other 21 have no class and {@see fromNumberIn()} refuses them.
+ * There is no `fromNumber()`: a jurisdiction without a published format could have issued any number, so a single
+ * match among the covered ones does not identify the issuer. It returns once every jurisdiction is covered.
  *
  * @see docs/sources/US.md "Overlap — the factory's test oracle"
  */
@@ -50,16 +51,6 @@ final class DlIdNumberFactory
 {
     private function __construct()
     {
-    }
-
-    /**
-     * @throws AmbiguousJurisdictionException<Jurisdiction> when several jurisdictions match, listed in enum order
-     * @throws InvalidDocumentNumberException when none matches: "(fits no jurisdiction)" if the length fits a
-     *                                        jurisdiction, otherwise "(wrong length)"
-     */
-    public static function fromNumber(string $number): DlIdNumber
-    {
-        return self::resolver()->resolve($number);
     }
 
     /**
@@ -76,7 +67,7 @@ final class DlIdNumberFactory
      */
     public static function jurisdictionsMatching(string $number): array
     {
-        return self::resolver()->matching($number);
+        return SubdivisionResolver::matches(self::coveredJurisdictions(), self::tryIn(...), $number);
     }
 
     /**
@@ -94,27 +85,9 @@ final class DlIdNumberFactory
         return $covered;
     }
 
-    /**
-     * @return SubdivisionResolver<Jurisdiction, DlIdNumber>
-     */
-    private static function resolver(): SubdivisionResolver
-    {
-        return new SubdivisionResolver(
-            'American DL/ID',
-            self::coveredJurisdictions(),
-            self::tryIn(...),
-            self::fitsLengthIn(...),
-        );
-    }
-
     private static function tryIn(Jurisdiction $jurisdiction, string $number): ?DlIdNumber
     {
         return self::coveredClassFor($jurisdiction)::tryFrom($number);
-    }
-
-    private static function fitsLengthIn(Jurisdiction $jurisdiction, string $number): bool
-    {
-        return self::coveredClassFor($jurisdiction)::fitsLength($number);
     }
 
     /**

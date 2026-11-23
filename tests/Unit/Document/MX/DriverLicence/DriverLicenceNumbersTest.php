@@ -64,7 +64,6 @@ final class DriverLicenceNumbersTest extends TestCase
     {
         for ($length = 0; $length <= self::LONGEST_TRIED; $length++) {
             $input = \str_repeat('1', $length);
-            self::assertSame($length === 12, MexDriverLicenceNumber::fitsLength($input));
             if ($length === 12) {
                 continue;
             }

@@ -15,6 +15,7 @@ use MSSTC4PHP\ValueObject\Documents\Document\AU\DriverLicence\VicDriverLicenceNu
 use MSSTC4PHP\ValueObject\Documents\Document\AU\DriverLicence\WaDriverLicenceNumber;
 use MSSTC4PHP\ValueObject\Documents\Exception\AmbiguousJurisdictionException;
 use MSSTC4PHP\ValueObject\Documents\Exception\InvalidDocumentNumberException;
+use MSSTC4PHP\ValueObject\Documents\Internal\LengthProbe;
 use MSSTC4PHP\ValueObject\Documents\Internal\SubdivisionResolver;
 
 /**
@@ -76,7 +77,7 @@ final class DriverLicenceNumberFactory
 
     private static function fitsLengthIn(Jurisdiction $jurisdiction, string $number): bool
     {
-        return self::classFor($jurisdiction)::fitsLength($number);
+        return LengthProbe::fits(self::classFor($jurisdiction), $number);
     }
 
     /**

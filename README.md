@@ -274,15 +274,20 @@ use MSSTC4PHP\ValueObject\Documents\Document\US\DlIdNumberFactory;
 use MSSTC4PHP\ValueObject\Documents\Document\US\Jurisdiction;
 
 DlIdNumberFactory::fromNumberIn('123456789', Jurisdiction::Ny);   // NyDlIdNumber
-DlIdNumberFactory::fromNumber('Y620-9305-7270');                  // IlDlIdNumber, the only match
-DlIdNumberFactory::fromNumber('123456789');                       // AmbiguousJurisdictionException, 11 states
+DlIdNumberFactory::jurisdictionsMatching('Y620-9305-7270');       // [Il], among the covered jurisdictions
+DlIdNumberFactory::jurisdictionsMatching('123456789');            // 11 states
 DlIdNumberFactory::fromNumberIn('123456789', Jurisdiction::Ca);   // "Invalid US-CA DL/ID number (format not covered)."
 ```
 
-`DlIdNumberFactory` works like the AU factory, over the 30 jurisdictions with a published format only. Unlike AU,
-some numbers fit exactly one state (10 digits: IN; a letter and 13 digits: WI; WA's `WDL` numbers). A plain 7-9 digit
-number fits several, so pass the issuer when it is known. The 21 jurisdictions without a published format have no
-class, and `fromNumberIn()` refuses them (`docs/sources/US.md` "DL/ID numbers").
+`DlIdNumberFactory` covers the 30 jurisdictions with a published format. The 21 others have no class, and
+`fromNumberIn()` refuses them (`docs/sources/US.md` "DL/ID numbers"). `jurisdictionsMatching()` lists the covered
+jurisdictions a number fits: some numbers fit exactly one of them (10 digits: IN; a letter and 13 digits: WI; WA's
+`WDL` numbers), but an uncovered state could have issued the same number.
+
+**No `fromNumber()` for a partly covered country** (US and CA licences, MX licences, BR identity cards): a single match
+among the covered jurisdictions does not identify the issuer, and the result would change in a minor release that
+covers one more jurisdiction. Pass the issuer to `fromNumberIn()`. `fromNumber()` returns, additively, once a country is
+fully covered; AU licences and CA health cards are, and keep it.
 
 ### Canadian provincial documents
 
@@ -293,8 +298,8 @@ use MSSTC4PHP\ValueObject\Documents\Document\CA\HealthCardNumberFactory;
 use MSSTC4PHP\ValueObject\Documents\Document\CA\Jurisdiction;
 
 DriverLicenceNumberFactory::fromNumberIn('890562', Jurisdiction::Sk);   // SkDriverLicenceNumber, value 00890562
-DriverLicenceNumberFactory::fromNumber('L1531-171274-08');            // QcDriverLicenceNumber, the only match
-DriverLicenceNumberFactory::fromNumber('347631');                     // AmbiguousJurisdictionException: CA-BC, CA-SK
+DriverLicenceNumberFactory::jurisdictionsMatching('L1531-171274-08'); // [Qc], among the covered jurisdictions
+DriverLicenceNumberFactory::jurisdictionsMatching('347631');          // [Bc, Sk]
 DriverLicenceNumberFactory::fromNumberIn('123', Jurisdiction::Mb);     // "Invalid CA-MB driver's licence number (format not covered)."
 
 $card = OnHealthCardNumber::fromCard('9876543217 YM');                // OnHealthCard
@@ -304,7 +309,8 @@ HealthCardNumberFactory::fromNumber('9876543217');                     // Ambigu
 HealthCardNumberFactory::fromNumber('123456789');                      // AmbiguousJurisdictionException, 6 jurisdictions
 ```
 
-Both factories work like the AU and US ones. When `HealthCardNumberFactory::fromNumber()` finds no match and the input
+The licence factory works like the US one (6 of 13 jurisdictions covered, no `fromNumber()`); the health card factory
+like the AU one (all 13 covered). When `HealthCardNumberFactory::fromNumber()` finds no match and the input
 is an Ontario card with a version code, its message points to `OnHealthCardNumber::fromCard()` (nothing of the input is
 echoed). BC and SK licence numbers share every shape (1-8 digits, stored padded to 8), so a bare BC or SK number is
 always ambiguous: pass the issuer. All 13 health card formats are published (Ontario's reciprocal-billing table, checked
@@ -320,14 +326,13 @@ use MSSTC4PHP\ValueObject\Documents\Document\MX\DriverLicenceNumberFactory;
 use MSSTC4PHP\ValueObject\Documents\Document\MX\Jurisdiction;
 
 DriverLicenceNumberFactory::fromNumberIn('1234 5678 9012', Jurisdiction::Mex);   // MexDriverLicenceNumber, value 123456789012
-DriverLicenceNumberFactory::fromNumber('123456789012');                         // MexDriverLicenceNumber, the only covered entity
+DriverLicenceNumberFactory::jurisdictionsMatching('123456789012');              // [Mex], the only covered entity
 DriverLicenceNumberFactory::fromNumberIn('123456789012', Jurisdiction::Cmx);    // "Invalid MX-CMX driver's licence number (format not covered)."
 ```
 
 Only the Estado de México publishes a number format (its validator's field rule: twelve digits). The other 31
-entities have no class and `fromNumberIn()` refuses them. With one covered entity, `fromNumber()` assigns any
-twelve-digit number to MX-MEX, whichever state issued it: callers that know the issuer must use `fromNumberIn()`
-(`docs/sources/MX.md` "State driving licences").
+entities have no class and `fromNumberIn()` refuses them. Any other state could issue a twelve-digit number, so
+there is no `fromNumber()`: pass the issuer to `fromNumberIn()` (`docs/sources/MX.md` "State driving licences").
 
 ### Brazilian state identity cards (RG)
 
@@ -337,16 +342,16 @@ use MSSTC4PHP\ValueObject\Documents\Document\BR\IdentityCardNumberFactory;
 use MSSTC4PHP\ValueObject\Documents\Document\BR\Jurisdiction;
 
 IdentityCardNumberFactory::fromNumberIn('12.345.678-2', Jurisdiction::Sp);   // SpIdentityCardNumber, value 123456782
-IdentityCardNumberFactory::fromNumber('24.681.357-X');                       // SpIdentityCardNumber, the only covered unit
-IdentityCardNumberFactory::fromNumber('12.345.678-3');                       // "Invalid Brazilian identity card number (fits no jurisdiction)."
+IdentityCardNumberFactory::jurisdictionsMatching('24.681.357-X');            // [Sp], the only covered unit
+IdentityCardNumberFactory::jurisdictionsMatching('12.345.678-3');            // [] (wrong SP check character)
 IdentityCardNumberFactory::fromNumberIn('1234567', Jurisdiction::Rj);        // "Invalid BR-RJ identity card number (format not covered)."
 SpIdentityCardNumber::fromNumberAndCheckCharacter('1.234.567', null);         // card without a printed check character: value 012345672
 ```
 
 Only São Paulo publishes an RG format (the SSP's antecedentes form: up to eight digits and a required check character
-with its algorithm). The other 26 units have no class and `fromNumberIn()` refuses them. With one covered unit, `fromNumber()`
-assigns any number that fits the SP shape to BR-SP (an RG of another state whose last character happens to be SP's
-check character included): callers that know the issuer must use `fromNumberIn()`. An old SP card that does not print its check character is still valid:
+with its algorithm). The other 26 units have no class and `fromNumberIn()` refuses them. An RG of another state can fit the SP shape (its
+last character may happen to be SP's check character), so there is no `fromNumber()`: pass the issuer to
+`fromNumberIn()`. An old SP card that does not print its check character is still valid:
 `fromNumberAndCheckCharacter()` takes the form's two fields and stores the computed character (`from()` and the factory
 want both in one string). The RG of a CIN is its CPF: use `Document\BR\Cpf`. Old-model cards stay valid until
 2032-03-01 (Decreto nº 10.977/2022, art. 25) (`docs/sources/BR.md` "RG per state").

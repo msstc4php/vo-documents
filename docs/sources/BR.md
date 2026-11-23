@@ -578,6 +578,10 @@ formats); a caller that knows the issuer uses `fromNumberIn()`, which throws "(f
 | 2 to 9 | `[0-9]{1,8}[0-9X]` with the SP check character | BR-SP |
 | any other | — | none |
 
+**Since 1.0 the factory has no `fromNumber()`** (owner decision O2: the country is not fully covered, so a single
+match does not identify the issuer); the `fromNumber()` results below are the pre-1.0 behaviour and now describe a
+single-element `jurisdictionsMatching()`.
+
 Worked examples (`jurisdictionsMatching()`, then `fromNumber()`):
 
 | Input | Matching | `fromNumber()` |

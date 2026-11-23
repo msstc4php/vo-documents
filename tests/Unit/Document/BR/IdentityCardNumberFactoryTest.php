@@ -85,7 +85,9 @@ final class IdentityCardNumberFactoryTest extends TestCase
     #[DataProvider('singleMatches')]
     public function testReturnsTheOnlyMatchingJurisdiction(string $number, string $value): void
     {
-        $card = IdentityCardNumberFactory::fromNumber($number);
+        $matches = IdentityCardNumberFactory::jurisdictionsMatching($number);
+        self::assertCount(1, $matches);
+        $card = IdentityCardNumberFactory::fromNumberIn($number, $matches[0]);
 
         self::assertInstanceOf(SpIdentityCardNumber::class, $card);
         self::assertSame($value, (string) $card);
@@ -93,36 +95,24 @@ final class IdentityCardNumberFactoryTest extends TestCase
     }
 
     /**
-     * @return iterable<string, array{string, string}>
+     * @return iterable<string, array{string}>
      */
     public static function numbersValidNowhere(): iterable
     {
-        $noJurisdiction = 'Invalid Brazilian identity card number (fits no jurisdiction).';
-
-        yield 'empty' => ['', 'Invalid Brazilian identity card number (wrong length).'];
-        yield 'wrong check digit' => ['12.345.678-3', $noJurisdiction];
-        yield 'zeros only' => ['0-0', $noJurisdiction];
-        yield 'one character' => ['2', 'Invalid Brazilian identity card number (wrong length).'];
-        yield 'ten digits' => ['1234567890', 'Invalid Brazilian identity card number (wrong length).'];
-        yield 'ten characters with dots' => [
-            '1.234.567.890',
-            'Invalid Brazilian identity card number (wrong length).',
-        ];
-        yield 'letter as check' => ['12345678A', $noJurisdiction];
-        yield 'pasted several times' => [
-            \str_repeat('12.345.678-2 ', 5),
-            'Invalid Brazilian identity card number (wrong length).',
-        ];
+        yield 'empty' => [''];
+        yield 'wrong check digit' => ['12.345.678-3'];
+        yield 'zeros only' => ['0-0'];
+        yield 'one character' => ['2'];
+        yield 'ten digits' => ['1234567890'];
+        yield 'ten characters with dots' => ['1.234.567.890'];
+        yield 'letter as check' => ['12345678A'];
+        yield 'pasted several times' => [\str_repeat('12.345.678-2 ', 5)];
     }
 
     #[DataProvider('numbersValidNowhere')]
-    public function testRefusesANumberValidNowhereWithoutEchoingIt(string $number, string $message): void
+    public function testANumberValidNowhereMatchesNoJurisdiction(string $number): void
     {
-        self::assertRefusedWithoutEcho(
-            static fn (string $value): mixed => IdentityCardNumberFactory::fromNumber($value),
-            $number,
-            $message,
-        );
+        self::assertSame([], IdentityCardNumberFactory::jurisdictionsMatching($number));
     }
 
     /**
