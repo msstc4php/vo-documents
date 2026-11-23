@@ -100,7 +100,7 @@ final class PersonNameCodecTest extends TestCase
     use RefusesNameWithoutEchoingInput;
 
     private const string SHAPE = 'Expected a Japanese person name payload with string "family", "given", '
-        . '"familyReading" and "givenReading", string, null or missing "latin", and no other keys.';
+        . '"familyReading" and "givenReading", string, null or missing "latinOverride", and no other keys.';
 
     public function testMapsItsClass(): void
     {
@@ -110,12 +110,12 @@ final class PersonNameCodecTest extends TestCase
     public function testRoundTripWithoutOverride(): void
     {
         $codec = new PersonNameCodec();
-        $name = self::japaneseName();
+        $name = $this->japaneseName();
 
         $payload = $codec->encode($name);
 
         self::assertSame(
-            ['family' => '大野', 'given' => '翔', 'familyReading' => 'オオノ', 'givenReading' => 'しょう', 'latin' => null],
+            ['family' => '大野', 'given' => '翔', 'familyReading' => 'オオノ', 'givenReading' => 'しょう', 'latinOverride' => null],
             $payload,
         );
         self::assertTrue($codec->decode($payload)->equals($name));
@@ -124,11 +124,11 @@ final class PersonNameCodecTest extends TestCase
     public function testRoundTripWithOverride(): void
     {
         $codec = new PersonNameCodec();
-        $name = self::japaneseName(IcaoPersonName::from('OHNO<<SHO'));
+        $name = $this->japaneseName(IcaoPersonName::from('OHNO<<SHO'));
 
         $payload = $codec->encode($name);
 
-        self::assertSame('OHNO<<SHO', $payload['latin']);
+        self::assertSame('OHNO<<SHO', $payload['latinOverride']);
         $decoded = $codec->decode($payload);
         self::assertTrue($decoded->equals($name));
         self::assertSame('OHNO<<SHO', $decoded->latinOverride()?->value);
@@ -136,7 +136,7 @@ final class PersonNameCodecTest extends TestCase
 
     public function testAnOverrideThatIsTheDerivedFormIsStoredAsNull(): void
     {
-        self::assertNull(new PersonNameCodec()->encode(self::japaneseName(IcaoPersonName::from('ONO<<SHO')))['latin']);
+        self::assertNull(new PersonNameCodec()->encode($this->japaneseName(IcaoPersonName::from('ONO<<SHO')))['latinOverride']);
     }
 
     public function testDecodeAcceptsAMissingLatin(): void
@@ -162,8 +162,8 @@ final class PersonNameCodecTest extends TestCase
         yield 'givenReading missing' => [\array_diff_key($valid, ['givenReading' => true])];
         yield 'family is an int' => [['family' => 1] + $valid];
         yield 'givenReading is null' => [['givenReading' => null] + $valid];
-        yield 'latin is an int' => [$valid + ['latin' => 1]];
-        yield 'unknown key' => [$valid + ['latin' => null, 'extra' => 'x']];
+        yield 'latin is an int' => [$valid + ['latinOverride' => 1]];
+        yield 'unknown key' => [$valid + ['latinOverride' => null, 'extra' => 'x']];
     }
 
     /**
@@ -180,14 +180,11 @@ final class PersonNameCodecTest extends TestCase
         );
     }
 
-    public function testTheJsonViewIsNotACodecPayload(): void
+    public function testTheJsonViewReadsBackAsTheSameName(): void
     {
-        self::assertNameRefusedWithoutEcho(
-            static fn (): PersonName => new PersonNameCodec()->decode(self::japaneseName()->jsonSerialize()),
-            self::payloadProbe(self::japaneseName()->jsonSerialize()),
-            self::SHAPE,
-            InvalidPayloadException::class,
-        );
+        foreach ([$this->japaneseName(), $this->japaneseName(IcaoPersonName::from('OHNO<<SHO'))] as $name) {
+            self::assertTrue(new PersonNameCodec()->decode($name->jsonSerialize())->equals($name));
+        }
     }
 
     public function testDecodeRefusesAnInvalidReadingWithoutEchoingIt(): void
@@ -197,7 +194,7 @@ final class PersonNameCodecTest extends TestCase
             'given' => '翔',
             'familyReading' => '大野',
             'givenReading' => 'しょう',
-            'latin' => null,
+            'latinOverride' => null,
         ];
 
         self::assertNameRefusedWithoutEcho(
@@ -225,16 +222,16 @@ final class PersonNameCodecTest extends TestCase
             'given' => '洋子',
             'familyReading' => 'イトウ',
             'givenReading' => 'ヨウコ',
-            'latin' => 'itoh<<yoko',
+            'latinOverride' => 'itoh<<yoko',
         ];
 
         $name = $mapper->fromUntrustedPayload(PersonName::class, $payload);
 
         self::assertSame('ITOH<<YOKO', $name->latin()->value);
-        self::assertSame(\array_replace($payload, ['latin' => 'ITOH<<YOKO']), $mapper->toPayload($name));
+        self::assertSame(\array_replace($payload, ['latinOverride' => 'ITOH<<YOKO']), $mapper->toPayload($name));
     }
 
-    private static function japaneseName(?IcaoPersonName $latin = null): PersonName
+    private function japaneseName(?IcaoPersonName $latin = null): PersonName
     {
         return new PersonName(
             FamilyName::from('大野'),

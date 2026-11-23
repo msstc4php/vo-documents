@@ -69,7 +69,7 @@ final class PersonNameTest extends TestCase
     use RefusesNameWithoutEchoingInput;
 
     private const string SHAPE = 'Expected an Indian person name payload with string "given", '
-        . 'string, null or missing "surname" and "latin", and no other keys.';
+        . 'string, null or missing "surname" and "latinOverride", and no other keys.';
 
     private const string NOT_A_TRANSLITERATION =
         'Invalid Indian person name (the Latin form is not a transliteration of the name).';
@@ -111,7 +111,7 @@ final class PersonNameTest extends TestCase
         self::assertSame('Rajesh Kumar', $name->full());
         self::assertNull($name->surname);
         self::assertSame(
-            ['given' => 'Rajesh Kumar', 'surname' => null, 'effectiveLatin' => 'RAJESH<KUMAR'],
+            ['given' => 'Rajesh Kumar', 'surname' => null, 'latin' => 'RAJESH<KUMAR'],
             $name->jsonSerialize(),
         );
     }
@@ -197,7 +197,7 @@ final class PersonNameTest extends TestCase
     public function testJsonViewShowsTheEffectiveLatinForm(): void
     {
         self::assertSame(
-            ['given' => 'Piyush Kumar', 'surname' => 'Jain', 'effectiveLatin' => 'JAIN<<PIYUSH<KUMAR'],
+            ['given' => 'Piyush Kumar', 'surname' => 'Jain', 'latin' => 'JAIN<<PIYUSH<KUMAR'],
             new PersonName(GivenName::from('Piyush Kumar'), Surname::from('Jain'))->jsonSerialize(),
         );
     }
@@ -229,7 +229,7 @@ final class PersonNameTest extends TestCase
 
         $payload = $codec->encode($name);
 
-        self::assertSame(['given' => 'Jürgen', 'surname' => 'Müller', 'latin' => 'MULLER<<JURGEN'], $payload);
+        self::assertSame(['given' => 'Jürgen', 'surname' => 'Müller', 'latinOverride' => 'MULLER<<JURGEN'], $payload);
         self::assertTrue($codec->decode($payload)->equals($name));
         self::assertSame(PersonName::class, $codec->valueObjectClass());
     }
@@ -241,7 +241,7 @@ final class PersonNameTest extends TestCase
 
         $payload = $codec->encode($name);
 
-        self::assertSame(['given' => 'Rajesh Kumar', 'surname' => null, 'latin' => null], $payload);
+        self::assertSame(['given' => 'Rajesh Kumar', 'surname' => null, 'latinOverride' => null], $payload);
         self::assertTrue($codec->decode($payload)->equals($name));
         self::assertTrue($codec->decode(['given' => 'Rajesh Kumar'])->equals($name));
     }
@@ -255,10 +255,12 @@ final class PersonNameTest extends TestCase
         yield 'given null' => [['given' => null, 'surname' => 'Jain']];
         yield 'given int' => [['given' => 1]];
         yield 'surname int' => [['given' => 'Rajesh', 'surname' => 1]];
-        yield 'latin int' => [['given' => 'Rajesh', 'latin' => 1]];
+        yield 'latin int' => [['given' => 'Rajesh', 'latinOverride' => 1]];
         yield 'unknown key' => [['given' => 'Rajesh', 'x' => 'y']];
         yield 'family key of other countries' => [['family' => 'Jain', 'given' => 'Rajesh']];
-        yield 'the json view' => [['given' => 'Rajesh', 'surname' => 'Jain', 'effectiveLatin' => 'JAIN<<RAJESH']];
+        yield 'both the 0.x and the 1.0 override key' => [
+            ['given' => 'Rajesh', 'surname' => 'Jain', 'latin' => null, 'latinOverride' => null],
+        ];
     }
 
     /**

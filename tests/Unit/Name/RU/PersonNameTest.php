@@ -216,11 +216,11 @@ final class PersonNameTest extends TestCase
     public function testJsonSerializeGivesTheFullValue(): void
     {
         self::assertSame(
-            ['family' => 'Иванов', 'given' => 'Иван', 'patronymic' => 'Иванович', 'effectiveLatin' => 'IVANOV<<IVAN'],
+            ['family' => 'Иванов', 'given' => 'Иван', 'patronymic' => 'Иванович', 'latin' => 'IVANOV<<IVAN'],
             $this->ivanov()->jsonSerialize(),
         );
         self::assertSame(
-            ['family' => 'Иванов', 'given' => 'Иван', 'patronymic' => null, 'effectiveLatin' => 'IVANOV<<IVAN'],
+            ['family' => 'Иванов', 'given' => 'Иван', 'patronymic' => null, 'latin' => 'IVANOV<<IVAN'],
             $this->ivanov(withPatronymic: false)->jsonSerialize(),
         );
     }

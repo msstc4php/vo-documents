@@ -195,7 +195,7 @@ final class PersonNameTest extends TestCase
     public function testJsonViewShowsTheEffectiveLatinForm(): void
     {
         self::assertSame(
-            ['family' => 'Müller', 'given' => 'Jürgen', 'effectiveLatin' => 'MUELLER<<JUERGEN'],
+            ['family' => 'Müller', 'given' => 'Jürgen', 'latin' => 'MUELLER<<JUERGEN'],
             new PersonName(FamilyName::from('Müller'), GivenName::from('Jürgen'))->jsonSerialize(),
         );
     }

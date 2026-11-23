@@ -142,10 +142,11 @@ Such a spelling is not computable from the national form: an earlier passport ma
 
 ### 5. Storage payload and JSON view
 
-`PersonNameCodec` stores `{family, given, patronymic, latin}` where `latin` is the **override only** (`null` when the
+`PersonNameCodec` stores `{family, given, patronymic, latinOverride}` where `latinOverride` is the **override only** (0.x key `latin`, still read) (`null` when the
 Latin form is derived) and refuses any other key. `PersonName::jsonSerialize()` is a view
-`{family, given, patronymic, effectiveLatin}` with the Latin form actually in use; because of the different key it is
-refused by the codec instead of being read back as "no override".
+`{family, given, patronymic, latin}` with the Latin form actually in use; it reads back through the codec as the same
+name (its `latin` is taken as the 0.x override key, and an override equal to the derived form is dropped). Until 1.0
+the view key was `effectiveLatin` and the payload key `latin`.
 
 ### 6. Where this note departs from plan 1, task 4 (the source wins)
 

@@ -118,8 +118,12 @@ final class PayloadFieldsTest extends TestCase
 
     public function testReadsAnOptionalLatinOverride(): void
     {
-        self::assertSame('ZHANG<<WEI', PayloadFields::latinOverride(['latin' => 'ZHANG<<WEI'], 'Shape.')?->value);
-        self::assertNull(PayloadFields::latinOverride(['latin' => null], 'Shape.'));
+        self::assertSame(
+            'ZHANG<<WEI',
+            PayloadFields::latinOverride(['latinOverride' => 'ZHANG<<WEI'], 'Shape.')?->value,
+        );
+        self::assertNull(PayloadFields::latinOverride(['latinOverride' => null], 'Shape.'));
+        self::assertNull(PayloadFields::latinOverride(['latin' => 'ZHANG<<WEI'], 'Shape.'));
         self::assertNull(PayloadFields::latinOverride([], 'Shape.'));
     }
 
@@ -128,6 +132,34 @@ final class PayloadFieldsTest extends TestCase
         $this->expectException(InvalidPayloadException::class);
         $this->expectExceptionMessage('Shape.');
 
-        PayloadFields::latinOverride(['latin' => 1], 'Shape.');
+        PayloadFields::latinOverride(['latinOverride' => 1], 'Shape.');
+    }
+
+    public function testUpgradedMovesA0xKeyToIts10Key(): void
+    {
+        self::assertSame(
+            ['family' => 'A', 'latinOverride' => 'B'],
+            PayloadFields::upgraded(['family' => 'A', 'latin' => 'B'], PayloadFields::LEGACY_LATIN_OVERRIDE, 'Shape.'),
+        );
+        self::assertSame(
+            ['latinOverride' => null],
+            PayloadFields::upgraded(['latin' => null], PayloadFields::LEGACY_LATIN_OVERRIDE, 'Shape.'),
+        );
+        self::assertSame(
+            ['family' => 'A', 'latinOverride' => 'B'],
+            PayloadFields::upgraded(['family' => 'A', 'latinOverride' => 'B'], PayloadFields::LEGACY_LATIN_OVERRIDE, 'Shape.'),
+        );
+        self::assertSame(
+            ['b2' => 2, 'a2' => 1],
+            PayloadFields::upgraded(['a1' => 1, 'b1' => 2], ['b1' => 'b2', 'a1' => 'a2'], 'Shape.'),
+        );
+    }
+
+    public function testUpgradedRefusesBothKeysOfAField(): void
+    {
+        $this->expectException(InvalidPayloadException::class);
+        $this->expectExceptionMessage('Shape.');
+
+        PayloadFields::upgraded(['latin' => 'A', 'latinOverride' => 'A'], PayloadFields::LEGACY_LATIN_OVERRIDE, 'Shape.');
     }
 }

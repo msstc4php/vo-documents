@@ -88,8 +88,7 @@ How the package applies this:
 - **Not covered:** adellijke titels and predicaten (table 38; art. 23 lid 3 counts them in the name, the package keeps
   family and given names only), the BRP placeholder `.` for an unknown family name.
 
-Payload (`PersonNameCodec`): `{family, given, latin}` with `given` null for one name and `latin` the override only; the
-JSON view is `{family, given, effectiveLatin}` and is refused by the codec.
+Payload (`PersonNameCodec`): `{family, given, latinOverride}` with `given` null for one name and `latinOverride` the override only (0.x key `latin`, still read); the JSON view is `{family, given, latin}` (the full Latin form) and reads back through the codec as the same name.
 
 ## BSN (`Document\NL\Bsn`)
 

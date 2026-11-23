@@ -18,7 +18,7 @@
   message `Invalid <label> (empty).` or `(too long)`; allowed separators per part come from the country's source note (RU:
   given names and patronymics have no apostrophe).
 - A composite name is a `final readonly` class with public part properties, its codec stores only an explicit Latin
-  override (`latin: null` otherwise) and is listed in `Codecs::all()`. A Latin-script family + given name extends
+  override (`latinOverride: null` otherwise; the 0.x key `latin` is read through `PayloadFields::upgraded()`) and is listed in `Codecs::all()`. A Latin-script family + given name extends
   `Name\Latin\AbstractFamilyGivenPersonName<FamilyName, GivenName>` (or `<…, GivenName|null>`), keeps only its
   constructor (typed parts, calls the parent) and `overridePolicy()`; its codec extends
   `AbstractFamilyGivenPersonNameCodec<PersonName, string>` (`string|null` for an optional given name) with

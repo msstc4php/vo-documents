@@ -106,9 +106,9 @@ final readonly class PersonName implements NationalPersonName
     }
 
     /**
-     * A view, not the storage payload ({@see PersonNameCodec}): `effectiveLatin` is {@see latin()}, derived or not.
+     * A view, not the storage payload ({@see PersonNameCodec}): `latin` is {@see latin()}, derived or not.
      *
-     * @return array{family: string, given: string, patronymic: string|null, effectiveLatin: string}
+     * @return array{family: string, given: string, patronymic: string|null, latin: string}
      */
     #[Override]
     public function jsonSerialize(): array
@@ -117,7 +117,7 @@ final readonly class PersonName implements NationalPersonName
             'family' => $this->family->value,
             'given' => $this->given->value,
             'patronymic' => $this->patronymic?->value,
-            'effectiveLatin' => $this->effective->value,
+            'latin' => $this->effective->value,
         ];
     }
 

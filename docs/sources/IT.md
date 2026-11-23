@@ -51,8 +51,7 @@ civil status could not be read), so the package keeps its Latin default:
 - **Not covered:** the married woman's added surname (a separate civil-status matter); the codice fiscale uses only the
   maiden surname (DM 1976 art. 3).
 
-Payload (`PersonNameCodec`): `{family, given, latin}` with `latin` the override only; the JSON view is
-`{family, given, effectiveLatin}` and is refused by the codec, as for AU, DE and FR.
+Payload (`PersonNameCodec`): `{family, given, latinOverride}` with `latinOverride` the override only (0.x key `latin`, still read); the JSON view is `{family, given, latin}` (the full Latin form) and reads back through the codec as the same name.
 
 ## Codice fiscale (`Document\IT\FiscalCode`)
 

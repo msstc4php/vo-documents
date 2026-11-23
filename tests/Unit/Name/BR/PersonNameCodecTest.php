@@ -103,7 +103,7 @@ final class PersonNameCodecTest extends TestCase
     use RefusesNameWithoutEchoingInput;
 
     private const string SHAPE = 'Expected a Brazilian person name payload with string "family" and "given", '
-        . 'string, null or missing "latin", and no other keys.';
+        . 'string, null or missing "latinOverride", and no other keys.';
 
     public function testMapsItsClass(): void
     {
@@ -120,7 +120,7 @@ final class PersonNameCodecTest extends TestCase
 
         $payload = $codec->encode($name);
 
-        self::assertSame(['family' => 'da Silva', 'given' => 'Maria da Conceição', 'latin' => null], $payload);
+        self::assertSame(['family' => 'da Silva', 'given' => 'Maria da Conceição', 'latinOverride' => null], $payload);
         $decoded = $codec->decode($payload);
         self::assertTrue($decoded->equals($name));
         self::assertSame('da Silva', $decoded->family->value);
@@ -139,7 +139,7 @@ final class PersonNameCodecTest extends TestCase
         $payload = $codec->encode($name);
 
         self::assertSame(
-            ['family' => 'dos Santos de Oliveira', 'given' => 'Ana', 'latin' => 'SANTOS<OLIVEIRA<<ANA'],
+            ['family' => 'dos Santos de Oliveira', 'given' => 'Ana', 'latinOverride' => 'SANTOS<OLIVEIRA<<ANA'],
             $payload,
         );
         $decoded = $codec->decode($payload);
@@ -162,8 +162,8 @@ final class PersonNameCodecTest extends TestCase
         yield 'given missing' => [['family' => 'Souza']];
         yield 'given null' => [['family' => 'Souza', 'given' => null]];
         yield 'given is an int' => [['family' => 'Souza', 'given' => 1]];
-        yield 'latin is an int' => [['family' => 'Souza', 'given' => 'Ana', 'latin' => 1]];
-        yield 'unknown key' => [['family' => 'Souza', 'given' => 'Ana', 'latin' => null, 'agnome' => null]];
+        yield 'latin is an int' => [['family' => 'Souza', 'given' => 'Ana', 'latinOverride' => 1]];
+        yield 'unknown key' => [['family' => 'Souza', 'given' => 'Ana', 'latinOverride' => null, 'agnome' => null]];
     }
 
     /**
@@ -180,16 +180,11 @@ final class PersonNameCodecTest extends TestCase
         );
     }
 
-    public function testTheJsonViewIsNotACodecPayload(): void
+    public function testTheJsonViewReadsBackAsTheSameName(): void
     {
-        self::assertNameRefusedWithoutEcho(
-            fn (): PersonName => new PersonNameCodec()->decode(
-                new PersonName(FamilyName::from('Souza'), GivenName::from('Ana'))->jsonSerialize(),
-            ),
-            '',
-            self::SHAPE,
-            InvalidPayloadException::class,
-        );
+        $name = new PersonName(FamilyName::from('Souza'), GivenName::from('Ana'));
+
+        self::assertTrue(new PersonNameCodec()->decode($name->jsonSerialize())->equals($name));
     }
 
     public function testDecodeRefusesAnInvalidPart(): void
@@ -215,12 +210,12 @@ final class PersonNameCodecTest extends TestCase
 
         $name = $mapper->fromUntrustedPayload(
             PersonName::class,
-            ['family' => 'da Silva', 'given' => 'João', 'latin' => 'silva<<joao'],
+            ['family' => 'da Silva', 'given' => 'João', 'latinOverride' => 'silva<<joao'],
         );
 
         self::assertSame('SILVA<<JOAO', $name->latin()->value);
         self::assertSame(
-            ['family' => 'da Silva', 'given' => 'João', 'latin' => 'SILVA<<JOAO'],
+            ['family' => 'da Silva', 'given' => 'João', 'latinOverride' => 'SILVA<<JOAO'],
             $mapper->toPayload($name),
         );
     }

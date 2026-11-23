@@ -232,7 +232,7 @@ final class PersonNameTest extends TestCase
                 'given' => '洋子',
                 'familyReading' => 'イトウ',
                 'givenReading' => 'ようこ',
-                'effectiveLatin' => 'ITOH<<YOKO',
+                'latin' => 'ITOH<<YOKO',
             ],
             self::japaneseName('伊藤', '洋子', 'イトウ', 'ようこ', IcaoPersonName::from('ITOH<<YOKO'))->jsonSerialize(),
         );

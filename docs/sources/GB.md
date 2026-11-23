@@ -73,8 +73,8 @@ How the package applies this:
   found on the transliteration table", (3)), the name has no derived form: with an override (the evidenced spelling)
   it is accepted, without one it is refused.
 
-Payload (`PersonNameCodec`): `{family, given, latin}` with `given` null for a person with one name and `latin` the
-override only; the JSON view is `{family, given, effectiveLatin}` and is refused by the codec.
+Payload (`PersonNameCodec`): `{family, given, latinOverride}` with `given` null for a person with one name and `latinOverride` the
+override only (0.x key `latin`, still read); the JSON view is `{family, given, latin}` (the full Latin form) and reads back through the codec as the same name.
 
 ## National Insurance number (`Document\GB\NationalInsuranceNumber`)
 

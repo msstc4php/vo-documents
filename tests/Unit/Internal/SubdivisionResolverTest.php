@@ -48,8 +48,7 @@ final class SubdivisionResolverTest extends TestCase
 
     public function testListsTheMatchesWithoutAResolver(): void
     {
-        $tryParse = static fn (TestSubdivision $subdivision, string $number): ?PackageString
-            => \str_contains($number, $subdivision->name[0]) ? PackageString::from($number) : null;
+        $tryParse = static fn (TestSubdivision $subdivision, string $number): ?PackageString => \str_contains($number, $subdivision->name[0]) ? PackageString::from($number) : null;
 
         self::assertSame(
             [TestSubdivision::Vic],

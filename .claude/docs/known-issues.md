@@ -15,12 +15,14 @@
 - **Russian passports omit the patronymic in Latin** (MVD Orders 996/186): `Name\RU\PersonName::latin()` derives
   `IVANOV<<IVAN`, not the plan's `IVANOV<<IVAN<IVANOVICH`; a RU override may be any valid ICAO name (MVD §32/§140,
   RU.md §4). An override equal to the derived form (also with `<` for a hyphen) is normalised to null, so it equals
-  no override and the codec stores `latin: null`.
+  no override and the codec stores `latinOverride: null`.
 - `Name\RU\*` letters are the 33 Russian letters (`А-ЯЁа-яё`), not `\p{Cyrillic}`: Ukrainian/Belarusian letters are
   refused; no word starts with Ъ/Ь (`AbstractRussianNamePart::word()`), otherwise `PersonName` failed later with a
   transliteration message.
-- `PersonName::jsonSerialize()` uses `effectiveLatin`, the codec payload `latin` (override only); the codec refuses
-  unknown keys so the JSON view can never be decoded as "no override".
+- Since 1.0 every `jsonSerialize()` view has the full Latin form under `latin`; the derived names' codec key is
+  `latinOverride` (override only) and `PayloadFields::upgraded()` reads the 0.x key `latin` as the override. So the
+  view of a derived name decodes as the same name (an override equal to the derived form is dropped), which the
+  `SerializationTest` view test pins. A payload with both `latin` and `latinOverride` is refused.
 - Infection only runs tests that cover a mutated line: a base-class hook overridden in every real subclass needs a
   `tests/Fixture` subclass that uses the default (see `LatinNamePart`, `SingleWordNamePart`).
 - php-cs-fixer rewrites `@link <url>` to `@see <url>` in class docblocks; source citations therefore use `@see`.

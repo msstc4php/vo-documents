@@ -102,9 +102,8 @@ apellidos a cualquiera de las lenguas oficiales correspondiente al origen o domi
   of the table: `ARGUELLES<<ANA` for `Argüelles` (table default `ARGUEELLES`), `MUNXXOZ<<…` for `Muñoz`.
 - **Display order** (`full()`): given name, first surname, second surname (`María José García López`).
 
-Payload (`PersonNameCodec`): `{first, second, given, latin}` with `second` null for one surname and `latin` the
-override only; the JSON view is `{first, second, given, effectiveLatin}` and is refused by the codec, as for the other
-countries.
+Payload (`PersonNameCodec`): `{first, second, given, latinOverride}` with `second` null for one surname and `latinOverride` the
+override only (0.x key `latin`, still read); the JSON view is `{first, second, given, latin}` (the full Latin form) and reads back through the codec as the same name.
 
 ## DNI (`Document\ES\Dni`)
 

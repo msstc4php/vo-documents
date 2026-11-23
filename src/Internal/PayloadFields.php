@@ -18,8 +18,43 @@ use MSSTC4PHP\ValueObject\Exception\InvalidPayloadException;
  */
 final class PayloadFields
 {
+    /**
+     * The key of a 0.x payload that held only a Latin override: 1.0 calls it `latinOverride`, so that `latin` means the
+     * full Latin form everywhere (views and the required field of the names that never derive it).
+     */
+    public const array LEGACY_LATIN_OVERRIDE = ['latin' => 'latinOverride'];
+
     private function __construct()
     {
+    }
+
+    /**
+     * Moves the fields of a 0.x payload to their 1.0 keys, so stored payloads keep loading.
+     *
+     * @param array<array-key, mixed> $payload
+     * @param non-empty-array<non-empty-string, non-empty-string> $renamed the 0.x key => the 1.0 key
+     * @param non-empty-string $shape
+     *
+     * @return array<array-key, mixed>
+     *
+     * @throws InvalidPayloadException when the payload holds both keys of a renamed field
+     */
+    public static function upgraded(array $payload, array $renamed, string $shape): array
+    {
+        foreach ($renamed as $legacy => $current) {
+            if (!\array_key_exists($legacy, $payload)) {
+                continue;
+            }
+
+            if (\array_key_exists($current, $payload)) {
+                throw new InvalidPayloadException($shape);
+            }
+
+            $payload[$current] = $payload[$legacy];
+            unset($payload[$legacy]);
+        }
+
+        return $payload;
     }
 
     /**
@@ -104,7 +139,7 @@ final class PayloadFields
     }
 
     /**
-     * The optional `latin` field of a name that derives its Latin form: only an override is stored.
+     * The optional `latinOverride` field of a name that derives its Latin form: only an override is stored.
      *
      * @param array<array-key, mixed> $payload
      * @param non-empty-string $shape
@@ -114,7 +149,7 @@ final class PayloadFields
      */
     public static function latinOverride(array $payload, string $shape): ?IcaoPersonName
     {
-        $latin = self::nullableString($payload, 'latin', $shape);
+        $latin = self::nullableString($payload, 'latinOverride', $shape);
 
         return $latin === null ? null : IcaoPersonName::from($latin);
     }

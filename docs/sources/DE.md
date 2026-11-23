@@ -61,8 +61,7 @@ How the package applies this:
 - **Not covered:** the birth name (Geburtsname), the doctorate (Doktorgrad, PAuswV Anlage 3 Nr. 8, not part of the
   name) and the Ordens- or Künstlername; the composite has a family name and given names only.
 
-Payload (`PersonNameCodec`): `{family, given, latin}` with `latin` the override only; the JSON view is
-`{family, given, effectiveLatin}` and is refused by the codec, as for AU.
+Payload (`PersonNameCodec`): `{family, given, latinOverride}` with `latinOverride` the override only (0.x key `latin`, still read); the JSON view is `{family, given, latin}` (the full Latin form) and reads back through the codec as the same name.
 
 ## Personalausweis number (`Document\DE\IdentityCardNumber`)
 

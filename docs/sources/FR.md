@@ -66,8 +66,7 @@ as the letters of a French name part:
 - **Display order** (`full()`): given names, then family name (`Jean-Pierre de La Fontaine`).
 - **Not covered:** the nom d'usage (married or usage name), which is a separate field on the documents.
 
-Payload (`PersonNameCodec`): `{family, given, latin}` with `latin` the override only; the JSON view is
-`{family, given, effectiveLatin}` and is refused by the codec, as for AU and DE.
+Payload (`PersonNameCodec`): `{family, given, latinOverride}` with `latinOverride` the override only (0.x key `latin`, still read); the JSON view is `{family, given, latin}` (the full Latin form) and reads back through the codec as the same name.
 
 ## NIR — numéro d'inscription au répertoire (`Document\FR\Nir`)
 

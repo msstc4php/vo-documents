@@ -61,9 +61,9 @@ abstract readonly class AbstractFamilyGivenPersonName extends AbstractLatinPerso
     }
 
     /**
-     * A view, not the storage payload (the country's codec): `effectiveLatin` is {@see latin()}, derived or not.
+     * A view, not the storage payload (the country's codec): `latin` is {@see latin()}, derived or not.
      *
-     * @return array{family: string, given: (TGiven is null ? null : string), effectiveLatin: string}
+     * @return array{family: string, given: (TGiven is null ? null : string), latin: string}
      */
     #[Override]
     final public function jsonSerialize(): array
@@ -71,7 +71,7 @@ abstract readonly class AbstractFamilyGivenPersonName extends AbstractLatinPerso
         return [
             'family' => $this->family->value,
             'given' => $this->given?->value,
-            'effectiveLatin' => $this->latin()->value,
+            'latin' => $this->latin()->value,
         ];
     }
 }

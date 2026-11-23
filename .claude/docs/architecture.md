@@ -15,7 +15,7 @@ core.
 | `Name\LatinSpelling` | `@internal`: finds a Latin override among the ICAO spellings of a name, word by word (`Name\IdentifierSpellings`: variants per word + national separators; hyphen ≡ `<`; cap 4096 per word) |
 | `Name\LatinOverridePolicy` | `@internal` abstract: `resolve(?override, derived)` (template method, drops the derived form); `withoutDerivedForm()` (refuses, except `AnyIcaoSpelling` with an override); subclasses `AnyIcaoSpelling` (RU, GB, CA, BR, JP) and `TransliterationVariant` (AU, DE, FR, IT, ES, NL, CH, TR, US, MX, IN in Latin letters; via `LatinSpelling`). CN, KR, ID, SA and IN-Devanagari have no policy: the Latin form is required |
 | `Name\PersonName` | Interface of a national full name: `latin(): Icao\PersonName`, `full()` |
-| `Name\Latin\*` | `AbstractLatinNamePart` (`\p{sc=Latin}` part; `wordWithAbbreviationDots()` for MX and ID); `@internal`: `LatinPersonNameBuilder` (derived form, spellings per word for `TransliterationVariant`; strips the `$omitted` punctuation first), `AbstractLatinPersonName` (effective Latin form + kept override, hook `overridePolicy()`; constructor argument `$omittedPunctuation` (MRZ-omitted punctuation, default none, MX `.` `/`, ES `·`)), `AbstractFamilyGivenPersonName<TFamily, TGiven>` (public `family`/`given`, `full()`, `equals()`, JSON view; AU DE FR IT TR NL CH GB CA BR), `AbstractFamilyGivenPersonNameCodec<TName>` (keys `family`/`given`/`latin`; hooks `shape()`, `create()`) |
+| `Name\Latin\*` | `AbstractLatinNamePart` (`\p{sc=Latin}` part; `wordWithAbbreviationDots()` for MX and ID); `@internal`: `LatinPersonNameBuilder` (derived form, spellings per word for `TransliterationVariant`; strips the `$omitted` punctuation first), `AbstractLatinPersonName` (effective Latin form + kept override, hook `overridePolicy()`; constructor argument `$omittedPunctuation` (MRZ-omitted punctuation, default none, MX `.` `/`, ES `·`)), `AbstractFamilyGivenPersonName<TFamily, TGiven>` (public `family`/`given`, `full()`, `equals()`, JSON view; AU DE FR IT TR NL CH GB CA BR), `AbstractFamilyGivenPersonNameCodec<TName>` (keys `family`/`given`/`latinOverride`, 0.x `latin` still read; hooks `shape()`, `create()`) |
 | `Name\RequiredLatin\*` | `@internal` `AbstractRequiredLatinPersonName<TFamily, TGiven>` (family + nullable given in a national script + a **mandatory** `Icao\PersonName`, never derived; equality includes it, compared as stored; JSON view has `latin`, typed `RequiredLatinPayloadShape`) and its codec (keys `family`, `given`, `latin`; hooks `shape()`, `create()`); used by CN and KR. `given` null stores a name with no family/given split whole in `family`. The Latin base (`Name\Latin`) is the opposite: derived form plus optional override |
 | `Name\RU\*` | `AbstractRussianNamePart` (letters, word pattern), `FamilyName`, `GivenName`, `Patronymic`, `PersonName` (+ `short()`, `initialsFirst()`), `PersonNameCodec`; `@internal RussianTransliteration` (drops Ь, then `Icao\Transliterator`) |
 | `Document\RU\*` | Number VOs (`Snils`, `Inn`, `InternalPassportNumber`, `PassportIssuingUnitCode`, `InternationalPassportNumber`, `DriverLicenceNumber`, `OmsPolicyNumber`): `final`, extend `AbstractStringValueObject`, implement `Maskable`, store digits only, `formatted()`; enum `DriverLicenceCategory`. No `Region` (no published ISO mapping, RU.md) |
@@ -46,7 +46,7 @@ through lookup tables; year as two digits, `birthMonth()`/`birthDay()` ints, `bi
 internal `ControlLetter`; pre-2008 X + 8 digits + letter, format only), `SocialSecurityNumber` (12 digits, format only;
 `provinceCode()` string). The driving licence number is the DNI or NIE (no class); the passport number is not covered.
 `Name\ES\PersonName($first, ?$second, $given, ?$latin)` extends `AbstractLatinPersonName` only: both surnames are family
-parts (primary identifier joined by a space); codec keys `first`, `second`, `given`, `latin`. Parts extend
+parts (primary identifier joined by a space); codec keys `first`, `second`, `given`, `latinOverride`. Parts extend
 `Name\ES\AbstractSpanishNamePart` (U+00B7 only in `l·l`, matched as `\x{00B7}`; `ŀ`/`Ŀ` folded to `l·`/`L·`); the
 `PersonName` passes `['·']` as `$omittedPunctuation`.
 
@@ -54,7 +54,7 @@ parts (primary identifier joined by a space); codec keys `first`, `second`, `giv
 `IdentityDocumentNumber` (passport, emergency documents and identity card: 2 letters, 6 letters/digits, 1 digit, no
 `O`, `0` allowed for model 2014). The rijbewijsnummer is not covered. `Name\NL\PersonName($family, ?$given, ?$latin)`:
 prefixes live inside `FamilyName` as typed; letters come from the BRP Teletex tables (`Name\NL\AbstractDutchNamePart`,
-which also overrides `word()` for apostrophe prefixes); codec keys `family`, `given` (null for one name), `latin`.
+which also overrides `word()` for apostrophe prefixes); codec keys `family`, `given` (null for one name), `latinOverride`.
 
 `Document\CH\*`: `AhvNumber` (13 digits, `756` + 9 random + check digit verified per BSV WL VA/IK Anhang 7, weights
 1/3 mod 10; dots of `756.3047.5009.62` accepted; `formatted()` gives that form), `IdentityDocumentNumber` (passport and
@@ -62,7 +62,7 @@ identity card: 8 characters, no `I`/`O`, format only), `DriverLicenceNumber` (fe
 FABER-PIN + running number with `faberPin()`/`sequenceNumber()`, or 15 digits of the 2003 card with both null).
 `Name\CH\PersonName($family, ?$given, ?$latin)`: letters of ISO 8859-1 + Latin Extended-A
 (`Name\CH\AbstractSwissNamePart`, SR 143.111 Art. 22 / ZStV Art. 80); codec keys `family`, `given` (null without a
-given name), `latin`.
+given name), `latinOverride`.
 
 `Document\GB\*`: `NationalInsuranceNumber` (HMRC NIM39110 prefix exclusions, suffix `A`-`D`, no check digit),
 `PassportNumber` (9 digits), `GreatBritainDriverLicenceNumber` (DVLA, 16 characters; `HasSex`, two-digit year,
@@ -73,13 +73,13 @@ digits; two plain classes, no `SubdivisionResolver`: the formats never overlap),
 century-less year (shared by the DVLA and CHI classes). `Name\GB\PersonName($family, ?$given, ?$latin)`: `\p{Latin}`
 parts, override policy `AnyIcaoSpelling` (HMPO writes a documented spelling; kept also without a derived form), `given`
 null for a person with one name (an override's lone `XXX` forename is dropped);
-codec keys `family`, `given`, `latin`.
+codec keys `family`, `given`, `latinOverride`.
 
 `Document\TR\*`: `IdentityNumber` (T.C. Kimlik No, 11 digits, format only: NVİ does not publish the check-digit
 algorithm), `PassportNumber` (letter + 8 digits, PRADO composition). Sürücü belgesi number not covered (no published
 layout). `Name\TR\PersonName($family, $given, ?$latin)`: letters of the Law 1353 alphabet plus `â î û`
 (`Name\TR\AbstractTurkishNamePart`), space as the only separator, override policy `TransliterationVariant`; codec
-keys `family`, `given`, `latin`.
+keys `family`, `given`, `latinOverride`.
 
 `Document\US\*` (federal): `SocialSecurityNumber` (SSA refusals: area
 000/666/9xx, group 00, serial 0000; `formatted()` `123-45-6789`), `Itin` (first digit 9, digits 4-5 in the IRM ranges;
@@ -92,7 +92,7 @@ secondary identifiers are given, middle, `NameSuffix::icao()` (ordinals as Roman
 `TransliterationVariant`. `Name\US\NameSuffix` is a string-backed enum of the 20 AAMVA `DCU` codes (`fromCode()`
 case-insensitive, message "Invalid American name suffix."), not a value object: `PersonName::equals()` compares it
 with `===`. `Name\US\AbstractAmericanNamePart` maps the ʻokina U+02BB to `'` before the shared parse. Codec keys
-`family`, `given` (null for one name), `middle`, `suffix` (AAMVA code), `latin`.
+`family`, `given` (null for one name), `middle`, `suffix` (AAMVA code), `latinOverride`.
 
 `Document\US\*` DL/ID (plan 3 Task 3): `Jurisdiction` (51 cases, ISO 3166-2:US, the states and DC), `DlIdNumber`
 interface, `DlId\AbstractDlIdNumber` (hooks `shapes(): NumberShapes`, `layout()`; final `masked()`/`parse()`/
@@ -104,7 +104,7 @@ a new enum case breaks the `match`. FL, WI, WY add `formatted()` (published hyph
 `123 456 789`, mask `*** **6 789`; `isTemporaryResident()` = first digit 9), `PassportNumber` (`A123456BC` since
 2023-05-10 or `AB123456` before; mask 4, 3 for 8 characters). `Name\CA\PersonName($family, ?$given, ?$latin)` on
 `AbstractFamilyGivenPersonName` like GB (one-word name = `given` null), policy `AnyIcaoSpelling`, no `XXX` handling;
-codec keys `family`, `given`, `latin`.
+codec keys `family`, `given`, `latinOverride`.
 
 `Document\CA\*` provincial (plan 3 Task 5b): `Jurisdiction` (13 cases, ISO 3166-2:CA), interfaces `DriverLicenceNumber`
 and `HealthCardNumber`, bases `DriverLicence\AbstractDriverLicenceNumber` (hooks `shapes()`, `layout()`, `stored()`)
@@ -133,7 +133,7 @@ and `Document\MX\DriverLicenceNumberFactory` (CA pattern, resolver document "Mex
 `Name\MX\PersonName(?$first, ?$second, $given, ?$latin)` extends `AbstractLatinPersonName` like ES (parts on
 `AbstractMexicanNamePart`: `/` separator, `.` after or between letters, both omitted in the ICAO form); no surnames →
 the given names are the primary identifier (`JUAN`); policy `TransliterationVariant`; codec keys `first`, `second`,
-`given`, `latin` (`first` and `second` nullable).
+`given`, `latinOverride` (`first` and `second` nullable).
 
 `Document\BR\*` (national, plan 3 Task 7a): `Cpf` (Receita "DV módulo 11": weights 1-9 then 0-9 from the left, `sum %
 11 % 10`; dots stripped; `fiscalRegion()` = 9th digit string; `formatted()` `XXX.XXX.XXX-XX`; repeated digits
@@ -171,7 +171,7 @@ U+00B7 between words; U+30FB and U+2022 folded to U+00B7).
 derived form is `Name\JP\PassportHepburn` (internal, MOFA table; katakana folded to hiragana for the derivation only),
 policy `AnyIcaoSpelling`; readings on `AbstractJapaneseReading` (hiragana, katakana, `ー` U+30FC listed explicitly),
 parts on `AbstractJapaneseNamePart` (`\p{sc=Han}`, kana, `ー`, `〆`). Codec keys `family`, `given`, `familyReading`,
-`givenReading`, `latin` (override only).
+`givenReading`, `latinOverride` (override only).
 
 `Document\KR\*` (plan 4): `ResidentRegistrationNumber` and `ForeignerRegistrationNumber` (`KoreanRegistrationNumber`;
 `HasBirthDate`, `HasSex`; the resident class refuses 7th digits 5-8, the foreigner class 1-4, 9 and 0),

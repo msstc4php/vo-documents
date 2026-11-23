@@ -205,11 +205,11 @@ final class PersonNameTest extends TestCase
     public function testJsonViewShowsTheEffectiveLatinForm(): void
     {
         self::assertSame(
-            ['family' => 'Schweizer Sample', 'given' => 'Helvetia', 'effectiveLatin' => 'SCHWEIZER<SAMPLE<<HELVETIA'],
+            ['family' => 'Schweizer Sample', 'given' => 'Helvetia', 'latin' => 'SCHWEIZER<SAMPLE<<HELVETIA'],
             new PersonName(FamilyName::from('Schweizer Sample'), GivenName::from('Helvetia'))->jsonSerialize(),
         );
         self::assertSame(
-            ['family' => 'Müller', 'given' => null, 'effectiveLatin' => 'MUELLER'],
+            ['family' => 'Müller', 'given' => null, 'latin' => 'MUELLER'],
             new PersonName(FamilyName::from('Müller'), null)->jsonSerialize(),
         );
     }

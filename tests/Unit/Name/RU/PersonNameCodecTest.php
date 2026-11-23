@@ -101,7 +101,7 @@ final class PersonNameCodecTest extends TestCase
     use RefusesNameWithoutEchoingInput;
 
     private const string SHAPE = 'Expected a Russian person name payload with string "family" and "given", '
-        . 'string, null or missing "patronymic" and "latin", and no other keys.';
+        . 'string, null or missing "patronymic" and "latinOverride", and no other keys.';
 
     public function testMapsItsClass(): void
     {
@@ -116,7 +116,7 @@ final class PersonNameCodecTest extends TestCase
         $payload = $codec->encode($name);
 
         self::assertSame(
-            ['family' => 'Иванов', 'given' => 'Иван', 'patronymic' => 'Иванович', 'latin' => null],
+            ['family' => 'Иванов', 'given' => 'Иван', 'patronymic' => 'Иванович', 'latinOverride' => null],
             $payload,
         );
         self::assertTrue($codec->decode($payload)->equals($name));
@@ -135,7 +135,7 @@ final class PersonNameCodecTest extends TestCase
         $payload = $codec->encode($name);
 
         self::assertSame(
-            ['family' => 'Иванова', 'given' => 'Юлия', 'patronymic' => null, 'latin' => 'IVANOVA<<YULIYA'],
+            ['family' => 'Иванова', 'given' => 'Юлия', 'patronymic' => null, 'latinOverride' => 'IVANOVA<<YULIYA'],
             $payload,
         );
         $decoded = $codec->decode($payload);
@@ -152,7 +152,7 @@ final class PersonNameCodecTest extends TestCase
             IcaoPersonName::from('IVANOV<<IVAN'),
         );
 
-        self::assertNull(new PersonNameCodec()->encode($name)['latin']);
+        self::assertNull(new PersonNameCodec()->encode($name)['latinOverride']);
     }
 
     public function testDecodeAcceptsMissingOptionalKeys(): void
@@ -173,9 +173,9 @@ final class PersonNameCodecTest extends TestCase
         yield 'family missing' => [['given' => 'Иван']];
         yield 'given is an int' => [['family' => 'Иванов', 'given' => 1]];
         yield 'patronymic is an int' => [['family' => 'Иванов', 'given' => 'Иван', 'patronymic' => 1]];
-        yield 'latin is an int' => [['family' => 'Иванов', 'given' => 'Иван', 'latin' => 1]];
+        yield 'latin is an int' => [['family' => 'Иванов', 'given' => 'Иван', 'latinOverride' => 1]];
         yield 'unknown key' => [
-            ['family' => 'Иванов', 'given' => 'Иван', 'patronymic' => null, 'latin' => null, 'extra' => 'x'],
+            ['family' => 'Иванов', 'given' => 'Иван', 'patronymic' => null, 'latinOverride' => null, 'extra' => 'x'],
         ];
         yield 'int key' => [['family' => 'Иванов', 'given' => 'Иван', 0 => 'x']];
     }
@@ -194,7 +194,7 @@ final class PersonNameCodecTest extends TestCase
         );
     }
 
-    public function testTheJsonViewIsNotACodecPayload(): void
+    public function testTheJsonViewReadsBackAsTheSameName(): void
     {
         $name = new PersonName(
             FamilyName::from('Иванов'),
@@ -203,19 +203,14 @@ final class PersonNameCodecTest extends TestCase
             IcaoPersonName::from('IVANOV<<IVAN'),
         );
 
-        self::assertNameRefusedWithoutEcho(
-            fn (): PersonName => new PersonNameCodec()->decode($name->jsonSerialize()),
-            '',
-            self::SHAPE,
-            InvalidPayloadException::class,
-        );
+        self::assertTrue(new PersonNameCodec()->decode($name->jsonSerialize())->equals($name));
     }
 
     public function testDecodeRefusesAnInvalidPart(): void
     {
         $this->expectException(InvalidPersonNameException::class);
 
-        new PersonNameCodec()->decode(['family' => 'Ivanov', 'given' => 'Иван', 'patronymic' => null, 'latin' => null]);
+        new PersonNameCodec()->decode(['family' => 'Ivanov', 'given' => 'Иван', 'patronymic' => null, 'latinOverride' => null]);
     }
 
     public function testEncodeRefusesAnotherValueObject(): void
@@ -234,12 +229,12 @@ final class PersonNameCodecTest extends TestCase
 
         $name = $mapper->fromUntrustedPayload(
             PersonName::class,
-            ['family' => 'Иванов', 'given' => 'Иван', 'patronymic' => 'Иванович', 'latin' => 'ivanov<<ivan<ivanovich'],
+            ['family' => 'Иванов', 'given' => 'Иван', 'patronymic' => 'Иванович', 'latinOverride' => 'ivanov<<ivan<ivanovich'],
         );
 
         self::assertSame('IVANOV<<IVAN<IVANOVICH', $name->latin()->value);
         self::assertSame(
-            ['family' => 'Иванов', 'given' => 'Иван', 'patronymic' => 'Иванович', 'latin' => 'IVANOV<<IVAN<IVANOVICH'],
+            ['family' => 'Иванов', 'given' => 'Иван', 'patronymic' => 'Иванович', 'latinOverride' => 'IVANOV<<IVAN<IVANOVICH'],
             $mapper->toPayload($name),
         );
     }

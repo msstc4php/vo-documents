@@ -73,8 +73,8 @@ apostrophe, space); its digits, punctuation and other signs are refused in names
 - **Not covered:** the Allianzname as a separate field (it is the family name with a hyphen when the holder asks for
   it), the "\*\*\*" placeholder itself.
 
-Payload (`PersonNameCodec`): `{family, given, latin}` with `given` null when there is no given name and `latin` the
-override only; the JSON view is `{family, given, effectiveLatin}` and is refused by the codec.
+Payload (`PersonNameCodec`): `{family, given, latinOverride}` with `given` null when there is no given name and `latinOverride` the
+override only (0.x key `latin`, still read); the JSON view is `{family, given, latin}` (the full Latin form) and reads back through the codec as the same name.
 
 ## AHV number (`Document\CH\AhvNumber`)
 

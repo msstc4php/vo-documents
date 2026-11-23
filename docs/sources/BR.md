@@ -84,8 +84,7 @@ check-digit pages (they are about state registrations), Wikipedia.
   exceed `Icao\PersonName::MAX_LENGTH` (two parts of 100 characters), so the override is never required for length.
 - **Display order** (`full()`): given names, then surnames (`João Pedro da Silva`).
 
-Payload (`PersonNameCodec`): `{family, given, latin}`, `given` required, `latin` the override only. The JSON view
-`{family, given, effectiveLatin}` is refused by the codec. `da Silva` round-trips unchanged (Review Focus 5).
+Payload (`PersonNameCodec`): `{family, given, latinOverride}`, `given` required, `latinOverride` the override only (0.x key `latin`, still read). The JSON view `{family, given, latin}` (the full Latin form) reads back through the codec as the same name. `da Silva` round-trips unchanged (Review Focus 5).
 
 ## CPF (`Document\BR\Cpf`)
 

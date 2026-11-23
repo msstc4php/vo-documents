@@ -80,14 +80,14 @@ final readonly class PersonName extends AbstractLatinPersonName
     }
 
     /**
-     * A view, not the storage payload ({@see PersonNameCodec}): `effectiveLatin` is {@see latin()}, derived or not.
+     * A view, not the storage payload ({@see PersonNameCodec}): `latin` is {@see latin()}, derived or not.
      *
      * @return array{
      *     family: string,
      *     given: string|null,
      *     middle: string|null,
      *     suffix: string|null,
-     *     effectiveLatin: string,
+     *     latin: string,
      * }
      */
     #[Override]
@@ -98,7 +98,7 @@ final readonly class PersonName extends AbstractLatinPersonName
             'given' => $this->given?->value,
             'middle' => $this->middle?->value,
             'suffix' => $this->suffix?->value,
-            'effectiveLatin' => $this->latin()->value,
+            'latin' => $this->latin()->value,
         ];
     }
 

@@ -72,8 +72,8 @@ Wikipedia, news sites, CURP/RFC generator and validator sites, law-firm summarie
   spelling: `ARGUELLO<<ANA` for `Argüello`, `NUNXXEZ<<ANA` for `Núñez`.
 - **Display order** (`full()`): given names, first surname, second surname.
 
-Payload (`PersonNameCodec`): `{first, second, given, latin}`; `first` and `second` null for no surname, `second` null
-for one, `latin` the override only. The JSON view `{first, second, given, effectiveLatin}` is refused by the codec.
+Payload (`PersonNameCodec`): `{first, second, given, latinOverride}`; `first` and `second` null for no surname, `second` null
+for one, `latinOverride` the override only (0.x key `latin`, still read). The JSON view `{first, second, given, latin}` (the full Latin form) reads back through the codec as the same name.
 
 ## CURP (`Document\MX\Curp`)
 

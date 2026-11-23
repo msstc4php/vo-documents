@@ -70,9 +70,9 @@ final readonly class PersonName extends AbstractLatinPersonName
     }
 
     /**
-     * A view, not the storage payload ({@see PersonNameCodec}): `effectiveLatin` is {@see latin()}, derived or not.
+     * A view, not the storage payload ({@see PersonNameCodec}): `latin` is {@see latin()}, derived or not.
      *
-     * @return array{first: string, second: string|null, given: string, effectiveLatin: string}
+     * @return array{first: string, second: string|null, given: string, latin: string}
      */
     #[Override]
     public function jsonSerialize(): array
@@ -81,7 +81,7 @@ final readonly class PersonName extends AbstractLatinPersonName
             'first' => $this->first->value,
             'second' => $this->second?->value,
             'given' => $this->given->value,
-            'effectiveLatin' => $this->latin()->value,
+            'latin' => $this->latin()->value,
         ];
     }
 

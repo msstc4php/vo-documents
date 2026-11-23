@@ -107,7 +107,7 @@ final class PersonNameCodecTest extends TestCase
     use RefusesNameWithoutEchoingInput;
 
     private const string SHAPE = 'Expected an Italian person name payload with string "family" and "given", '
-        . 'string, null or missing "latin", and no other keys.';
+        . 'string, null or missing "latinOverride", and no other keys.';
 
     public function testMapsItsClass(): void
     {
@@ -121,7 +121,7 @@ final class PersonNameCodecTest extends TestCase
 
         $payload = $codec->encode($name);
 
-        self::assertSame(['family' => 'Rossi', 'given' => 'Nicolò', 'latin' => null], $payload);
+        self::assertSame(['family' => 'Rossi', 'given' => 'Nicolò', 'latinOverride' => null], $payload);
         self::assertTrue($codec->decode($payload)->equals($name));
     }
 
@@ -136,7 +136,7 @@ final class PersonNameCodecTest extends TestCase
 
         $payload = $codec->encode($name);
 
-        self::assertSame(['family' => 'Müller', 'given' => 'Anna', 'latin' => 'MULLER<<ANNA'], $payload);
+        self::assertSame(['family' => 'Müller', 'given' => 'Anna', 'latinOverride' => 'MULLER<<ANNA'], $payload);
         $decoded = $codec->decode($payload);
         self::assertTrue($decoded->equals($name));
         self::assertSame('MULLER<<ANNA', $decoded->latinOverride()?->value);
@@ -149,7 +149,7 @@ final class PersonNameCodecTest extends TestCase
 
         $payload = $codec->encode($name);
 
-        self::assertSame(['family' => 'di Pietro', 'given' => 'Maria Grazia', 'latin' => null], $payload);
+        self::assertSame(['family' => 'di Pietro', 'given' => 'Maria Grazia', 'latinOverride' => null], $payload);
         self::assertTrue($codec->decode($payload)->equals($name));
         self::assertSame('DI<PIETRO<<MARIA<GRAZIA', $codec->decode($payload)->latin()->value);
     }
@@ -168,8 +168,8 @@ final class PersonNameCodecTest extends TestCase
         yield 'family missing' => [['given' => 'Giulia']];
         yield 'given missing' => [['family' => 'Rossi']];
         yield 'given is an int' => [['family' => 'Rossi', 'given' => 1]];
-        yield 'latin is an int' => [['family' => 'Rossi', 'given' => 'Giulia', 'latin' => 1]];
-        yield 'unknown key' => [['family' => 'Rossi', 'given' => 'Giulia', 'latin' => null, 'patronymic' => null]];
+        yield 'latin is an int' => [['family' => 'Rossi', 'given' => 'Giulia', 'latinOverride' => 1]];
+        yield 'unknown key' => [['family' => 'Rossi', 'given' => 'Giulia', 'latinOverride' => null, 'patronymic' => null]];
         yield 'int key' => [['family' => 'Rossi', 'given' => 'Giulia', 0 => 'x']];
     }
 
@@ -187,16 +187,11 @@ final class PersonNameCodecTest extends TestCase
         );
     }
 
-    public function testTheJsonViewIsNotACodecPayload(): void
+    public function testTheJsonViewReadsBackAsTheSameName(): void
     {
-        self::assertNameRefusedWithoutEcho(
-            fn (): PersonName => new PersonNameCodec()->decode(
-                new PersonName(FamilyName::from('Rossi'), GivenName::from('Giulia'))->jsonSerialize(),
-            ),
-            '',
-            self::SHAPE,
-            InvalidPayloadException::class,
-        );
+        $name = new PersonName(FamilyName::from('Rossi'), GivenName::from('Giulia'));
+
+        self::assertTrue(new PersonNameCodec()->decode($name->jsonSerialize())->equals($name));
     }
 
     public function testDecodeRefusesAnInvalidPart(): void
@@ -222,11 +217,11 @@ final class PersonNameCodecTest extends TestCase
 
         $name = $mapper->fromUntrustedPayload(
             PersonName::class,
-            ['family' => 'Müller', 'given' => 'Anna', 'latin' => 'muller<<anna'],
+            ['family' => 'Müller', 'given' => 'Anna', 'latinOverride' => 'muller<<anna'],
         );
 
         self::assertSame('MULLER<<ANNA', $name->latin()->value);
-        $expected = ['family' => 'Müller', 'given' => 'Anna', 'latin' => 'MULLER<<ANNA'];
+        $expected = ['family' => 'Müller', 'given' => 'Anna', 'latinOverride' => 'MULLER<<ANNA'];
         self::assertSame($expected, $mapper->toPayload($name));
     }
 }

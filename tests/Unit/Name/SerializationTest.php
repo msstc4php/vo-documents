@@ -42,35 +42,41 @@ final class SerializationTest extends TestCase
         . 's:5:"given";O:49:"MSSTC4PHP\ValueObject\Documents\Name\DE\GivenName":1:{s:5:"value";s:7:"Jürgen";}}';
 
     /**
+     * A name serialized by 0.3 or 0.4: the codec payload with the override under its 0.x key `latin`.
+     */
+    private const string CODEC_PAYLOAD_04_DE = 'O:50:"MSSTC4PHP\ValueObject\Documents\Name\DE\PersonName":3:{'
+        . 's:6:"family";s:7:"Müller";s:5:"given";s:7:"Jürgen";s:5:"latin";s:14:"MULLER<<JURGEN";}';
+
+    /**
      * @return iterable<string, array{string, array<string, string|null>}>
      */
     public static function payloads(): iterable
     {
         $samples = [
-            'RU' => ['family' => 'Иванов', 'given' => 'Иван', 'patronymic' => 'Иванович', 'latin' => null],
-            'AU' => ['family' => 'Citizen', 'given' => 'Zoë', 'latin' => null],
-            'DE' => ['family' => 'Schmidt', 'given' => 'Jürgen', 'latin' => null],
-            'FR' => ['family' => 'Dupont', 'given' => 'Joël', 'latin' => null],
-            'IT' => ['family' => 'Rossi', 'given' => 'Nicolò', 'latin' => null],
-            'ES' => ['first' => 'García', 'second' => 'López', 'given' => 'María José', 'latin' => null],
-            'NL' => ['family' => 'van der Berg', 'given' => 'Jan Pieter', 'latin' => null],
-            'CH' => ['family' => 'Schweizer Sample', 'given' => 'Helvetia', 'latin' => null],
-            'GB' => ['family' => "O'Brien", 'given' => 'Siân', 'latin' => null],
-            'TR' => ['family' => 'Yılmaz', 'given' => 'İnci', 'latin' => null],
-            'US' => ['family' => "O'Brien", 'given' => 'Mary Ann', 'middle' => 'Lee', 'suffix' => '3RD', 'latin' => null],
-            'CA' => ['family' => "D'Amours", 'given' => 'Hélène', 'latin' => null],
-            'MX' => ['first' => 'Hernández', 'second' => 'de la Cruz', 'given' => 'José', 'latin' => null],
-            'BR' => ['family' => 'da Silva', 'given' => 'Maria da Conceição', 'latin' => null],
+            'RU' => ['family' => 'Иванов', 'given' => 'Иван', 'patronymic' => 'Иванович', 'latinOverride' => null],
+            'AU' => ['family' => 'Citizen', 'given' => 'Zoë', 'latinOverride' => null],
+            'DE' => ['family' => 'Schmidt', 'given' => 'Jürgen', 'latinOverride' => null],
+            'FR' => ['family' => 'Dupont', 'given' => 'Joël', 'latinOverride' => null],
+            'IT' => ['family' => 'Rossi', 'given' => 'Nicolò', 'latinOverride' => null],
+            'ES' => ['first' => 'García', 'second' => 'López', 'given' => 'María José', 'latinOverride' => null],
+            'NL' => ['family' => 'van der Berg', 'given' => 'Jan Pieter', 'latinOverride' => null],
+            'CH' => ['family' => 'Schweizer Sample', 'given' => 'Helvetia', 'latinOverride' => null],
+            'GB' => ['family' => "O'Brien", 'given' => 'Siân', 'latinOverride' => null],
+            'TR' => ['family' => 'Yılmaz', 'given' => 'İnci', 'latinOverride' => null],
+            'US' => ['family' => "O'Brien", 'given' => 'Mary Ann', 'middle' => 'Lee', 'suffix' => '3RD', 'latinOverride' => null],
+            'CA' => ['family' => "D'Amours", 'given' => 'Hélène', 'latinOverride' => null],
+            'MX' => ['first' => 'Hernández', 'second' => 'de la Cruz', 'given' => 'José', 'latinOverride' => null],
+            'BR' => ['family' => 'da Silva', 'given' => 'Maria da Conceição', 'latinOverride' => null],
             'CN' => ['family' => "阿沛\u{00B7}阿旺晋美", 'given' => null, 'latin' => 'NGAPOI<<NGAWANG<JIGME'],
-            'JP' => ['family' => '大野', 'given' => '翔', 'familyReading' => 'オオノ', 'givenReading' => 'しょう', 'latin' => null],
+            'JP' => ['family' => '大野', 'given' => '翔', 'familyReading' => 'オオノ', 'givenReading' => 'しょう', 'latinOverride' => null],
             'KR' => ['family' => '마이클 존슨', 'given' => null, 'latin' => 'JOHNSON<<MICHAEL'],
-            'IN' => ['given' => 'Jürgen', 'surname' => 'Müller', 'latin' => 'MULLER<<JURGEN'],
+            'IN' => ['given' => 'Jürgen', 'surname' => 'Müller', 'latinOverride' => 'MULLER<<JURGEN'],
             'IN Devanagari' => ['given' => 'पीयूष कुमार', 'surname' => 'जैन', 'latin' => 'JAIN<<PIYUSH<KUMAR'],
             'ID' => ['name' => 'Siti Nurhaliza', 'latin' => 'NURHALIZA<<SITI'],
             'SA' => ['given' => 'محمد', 'father' => 'سلمان', 'grandfather' => 'سعد', 'family' => 'آل سعود', 'latin' => 'AL<SAUD<<MOHAMMED'],
-            'RU with a kept Latin form' => ['family' => 'Иванова', 'given' => 'Юлия', 'patronymic' => null, 'latin' => 'IVANOVA<<YULIYA'],
-            'JP with a kept Latin form' => ['family' => '大野', 'given' => '翔', 'familyReading' => 'オオノ', 'givenReading' => 'しょう', 'latin' => 'OHNO<<SHO'],
-            'DE with a kept Latin form' => ['family' => 'Müller', 'given' => 'Jürgen', 'latin' => 'MULLER<<JURGEN'],
+            'RU with a kept Latin form' => ['family' => 'Иванова', 'given' => 'Юлия', 'patronymic' => null, 'latinOverride' => 'IVANOVA<<YULIYA'],
+            'JP with a kept Latin form' => ['family' => '大野', 'given' => '翔', 'familyReading' => 'オオノ', 'givenReading' => 'しょう', 'latinOverride' => 'OHNO<<SHO'],
+            'DE with a kept Latin form' => ['family' => 'Müller', 'given' => 'Jürgen', 'latinOverride' => 'MULLER<<JURGEN'],
         ];
 
         foreach ($samples as $label => $payload) {
@@ -115,6 +121,61 @@ final class SerializationTest extends TestCase
         [, $name] = $this->decoded($class, $payload);
 
         self::assertTrue($name->equals($this->restored($this->defaultLayout($name))));
+    }
+
+    /**
+     * @param array<string, string|null> $payload
+     */
+    #[DataProvider('payloads')]
+    public function testANameReadsBackFromItsJsonView(string $class, array $payload): void
+    {
+        [$codec, $name] = $this->decoded($class, $payload);
+
+        $view = $name->jsonSerialize();
+
+        self::assertIsArray($view);
+        self::assertTrue($name->equals($codec->decode($view)));
+    }
+
+    /**
+     * The names that derive their Latin form: their 0.x payloads stored the override under `latin`.
+     *
+     * @return iterable<string, array{string, array<string, string|null>}>
+     */
+    public static function derivedPayloads(): iterable
+    {
+        foreach (self::payloads() as $label => [$class, $payload]) {
+            if (\array_key_exists('latinOverride', $payload)) {
+                yield $label => [$class, $payload];
+            }
+        }
+    }
+
+    /**
+     * @param array<string, string|null> $payload
+     */
+    #[DataProvider('derivedPayloads')]
+    public function testA0xCodecPayloadStillDecodes(string $class, array $payload): void
+    {
+        [$codec, $name] = $this->decoded($class, $payload);
+        $legacy = [];
+        foreach ($payload as $key => $value) {
+            $legacy[$key === 'latinOverride' ? 'latin' : $key] = $value;
+        }
+
+        self::assertTrue($name->equals($codec->decode($legacy)));
+    }
+
+    public function testAName0304SerializedStillLoads(): void
+    {
+        $restored = $this->restored(self::CODEC_PAYLOAD_04_DE);
+
+        self::assertInstanceOf(PersonName::class, $restored);
+        self::assertSame('MULLER<<JURGEN', $restored->latinOverride()?->value);
+        self::assertTrue(
+            new PersonName(FamilyName::from('Müller'), GivenName::from('Jürgen'), IcaoPersonName::from('MULLER<<JURGEN'))
+                ->equals($restored),
+        );
     }
 
     public function testThe020PayloadCapturedFromTheReleaseLoads(): void

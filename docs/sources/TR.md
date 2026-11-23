@@ -71,8 +71,7 @@ How the package applies this:
   `ORNEK<<ZEYNEP` for `Örnek Zeynep` (the PRADO specimen's MRZ, (5)) and `OZTURK<<AYSE` are accepted; a different
   name is refused; an override equal to the derived form is not kept.
 
-Payload (`PersonNameCodec`): `{family, given, latin}` with `latin` the override only; the JSON view is `{family, given,
-effectiveLatin}` and is refused by the codec.
+Payload (`PersonNameCodec`): `{family, given, latinOverride}` with `latinOverride` the override only (0.x key `latin`, still read); the JSON view is `{family, given, latin}` (the full Latin form) and reads back through the codec as the same name.
 
 ## T.C. Kimlik No (`Document\TR\IdentityNumber`)
 

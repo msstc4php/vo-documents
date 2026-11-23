@@ -14,19 +14,19 @@ use MSSTC4PHP\ValueObject\Payload\PayloadCodec;
 use Override;
 
 /**
- * {family: string, given: string, patronymic: string|null, latin: string|null}; latin holds only an override, the
- * derived form is never stored; a missing "patronymic" or "latin" key reads as null. Other keys are refused, so the
- * {@see PersonName::jsonSerialize()} view (which has `effectiveLatin`) is never read as a payload that silently drops
- * an override.
+ * {family: string, given: string, patronymic: string|null, latinOverride: string|null}; latinOverride holds only an
+ * override, the derived form is never stored; a missing "patronymic" or "latinOverride" key reads as null. The 0.x key
+ * `latin` is read as `latinOverride`, so the `jsonSerialize()` view (whose `latin` is the full Latin form) reads back
+ * as the same name; other keys are refused.
  *
  * @implements PayloadCodec<PersonName>
  */
 final readonly class PersonNameCodec implements PayloadCodec
 {
     private const string SHAPE = 'Expected a Russian person name payload with string "family" and "given", '
-        . 'string, null or missing "patronymic" and "latin", and no other keys.';
+        . 'string, null or missing "patronymic" and "latinOverride", and no other keys.';
 
-    private const array KEYS = ['family', 'given', 'patronymic', 'latin'];
+    private const array KEYS = ['family', 'given', 'patronymic', 'latinOverride'];
 
     #[Override]
     public function valueObjectClass(): string
@@ -35,7 +35,7 @@ final readonly class PersonNameCodec implements PayloadCodec
     }
 
     /**
-     * @return array{family: string, given: string, patronymic: string|null, latin: string|null}
+     * @return array{family: string, given: string, patronymic: string|null, latinOverride: string|null}
      */
     #[Override]
     public function encode(ValueObject $value): array
@@ -50,7 +50,7 @@ final readonly class PersonNameCodec implements PayloadCodec
             'family' => $value->family->value,
             'given' => $value->given->value,
             'patronymic' => $value->patronymic?->value,
-            'latin' => $value->latinOverride()?->value,
+            'latinOverride' => $value->latinOverride()?->value,
         ];
     }
 
@@ -61,9 +61,10 @@ final readonly class PersonNameCodec implements PayloadCodec
     #[Override]
     public function decode(array $payload): PersonName
     {
+        $payload = PayloadFields::upgraded($payload, PayloadFields::LEGACY_LATIN_OVERRIDE, self::SHAPE);
         PayloadFields::assertOnlyKeys($payload, self::KEYS, self::SHAPE);
         $patronymic = PayloadFields::nullableString($payload, 'patronymic', self::SHAPE);
-        $latin = PayloadFields::nullableString($payload, 'latin', self::SHAPE);
+        $latin = PayloadFields::nullableString($payload, 'latinOverride', self::SHAPE);
 
         return new PersonName(
             FamilyName::from(PayloadFields::string($payload, 'family', self::SHAPE)),

@@ -103,7 +103,7 @@ final class PersonNameCodecTest extends TestCase
     use RefusesNameWithoutEchoingInput;
 
     private const string SHAPE = 'Expected a British person name payload with string "family", '
-        . 'string, null or missing "given" and "latin", and no other keys.';
+        . 'string, null or missing "given" and "latinOverride", and no other keys.';
 
     public function testMapsItsClass(): void
     {
@@ -117,7 +117,7 @@ final class PersonNameCodecTest extends TestCase
 
         $payload = $codec->encode($name);
 
-        self::assertSame(['family' => "O'Brien", 'given' => 'Siân', 'latin' => null], $payload);
+        self::assertSame(['family' => "O'Brien", 'given' => 'Siân', 'latinOverride' => null], $payload);
         $decoded = $codec->decode($payload);
         self::assertTrue($decoded->equals($name));
         self::assertSame('OBRIEN<<SIAN', $decoded->latin()->value);
@@ -130,7 +130,7 @@ final class PersonNameCodecTest extends TestCase
 
         $payload = $codec->encode($name);
 
-        self::assertSame(['family' => 'ap Rhys-Llŷr', 'given' => 'Mary-Kate', 'latin' => null], $payload);
+        self::assertSame(['family' => 'ap Rhys-Llŷr', 'given' => 'Mary-Kate', 'latinOverride' => null], $payload);
         self::assertTrue($codec->decode($payload)->equals($name));
     }
 
@@ -145,7 +145,7 @@ final class PersonNameCodecTest extends TestCase
 
         $payload = $codec->encode($name);
 
-        self::assertSame(['family' => 'Müller', 'given' => 'Anna', 'latin' => 'MILLER<<ANNA'], $payload);
+        self::assertSame(['family' => 'Müller', 'given' => 'Anna', 'latinOverride' => 'MILLER<<ANNA'], $payload);
         $decoded = $codec->decode($payload);
         self::assertTrue($decoded->equals($name));
         self::assertSame('MILLER<<ANNA', $decoded->latinOverride()?->value);
@@ -158,7 +158,7 @@ final class PersonNameCodecTest extends TestCase
 
         $payload = $codec->encode($name);
 
-        self::assertSame(['family' => 'Müller', 'given' => null, 'latin' => null], $payload);
+        self::assertSame(['family' => 'Müller', 'given' => null, 'latinOverride' => null], $payload);
         self::assertTrue($codec->decode($payload)->equals($name));
     }
 
@@ -179,8 +179,8 @@ final class PersonNameCodecTest extends TestCase
         yield 'family missing' => [['given' => 'Anna']];
         yield 'family is null' => [['family' => null, 'given' => 'Anna']];
         yield 'given is an int' => [['family' => 'Berg', 'given' => 1]];
-        yield 'latin is an int' => [['family' => 'Berg', 'given' => 'Anna', 'latin' => 1]];
-        yield 'unknown key' => [['family' => 'Berg', 'given' => 'Anna', 'latin' => null, 'middle' => 'x']];
+        yield 'latin is an int' => [['family' => 'Berg', 'given' => 'Anna', 'latinOverride' => 1]];
+        yield 'unknown key' => [['family' => 'Berg', 'given' => 'Anna', 'latinOverride' => null, 'middle' => 'x']];
         yield 'int key' => [['family' => 'Berg', 'given' => 'Anna', 0 => 'x']];
     }
 
@@ -198,16 +198,11 @@ final class PersonNameCodecTest extends TestCase
         );
     }
 
-    public function testTheJsonViewIsNotACodecPayload(): void
+    public function testTheJsonViewReadsBackAsTheSameName(): void
     {
-        self::assertNameRefusedWithoutEcho(
-            fn (): PersonName => new PersonNameCodec()->decode(
-                new PersonName(FamilyName::from('Berg'), GivenName::from('Anna'))->jsonSerialize(),
-            ),
-            '',
-            self::SHAPE,
-            InvalidPayloadException::class,
-        );
+        $name = new PersonName(FamilyName::from('Berg'), GivenName::from('Anna'));
+
+        self::assertTrue(new PersonNameCodec()->decode($name->jsonSerialize())->equals($name));
     }
 
     public function testDecodeRefusesAnInvalidPart(): void
@@ -233,11 +228,11 @@ final class PersonNameCodecTest extends TestCase
 
         $name = $mapper->fromUntrustedPayload(
             PersonName::class,
-            ['family' => 'Müller', 'given' => 'Anna Maria', 'latin' => 'MULLER<<ANNA<MARIA'],
+            ['family' => 'Müller', 'given' => 'Anna Maria', 'latinOverride' => 'MULLER<<ANNA<MARIA'],
         );
 
         self::assertSame('MULLER<<ANNA<MARIA', $name->latin()->value);
-        $expected = ['family' => 'Müller', 'given' => 'Anna Maria', 'latin' => 'MULLER<<ANNA<MARIA'];
+        $expected = ['family' => 'Müller', 'given' => 'Anna Maria', 'latinOverride' => 'MULLER<<ANNA<MARIA'];
         self::assertSame($expected, $mapper->toPayload($name));
     }
 }

@@ -10,17 +10,17 @@ use MSSTC4PHP\ValueObject\Documents\Name\Latin\AbstractFamilyGivenPersonNameCode
 use Override;
 
 /**
- * {family: string, given: string|null, latin: string|null}; given is null for a person without a given name, latin
- * holds only an override, the derived form is never stored; a missing "given" or "latin" key reads as null. Other keys
- * are refused, so the {@see PersonName::jsonSerialize()} view (which has `effectiveLatin`) is never read as a payload
- * that silently drops an override.
+ * {family: string, given: string|null, latinOverride: string|null}; given is null for a person without a given name,
+ * latinOverride holds only an override, the derived form is never stored; a missing "given" or "latinOverride" key
+ * reads as null. The 0.x key `latin` is read as `latinOverride`, so the `jsonSerialize()` view (whose `latin` is the
+ * full Latin form) reads back as the same name; other keys are refused.
  *
  * @extends AbstractFamilyGivenPersonNameCodec<PersonName, string|null>
  */
 final readonly class PersonNameCodec extends AbstractFamilyGivenPersonNameCodec
 {
     private const string SHAPE = 'Expected a Swiss person name payload with string "family", '
-        . 'string, null or missing "given" and "latin", and no other keys.';
+        . 'string, null or missing "given" and "latinOverride", and no other keys.';
 
     #[Override]
     public function valueObjectClass(): string

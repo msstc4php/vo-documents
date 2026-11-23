@@ -14,9 +14,9 @@ use MSSTC4PHP\ValueObject\Payload\PayloadCodec;
 use Override;
 
 /**
- * {family: string, given: string|null, latin: string|null}; latin holds only an override, the derived form is never
- * stored. A missing nullable key reads as null. Other keys are refused, so the name's `jsonSerialize()` view (which
- * has `effectiveLatin`) is never read as a payload that silently drops an override.
+ * {family: string, given: string|null, latinOverride: string|null}; latinOverride holds only an override, the derived
+ * form is never stored. A missing nullable key reads as null. The 0.x key `latin` is read as `latinOverride`, so the
+ * `jsonSerialize()` view (whose `latin` is the full Latin form) reads back as the same name; other keys are refused.
  *
  * @internal
  *
@@ -27,10 +27,10 @@ use Override;
  */
 abstract readonly class AbstractFamilyGivenPersonNameCodec implements PayloadCodec
 {
-    private const array KEYS = ['family', 'given', 'latin'];
+    private const array KEYS = ['family', 'given', 'latinOverride'];
 
     /**
-     * @return array{family: string, given: TGivenValue, latin: string|null}
+     * @return array{family: string, given: TGivenValue, latinOverride: string|null}
      */
     #[Override]
     final public function encode(ValueObject $value): array
@@ -45,7 +45,7 @@ abstract readonly class AbstractFamilyGivenPersonNameCodec implements PayloadCod
         return [
             'family' => $value->family->value,
             'given' => $this->givenValue($value),
-            'latin' => $value->latinOverride()?->value,
+            'latinOverride' => $value->latinOverride()?->value,
         ];
     }
 
@@ -58,8 +58,9 @@ abstract readonly class AbstractFamilyGivenPersonNameCodec implements PayloadCod
     #[Override]
     final public function decode(array $payload): AbstractFamilyGivenPersonName
     {
+        $payload = PayloadFields::upgraded($payload, PayloadFields::LEGACY_LATIN_OVERRIDE, $this->shape());
         PayloadFields::assertOnlyKeys($payload, self::KEYS, $this->shape());
-        $latin = PayloadFields::nullableString($payload, 'latin', $this->shape());
+        $latin = PayloadFields::nullableString($payload, 'latinOverride', $this->shape());
 
         return $this->create(
             PayloadFields::string($payload, 'family', $this->shape()),

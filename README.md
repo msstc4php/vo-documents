@@ -477,7 +477,10 @@ $name->latin();           // IVANOVA<<YULIYA
 $name->latinOverride();   // the same; null when the Latin form is derived
 ```
 
-The storage payload of a composite name stores only the override (`latin: null` otherwise), never the derived form.
+The storage payload of a name that derives its Latin form stores only the override (`latinOverride: null`
+otherwise), never the derived form; payloads written by 0.x under the key `latin` still load. The JSON view
+(`jsonSerialize()`) of every name has the full Latin form under `latin`, and reads back through the codec as the same
+name.
 
 ## Bridges
 

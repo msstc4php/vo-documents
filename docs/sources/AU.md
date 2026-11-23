@@ -48,8 +48,7 @@ How the package applies this (designer's calls, no official character rule found
 - **Not covered:** a single name (mononym). The passport form asks for it in "Family name" with `XXX` in "Given name"
   (passports.gov.au, quoted from a search snippet); the brief's constructor requires a given name.
 
-Payload (`PersonNameCodec`): `{family, given, latin}` with `latin` the override only; the JSON view is
-`{family, given, effectiveLatin}` and is refused by the codec, as for RU.
+Payload (`PersonNameCodec`): `{family, given, latinOverride}` with `latinOverride` the override only (0.x key `latin`, still read); the JSON view is `{family, given, latin}` (the full Latin form) and reads back through the codec as the same name.
 
 ## Driving licence numbers (`Document\AU\DriverLicence\*`)
 
