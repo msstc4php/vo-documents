@@ -46,6 +46,17 @@ final class SubdivisionResolverTest extends TestCase
         self::assertSame([], $this->resolver()->matching('X-1'));
     }
 
+    public function testListsTheMatchesWithoutAResolver(): void
+    {
+        $tryParse = static fn (TestSubdivision $subdivision, string $number): ?PackageString
+            => \str_contains($number, $subdivision->name[0]) ? PackageString::from($number) : null;
+
+        self::assertSame(
+            [TestSubdivision::Vic],
+            SubdivisionResolver::matches([TestSubdivision::Nsw, TestSubdivision::Vic], $tryParse, 'V-1'),
+        );
+    }
+
     public function testRefusesSeveralMatchesWithTheSubdivisionsInTheGivenOrder(): void
     {
         $resolver = new SubdivisionResolver(

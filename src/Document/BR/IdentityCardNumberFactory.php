@@ -37,15 +37,7 @@ final class IdentityCardNumberFactory
      */
     public static function jurisdictionsMatching(string $number): array
     {
-        return SubdivisionResolver::matches(self::coveredJurisdictions(), self::tryIn(...), self::withoutDots($number));
-    }
-
-    /**
-     * Dots are separators of the printed RG; removing them here keeps the length in the resolver's messages right.
-     */
-    private static function withoutDots(string $number): string
-    {
-        return \str_replace('.', '', $number);
+        return SubdivisionResolver::matches(self::coveredJurisdictions(), self::tryIn(...), $number);
     }
 
     /**
