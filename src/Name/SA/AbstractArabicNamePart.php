@@ -17,6 +17,9 @@ use Override;
  * orders the marks of a letter (fatha before shadda). Only letters (Lo) are name characters: Arabic-Indic digits,
  * Arabic punctuation, Quranic annotation marks and format characters are not. A particle such as `آل` or `بن` is an
  * ordinary word. See docs/sources/SA.md "Names".
+ *
+ * @internal extended by this package's name parts only, its protected hooks are no API: type-hint the concrete
+ *           part or {@see AbstractNamePart}
  */
 abstract class AbstractArabicNamePart extends AbstractNamePart
 {

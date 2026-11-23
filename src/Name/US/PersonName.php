@@ -26,7 +26,7 @@ use Override;
  * docs/sources/US.md "Names".
  *
  * @see https://fam.state.gov/fam/08fam/08fam040301.html 8 FAM 403.1-3, 403.1-5(B)
- * @see https://www.icao.int/publications/Documents/9303_p3_cons_en.pdf ICAO Doc 9303 Part 3, 8th ed. (2021), §4.6,
+ * @see https://www.icao.int/sites/default/files/publications/DocSeries/9303_p3_cons_en.pdf ICAO Doc 9303 Part 3, 8th ed. (2021), §4.6,
  *      §6.A
  */
 final readonly class PersonName extends AbstractLatinPersonName

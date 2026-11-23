@@ -14,6 +14,9 @@ use Override;
  * Otherwise it is validated by character set only: a reading that {@see PassportHepburn} cannot spell (one starting
  * with a small kana, `ん` or `っ`) is valid, and its name needs a Latin override. See docs/sources/JP.md §2.
  *
+ * @internal extended by this package's name parts only, its protected hooks are no API: type-hint the concrete
+ *           part or {@see AbstractNamePart}
+ *
  * @see https://laws.e-gov.go.jp/law/322AC0000000224 戸籍法 Art. 13
  */
 abstract class AbstractJapaneseReading extends AbstractNamePart

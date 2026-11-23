@@ -427,13 +427,16 @@ $mrz->masked();                             // document number, optional data, b
 `MachineReadableZone` implements `HasSex` but not `HasBirthDate`. `sex()` is `Sex::Female`, `Sex::Male`, or `Sex::Unspecified`
 for the filler `<` (Doc 9303 Parts 4-6: "< = unspecified"); the VIZ letter `X` is not an MRZ value and is refused.
 `HasBirthDate::birthDate()` takes no argument, but the MRZ holds only two year digits and Doc 9303 gives no century, so
-`birthDate($today)` and `expiryDate($reference)` take the date they resolve against (no hidden clock). `masked()` puts `*`
+`birthDate($reference)` and `expiryDate($reference)` take the date they resolve against (no hidden clock). `masked()` puts `*`
 over the document number, optional data, birth date and their check digits; `*` is not an MRZ character, so a masked zone
-never parses. `birthDate($today)` takes the most recent past century; `expiryDate($reference)` the century that puts the
+never parses. `birthDate($reference)` takes the most recent past century; `expiryDate($reference)` the century that puts the
 year between 84 years before and 15 years after the reference year (documents are valid for about 10 to 15 years, so an
-archived document reads as past: `760101` with a 2026 reference is 1976). `birthDateDigits()` and `expiryDateDigits()`
+archived document reads as past: `760101` with a 2026 reference is 1976). These windows are part of the 1.x contract
+and change only in a major release; the parameter was `$today` for `birthDate()` before 1.0 (named arguments). `birthDateDigits()` and `expiryDateDigits()`
 give the raw `YYMMDD`. `Td3::fromString()` (and `Td1`, `Td2`) refuses the lines of another format as "Invalid ICAO MRZ."
-without applying that format's rules. A serialized MRZ holds its value alone and is validated again on `unserialize()`. The visa formats MRV-A and MRV-B (Part 7) are not read. Notes: `docs/sources/ICAO.md` section 5.
+without applying that format's rules. A serialized MRZ holds its value alone and is validated again on `unserialize()`. The visa formats MRV-A and MRV-B (Part 7) are not read.
+`MachineReadableZone` is sealed: type-hint it, do not extend it (its `layout()` hook is `@internal`; the package may add
+the visa formats as further subclasses). Notes: `docs/sources/ICAO.md` section 5.
 
 `Icao\Transliterator` turns a national name part into its ICAO spelling (`toLatin()`, or `variants()` for every
 spelling the table allows). Two rules that follow the sources, not the obvious guess:

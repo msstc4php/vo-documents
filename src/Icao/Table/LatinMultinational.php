@@ -16,7 +16,7 @@ use Override;
  * decision, not part of §6.A (docs/sources/ICAO.md "Letters outside table 6.A"); a letter with no base in the table
  * (`Ƒ`) is still refused.
  *
- * @see https://www.icao.int/publications/Documents/9303_p3_cons_en.pdf ICAO Doc 9303 Part 3, 8th ed. (2021), §6.A
+ * @see https://www.icao.int/sites/default/files/publications/DocSeries/9303_p3_cons_en.pdf ICAO Doc 9303 Part 3, 8th ed. (2021), §6.A
  *
  * @internal
  */

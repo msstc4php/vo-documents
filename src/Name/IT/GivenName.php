@@ -14,7 +14,7 @@ use Override;
  *
  * @see https://www.normattiva.it/uri-res/N2Ls?urn:nir:presidente.repubblica:decreto:2000-11-03;396~art35 DPR
  *      3 novembre 2000, n. 396, art. 35 (given names)
- * @see https://www.icao.int/publications/Documents/9303_p3_cons_en.pdf ICAO Doc 9303 Part 3, 8th ed. (2021), §6.A
+ * @see https://www.icao.int/sites/default/files/publications/DocSeries/9303_p3_cons_en.pdf ICAO Doc 9303 Part 3, 8th ed. (2021), §6.A
  */
 final class GivenName extends AbstractLatinNamePart
 {

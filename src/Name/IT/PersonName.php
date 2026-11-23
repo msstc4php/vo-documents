@@ -20,7 +20,7 @@ use Override;
  *
  * @see https://www.gazzettaufficiale.it/eli/gu/2010/05/19/115/sg/html DM 23 marzo 2010, n. 303/13 (GU n. 115 del
  *      19-5-2010), art. 1 (page 2 read "secondo la normativa ICAO")
- * @see https://www.icao.int/publications/Documents/9303_p3_cons_en.pdf ICAO Doc 9303 Part 3, 8th ed. (2021), §4.6,
+ * @see https://www.icao.int/sites/default/files/publications/DocSeries/9303_p3_cons_en.pdf ICAO Doc 9303 Part 3, 8th ed. (2021), §4.6,
  *      §6.A
  *
  * @extends AbstractFamilyGivenPersonName<FamilyName, GivenName>

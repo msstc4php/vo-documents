@@ -3,7 +3,7 @@
 Sources (free PDFs published by ICAO, both "Eighth Edition, 2021"; fetched 2026-11-13 UTC):
 
 - Doc 9303 Part 3, *Specifications Common to all MRTDs*:
-  <https://www.icao.int/publications/Documents/9303_p3_cons_en.pdf>
+  <https://www.icao.int/sites/default/files/publications/DocSeries/9303_p3_cons_en.pdf>
   (that URL answered 404 on 2026-11-13 UTC; the same file was fetched from
   `https://www.icao.int/sites/default/files/publications/DocSeries/9303_p3_cons_en.pdf`;
   its record of amendments lists No. 1 of 14/11/22 and No. 2 of 20/3/24, and the pages carry "No. 2" markers).
@@ -446,10 +446,10 @@ So an unknown part of the birth date is `<<` per year, month or day; the class r
 specimen even has the expiry `960108`). Chosen, conservatively and with the caller supplying the reference date (no
 hidden clock):
 
-- `birthDate($today)`: the most recent date not after `$today` (UTC date), taking the current century or the one
+- `birthDate($reference)`: the most recent date not after `$reference` (UTC date), taking the current century or the one
   before; null when neither holds the date, which only happens for 29 February `00` before 29 February 2000 (1900 is
   not a leap year, and 1600 is no birth date);
-- `birthDate($today)` searches from the reference year clamped to 1-9999 and compares year, month and day as integers,
+- `birthDate($reference)` searches from the reference year clamped to 1-9999 and compares year, month and day as integers,
   so a reference after 9999 still finds the date (`991231` with a reference in 10050 is 9999-12-31);
 - `expiryDate($reference)` (wave 3 review CR-016, controller ruling): the century that puts the year in
   [reference year - 84, reference year + 15] (UTC year, clamped to 1-9999). Documents are valid for about 10 to 15

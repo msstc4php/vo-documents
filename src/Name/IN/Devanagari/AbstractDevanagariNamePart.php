@@ -15,6 +15,9 @@ use Override;
  * (Script=Inherited) are allowed, one at a time, only right after the virama U+094D and before a letter, where they
  * select the half or explicit-virama form; anywhere else they would store a second value for the same visible name.
  * See docs/sources/IN.md "Names".
+ *
+ * @internal extended by this package's name parts only, its protected hooks are no API: type-hint the concrete
+ *           part or {@see AbstractNamePart}
  */
 abstract class AbstractDevanagariNamePart extends AbstractNamePart
 {

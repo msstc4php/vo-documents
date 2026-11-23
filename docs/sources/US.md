@@ -14,7 +14,7 @@ All dates UTC. Sources read 2026-11-16.
 | "Understanding the Medicare Beneficiary Identifier (MBI) Format" | CMS | <https://www.cms.gov/medicare/new-medicare-card/understanding-the-mbi.pdf> |
 | Foreign Affairs Manual 8 FAM 403.1 "Name Usage and Name Changes" (CT:CITZ-141, 03-10-2026) | U.S. Department of State, CA/PPT/S/A | <https://fam.state.gov/fam/08fam/08fam040301.html>, Internet Archive copy of 2026-10-09 11:54:24 UTC: <http://web.archive.org/web/20261009115424id_/https://fam.state.gov/fam/08fam/08fam040301.html> |
 | 2020 AAMVA DL/ID Card Design Standard, Ver 1.0 (Table 2 ref. g; Table D.4 ref. i, `DCU`) | AAMVA | <https://www.aamva.org/getmedia/99ac7057-0f4d-4461-b0a2-3a5532e1b35c/AAMVA-2020-DLID-Card-Design-Standard.pdf> |
-| ICAO Doc 9303 Part 3, 8th ed. (2021), §3.4, §4.6, §6.A | ICAO | <https://www.icao.int/publications/Documents/9303_p3_cons_en.pdf> (fetched from `https://www.icao.int/sites/default/files/publications/DocSeries/9303_p3_cons_en.pdf`) |
+| ICAO Doc 9303 Part 3, 8th ed. (2021), §3.4, §4.6, §6.A | ICAO | <https://www.icao.int/sites/default/files/publications/DocSeries/9303_p3_cons_en.pdf> (fetched from `https://www.icao.int/sites/default/files/publications/DocSeries/9303_p3_cons_en.pdf`) |
 
 Reachability: `www.ssa.gov` answers 403 ("Access Denied", Akamai) to curl; `travel.state.gov` serves a Cloudflare block
 page to curl and WebFetch (also in the most recent archive captures, so earlier captures with status 200 are cited);

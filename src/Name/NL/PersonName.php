@@ -21,7 +21,7 @@ use Override;
  *
  * @see https://wetten.overheid.nl/BWBR0012811/ Paspoortuitvoeringsregeling Nederland 2001, art. 23 lid 3 and 4
  * @see https://wetten.overheid.nl/BWBR0005212/ Paspoortwet, art. 3 lid 1
- * @see https://www.icao.int/publications/Documents/9303_p3_cons_en.pdf ICAO Doc 9303 Part 3, 8th ed. (2021), §4.6,
+ * @see https://www.icao.int/sites/default/files/publications/DocSeries/9303_p3_cons_en.pdf ICAO Doc 9303 Part 3, 8th ed. (2021), §4.6,
  *      §6.A
  *
  * @extends AbstractFamilyGivenPersonName<FamilyName, GivenName|null>

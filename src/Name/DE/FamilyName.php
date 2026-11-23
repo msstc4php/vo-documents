@@ -15,7 +15,7 @@ use Override;
  * @see https://www.gesetze-im-internet.de/pauswv/ PAuswV, Anlage 3 Abschnitt 1, Vorbemerkung Nr. 3 and 5 (character
  *      set String.Latin)
  * @see https://www.gesetze-im-internet.de/passv_2007/ PassV, Anlage 11, Vorbemerkung Nr. 3 and 5
- * @see https://www.icao.int/publications/Documents/9303_p3_cons_en.pdf ICAO Doc 9303 Part 3, 8th ed. (2021), §6.A
+ * @see https://www.icao.int/sites/default/files/publications/DocSeries/9303_p3_cons_en.pdf ICAO Doc 9303 Part 3, 8th ed. (2021), §6.A
  */
 final class FamilyName extends AbstractLatinNamePart
 {

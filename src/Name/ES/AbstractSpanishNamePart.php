@@ -13,6 +13,9 @@ use Override;
  * dot (Doc 9303 Part 3 §4.6, "All other punctuation characters shall be omitted from the MRZ"; {@see PersonName}).
  * `ŀ` (U+0140) and `Ŀ` (U+013F) are stored as their NFKC forms `l·` and `L·`, so both spellings give one value. See
  * docs/sources/ES.md "Names".
+ *
+ * @internal extended by this package's name parts only, its protected hooks are no API: type-hint the concrete
+ *           part or {@see \MSSTC4PHP\ValueObject\Documents\Name\AbstractNamePart}
  */
 abstract class AbstractSpanishNamePart extends AbstractLatinNamePart
 {

@@ -513,7 +513,7 @@ script classes use `\p{sc=Latin}` / `\p{sc=Cyrillic}` (Script property only); `c
 
 ## MRZ (ICAO Doc 9303 Parts 3 to 6)
 
-- **No `HasBirthDate` on `MachineReadableZone`; `HasSex` yes.** Two-digit years have no century (`birthDate(DateTimeImmutable $today)`: most
+- **No `HasBirthDate` on `MachineReadableZone`; `HasSex` yes.** Two-digit years have no century (`birthDate(DateTimeImmutable $reference)`: most
   recent past century; `expiryDate($reference)`: year in [reference - 84, reference + 15], wave 3 ruling CR-016). `<` is `Sex::Unspecified` (Doc 9303
   "< = unspecified", CR-015); `X` is refused (VIZ only). The century rules are this package's, not Doc 9303's (`docs/sources/ICAO.md` 5.4).
 - **Serialization (0.3.0):** vo-base `^1.3` re-runs `parse()` on unserialize for every string VO, so `MachineReadableZone` and

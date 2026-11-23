@@ -11,7 +11,7 @@ use MSSTC4PHP\ValueObject\Documents\Internal\ReparsesThroughCodec;
 use MSSTC4PHP\ValueObject\Documents\Internal\Text;
 use MSSTC4PHP\ValueObject\Documents\Name\AbstractNamePart;
 use MSSTC4PHP\ValueObject\Documents\Name\LatinOverridePolicy;
-use MSSTC4PHP\ValueObject\Documents\Name\PersonName;
+use MSSTC4PHP\ValueObject\Documents\Name\NationalPersonName;
 use Override;
 
 /**
@@ -31,7 +31,7 @@ use Override;
  * @template-covariant TGiven of AbstractNamePart the country's given-name part, null for a name stored whole in the
  *                                                 family part
  */
-abstract readonly class AbstractRequiredLatinPersonName implements PersonName
+abstract readonly class AbstractRequiredLatinPersonName implements NationalPersonName
 {
     use ReparsesThroughCodec;
 

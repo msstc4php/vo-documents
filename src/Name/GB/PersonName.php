@@ -24,7 +24,7 @@ use Override;
  *      HM Passport Office, Names: names that cannot be used in passports, v19.0, § 2.2
  * @see https://www.gov.uk/government/publications/how-to-show-uncommon-names-in-passports-caseworker-guidance/names-how-to-show-uncommon-names-in-passports
  *      HM Passport Office, Names: how to show uncommon names in passports, v18.0, "When the customer only has one name"
- * @see https://www.icao.int/publications/Documents/9303_p3_cons_en.pdf ICAO Doc 9303 Part 3, 8th ed. (2021), §4.6,
+ * @see https://www.icao.int/sites/default/files/publications/DocSeries/9303_p3_cons_en.pdf ICAO Doc 9303 Part 3, 8th ed. (2021), §4.6,
  *      §6.A
  *
  * @extends AbstractFamilyGivenPersonName<FamilyName, GivenName|null>

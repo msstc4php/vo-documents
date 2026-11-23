@@ -12,7 +12,7 @@ use MSSTC4PHP\ValueObject\Documents\Icao\PersonName as IcaoPersonName;
  *
  * The override is matched word by word, each word among its own variants, so the work is the sum of the variant
  * counts, not their product; the variants of one word are capped where they are listed
- * ({@see \MSSTC4PHP\ValueObject\Documents\Icao\Transliterator::MAX_VARIANTS}).
+ * (4096, `Icao\Transliterator::variants()`).
  *
  * @internal
  */

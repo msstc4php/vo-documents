@@ -14,6 +14,8 @@ use Override;
  * The driver's licence number of a federal entity; one class per entity with a published format in
  * `Document\MX\DriverLicence\`, built from a bare number by {@see DriverLicenceNumberFactory}.
  *
+ * Implemented by this package only; methods may be added in minor releases.
+ *
  * @see docs/sources/MX.md "State driving licences (Task 6b)"
  */
 interface DriverLicenceNumber extends StringConvertible, ValueObject, Maskable, IssuedBySubdivision

@@ -12,7 +12,7 @@ use Override;
  * apostrophe (`D'Arcy`) or a space (`Joan Catherine`). Australia sets no character rule of its own; see
  * docs/sources/AU.md "Names".
  *
- * @see https://www.icao.int/publications/Documents/9303_p3_cons_en.pdf ICAO Doc 9303 Part 3, 8th ed. (2021), §6.A
+ * @see https://www.icao.int/sites/default/files/publications/DocSeries/9303_p3_cons_en.pdf ICAO Doc 9303 Part 3, 8th ed. (2021), §6.A
  */
 final class GivenName extends AbstractLatinNamePart
 {

@@ -19,7 +19,7 @@ use Override;
  * hyphen, and an override equal to the derived form is not kept. See docs/sources/FR.md "Names".
  *
  * @see https://www.legifrance.gouv.fr/circulaire/id/38565 Circulaire du 23 juillet 2014 relative à l'état civil, § 1
- * @see https://www.icao.int/publications/Documents/9303_p3_cons_en.pdf ICAO Doc 9303 Part 3, 8th ed. (2021), §4.6,
+ * @see https://www.icao.int/sites/default/files/publications/DocSeries/9303_p3_cons_en.pdf ICAO Doc 9303 Part 3, 8th ed. (2021), §4.6,
  *      §6.A
  *
  * @extends AbstractFamilyGivenPersonName<FamilyName, GivenName>

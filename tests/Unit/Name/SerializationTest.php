@@ -17,7 +17,7 @@ use MSSTC4PHP\ValueObject\Documents\Name\DE\PersonName;
 use MSSTC4PHP\ValueObject\Documents\Name\ES;
 use MSSTC4PHP\ValueObject\Documents\Name\Latin\AbstractLatinPersonName;
 use MSSTC4PHP\ValueObject\Documents\Name\MX;
-use MSSTC4PHP\ValueObject\Documents\Name\PersonName as NationalPersonName;
+use MSSTC4PHP\ValueObject\Documents\Name\NationalPersonName;
 use MSSTC4PHP\ValueObject\Exception\InvalidPayloadException;
 use MSSTC4PHP\ValueObject\Exception\InvalidValueObjectException;
 use MSSTC4PHP\ValueObject\Payload\PayloadCodec;

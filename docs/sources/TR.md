@@ -14,7 +14,7 @@ All dates UTC. Sources read 2026-11-13.
 | PRADO TUR-AO-02001 (ordinary passport, first issued 01/06/2010), biodata page "Numbering", specimen image 265357 | Council of the EU | <https://www.consilium.europa.eu/prado/en/TUR-AO-02001/index.html>, Internet Archive copy of 2026-08-18 08:47:38 UTC (`web.archive.org/web/20260818084738/…`); image `…/prado/images/265357.jpg` (copy of 2017) |
 | PRADO TUR-AO-03001 (ordinary passport, first issued 01/04/2018), specimen image 306152 | Council of the EU | <https://www.consilium.europa.eu/prado/en/TUR-AO-03001/index.html>, Internet Archive copy of 2019-03-19 10:38:01 UTC; image `…/prado/images/306152.jpg` (copy of 2019) |
 | PRADO TUR-FO-01001 (driving licence, first issued 01/01/2016) | Council of the EU | Internet Archive copy of 2022-02-09 11:56:21 UTC |
-| ICAO Doc 9303 Part 3, 8th ed. (2021), §4.6, §6.A | ICAO | <https://www.icao.int/publications/Documents/9303_p3_cons_en.pdf> |
+| ICAO Doc 9303 Part 3, 8th ed. (2021), §4.6, §6.A | ICAO | <https://www.icao.int/sites/default/files/publications/DocSeries/9303_p3_cons_en.pdf> |
 
 Reachability: `www.mevzuat.gov.tr` and `www.nvi.gov.tr` answer to curl. `www.consilium.europa.eu` (PRADO) is read
 through its unmodified Internet Archive copies (earlier ruling). An NVİ circular on Law 7039

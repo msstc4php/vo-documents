@@ -18,6 +18,9 @@ use Override;
  * `masked()` (no official rule) hides every character but the last min(3, ⌊length / 2⌋): `*******890`, `*2`. Three,
  * not the package's usual four, because AU numbers are short (at most 10 characters).
  *
+ * @internal extended by this package's jurisdiction classes only, its protected hooks are no API: type-hint
+ *           {@see DriverLicenceNumber}
+ *
  * @see docs/sources/AU.md "Driving licence numbers"
  */
 abstract class AbstractDriverLicenceNumber extends AbstractStringValueObject implements DriverLicenceNumber

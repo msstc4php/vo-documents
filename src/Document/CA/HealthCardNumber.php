@@ -14,6 +14,8 @@ use Override;
  * The health card (health insurance) number of a province or territory; one class per jurisdiction in
  * `Document\CA\HealthCard\`, built from a bare number by {@see HealthCardNumberFactory}.
  *
+ * Implemented by this package only; methods may be added in minor releases.
+ *
  * @see docs/sources/CA.md "Health card numbers — per jurisdiction"
  */
 interface HealthCardNumber extends StringConvertible, ValueObject, Maskable, IssuedBySubdivision

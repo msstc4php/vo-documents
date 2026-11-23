@@ -9,8 +9,10 @@ use MSSTC4PHP\ValueObject\Documents\Icao\PersonName as IcaoPersonName;
 
 /**
  * A national full name that can give itself in Latin as ICAO Doc 9303 writes it in a passport.
+ *
+ * Implemented by this package only; methods may be added in minor releases.
  */
-interface PersonName extends ValueObject
+interface NationalPersonName extends ValueObject
 {
     public function latin(): IcaoPersonName;
 

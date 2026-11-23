@@ -15,6 +15,8 @@ use Override;
  * state or DC; one class per jurisdiction with a published format in `Document\US\DlId\`, built from a bare number by
  * {@see DlIdNumberFactory}.
  *
+ * Implemented by this package only; methods may be added in minor releases.
+ *
  * @see docs/sources/US.md "DL/ID numbers"
  */
 interface DlIdNumber extends StringConvertible, ValueObject, Maskable, IssuedBySubdivision

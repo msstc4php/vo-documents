@@ -6,7 +6,6 @@ namespace MSSTC4PHP\ValueObject\Documents\Tests\Unit\Name;
 
 use LogicException;
 use MSSTC4PHP\ValueObject\Documents\Icao\PersonName as IcaoPersonName;
-use MSSTC4PHP\ValueObject\Documents\Icao\Transliterator;
 use MSSTC4PHP\ValueObject\Documents\Internal\UnicodeText;
 use MSSTC4PHP\ValueObject\Documents\Name\IdentifierSpellings;
 use MSSTC4PHP\ValueObject\Documents\Name\LatinSpelling;
@@ -72,7 +71,7 @@ final class LatinSpellingTest extends TestCase
 
     public function testAWordWithExactlyTheCapIsSearched(): void
     {
-        $variants = $this->variants(Transliterator::MAX_VARIANTS);
+        $variants = $this->variants(4096);
         $last = $variants[\count($variants) - 1];
 
         self::assertSame(
@@ -87,7 +86,7 @@ final class LatinSpellingTest extends TestCase
 
     public function testWordsWhoseProductIsFarAboveTheCapAreMatchedWordByWord(): void
     {
-        $variants = $this->variants(Transliterator::MAX_VARIANTS);
+        $variants = $this->variants(4096);
         $last = $variants[\count($variants) - 1];
         $primary = new IdentifierSpellings([$variants, $variants], [' ']);
         $secondary = new IdentifierSpellings([$variants, $variants], [' ']);

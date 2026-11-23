@@ -13,6 +13,9 @@ use Override;
  * ʻokina, so the ʻokina (U+02BB, or U+2018 as 8 FAM types it) is stored as an apostrophe. See docs/sources/US.md
  * "Names".
  *
+ * @internal extended by this package's name parts only, its protected hooks are no API: type-hint the concrete
+ *           part or {@see \MSSTC4PHP\ValueObject\Documents\Name\AbstractNamePart}
+ *
  * @see https://fam.state.gov/fam/08fam/08fam040301.html 8 FAM 403.1-3(C)(1) a.(3), 403.1-3(C)(3)
  */
 abstract class AbstractAmericanNamePart extends AbstractLatinNamePart

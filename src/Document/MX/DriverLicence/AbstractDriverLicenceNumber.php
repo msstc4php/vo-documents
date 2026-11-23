@@ -18,6 +18,9 @@ use Override;
  * `masked()` (no official rule) keeps the last four characters (plan default; every covered shape is longer than
  * eight characters, so the three-character case of the default does not arise yet).
  *
+ * @internal extended by this package's jurisdiction classes only, its protected hooks are no API: type-hint
+ *           {@see DriverLicenceNumber}
+ *
  * @see docs/sources/MX.md "State driving licences (Task 6b)"
  */
 abstract class AbstractDriverLicenceNumber extends AbstractStringValueObject implements DriverLicenceNumber

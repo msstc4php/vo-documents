@@ -16,7 +16,7 @@ All dates UTC. Sources read 2026-11-13.
 | NHS Data Model and Dictionary, attribute COMMUNITY HEALTH INDEX NUMBER | NHS England | <https://www.datadictionary.nhs.uk/attributes/community_health_index_number.html>, Internet Archive copy of 2025-09-13 14:34:28 UTC |
 | NHS Data Model and Dictionary, attribute HEALTH AND CARE NUMBER | NHS England | <https://www.datadictionary.nhs.uk/attributes/health_and_care_number.html>, Internet Archive copy of 2025-09-10 10:41:19 UTC |
 | phsmethods `chi_check()` reference (version 1.2.0.9000) | Public Health Scotland | <https://code.publichealthscotland.scot/phsmethods/reference/chi_check.html> (through WebFetch) |
-| ICAO Doc 9303 Part 3, 8th ed. (2021), §4.6, §6.A | ICAO | <https://www.icao.int/publications/Documents/9303_p3_cons_en.pdf> |
+| ICAO Doc 9303 Part 3, 8th ed. (2021), §4.6, §6.A | ICAO | <https://www.icao.int/sites/default/files/publications/DocSeries/9303_p3_cons_en.pdf> |
 
 Reachability: `www.gov.uk`, `assets.publishing.service.gov.uk` and `www.nidirect.gov.uk` answer to curl.
 `www.datadictionary.nhs.uk` answers 403 to curl and WebFetch: its unmodified Internet Archive captures were read (`id_`

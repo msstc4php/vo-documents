@@ -14,12 +14,12 @@ use MSSTC4PHP\ValueObject\Documents\Internal\UnicodeText;
  * Latin spelling of a national name part per the ICAO Doc 9303 transliteration tables (see docs/sources/ICAO.md).
  * The whole part must be written in the script of one table; spaces and hyphens are kept, apostrophes omitted.
  *
- * @see https://www.icao.int/publications/Documents/9303_p3_cons_en.pdf ICAO Doc 9303 Part 3, 8th ed. (2021), §6
+ * @see https://www.icao.int/sites/default/files/publications/DocSeries/9303_p3_cons_en.pdf ICAO Doc 9303 Part 3, 8th ed. (2021), §6
  */
 final readonly class Transliterator
 {
     /** Bounds variants() on untrusted input: 4096 = twelve two-way or seven three-way characters. */
-    public const int MAX_VARIANTS = 4096;
+    private const int MAX_VARIANTS = 4096;
 
     /** Omitted without a filler, Doc 9303 Part 3 §4.6 ("D’ARTAGNAN" → "DARTAGNAN"). */
     private const array APOSTROPHES = ["'", "\u{2019}"];
@@ -49,6 +49,8 @@ final readonly class Transliterator
 
     /**
      * Whether a table has a row of its own for `$character` in either letter case, such as the ligature Ĳ of table 6.A.
+     *
+     * @internal for {@see \MSSTC4PHP\ValueObject\Documents\Name\AbstractNamePart}
      */
     public function lists(string $character): bool
     {
@@ -61,7 +63,7 @@ final readonly class Transliterator
      * @return non-empty-list<non-empty-string> every spelling the tables allow, the default first
      *
      * @throws InvalidPersonNameException when a character has no transliteration, the scripts are mixed or the
-     *                                    spellings exceed {@see self::MAX_VARIANTS}
+     *                                    spellings exceed 4096 combinations
      */
     public function variants(string $nationalPart): array
     {

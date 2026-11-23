@@ -12,7 +12,7 @@ use Override;
  *
  * @see https://www.gob.mx/cms/uploads/attachment/file/681698/reglas_para_la_ejecucion_de_los_procedimientos_asignacion_de_la_curp.pdf
  *      Reglas para la ejecución de los procedimientos para la asignación de la CURP (2021), 5.1
- * @see https://www.icao.int/publications/Documents/9303_p3_cons_en.pdf ICAO Doc 9303 Part 3, 8th ed. (2021), §6.A
+ * @see https://www.icao.int/sites/default/files/publications/DocSeries/9303_p3_cons_en.pdf ICAO Doc 9303 Part 3, 8th ed. (2021), §6.A
  */
 final class GivenName extends AbstractMexicanNamePart
 {

@@ -12,6 +12,9 @@ use Override;
  * ligatures `æ` and `œ`; "tout autre signe diacritique … ne peut être retenu" (`ñ`, `ł`, `ß` are refused). Words are
  * joined by a hyphen, an apostrophe or a space. See docs/sources/FR.md "Names".
  *
+ * @internal extended by this package's name parts only, its protected hooks are no API: type-hint the concrete
+ *           part or {@see \MSSTC4PHP\ValueObject\Documents\Name\AbstractNamePart}
+ *
  * @see https://www.legifrance.gouv.fr/circulaire/id/38565 Circulaire du 23 juillet 2014 relative à l'état civil
  *      (JUSC1412888C), § 1
  */

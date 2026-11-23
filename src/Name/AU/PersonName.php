@@ -17,7 +17,7 @@ use Override;
  * another ICAO spelling of both parts (`MULLER<<ZOE`), an MRZ-style `<` for a hyphen is stored as the hyphen, and an
  * override equal to the derived form is not kept. See docs/sources/AU.md "Names".
  *
- * @see https://www.icao.int/publications/Documents/9303_p3_cons_en.pdf ICAO Doc 9303 Part 3, 8th ed. (2021), §4.6,
+ * @see https://www.icao.int/sites/default/files/publications/DocSeries/9303_p3_cons_en.pdf ICAO Doc 9303 Part 3, 8th ed. (2021), §4.6,
  *      §6.A
  *
  * @extends AbstractFamilyGivenPersonName<FamilyName, GivenName>

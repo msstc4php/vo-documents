@@ -12,7 +12,10 @@ use Override;
  * apostrophe or a space. A country that sets a stricter character rule overrides {@see letters()} or
  * {@see innerSeparators()}. Subclasses implement {@see label()}.
  *
- * @see https://www.icao.int/publications/Documents/9303_p3_cons_en.pdf ICAO Doc 9303 Part 3, 8th ed. (2021), §6.A
+ * @internal extended by this package's name parts only, its protected hooks are no API: type-hint the concrete
+ *           part or {@see AbstractNamePart}
+ *
+ * @see https://www.icao.int/sites/default/files/publications/DocSeries/9303_p3_cons_en.pdf ICAO Doc 9303 Part 3, 8th ed. (2021), §6.A
  */
 abstract class AbstractLatinNamePart extends AbstractNamePart
 {

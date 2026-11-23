@@ -15,6 +15,9 @@ use Override;
  * (`'t Hart`, `van 't Hof`) or end one before a space (`d' Ancona`), never both around one space (no prefix of the
  * table reads `d' 't`). See docs/sources/NL.md "Names".
  *
+ * @internal extended by this package's name parts only, its protected hooks are no API: type-hint the concrete
+ *           part or {@see \MSSTC4PHP\ValueObject\Documents\Name\AbstractNamePart}
+ *
  * @see https://rvig.nl/sites/default/files/2025-05/Logisch%20Ontwerp%20BRP%202025.Q2.pdf Logisch Ontwerp BRP 2025.Q2,
  *      § 5.1.2 (tables 5.2, 5.3)
  * @see https://publicaties.rvig.nl/media/13287/download Landelijke tabel 36, Voorvoegseltabel

@@ -14,6 +14,9 @@ use Override;
  * before; a Han radical or a Hangzhou numeral (`⻄`, `〡`) is a symbol and is refused. The 常用漢字/人名用漢字 lists bind only a
  * new given name, and surnames such as `〆木` exist, so any Han letter and `〆` are accepted. See docs/sources/JP.md §1.
  *
+ * @internal extended by this package's name parts only, its protected hooks are no API: type-hint the concrete
+ *           part or {@see AbstractNamePart}
+ *
  * @see https://laws.e-gov.go.jp/law/322M40000010094 戸籍法施行規則 Art. 60
  */
 abstract class AbstractJapaneseNamePart extends AbstractNamePart

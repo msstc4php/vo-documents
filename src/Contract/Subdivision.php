@@ -8,6 +8,8 @@ use BackedEnum;
 
 /**
  * A string-backed enum whose value is the ISO 3166-2 code.
+ *
+ * Implemented by this package only; methods may be added in minor releases.
  */
 interface Subdivision extends BackedEnum
 {

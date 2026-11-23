@@ -12,6 +12,9 @@ use Override;
  * letters, words joined by a hyphen, an apostrophe, a space or a slash (`D/Amico`), and a full stop after or between
  * letters (`Ma.`, `J.`, `M.A.`). The ICAO form omits the slash and the full stop (Doc 9303 Part 3 §4.6, "Other
  * punctuation characters"; {@see PersonName}). See docs/sources/MX.md "Names".
+ *
+ * @internal extended by this package's name parts only, its protected hooks are no API: type-hint the concrete
+ *           part or {@see \MSSTC4PHP\ValueObject\Documents\Name\AbstractNamePart}
  */
 abstract class AbstractMexicanNamePart extends AbstractLatinNamePart
 {

@@ -19,6 +19,9 @@ use Override;
  * `masked()` (no official rule) keeps the last four characters, three for a number of eight characters or fewer:
  * `*****6789`, `*****678`; a class with a published display form masks in that layout.
  *
+ * @internal extended by this package's jurisdiction classes only, its protected hooks are no API: type-hint
+ *           {@see DlIdNumber}
+ *
  * @see docs/sources/US.md "DL/ID numbers"
  */
 abstract class AbstractDlIdNumber extends AbstractStringValueObject implements DlIdNumber

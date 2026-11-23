@@ -20,6 +20,9 @@ use Override;
  * A compatibility character (NFKC differs from NFC: fullwidth `Ｓｍｉｔｈ`, `ª`, `ﬁ`) is refused: it looks like another
  * spelling of the same name, so two stored values would denote one person. Characters an ICAO table lists itself
  * (`Ĳ`, `Ŀ` of table 6.A) are kept, because the table gives them their own spelling.
+ *
+ * Type-hint this class for "any name part"; it is extended by this package's name parts only. Extending it elsewhere
+ * is outside the 1.x promise, and its protected hooks are `@internal`.
  */
 abstract class AbstractNamePart extends AbstractStringValueObject
 {
@@ -37,16 +40,22 @@ abstract class AbstractNamePart extends AbstractStringValueObject
     private const array APOSTROPHES = ["\u{2019}", "\u{02BC}"];
 
     /**
+     * @internal
+     *
      * @return non-empty-string a regex class body, e.g. \p{sc=Latin}
      */
     abstract protected function letters(): string;
 
     /**
+     * @internal
+     *
      * @return non-empty-string the part's name in exception messages, e.g. "Russian given name"
      */
     abstract protected function label(): string;
 
     /**
+     * @internal
+     *
      * @return string the characters allowed between two letters
      */
     protected function innerSeparators(): string
@@ -55,6 +64,8 @@ abstract class AbstractNamePart extends AbstractStringValueObject
     }
 
     /**
+     * @internal
+     *
      * @return non-empty-string a regex matching one word
      */
     protected function word(): string

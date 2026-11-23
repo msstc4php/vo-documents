@@ -13,7 +13,7 @@ use Override;
  *
  * @see https://www.boe.es/buscar/pdf/2011/BOE-A-2011-12628-consolidado.pdf Ley 20/2011 del Registro Civil, arts. 49,
  *      53, 56
- * @see https://www.icao.int/publications/Documents/9303_p3_cons_en.pdf ICAO Doc 9303 Part 3, 8th ed. (2021), §6.A
+ * @see https://www.icao.int/sites/default/files/publications/DocSeries/9303_p3_cons_en.pdf ICAO Doc 9303 Part 3, 8th ed. (2021), §6.A
  */
 final class FamilyName extends AbstractSpanishNamePart
 {

@@ -38,6 +38,11 @@ use Override;
  * Parts 4-6: "< = unspecified"). It does not implement `HasBirthDate` (`birthDate()` takes the reference date). A
  * serialized MRZ is validated again on unserialize.
  *
+ * Sealed: the formats are {@see Td1}, {@see Td2} and {@see Td3} (the package may add MRV-A and MRV-B in a minor
+ * release); {@see from()} never returns a subclass from outside the package, and the protected hooks are `@internal`.
+ * The century windows of {@see birthDate()} and {@see expiryDate()} are part of the 1.x contract: they change only in
+ * a major release.
+ *
  * @see https://www.icao.int/sites/default/files/publications/DocSeries/9303_p3_cons_en.pdf ICAO Doc 9303 Part 3,
  *      8th ed. (2021), §4.8 (dates), §4.9 (check digits), §5 (codes)
  * @see https://www.icao.int/sites/default/files/publications/DocSeries/9303_p4_cons_en.pdf Part 4 (TD3)
@@ -161,11 +166,11 @@ abstract class MachineReadableZone extends AbstractStringValueObject implements 
     }
 
     /**
-     * The birth date in the most recent past century: not after `$today` (UTC date), at most one century back. Null
+     * The birth date in the most recent past century: not after `$reference` (UTC date), at most one century back. Null
      * when the year, the month or the day is unknown (`<<`), or when neither of the two centuries has the date
      * (a 29 February `00` before 29 February 2000). The century is searched from the reference year clamped to 1-9999.
      */
-    public function birthDate(DateTimeImmutable $today): ?DateTimeImmutable
+    public function birthDate(DateTimeImmutable $reference): ?DateTimeImmutable
     {
         $parts = $this->dateParts($this->birthDateDigits());
         if ($parts === null) {
@@ -173,7 +178,7 @@ abstract class MachineReadableZone extends AbstractStringValueObject implements 
         }
 
         [$yearDigits, $month, $day] = $parts;
-        $utcToday = $today->setTimezone(new DateTimeZone('UTC'));
+        $utcToday = $reference->setTimezone(new DateTimeZone('UTC'));
         $limit = [(int) $utcToday->format('Y'), (int) $utcToday->format('n'), (int) $utcToday->format('j')];
         $latest = \intdiv($this->clampYear($limit[0]), 100) * 100 + $yearDigits;
         foreach ([$latest, $latest - 100] as $year) {
@@ -241,9 +246,14 @@ abstract class MachineReadableZone extends AbstractStringValueObject implements 
         return Text::nonEmpty(\implode("\n", $lines));
     }
 
+    /**
+     * @internal the layouts of this package's TD1, TD2 and TD3
+     */
     abstract protected static function layout(): MrzLayout;
 
     /**
+     * @internal
+     *
      * @param list<string> $lines
      *
      * @throws InvalidMrzException

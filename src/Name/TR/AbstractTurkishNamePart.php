@@ -12,6 +12,9 @@ use Override;
  * different letters, kept as typed and never re-cased) and the circumflex vowels `Â â Î î Û û` the register writes;
  * words are joined by a space only (`Ahmet Can`, `Yılmaz Kaya`). See docs/sources/TR.md "Names".
  *
+ * @internal extended by this package's name parts only, its protected hooks are no API: type-hint the concrete
+ *           part or {@see \MSSTC4PHP\ValueObject\Documents\Name\AbstractNamePart}
+ *
  * @see https://www.mevzuat.gov.tr/MevzuatMetin/1.3.1353.pdf Law 1353 (Türk Harflerinin Kabul ve Tatbiki Hakkında
  *      Kanun), Madde 1, 3 and Merbut Cetvel
  * @see https://www.mevzuat.gov.tr/MevzuatMetin/1.5.5490.pdf Law 5490 (Nüfus Hizmetleri Kanunu), Geçici Madde 8

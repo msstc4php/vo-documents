@@ -14,6 +14,9 @@ use Override;
  * (`\p{Lo}`), so the tone marks U+302E and U+302F are refused. Hanja names are not covered. A conjoining jamo left over
  * after NFC (it does not complete a syllable) and a compatibility jamo (`ㄱ` U+3131, NFKC differs) are refused: a
  * registered name is written in syllables. See docs/sources/KR.md "Names".
+ *
+ * @internal extended by this package's name parts only, its protected hooks are no API: type-hint the concrete
+ *           part or {@see AbstractNamePart}
  */
 abstract class AbstractKoreanNamePart extends AbstractNamePart
 {

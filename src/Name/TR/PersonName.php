@@ -19,7 +19,7 @@ use Override;
  * specimen's MRZ for `Örnek Zeynep`); there is no hyphen to store, and an override equal to the derived form is not
  * kept. See docs/sources/TR.md "Names".
  *
- * @see https://www.icao.int/publications/Documents/9303_p3_cons_en.pdf ICAO Doc 9303 Part 3, 8th ed. (2021), §4.6,
+ * @see https://www.icao.int/sites/default/files/publications/DocSeries/9303_p3_cons_en.pdf ICAO Doc 9303 Part 3, 8th ed. (2021), §4.6,
  *      §6.A
  *
  * @extends AbstractFamilyGivenPersonName<FamilyName, GivenName>

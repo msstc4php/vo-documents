@@ -13,6 +13,9 @@ use Override;
  * minority-nationality name the middle dot U+00B7 between two words (`阿沛·阿旺晋美`), never leading, trailing or doubled.
  * The katakana middle dot U+30FB and the bullet U+2022, which keyboards and systems put in its place, are stored as
  * U+00B7. Uyghur, Tibetan and Mongolian script names are not covered. See docs/sources/CN.md "Names".
+ *
+ * @internal extended by this package's name parts only, its protected hooks are no API: type-hint the concrete
+ *           part or {@see AbstractNamePart}
  */
 abstract class AbstractChineseNamePart extends AbstractNamePart
 {

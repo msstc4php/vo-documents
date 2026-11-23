@@ -12,6 +12,9 @@ use Override;
  * and U+0100-U+017F, which hold the letters of German, French, Italian and Romansh (`ä ö ü é è à ç`). Words are joined
  * by a hyphen (`Müller-Brunner`), an apostrophe (`D'Amico`) or a space (`de Weck`). See docs/sources/CH.md "Names".
  *
+ * @internal extended by this package's name parts only, its protected hooks are no API: type-hint the concrete
+ *           part or {@see \MSSTC4PHP\ValueObject\Documents\Name\AbstractNamePart}
+ *
  * @see https://www.fedlex.admin.ch/eli/cc/2010/96/de SR 143.111 (Verordnung des EJPD über die Ausweise), Art. 4, 5
  *      and 22
  * @see https://www.fedlex.admin.ch/eli/oc/2024/335/de Zivilstandsverordnung, Änderung vom 26. Juni 2024, Art. 80

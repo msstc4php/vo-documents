@@ -25,7 +25,7 @@ use Override;
  *      art. 515-B
  * @see https://www.gov.br/pf/pt-br/assuntos/passaporte/duvidas Polícia Federal, Passaporte, Dúvidas, "Nome abreviado
  *      no passaporte"
- * @see https://www.icao.int/publications/Documents/9303_p3_cons_en.pdf ICAO Doc 9303 Part 3, 8th ed. (2021), §4.6,
+ * @see https://www.icao.int/sites/default/files/publications/DocSeries/9303_p3_cons_en.pdf ICAO Doc 9303 Part 3, 8th ed. (2021), §4.6,
  *      §6.A
  *
  * @extends AbstractFamilyGivenPersonName<FamilyName, GivenName>

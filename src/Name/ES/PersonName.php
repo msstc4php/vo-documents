@@ -22,7 +22,7 @@ use Override;
  * form is not kept. See docs/sources/ES.md "Names".
  *
  * @see https://www.boe.es/buscar/pdf/2003/BOE-A-2003-13978-consolidado.pdf RD 896/2003 (pasaporte), art. 10.2 f)
- * @see https://www.icao.int/publications/Documents/9303_p3_cons_en.pdf ICAO Doc 9303 Part 3, 8th ed. (2021), §4.6,
+ * @see https://www.icao.int/sites/default/files/publications/DocSeries/9303_p3_cons_en.pdf ICAO Doc 9303 Part 3, 8th ed. (2021), §4.6,
  *      §6.A
  */
 final readonly class PersonName extends AbstractLatinPersonName

@@ -15,6 +15,8 @@ use Override;
  * with a published format in `Document\BR\IdentityCard\`, built from a bare number by
  * {@see IdentityCardNumberFactory}. The CIN's number is the CPF ({@see Cpf}), not a state RG.
  *
+ * Implemented by this package only; methods may be added in minor releases.
+ *
  * @see docs/sources/BR.md "RG per state (Task 7b)"
  */
 interface IdentityCardNumber extends StringConvertible, ValueObject, Maskable, IssuedBySubdivision

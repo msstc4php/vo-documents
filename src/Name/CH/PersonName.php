@@ -20,7 +20,7 @@ use Override;
  * to the derived form is not kept. See docs/sources/CH.md "Names".
  *
  * @see https://www.fedlex.admin.ch/eli/cc/2010/96/de SR 143.111, Art. 4 and 5
- * @see https://www.icao.int/publications/Documents/9303_p3_cons_en.pdf ICAO Doc 9303 Part 3, 8th ed. (2021), §4.6,
+ * @see https://www.icao.int/sites/default/files/publications/DocSeries/9303_p3_cons_en.pdf ICAO Doc 9303 Part 3, 8th ed. (2021), §4.6,
  *      §6.A
  *
  * @extends AbstractFamilyGivenPersonName<FamilyName, GivenName|null>
