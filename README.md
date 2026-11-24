@@ -210,7 +210,7 @@ $id->birthDate();                                                   // 1949-12-3
 $id->sex();                                                         // Sex::Female
 IqamaNumber::from('٢٣٤٥٦٧٨٩٠١');                                    // Arabic-Indic digits fold: 2345678901
 IdentityNumberFactory::fromNumber('1012345678');                    // NationalIdentityNumber (first digit 1; 2: IqamaNumber)
-IdentityNumberFactory::tryFromNumber('3012345678');                 // null: fits neither class by its first digit
+IdentityNumberFactory::tryFromNumber('3012345678');                 // null: first digit neither 1 nor 2
 
 // China, Korea, Indonesia, Saudi Arabia, Indian Devanagari: the Latin form of the passport is required, never derived.
 $name = new PersonName(FamilyName::from('张'), GivenName::from('伟'), IcaoPersonName::from('ZHANG<<WEI'));

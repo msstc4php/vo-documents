@@ -16,7 +16,7 @@ use MSSTC4PHP\ValueObject\Exception\InvalidValueObjectException;
  */
 final class IdentityNumberFactory
 {
-    private const string NO_CLASS = 'Saudi identity number fits neither class by its first digit.';
+    private const string NO_CLASS = 'Saudi identity number fits neither the national ID nor the iqama number.';
 
     private function __construct()
     {
@@ -40,7 +40,7 @@ final class IdentityNumberFactory
         };
     }
 
-    /** Null when no candidate or several fit; fromNumber() says which. */
+    /** Null when the number fits neither class; fromNumber() says why. */
     public static function tryFromNumber(string $number): NationalIdentityNumber|IqamaNumber|null
     {
         try {

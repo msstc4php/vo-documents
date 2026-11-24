@@ -34,7 +34,7 @@ final class DriverLicenceNumberFactory
         return self::coveredClassFor($jurisdiction)::from($number);
     }
 
-    /** Null when no candidate or several fit; fromNumberIn() says which. */
+    /** Null when the number does not fit that jurisdiction; fromNumberIn() says why. */
     public static function tryFromNumberIn(string $number, Jurisdiction $jurisdiction): ?DriverLicenceNumber
     {
         try {

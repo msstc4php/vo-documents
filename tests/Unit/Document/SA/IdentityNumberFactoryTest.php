@@ -31,7 +31,7 @@ final class IdentityNumberFactoryTest extends TestCase
 {
     use RefusesWithoutEchoingInput;
 
-    private const string NO_CLASS = 'Saudi identity number fits neither class by its first digit.';
+    private const string NO_CLASS = 'Saudi identity number fits neither the national ID nor the iqama number.';
 
     /**
      * @return iterable<string, array{string, class-string<AbstractIdentityNumber>, string}>

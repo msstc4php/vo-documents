@@ -70,7 +70,7 @@ links, guessed zip paths answer 520, and WebFetch gets 403 (the sandbox was not 
   values and no longer discriminate: `NationalIdentityNumber::tryFrom($n) ?? IqamaNumber::from($n)` types every iqama
   as a national ID. Callers route on the first digit themselves (README "Limits to know about"; CHANGELOG 1.0.0
   Upgrading). Since 1.1 `IdentityNumberFactory::fromNumber()` routes by this rule (`1` → national ID, `2` → iqama, any
-  other first digit refused with "Saudi identity number fits neither class by its first digit.", never guessed;
+  other first digit refused with "Saudi identity number fits neither the national ID nor the iqama number.", never guessed;
   `tryFromNumber()` returns null), as recommended by the 1.0 review (CR-014); its two candidates are frozen for 1.x and
   the classes keep accepting every first digit.
 - **Enforced:** ten digits after removing space, hyphen, NBSP and the ideographic space; fullwidth, Arabic-Indic
