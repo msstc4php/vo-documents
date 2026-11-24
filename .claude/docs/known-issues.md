@@ -583,6 +583,9 @@ script classes use `\p{sc=Latin}` / `\p{sc=Cyrillic}` (Script property only); `c
   `012345678` (the ATO form field is right-justified and zero-padded, so data from ATO forms may carry the padded
   form). `formatted()` groups from the right (`substr(0, -6)`), so the 9-digit output is unchanged. Before widening
   any class, check it is in no factory candidate set (`grep -rn ClassName src/`); TFN is in none.
+- **Masking a widened shorter length must hide at least the same share** (controller ruling for the 8-digit TFN):
+  `masked()` output of a new length is frozen once released, so pick it so the hidden share is >= that of the old
+  length. TFN: 9 digits keep 3 (6/9 hidden), 8 digits keep 2 (`** *** *78`, 6/8), not 3 (5/8).
 - **AU TFN code numbers** (`000000000`, `111111111`, `333333333`, `444444444`, `987654321`, spec § 7.48) are accepted;
   docs only, no `isTfnCode()`.
 - **GB CHI check digit**: PHS code (`chi_check.R`, commit `ee4e496`) counts as the official text (controller ruling,

@@ -15,9 +15,9 @@ use Override;
  * Social Insurance Number, `123 456 789`: nine digits. `from()` checks the format only: the CRA tells tax preparers
  * to report a SIN that fails its check "even if it is not a valid number", and its own sample SINs `123 456 789` and
  * `111 111 111` fail it; {@see hasValidCheckDigit()} reports the CRA check. No first digit is refused: no ESDC text
- * marks a leading digit unassigned. ESDC states that SINs "beginning with a "9" are issued to temporary workers who are neither Canadian citizens nor
- * permanent residents", which {@see isTemporaryResident()} reads. `masked()` keeps the last four digits (no official
- * masking rule): `*** **6 789`.
+ * marks a leading digit unassigned. ESDC states that SINs "beginning with a "9" are issued to temporary workers who
+ * are neither Canadian citizens nor permanent residents", which {@see isTemporaryResident()} reads. `masked()` keeps
+ * the last four digits (no official masking rule): `*** **6 789`.
  *
  * @see https://bac-lac.wayback.archive-it.org/web/20061210041004/http:/www.cra-arc.gc.ca/eservices/magmedia/sin-e.pdf
  *      CRA, "Validating a Social Insurance Number -- Example" (Library and Archives Canada web archive)

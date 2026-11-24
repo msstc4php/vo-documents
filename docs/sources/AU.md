@@ -196,12 +196,13 @@ non-individuals, and nothing says they were withdrawn, so 1.2 accepts them: a re
 `MAX_LENGTH` (9). `TaxFileNumber` is in no factory, so no candidate set changes. **An 8-digit TFN is kept as written**,
 not zero-padded to the nine digits of the ATO form field: `12345678` and `012345678` are different values
 (`equals()` is false). A caller that receives TFNs from both sources should normalise them itself. An 8-digit TFN
-keeps the last three digits visible like a 9-digit one (five of eight hidden).
+keeps only the last two digits visible (six of eight hidden, 75%), so it hides at least the share of a 9-digit one
+(six of nine, 67%); keeping three would hide only 62.5% (controller ruling, 2026-11-24 UTC).
 
 Implemented: 8 or 9 digits. Test numbers: `123 456 782` and `330 600 376`; `12 345 678` (8 digits, synthetic).
 `formatted()` groups three digits from the right: `123 456 782`, `12 345 678` (no official display form for 8 digits;
-the 9-digit output is unchanged). `masked()` (no official rule) keeps the last three digits: `*** *** 782`,
-`** *** 678`.
+the 9-digit output is unchanged). `masked()` (no official rule) keeps the last three of 9 digits and the last two of
+8: `*** *** 782`, `** *** *78`.
 
 ## Medicare card number (`Document\AU\MedicareCardNumber`)
 
@@ -235,7 +236,8 @@ the last three digits: `**** ***02 1`.
 No AU source publishes a masking rule. Every AU `masked()` keeps the last **three** characters, not the four that plan
 1 set as the package default (and that every RU class keeps): AU numbers are short (driver licences 1-10 characters,
 TFN 8-9, Medicare 10), so four would show almost half of a short number. Licence numbers keep at most half of their
-length (`min(3, ⌊length / 2⌋)`), so a 2-character number shows one.
+length (`min(3, ⌊length / 2⌋)`), so a 2-character number shows one. An 8-digit TFN (since 1.2) keeps two, so it
+hides at least the share hidden of a 9-digit TFN (6 of 8 against 6 of 9).
 
 ## Where this note departs from plan 1, task 6 (the source wins)
 

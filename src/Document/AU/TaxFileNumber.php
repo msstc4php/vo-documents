@@ -17,8 +17,9 @@ use Override;
  * AU.md).
  *
  * `formatted()` groups three digits from the right (`123 456 782`, `12 345 678`; no official display form for 8
- * digits). `masked()` (no official rule) keeps the last three digits, not the package's usual four: AU numbers are
- * short (at most 10 characters), so four would show almost half of them. `*** *** 782`, `** *** 678`.
+ * digits). `masked()` (no official rule) keeps the last three digits of 9, not the package's usual four: AU numbers
+ * are short (at most 10 characters), so four would show almost half of them. Of 8 digits it keeps two, so it hides at
+ * least the share it hides of 9: `*** *** 782`, `** *** *78`.
  *
  * @see https://www.anao.gov.au/sites/default/files/anao_report_1998-99_37.pdf ANAO Audit Report No. 37 1998-99, § 1.5
  * @see https://softwaredevelopers.ato.gov.au/obtainTFNalgorithm ATO, "How to obtain the tax file number algorithm"
@@ -35,18 +36,25 @@ final class TaxFileNumber extends AbstractStringValueObject implements Maskable
      */
     public function formatted(): string
     {
-        return \sprintf('%s %s %s', \substr($this->value, 0, -6), \substr($this->value, -6, 3), \substr($this->value, -3));
+        return \sprintf(
+            '%s %s %s',
+            \substr($this->value, 0, -6),
+            \substr($this->value, -6, 3),
+            \substr($this->value, -3),
+        );
     }
 
     #[Override]
     public function masked(): string
     {
-        return Mask::keepLastDigits($this->formatted(), 3);
+        return Mask::keepLastDigits($this->formatted(), \strlen($this->value) === 8 ? 2 : 3);
     }
 
     #[Override]
     protected function parse(string $value): string
     {
-        return Digits::exactly($value, Digits::strippedLength($value) === 8 ? 8 : 9, self::DOCUMENT);
+        $digits = Digits::strip($value);
+
+        return Digits::exactlyStripped($digits, \mb_strlen($digits, 'UTF-8') === 8 ? 8 : 9, self::DOCUMENT);
     }
 }

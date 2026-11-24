@@ -59,7 +59,8 @@ folded. Names do not fold: a compatibility character in a name is refused.
 `__toString()` and `jsonSerialize()` return the full canonical value. Masking is an explicit, separate call,
 `masked()` (vo-base's interface `MSSTC4PHP\ValueObject\Contract\Maskable`). No masking rule is official unless the class says so; the default keeps the
 last four characters, and a number of 8 characters or fewer keeps three (CH identity document, GB Northern Ireland
-licence). The AU classes keep three (their numbers are at most 10 characters long, `docs/sources/AU.md`).
+licence). The AU classes keep three (their numbers are at most 10 characters long, `docs/sources/AU.md`); an 8-digit
+TFN keeps two.
 
 | Class | Document | Check | Source |
 |---|---|---|---|

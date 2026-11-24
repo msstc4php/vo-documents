@@ -58,7 +58,7 @@ final class TaxFileNumberTest extends TestCase
     public static function displayForms(): iterable
     {
         yield 'nine digits' => ['123456782', '123 456 782', '*** *** 782'];
-        yield 'eight digits' => ['12345678', '12 345 678', '** *** 678'];
+        yield 'eight digits, last two shown' => ['12345678', '12 345 678', '** *** *78'];
     }
 
     #[DataProvider('displayForms')]
@@ -82,6 +82,7 @@ final class TaxFileNumberTest extends TestCase
     {
         yield 'seven digits' => ['1 234 567', 'Invalid Australian tax file number (wrong length).'];
         yield 'eight characters, letter' => ['1234567O', 'Invalid Australian tax file number (invalid character).'];
+        yield 'eight characters, multibyte letter' => ['1234567Ö', 'Invalid Australian tax file number (invalid character).'];
         yield 'ten digits' => ['123 456 7820', 'Invalid Australian tax file number (wrong length).'];
         yield 'letter' => ['123 456 78O', 'Invalid Australian tax file number (invalid character).'];
         yield 'empty' => ['', 'Invalid Australian tax file number (wrong length).'];

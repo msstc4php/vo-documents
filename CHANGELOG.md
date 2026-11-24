@@ -19,7 +19,9 @@
 - `Document\AU\TaxFileNumber` accepts 8 digits (ANAO Audit Report No. 37 1998-99 § 1.5: "a eight or nine digit
   number"); 1.1 refused them. An 8-digit TFN is kept as written, not zero-padded: `12345678` does not equal
   `012345678`. `formatted()` groups three digits from the right (`12 345 678`; 9 digits unchanged), `masked()` keeps
-  the last three (`** *** 678`). `MAX_LENGTH` stays 9; the class is in no factory.
+  the last two (`** *** *78`, so it hides at least the share it hides of 9 digits). `MAX_LENGTH` stays 9; the class
+  is in no factory. An 8-character input with a non-digit is now refused as "(invalid character)" (was "(wrong
+  length)"); message wording is outside the 1.x promise.
 
 ### Documentation
 
