@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace MSSTC4PHP\ValueObject\Documents\Tests\Unit\Document\CA;
 
 use MSSTC4PHP\ValueObject\Documents\Document\CA\SocialInsuranceNumber;
+use MSSTC4PHP\ValueObject\Documents\Internal\Checksum;
 use MSSTC4PHP\ValueObject\Documents\Internal\Digits;
 use MSSTC4PHP\ValueObject\Documents\Internal\Mask;
 use MSSTC4PHP\ValueObject\Documents\Internal\Text;
@@ -15,10 +16,12 @@ use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
 
 /**
- * Expectations follow docs/sources/CA.md "Social Insurance Number": format only (no check digit published by ESDC,
- * no first digit refused); a SIN beginning with 9 is a temporary resident's, as ESDC states.
+ * Expectations follow docs/sources/CA.md "Social Insurance Number": format only for `from()` (no first digit
+ * refused), the CRA check digit reported by `hasValidCheckDigit()`; a SIN beginning with 9 is a temporary resident's,
+ * as ESDC states.
  */
 #[CoversClass(SocialInsuranceNumber::class)]
+#[UsesClass(Checksum::class)]
 #[UsesClass(Digits::class)]
 #[UsesClass(Text::class)]
 #[UsesClass(Mask::class)]
@@ -48,6 +51,24 @@ final class SocialInsuranceNumberTest extends TestCase
         self::assertSame($expected, $number->value);
         self::assertSame($expected, (string) $number);
         self::assertSame($expected, $number->jsonSerialize());
+    }
+
+    /**
+     * @return iterable<string, array{string, bool}>
+     */
+    public static function checkDigits(): iterable
+    {
+        yield 'CRA worked example' => ['999 999 998', true];
+        yield 'CRA worked example, check digit changed' => ['999 999 997', false];
+        yield 'CRA sample on a pay stub' => ['123 456 789', false];
+        yield 'CRA sample for Nova Scotia' => ['111 111 111', false];
+        yield 'synthetic, check digit 0' => ['100 000 090', true];
+    }
+
+    #[DataProvider('checkDigits')]
+    public function testReportsTheCheckDigit(string $input, bool $valid): void
+    {
+        self::assertSame($valid, SocialInsuranceNumber::from($input)->hasValidCheckDigit());
     }
 
     public function testFormatsAndMasks(): void

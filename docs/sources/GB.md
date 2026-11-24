@@ -198,12 +198,30 @@ arithmetical check digit."
 
 PHS `chi_check()`: the first six digits must be a valid date; "starting in August 2026, some CHIs will only pass if
 they meet the modulo 10 criteria" (a CHI passes either a modulus 11 or a modulus 10 check). Neither algorithm is
-published as text by PHS or ISD Scotland (the reference page gives only the function's switches).
+published as prose by PHS or ISD Scotland (the reference page gives only the function's switches); **both are
+published as PHS code**, which counts as the official text here (ruling of 2026-11-24 UTC, the same precedent as the
+ANS routines for the FR NIR: a government body's own publication). Source: `R/chi_check.R` of Public Health Scotland's
+`phsmethods` package (the `Public-Health-Scotland` GitHub organisation, CRAN `phsmethods`), commit
+`ee4e49644e90c04162bd6b8ce34ca5c1cb744f3e` (2026-07-28T11:28:59Z),
+<https://github.com/Public-Health-Scotland/phsmethods/blob/ee4e49644e90c04162bd6b8ce34ca5c1cb744f3e/R/chi_check.R>
+(read 2026-11-24 UTC). Verbatim:
+
+> By default, a CHI that passes either the modulo 10 or the modulo 11 check will be considered valid. Historically,
+> CHIs only used modulo 11 for their check digit; however, starting in August 2026, some CHIs will only pass if they
+> meet the modulo 10 criteria.
+
+Modulus 11: `wg <- 10:2` over the first nine digits, `check_digit <- 11 - mod11_remainder`,
+`check_digit[check_digit == 11] <- 0  # If 11, make 0`, passed when it equals the tenth digit (a computed 10 matches
+no digit). Modulus 10: "Start from digit 9, double it, then double every 2nd digit", "If doubling the digit makes it
+10 or more, subtract 9", "Sum up the digits in each row, divide the sum by 10 and take the remainder",
+`mod10_calc <- 10 - mod10_remainder`, 10 → 0: the Luhn sum over the ten digits. With both switches on (the default),
+`final_passed <- mod11_passed | mod10_passed`.
 
 Implemented: 10 digits; the date `DDMMYY` must exist (month 01-12, day of that month; 29 February only for a two-digit
 year divisible by four, no century encoded; a calendar check under the 1.0 rule, README "Birth dates": the Data
-Dictionary constructs the number from the PERSON BIRTH DATE and PHS's own `chi_check()` refuses an invalid date); **format only for the check digit** (no official algorithm text, and two
-algorithms are in use since August 2026). Encoded data: `sex()` (`HasSex`, ninth digit), `birthDay()`, `birthMonth()`,
+Dictionary constructs the number from the PERSON BIRTH DATE and PHS's own `chi_check()` refuses an invalid date);
+**format only for the check digit in `from()`**, which 1.0 accepted and 1.x keeps accepting; `hasValidCheckDigit()`
+(1.2) reports PHS's modulus 11 OR modulus 10 check, report only. Encoded data: `sex()` (`HasSex`, ninth digit), `birthDay()`, `birthMonth()`,
 `birthYearDigits()` (no `HasBirthDate`: no century). No published display form; `masked()` keeps the last four
 digits: `******6719` (for `1203456719`). No official example; tests use synthetic numbers.
 

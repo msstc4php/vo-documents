@@ -1,5 +1,35 @@
 # Changelog
 
+## [1.2.0] - unreleased
+
+### Added
+
+- `hasValidCheckDigit(): bool`, report only (`from()`, `tryFrom()` and `isValid()` accept what they accepted):
+  - `Document\DE\TaxIdentificationNumber`: ISO 7064 MOD 11,10 as ELSTER "Prüfung der Steuer- und
+    Steueridentifikationsnummer" § 2.2 computes it, tested against its six example numbers. Following ELSTER, the
+    correct check digit is never exposed.
+  - `Document\CA\SocialInsuranceNumber`: the CRA's "Validating a Social Insurance Number" (Luhn; `999 999 998`). The
+    CRA's own sample SINs `123 456 789` and `111 111 111` report false.
+  - `Document\GB\ChiNumber`: modulus 11 (weights 10 to 2) or modulus 10 (Luhn, since August 2026), as Public Health
+    Scotland's `chi_check()` (phsmethods, commit `ee4e496`) accepts either.
+- `Internal\Checksum::iso7064Mod11Dash10()` (internal).
+
+### Changed
+
+- `Document\AU\TaxFileNumber` accepts 8 digits (ANAO Audit Report No. 37 1998-99 § 1.5: "a eight or nine digit
+  number"); 1.1 refused them. An 8-digit TFN is kept as written, not zero-padded: `12345678` does not equal
+  `012345678`. `formatted()` groups three digits from the right (`12 345 678`; 9 digits unchanged), `masked()` keeps
+  the last three (`** *** 678`). `MAX_LENGTH` stays 9; the class is in no factory.
+
+### Documentation
+
+- Source notes: the ELSTER structure rules of the Steuer-ID (not applied: an ELSTER example breaks the adjacency rule),
+  the AU TFN code numbers (`000000000`, `111111111`, `333333333`, `444444444`, `987654321`; accepted, not TFNs), the CGU
+  CPF mask (`***.012.389-**`, shows more than `masked()`: a 2.0 candidate), the JR/T 0171-2020 masking annex for CN
+  (informative, not adopted), the ANS texts on the FR NIR key (mandatory, no formula), the FNS letter КВ-4-14/10475@
+  on the INN control number (method unchanged, unpublished) and the DOF copy of the CURP Instructivo (check digit
+  algorithm unpublished).
+
 ## [1.1.0] - 2026-11-24
 
 ### Added

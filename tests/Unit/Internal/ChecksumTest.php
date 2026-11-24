@@ -55,6 +55,14 @@ final class ChecksumTest extends TestCase
         self::assertSame('0', Checksum::iso7064Mod11Dash2('0794'));
     }
 
+    public function testIso7064Mod11Dash10ReturnsCheckDigit(): void
+    {
+        self::assertSame(8, Checksum::iso7064Mod11Dash10('0247629135'));
+        self::assertSame(2, Checksum::iso7064Mod11Dash10('0'));
+        self::assertSame(1, Checksum::iso7064Mod11Dash10('0000000000'));
+        self::assertSame(0, Checksum::iso7064Mod11Dash10('1000000000'));
+    }
+
     /**
      * @return iterable<string, array{Closure(): mixed}>
      */
@@ -72,6 +80,8 @@ final class ChecksumTest extends TestCase
         yield 'luhn empty' => [static fn (): bool => Checksum::luhn('')];
         yield 'weightedMod empty' => [static fn (): int => Checksum::weightedMod('', [], 11)];
         yield 'mod11-2 empty' => [static fn (): string => Checksum::iso7064Mod11Dash2('')];
+        yield 'mod11,10 letters' => [static fn (): int => Checksum::iso7064Mod11Dash10('12a4')];
+        yield 'mod11,10 empty' => [static fn (): int => Checksum::iso7064Mod11Dash10('')];
     }
 
     /**

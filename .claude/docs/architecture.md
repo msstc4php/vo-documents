@@ -25,11 +25,12 @@ The transliterator picks the one table whose `script()` covers every letter of t
 → "mixed scripts", none → "no ICAO transliteration".
 
 `Document\AU\*`: `Jurisdiction` (enum, ISO 3166-2), `DriverLicenceNumber` interface, `AbstractDriverLicenceNumber` + one
-final class per jurisdiction in `DriverLicence\`, `DriverLicenceNumberFactory`, `TaxFileNumber`, `MedicareCardNumber`.
+final class per jurisdiction in `DriverLicence\`, `DriverLicenceNumberFactory`, `TaxFileNumber` (8 or 9
+digits since 1.2, kept as written), `MedicareCardNumber`.
 `Name\AU\*`: part classes on the Latin base, `PersonName`/`PersonNameCodec` on the `Name\Latin` family+given bases.
 
 `Document\DE\*`: `IdentityCardNumber` (+ `authorityCode()`), `PassportNumber`, `TaxIdentificationNumber` (format
-only), `PensionInsuranceNumber` (VKVV checksum; fields as strings, no `HasBirthDate`/`HasSex`). `Name\DE\*` mirrors
+only; `hasValidCheckDigit()` ELSTER MOD 11,10 since 1.2), `PensionInsuranceNumber` (VKVV checksum; fields as strings, no `HasBirthDate`/`HasSex`). `Name\DE\*` mirrors
 `Name\AU\*` (Latin base, `TransliterationVariant`).
 
 `Document\FR\*`: `Nir` (`HasSex`; DSN field rules; key format only; `birthMonth()` nullable, `birthPlaceCode()`
@@ -69,7 +70,8 @@ given name), `latinOverride`.
 `birthMonth()`/`birthDay()`; check characters random, not verified), `NorthernIrelandDriverLicenceNumber` (DVA, 8
 digits; two plain classes, no `SubdivisionResolver`: the formats never overlap), `NhsNumber` and `HealthAndCareNumber`
 (NHS Modulus 11 verified through the internal `NhsCheckDigit`; H&C range 320000001-399999999), `ChiNumber` (Scotland;
-`HasSex`, `DDMMYY` date validated, check digit format only). `Internal\TwoDigitYearDate` validates a day/month with a
+`HasSex`, `DDMMYY` date validated, check digit format only in `from()`, `hasValidCheckDigit()` mod 11 OR Luhn since
+1.2). `Internal\TwoDigitYearDate` validates a day/month with a
 century-less year (`exists()` for CHI; DVLA uses `inRanges()` since the 1.0 review). `Name\GB\PersonName($family, ?$given, ?$latin)`: `\p{Latin}`
 parts, override policy `AnyIcaoSpelling` (HMPO writes a documented spelling; kept also without a derived form), `given`
 null for a person with one name (an override's lone `XXX` forename is dropped);
@@ -101,7 +103,7 @@ interface, `DlId\AbstractDlIdNumber` (hooks `shapes(): NumberShapes`, `layout()`
 covered cases only; `classFor()` lists the 21 uncovered cases explicitly (`=> null`), so
 a new enum case breaks the `match`. FL, WI, WY add `formatted()` (published hyphen layout) and mask in it.
 
-`Document\CA\*` (federal, plan 3 Task 4): `SocialInsuranceNumber` (9 digits, format only; `formatted()`
+`Document\CA\*` (federal, plan 3 Task 4): `SocialInsuranceNumber` (9 digits, format only; `hasValidCheckDigit()` Luhn since 1.2, report only; `formatted()`
 `123 456 789`, mask `*** **6 789`; `isTemporaryResident()` = first digit 9), `PassportNumber` (`A123456BC` since
 2023-05-10 or `AB123456` before; mask 4, 3 for 8 characters). `Name\CA\PersonName($family, ?$given, ?$latin)` on
 `AbstractFamilyGivenPersonName` like GB (one-word name = `given` null), policy `AnyIcaoSpelling`, no `XXX` handling;

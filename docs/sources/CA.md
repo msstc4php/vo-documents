@@ -8,6 +8,7 @@ All dates UTC. Sources read 2026-11-16.
 | "Employer information - Social Insurance Number (SIN)" (2023-06-22) | ESDC | <https://www.canada.ca/en/employment-social-development/programs/ei/ei-list/ei-employers-sin.html> |
 | "The Social Insurance Number (SIN) Code of Practice", main page and Section 2 (2026-03-24) | ESDC | <https://www.canada.ca/en/employment-social-development/services/sin/reports/code-of-practice.html>, <https://www.canada.ca/en/employment-social-development/services/sin/reports/code-of-practice/section-2.html> |
 | "Employers - What you need to know about Social Insurance Numbers" (2026-10-09) | ESDC | <https://www.canada.ca/en/employment-social-development/services/sin/reports/employers.html> |
+| "Validating a Social Insurance Number -- Example" (2002 PDF, archived 2006-12-10, read 2026-11-24 UTC) | CRA (Library and Archives Canada web archive) | <https://bac-lac.wayback.archive-it.org/web/20061210041004/http:/www.cra-arc.gc.ca/eservices/magmedia/sin-e.pdf> |
 | "Get the social insurance number (SIN) from the individual" (2024-04-10) | CRA | <https://www.canada.ca/en/revenue-agency/services/tax/businesses/topics/payroll/set-up-new-employee/social-insurance-number.html> |
 | "Rejected T4FHSA individual records or annual information returns" (2026-09-16) | CRA | <https://www.canada.ca/en/revenue-agency/services/tax/registered-plans-administrators/first-home-savings-account/rejected-t4fhsa-individual-records-annual-information-returns.html> |
 | Learn about your taxes, "Starting to work" | CRA | <https://www.canada.ca/en/revenue-agency/services/tax/individuals/educational-programs/starting-work.html> |
@@ -87,11 +88,28 @@ CRA:
 
 Verdict:
 
-- **Check digit: not verified (format only).** ESDC publishes none. The CRA names a "Modulus 10 (Mod 10) check digit
-  formula" but publishes no algorithm (no weights, no worked example) on any page found; "Mod 10" alone names a family
-  of algorithms, and the only algorithm quoted by third parties (Luhn) is not an official text. The CRA's own sample
-  SINs `123 456 789` and `111 111 111` fail the Luhn sum, so enforcing it would refuse official examples. A mistyped
-  SIN is therefore accepted.
+- **Check digit: reported, not enforced (1.2).** The CRA's algorithm is published in an archived CRA page,
+  "Validating a Social Insurance Number -- Example",
+  <https://bac-lac.wayback.archive-it.org/web/20061210041004/http:/www.cra-arc.gc.ca/eservices/magmedia/sin-e.pdf>
+  (Library and Archives Canada web archive of `cra-arc.gc.ca/eservices/magmedia/sin-e.pdf`, captured 2006-12-10; read
+  2026-11-24 UTC):
+
+  > Recipient's SIN: 999 999 998 … (Exclude the check digit, position 9, from calculation) … Multiply every second
+  > digit by 2 … 18 18 18 18 … Cross add the resulting digits (1 + 8 + 1 + 8 + 1 + 8 + 1 + 8) = 36 … Cross add the
+  > 1st, 3rd, 5th and 7th digits (9 + 9 + 9 + 9) = 36 … Total 72 … Subtract from the next highest number ending in
+  > zero 80 … Check digit (i.e., 80 - 72 = 8)
+
+  > If the SIN provided by the individual does not pass the verification check, the tax preparer should then confirm
+  > the SIN with the employer who received the original number. … do not leave the SIN field on the information slip
+  > blank. Instead, report the SIN that was provided, even if it is not a valid number.
+
+  This is the Luhn sum; `hasValidCheckDigit()` computes it, with `999 999 998` as the test vector. The page does not
+  show a total that already ends in zero: read literally, "the next highest number ending in zero" would give a check
+  digit of 10, which cannot be written, so the Luhn reading (check digit 0) is the only consistent one. **`from()`
+  never refuses a failing SIN:** the CRA itself says to report the SIN as provided "even if it is not a valid number",
+  its current pages give no algorithm (the T619 T4 page: "When the employee has failed to provide a SIN, the only
+  acceptable value to enter in the field is all zeroes"), and its own sample SINs `123 456 789` and `111 111 111`
+  (below) fail the sum; 1.0 accepted them, so refusing would also break the 1.x promise. ESDC publishes no check digit.
 - **First digit:** no leading digit is refused: no ESDC text says 0 or 8 is unassigned (the CRA ITN's `08`/`09` is a
   different number; this class cannot tell an ITN from a SIN). `isTemporaryResident()` is the ESDC statement "SINs
   beginning with a "9" are issued to temporary workers": first digit 9. The province meaning of other first digits is
@@ -429,7 +447,8 @@ Omit the YM", fails ON-IHCS's MOD 10; it is an Alberta illustration, not an Onta
 
 - The CRA individual tax number (ITN) and temporary tax number (TTN): CRA numbers, not ESDC identity documents; out of
   the plan's CA candidates.
-- The SIN check digit (no published algorithm, see above), the province meaning of a SIN's first digit and the SIN
-  expiry date (in the SIN record, not in the number).
+- Refusing a SIN that fails its check digit (reported by `hasValidCheckDigit()` since 1.2; the CRA says to report such
+  a SIN as given, see above), the province meaning of a SIN's first digit and the SIN expiry date (in the SIN record,
+  not in the number).
 - The passport print form of a one-word name (no Passport Program text found).
 - Special, diplomatic, temporary and emergency passport numbers: IRCC publishes the general passport format only.

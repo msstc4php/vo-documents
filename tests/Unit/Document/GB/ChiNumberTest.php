@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace MSSTC4PHP\ValueObject\Documents\Tests\Unit\Document\GB;
 
 use MSSTC4PHP\ValueObject\Documents\Document\GB\ChiNumber;
+use MSSTC4PHP\ValueObject\Documents\Internal\Checksum;
 use MSSTC4PHP\ValueObject\Documents\Internal\Digits;
 use MSSTC4PHP\ValueObject\Documents\Internal\Mask;
 use MSSTC4PHP\ValueObject\Documents\Internal\Text;
@@ -17,10 +18,11 @@ use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
 
 /**
- * Expectations follow docs/sources/GB.md "CHI number, Scotland"; no example is published and the check digit is not
- * verified, so the numbers are synthetic.
+ * Expectations follow docs/sources/GB.md "CHI number, Scotland"; no example is published, so the numbers are
+ * synthetic. `from()` checks the format of the check digit only; `hasValidCheckDigit()` reports the PHS checks.
  */
 #[CoversClass(ChiNumber::class)]
+#[UsesClass(Checksum::class)]
 #[UsesClass(Digits::class)]
 #[UsesClass(Text::class)]
 #[UsesClass(Mask::class)]
@@ -71,6 +73,30 @@ final class ChiNumberTest extends TestCase
         self::assertSame($day, $number->birthDay());
         self::assertSame($month, $number->birthMonth());
         self::assertSame($year, $number->birthYearDigits());
+    }
+
+    /**
+     * @return iterable<string, array{string, bool}>
+     */
+    public static function checkDigits(): iterable
+    {
+        yield 'modulus 11 only' => ['1203456719', true];
+        yield 'modulus 11 only, every weight in play' => ['2811883215', true];
+        yield 'every weight in play, check digit changed' => ['2811883216', false];
+        yield 'modulus 10 only' => ['1203456718', true];
+        yield 'neither' => ['1203456710', false];
+        yield 'modulus 11 of 11, read as 0' => ['1203450060', true];
+        yield 'modulus 11 of 10, never a digit; 0 fails' => ['1203450010', false];
+        yield 'modulus 11 of 10; the modulus 10 digit passes' => ['1203450018', true];
+    }
+
+    #[DataProvider('checkDigits')]
+    public function testReportsTheCheckDigitAndStillAcceptsAFailure(string $input, bool $valid): void
+    {
+        $number = ChiNumber::from($input);
+
+        self::assertSame($valid, $number->hasValidCheckDigit());
+        self::assertSame($input, $number->value);
     }
 
     public function testMasksAllButTheLastFourDigits(): void

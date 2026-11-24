@@ -37,6 +37,9 @@ final class TaxFileNumberTest extends TestCase
         // Format only: no official algorithm is published, so a "wrong" check digit is accepted.
         yield 'last digit changed, accepted' => ['123 456 783', '123456783'];
         yield 'first digit changed, accepted' => ['223 456 782', '223456782'];
+        // ANAO § 1.5: "a eight or nine digit number"; kept as written, not padded.
+        yield 'eight digits' => ['12 345 678', '12345678'];
+        yield 'eight digits, leading zero' => ['01234567', '01234567'];
     }
 
     #[DataProvider('validNumbers')]
@@ -49,12 +52,27 @@ final class TaxFileNumberTest extends TestCase
         self::assertSame($expected, $tfn->jsonSerialize());
     }
 
-    public function testFormatsAndMasks(): void
+    /**
+     * @return iterable<string, array{string, string, string}>
+     */
+    public static function displayForms(): iterable
     {
-        $tfn = TaxFileNumber::from('123456782');
+        yield 'nine digits' => ['123456782', '123 456 782', '*** *** 782'];
+        yield 'eight digits' => ['12345678', '12 345 678', '** *** 678'];
+    }
 
-        self::assertSame('123 456 782', $tfn->formatted());
-        self::assertSame('*** *** 782', $tfn->masked());
+    #[DataProvider('displayForms')]
+    public function testFormatsAndMasks(string $input, string $formatted, string $masked): void
+    {
+        $tfn = TaxFileNumber::from($input);
+
+        self::assertSame($formatted, $tfn->formatted());
+        self::assertSame($masked, $tfn->masked());
+    }
+
+    public function testEightDigitsAreNotPaddedSoTheyDifferFromTheZeroPaddedForm(): void
+    {
+        self::assertFalse(TaxFileNumber::from('12345678')->equals(TaxFileNumber::from('012345678')));
     }
 
     /**
@@ -62,7 +80,8 @@ final class TaxFileNumberTest extends TestCase
      */
     public static function invalidNumbers(): iterable
     {
-        yield 'eight digits' => ['12 345 678', 'Invalid Australian tax file number (wrong length).'];
+        yield 'seven digits' => ['1 234 567', 'Invalid Australian tax file number (wrong length).'];
+        yield 'eight characters, letter' => ['1234567O', 'Invalid Australian tax file number (invalid character).'];
         yield 'ten digits' => ['123 456 7820', 'Invalid Australian tax file number (wrong length).'];
         yield 'letter' => ['123 456 78O', 'Invalid Australian tax file number (invalid character).'];
         yield 'empty' => ['', 'Invalid Australian tax file number (wrong length).'];

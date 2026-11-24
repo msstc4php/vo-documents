@@ -71,7 +71,7 @@ licence). The AU classes keep three (their numbers are at most 10 characters lon
 | `Document\RU\DriverLicenceNumber` | Driving licence, `00 00 000000` | shape only | MVD Order No. 365 of 13.05.2009 |
 | `Document\RU\DriverLicenceCategory` | Licence categories (enum) | n/a | MVD Order No. 365; Federal Law 196-FZ |
 | `Document\RU\OmsPolicyNumber` | OMS policy (ЕНП), 16 digits | HL7 Mod10 (Luhn) | FFOMS Order No. 79 of 07.04.2011 |
-| `Document\AU\TaxFileNumber` | Tax file number, 9 digits | format only (no check digit verified) | ATO (algorithm not public) |
+| `Document\AU\TaxFileNumber` | Tax file number, 8 or 9 digits (kept as written) | format only (no check digit verified) | ATO (algorithm not public); ANAO Report 37 1998-99 |
 | `Document\AU\MedicareCardNumber` | Medicare card, 10 digits | format only (no check digit verified) | Australian Digital Health Agency (algorithm not public) |
 | `Document\AU\DriverLicence\{Act,Nsw,Nt,Qld,Sa,Tas,Vic,Wa}DriverLicenceNumber` | Licence number per state or territory | shape only | Home Affairs DVS field rules |
 | `Document\AU\Jurisdiction` | The eight states and territories (enum, ISO 3166-2:AU) | n/a | ISO 3166-2:AU |
@@ -87,7 +87,7 @@ official algorithm is published. A number with the right shape is accepted, neve
 |---|---|---|---|---|
 | `Document\DE\IdentityCardNumber` | Personalausweis serial number, 9 characters | format only (no check digit of its own) | `authorityCode()` | PAuswG § 2 Abs. 8; PAuswV Anlage 3 |
 | `Document\DE\PassportNumber` | Reisepass serial number, 9 characters | format only | none | PassG § 4; PassV Anlage 11 |
-| `Document\DE\TaxIdentificationNumber` | Steuer-ID, 11 digits | format only | none | StIdV § 1; AO § 139b |
+| `Document\DE\TaxIdentificationNumber` | Steuer-ID, 11 digits | format only; `hasValidCheckDigit()` reports the ELSTER check digit (ISO 7064 MOD 11,10) | none | StIdV § 1; AO § 139b; ELSTER § 2.2 |
 | `Document\DE\PensionInsuranceNumber` | Rentenversicherungsnummer, `NN DDMMYY L SS C` | checksum verified (VKVV § 2) | fields as strings, no typed date or sex | VKVV § 2 |
 | `Document\FR\Nir` | NIR (numéro de sécurité sociale), 15 characters | key format only | `HasSex`, birth year digits, `birthMonth()`, `birthPlaceCode()` | INSEE; DSN cahier technique |
 | `Document\FR\LegacyIdentityCardNumber` | CNI issued until 2021, 12 characters (digits; `2A`/`2B` in a Corsican place code) | format only | `issueYearDigits()`, `issueMonth()` (not validated), `issuePlaceCode()`, `serialNumber()` | NOR INTD0000001C |
@@ -110,7 +110,7 @@ official algorithm is published. A number with the right shape is accepted, neve
 | `Document\GB\NorthernIrelandDriverLicenceNumber` | DVA licence driver number, 8 digits | format only | none | nidirect (DVA) |
 | `Document\GB\NhsNumber` | NHS number (England, Wales), 10 digits | checksum verified (Modulus 11) | none | NHS Data Dictionary |
 | `Document\GB\HealthAndCareNumber` | H&C number (Northern Ireland), 10 digits | checksum verified; range 320000001-399999999 | none | NHS Data Dictionary |
-| `Document\GB\ChiNumber` | CHI number (Scotland), 10 digits | date validated; check digit format only | `HasSex`, birth year digits, month, day | NHS Data Dictionary; PHS |
+| `Document\GB\ChiNumber` | CHI number (Scotland), 10 digits | date validated; check digit format only, `hasValidCheckDigit()` reports PHS's modulus 11 or modulus 10 check | `HasSex`, birth year digits, month, day | NHS Data Dictionary; PHS `chi_check()` |
 | `Document\TR\IdentityNumber` | T.C. Kimlik No, 11 digits | format only | none (NVİ: encodes nothing) | NVİ; Nüfus Hizmetleri Yönetmeliği Madde 4 |
 | `Document\TR\PassportNumber` | Passport, letter + 8 digits | format only | none | Council of the EU PRADO |
 | `Document\US\SocialSecurityNumber` | SSN, `123-45-6789` | SSA rules: area not 000/666/900-999, group not 00, serial not 0000 (no check digit exists); masked `***-**-6789` (26 CFR 301.6109-4) | none | SSA; IRM 3.13.5.21 |
@@ -121,7 +121,7 @@ official algorithm is published. A number with the right shape is accepted, neve
 | `Document\US\DlId\{Al,Az,Co,Ct,Fl,Hi,Ia,Id,Il,In,Ks,Ky,Ma,Md,Me,Mi,Ms,Nd,Ne,Nj,Nm,Ny,Ok,Pa,Ri,Tx,Vt,Wa,Wi,Wy}DlIdNumber` | DL/ID number of 30 states (one class covers a state's licence and ID card where the source says so) | shape only (no check digit verified; HI, KS, MA, NE, VT, WA letters enforced as quoted) | none (the IL, WA, FL and MI name and birth data is not decoded) | state DMV and police publications; USCIS E-Verify RIDE fact sheets |
 | `Document\US\Jurisdiction` | The 50 states and DC (enum, ISO 3166-2:US) | n/a | n/a | ISO 3166-2:US |
 | `Document\US\DlIdNumber`, `Document\US\DlIdNumberFactory` | Interface of the 30 DL/ID classes; factory `fromNumberIn()` / `jurisdictionsMatching()` | n/a | n/a | the DL/ID sources above |
-| `Document\CA\SocialInsuranceNumber` | SIN, `123 456 789` | format only (no check digit verified: no algorithm published) | `isTemporaryResident()` (first digit 9, ESDC) | ESDC; CRA |
+| `Document\CA\SocialInsuranceNumber` | SIN, `123 456 789` | format only; `hasValidCheckDigit()` reports the CRA check digit (Luhn; the CRA says to keep a failing SIN) | `isTemporaryResident()` (first digit 9, ESDC) | ESDC; CRA |
 | `Document\CA\PassportNumber` | Passport, letter + 6 digits + 2 letters (since 2023-05-10) or 2 letters + 6 digits | format only | none | IRCC |
 | `Document\CA\DriverLicence\{Ab,Bc,Ns,On,Qc,Sk}DriverLicenceNumber` | Driver's licence number of 6 jurisdictions (NS and SK also cover the photo ID card): AB `123456-789`, BC and SK 1-8 digits stored zero-padded to 8, NS Master Number `FINCH220867001`, ON 15 alphanumerics, QC `L1531-171274-08` | shape only (no check digit published); NS day and month checked as calendar fields | none (the NS surname and birth fields are not decoded: two-digit year) | Service Alberta RDN; ICBC; Service Nova Scotia; MTO glossary; SAAQ; Government of Saskatchewan, SGI |
 | `Document\CA\HealthCard\{Ab,Bc,Mb,Nb,Nl,Ns,Nt,Nu,On,Pe,Qc,Sk,Yt}HealthCardNumber` | Health card number of all 13 jurisdictions (8-12 characters; NT letter `D`/`N`/`H`/`M`/`T` + 7 digits; QC NAM `YUXJ75021213`) | BC leading 9 and MOD-11, ON leading digit 1-9 and MOD 10 verified; QC month (01-12, 51-62) and day checked; the rest format only | ON: `OnHealthCardNumber::fromCard()` splits the printed card into the number and an `OnHealthCardVersionCode` (`from()` refuses the version code); QC `HasSex`, birth year digits, month, day (GIU REQ-19-53: a reading aid, not a value to fill a record with) | Ontario Ministry of Health "Province and Territory Codes" and HCV/IHCS specifications; BC Teleplan; Québec MSSS GIU; provincial ministries |
@@ -588,8 +588,8 @@ Collected from the source notes; each is a deliberate omission with its reason i
   MO, MT, NC, NH, NV, OH, OR, SC, SD, TN, UT, VA and WV (no official format published), the ID cards of CT, HI, IN, KY,
   ME, NJ, NM, OK and RI (numbering not stated), the Maryland customer ID, and the decoding of name or birth data in IL,
   WA, FL and MI numbers (`docs/sources/US.md`).
-- **CA:** the SIN check digit (the CRA names a "Mod 10" formula but no official text gives the algorithm), the province
-  meaning of a SIN's first digit, the CRA individual and temporary tax numbers, the passport print form of a one-word
+- **CA:** refusing a SIN that fails its check digit (reported by `hasValidCheckDigit()`; the CRA says to report such a
+  SIN as given), the province meaning of a SIN's first digit, the CRA individual and temporary tax numbers, the passport print form of a one-word
   name, special, diplomatic, temporary and emergency passport numbers (only the general format is published).
   Provincial documents: the driver's licence numbers of the 7 jurisdictions MB, NB, NL, NT, NU, PE and YT (their
   authorities name the number without a format; `fromNumberIn()` throws "(format not covered)"); the photo ID card
@@ -607,8 +607,8 @@ Collected from the source notes; each is a deliberate omission with its reason i
   MIC, NLE, PUE and YUC could not be read on 2026-11-16 UTC and are to be re-checked (`docs/sources/MX.md`).
 - **BR:** the check digits of the título de eleitor and the CNH registration number (the TSE and CONTRAN name "módulo
   11" without the weights, and no government text found gives them), the CNH número do espelho and formulário Renach,
-  passport formats other than the Polícia Federal's two letters and six digits, the masking rule of the CPF (plan
-  default used), a person with no surname (the CNJ code requires one). The RG of 26 of 27 units (all but BR-SP): their
+  passport formats other than the Polícia Federal's two letters and six digits, the CGU masking of the CPF
+  (`***.012.389-**`, LDO 2011: it shows more digits than `masked()`, so it waits for 2.0), a person with no surname (the CNJ code requires one). The RG of 26 of 27 units (all but BR-SP): their
   online forms limit the field at most (BA: eight digits with an optional control digit and no algorithm); the forms of
   BA, CE, MG, PE, RJ, RN and RS could not be read live on 2026-11-16 UTC and are to be re-checked
   (`docs/sources/BR.md`).
@@ -640,7 +640,6 @@ Collected from the source notes; each is a deliberate omission with its reason i
 - **RU old-form OMS policies** (series and number) and AU **11-digit Medicare individual numbers**.
 - **AU driving licence card numbers**: a different number on the same licence, left for a later release (`AU.md`).
 - **AU single names (mononyms)**: the constructor requires a given name (`AU.md`).
-- **AU 8-digit TFNs of non-individuals**: no official format is published (`AU.md`).
 
 ## Rules that may relax
 
@@ -683,11 +682,13 @@ foreigner registration number (no `HasBirthDate`).
   QC health card numbers, whose texts describe the digits but do not say a number with an impossible date is never
   issued. The DE pension insurance number checks no date at all (VKVV § 2 field with unpublished rules for an
   unproven birth date; `birthDateField()` returns it as issued). The decision per class is in its source note.
-- **Format only, check digit not verified:** INN, TFN, Medicare card number, CA SIN, the CA health card numbers other
-  than BC and ON, the MX CURP, RFC, NSS and clave de elector, and the BR título de eleitor and CNH registration number.
-  No official algorithm is published (FNS says only "по алгоритму, определенному ФНС"; the ATO gives the TFN algorithm
-  to registered developers only; the ADHA appendix is not reachable; the CRA names a "Mod 10" formula for the SIN
-  without giving it; the TSE and CONTRAN name "módulo 11" without weights), so a mistyped check digit is accepted. Only
+- **Format only, check digit not verified:** INN, TFN, Medicare card number, the CA health card numbers other than BC
+  and ON, the MX CURP, RFC, NSS and clave de elector, and the BR título de eleitor and CNH registration number. No
+  official algorithm is published (FNS says only "по алгоритму, определенному ФНС"; the ATO gives the TFN algorithm on
+  request under a confidentiality agreement; the ADHA appendix is not reachable; the TSE and CONTRAN name "módulo 11"
+  without weights), so a mistyped check digit is accepted.
+- **Check digit reported, not enforced (since 1.2):** the DE Steuer-ID (ELSTER), the CA SIN (CRA) and the GB CHI
+  number (PHS) have `hasValidCheckDigit()`. `from()` accepts a number that fails, as 1.0 did; refusing waits for 2.0. Only
   checksums quoted from an official source are verified: SNILS, OMS policy, DE pension insurance number, IT codice
   fiscale, ES DNI and NIE, NL BSN, CH AHV number, GB NHS and H&C numbers, BC and ON health card numbers, BR CPF, NIS,
   CNS and the SP RG. Any government body's own publication counts as official (the ANS algorithms for the NIS and CNS);
@@ -709,11 +710,11 @@ foreigner registration number (no `HasBirthDate`).
 - **Not verified against the official PDF:** the 16-digit length of the OMS policy and the FFOMS Order 79 text it is
   checked against (www.ffoms.gov.ru is unreachable from here, the text is quoted from a copy), and the 2 + 7 split of
   the international passport number (no text read states it; `RU.md`).
-- **Format only in Europe** (see the table above): DE Steuer-ID (no leading-zero or repeated-digit rule either, those
-  are in an unpublished BZSt paper), FR NIR key and numéro fiscal, the identity card, passport and licence numbers of
-  every country, ES social security number, TR T.C. Kimlik No (NVİ shares the algorithm only with public bodies; the
-  popular formula fails the official PRADO specimens) and the CHI check digit. ES pre-2008 NIE letters are accepted as
-  any `A-Z`.
+- **Format only in Europe** (see the table above): DE Steuer-ID (the check digit is reported; the ELSTER structure
+  rules, no leading zero and one repeated digit, are not applied: an ELSTER example number breaks one of them), FR NIR
+  key and numéro fiscal, the identity card, passport and licence numbers of every country, ES social security number,
+  TR T.C. Kimlik No (NVİ shares the algorithm only with public bodies; the popular formula fails the official PRADO
+  specimens) and the CHI check digit (reported, not enforced). ES pre-2008 NIE letters are accepted as any `A-Z`.
 - **Encoded data only where the source defines it:** the DE pension insurance number exposes strings (no century, no
   published rule for unproven birth dates); Italian codice fiscale accepts any omocodia substitution over the seven
   numeric positions and `29` February when the two-digit year is divisible by four (no century is encoded).

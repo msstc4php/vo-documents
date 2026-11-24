@@ -11,8 +11,8 @@ use LogicException;
  *
  * Every method expects at least one ASCII digit and nothing else, and throws \LogicException otherwise.
  *
- * Sources: ISO/IEC 7812-1 (Luhn), ISO/IEC 7064:2003 (MOD 11-2), Verhoeff 1969 (the scheme UIDAI's "A UID Numbering
- * Scheme" recommends for the Aadhaar number)
+ * Sources: ISO/IEC 7812-1 (Luhn), ISO/IEC 7064:2003 (MOD 11-2, MOD 11,10), Verhoeff 1969 (the scheme UIDAI's "A UID
+ * Numbering Scheme" recommends for the Aadhaar number)
  */
 final class Checksum
 {
@@ -117,6 +117,25 @@ final class Checksum
         $check = (12 - $product) % 11;
 
         return $check === 10 ? 'X' : (string) $check;
+    }
+
+    /**
+     * ISO 7064 MOD 11,10 as the ELSTER paper prints it for the DE Steuer-ID ("Algorithmus zur Berechnung der
+     * Prüfziffer"): a computed 10 becomes 0.
+     *
+     * @return int<0, 9> the check digit of `$digits`
+     */
+    public static function iso7064Mod11Dash10(string $digits): int
+    {
+        self::assertDigits($digits);
+
+        $product = 10;
+        for ($i = 0, $length = \strlen($digits); $i < $length; $i++) {
+            $sum = ((int) $digits[$i] + $product) % 10;
+            $product = (2 * ($sum === 0 ? 10 : $sum)) % 11;
+        }
+
+        return (11 - $product) % 10;
     }
 
     private static function assertDigits(string $digits): void

@@ -130,15 +130,53 @@ form; `masked()` keeps the last four characters: `*****1T47`.
    "Die Identifikationsnummer (IdNr) ist eine elfstellige Nummer und enthält keine Informationen über die betreffende
    Person." No algorithm on the BZSt site (also not in its FAQ page).
 
-**Format only; the check digit is not verified because no official algorithm is published.** Secondary sources name
-ISO 7064 MOD 11,10; no act or BZSt page says so. The BZSt paper "Erzeugung von Identifikationsnummern — grundlegende
-Beschreibung der Struktur und Merkmale" (released under the IFG, hosted by FragDenStaat:
-<https://media.frag-den-staat.de/files/foi/607002/erzeugung-von-identifikationsnummern-grundlegende-beschreibung-der-struktur-und-merkmale.pdf>)
-states further structure rules (no leading zero; one digit occurs twice or three times in the first ten) but no
-check-digit algorithm; it is not a publication of the agency and its OCR text is incomplete, so **those rules are not
-applied** (owner's rule: structural rules too). A leading zero is therefore accepted.
+4. **ELSTER, "Prüfung der Steuer- und Steueridentifikationsnummer sowie der Ordnungskriterien bei der Grundsteuer"**
+   (© Bayerisches Landesamt für Steuern, "Stand: 02. September 2026"), § 2.2 "Aufbau der Steueridentifikationsnummer
+   (IdNr)", pages 6-8,
+   <https://download.elster.de/download/schnittstellen/Pruefung_der_Steuer_und_Steueridentifikatsnummer.pdf>
+   (read 2026-11-24 UTC; ELSTER is the joint electronic filing system of the German tax administrations, run by the
+   Bayerisches Landesamt für Steuern):
 
-Implemented: 11 digits. No display form is published; `masked()` keeps the last four digits: `*******8901`.
+   > Die Steueridentifikationsnummer ist eine elfstellige Ziffernfolge, die elfte Stelle ist eine Prüfziffer. Die
+   > Steueridentifikationsnummer muss folgenden Kriterien entsprechen:
+   > • Keine führenden Nullen erlaubt, außer es ist eine Testidentifikationsnummer
+   > • Die elfte Ziffer ist eine Prüfziffer und wird aus den Stellen 1 – 10 nach einem bestimmten Algorithmus, siehe
+   >   Kasten „Algorithmus zur Berechnung der Prüfziffer" berechnet
+   > • In den ersten 10 Stellen der Identifikationsnummer muss genau eine Ziffer doppelt oder dreifach vorkommen.
+   > • Existieren drei gleiche Ziffern an den Positionen 1 bis 10, dürfen diese gleichen Ziffern niemals an direkt
+   >   aufeinander folgenden Stellen stehen.
+
+   > Schlägt die Prüfziffernberechnung fehl, darf die Fehlermeldung mit der korrekten Prüfziffer nicht nach außen
+   > kommuniziert werden.
+
+   The box "Algorithmus zur Berechnung der Prüfziffer" prints C++: `produkt = 10`; for each of the ten digits
+   `summe = (ziffer + produkt) % 10; if (summe == 0) summe = 10; produkt = (2*summe) % 11;`, then
+   `pruefZiffer = 11 – produkt` and `(pruefZiffer == 10) ? 0 : pruefZiffer`: ISO 7064 MOD 11,10. Transcription note:
+   the listing reads `ziffer = pSteuerID.at(i)` (a character, not its digit value) and loops over the input length;
+   it is only right for the ten leading digits taken as digit values, which is what
+   `Internal\Checksum::iso7064Mod11Dash10()` computes. Tabelle 2-1 gives six numbers, all of which pass:
+   `02476291358` (TestID, leading zero), `86095742719`, `47036892816`, `65929970489`, `57549285017`, `25768131411`
+   (the last five "ID laut Konzept des ITZ BUND", "dient ausschließlich der Veranschaulichung … darf in keinem Falle
+   für Test- oder Echtübertragungen verwendet werden"; used here as test vectors only).
+
+**Check digit: reported, not enforced (1.2).** `hasValidCheckDigit()` computes the ELSTER algorithm. `from()` keeps
+accepting any eleventh digit: 1.0 accepted it, and a minor never refuses a value an earlier 1.x accepted (README
+"Backward compatibility"); refusing waits for 2.0. Following the ELSTER sentence above, nothing reports the correct
+check digit: the method returns a bool, and no exception message names a digit.
+
+**Structure rules: not applied (docs only).** The three structure bullets (no leading zero except a test number; one
+digit exactly twice or three times among the first ten; a tripled digit never on adjacent positions) are stricter than
+1.x and cannot be enforced in a minor. They are not reported either: **the source contradicts itself**. The official
+example `65929970489` has the digit 9 three times (positions 3, 5 and 6), two of them adjacent, which the last bullet
+forbids if read literally; read as "not all three consecutive" it passes. With no way to tell which reading ELSTER
+means, no `hasValidStructure()` is offered. A leading zero stays accepted. (Before 1.2 the only text for these rules
+was the BZSt paper "Erzeugung von Identifikationsnummern — grundlegende Beschreibung der Struktur und Merkmale",
+released under the IFG and hosted by FragDenStaat,
+<https://media.frag-den-staat.de/files/foi/607002/erzeugung-von-identifikationsnummern-grundlegende-beschreibung-der-struktur-und-merkmale.pdf>,
+not an agency publication. The ELSTER paper is, so "not official" is no longer the reason.)
+
+Implemented: 11 digits; `hasValidCheckDigit()` (report only). No display form is published; `masked()` keeps the last
+four digits: `*******8901`.
 
 ## Rentenversicherungsnummer (`Document\DE\PensionInsuranceNumber`)
 
@@ -221,6 +259,6 @@ sources. Without a published total format there is nothing to validate: not cove
 |---|---|---|
 | Personalausweis number | PAuswG § 2 Abs. 8, PAuswV Anlage 3 Nr. 9 | `IdentityCardNumber`, alphabet rule, no check digit |
 | Reisepass number | PassG § 4 Abs. 2 Nr. 5, PassV Anlage 11 | `PassportNumber`, alphabet rule, no check digit |
-| Steuer-ID | StIdV § 1; no published algorithm | `TaxIdentificationNumber`, format only |
+| Steuer-ID | StIdV § 1; ELSTER § 2.2 (check digit, structure rules) | `TaxIdentificationNumber`, format only; check digit reported by `hasValidCheckDigit()` (1.2); structure rules not applied |
 | Rentenversicherungsnummer (birth date, sex) | VKVV § 2 | `PensionInsuranceNumber`, checksum verified; birth date and sex **not typed** (no century; 50-99 is not "female") |
 | Führerschein number | FeV Anlage 8: composition only | not covered |

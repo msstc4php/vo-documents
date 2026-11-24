@@ -11,13 +11,16 @@ use MSSTC4PHP\ValueObject\Support\AbstractStringValueObject;
 use Override;
 
 /**
- * Tax file number: 9 digits. Format only: the check digit is not verified because no official algorithm is
- * published (the ATO gives its TFN algorithm to registered software developers only, AU.md). The 8-digit TFNs once
- * issued to non-individuals are not accepted.
+ * Tax file number: 8 or 9 digits (ANAO: "a eight or nine digit number"; 8 digits accepted since 1.2), kept as written:
+ * `12345678` is not padded, so it is not equal to `012345678`. Format only: the check digit is not verified because
+ * no official algorithm is published (the ATO gives its TFN algorithm on request, under a confidentiality agreement,
+ * AU.md).
  *
- * `masked()` (no official rule) keeps the last three digits, not the package's usual four: AU numbers are short
- * (at most 10 characters), so four would show almost half of them. `*** *** 782`.
+ * `formatted()` groups three digits from the right (`123 456 782`, `12 345 678`; no official display form for 8
+ * digits). `masked()` (no official rule) keeps the last three digits, not the package's usual four: AU numbers are
+ * short (at most 10 characters), so four would show almost half of them. `*** *** 782`, `** *** 678`.
  *
+ * @see https://www.anao.gov.au/sites/default/files/anao_report_1998-99_37.pdf ANAO Audit Report No. 37 1998-99, § 1.5
  * @see https://softwaredevelopers.ato.gov.au/obtainTFNalgorithm ATO, "How to obtain the tax file number algorithm"
  * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/AU.md "Tax file number"
  */
@@ -28,11 +31,11 @@ final class TaxFileNumber extends AbstractStringValueObject implements Maskable
     private const string DOCUMENT = 'Australian tax file number';
 
     /**
-     * @return non-empty-string
+     * @return non-empty-string e.g. "123 456 782", "12 345 678"
      */
     public function formatted(): string
     {
-        return \sprintf('%s %s %s', \substr($this->value, 0, 3), \substr($this->value, 3, 3), \substr($this->value, 6));
+        return \sprintf('%s %s %s', \substr($this->value, 0, -6), \substr($this->value, -6, 3), \substr($this->value, -3));
     }
 
     #[Override]
@@ -44,6 +47,6 @@ final class TaxFileNumber extends AbstractStringValueObject implements Maskable
     #[Override]
     protected function parse(string $value): string
     {
-        return Digits::exactly($value, 9, self::DOCUMENT);
+        return Digits::exactly($value, Digits::strippedLength($value) === 8 ? 8 : 9, self::DOCUMENT);
     }
 }

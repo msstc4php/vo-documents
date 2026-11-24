@@ -54,7 +54,8 @@
   immi.homeaffairs.gov.au (the only AU gov site that reliably answers from this environment; most others reset HTTP/2
   or return 403).
 - **TFN and Medicare: format only; the check digit is not verified because no official algorithm is published.** The
-  ATO gives the TFN algorithm to registered developers only; the Medicare check digit is ADHA Appendix E, served by no
+  ATO gives the TFN algorithm on request under a confidentiality agreement (TFN declaration spec v3.0.0 § 9; ANAO
+  § 2.62); the Medicare check digit is ADHA Appendix E, served by no
   reachable official host. Owner rule: a checksum is computed only when its algorithm is quoted from an official source.
 - Sub-national pattern (copy for US/CA/BR): `Document\<CC>\Jurisdiction` enum, `DriverLicenceNumber` interface with a
   covariant `jurisdiction()`, an abstract base per country with `static format(): Internal\NumberFormat` (character
@@ -128,8 +129,13 @@
   field has no century and may hold non-dates (unpublished rules for unproven birth dates), and 50-99 is "female, no
   entry or divers", so the class exposes strings only (`birthDateField()`, `serialNumber()`), no `HasBirthDate`/
   `HasSex`, and does not validate the date.
-- **DE Steuer-ID: format only** (StIdV § 1: ten digits + check digit, no algorithm). The "no leading zero / one
-  repeated digit" rules come from a BZSt paper released under the IFG (FragDenStaat), not a publication: not applied.
+- **DE Steuer-ID: `from()` format only, `hasValidCheckDigit()` since 1.2** (ELSTER § 2.2, ISO 7064 MOD 11,10 in
+  `Checksum::iso7064Mod11Dash10()`). The ELSTER C++ box reads `pSteuerID.at(i)` as a char and loops over the input
+  length: implement the intent (ten digit values), not the listing. The structure rules (no leading zero, one digit
+  2-3 times, a tripled digit never adjacent) are official now but **not applied, not even reported**: ELSTER's own
+  example `65929970489` has two adjacent 9s of three, so the adjacency rule is ambiguous. ELSTER forbids showing the
+  correct check digit: keep `hasValidCheckDigit()` a bool and never add a `checkDigit()`/expected-digit accessor or put
+  a digit in a message.
 - **DE Führerschein number: not covered** (FeV Anlage 8 gives only the composition, no length or check algorithm).
 - Escaped equivalent mutant: `CastInt` in `Document\DE\PensionInsuranceNumber::checkDigit()` (numeric strings
   multiply the same). The character-class check uses `strspn` instead of an anchored regex because anchors on a
@@ -315,9 +321,11 @@ script classes use `\p{sc=Latin}` / `\p{sc=Cyrillic}` (Script property only); `c
   reads it. For verbatim text use the Internet Archive `id_` capture (`web.archive.org/web/2026id_/<url>` redirects to
   the latest; the body is gzip-encoded, `zcat` it). `ircc.canada.ca` help-centre pages answer WebFetch; the pre-2023
   version of qnum=1446 is under the old host `www.cic.gc.ca` in the CDX index.
-- **SIN check digit not enforced:** ESDC publishes none; the CRA rejection codes name a "Modulus 10 (Mod 10) check
-  digit formula" without the algorithm, and the CRA's own sample SINs `123 456 789` and `111 111 111` fail Luhn. Do not
-  add `Checksum::luhn()` to the SIN without an official text giving the algorithm (owner's rule). No leading digit is
+- **SIN check digit reported, never enforced (1.2):** the algorithm is the CRA's "Validating a Social Insurance
+  Number -- Example" (Luhn, vector `999 999 998`), found only in the Library and Archives Canada web archive
+  (`bac-lac.wayback.archive-it.org/web/20061210041004/...sin-e.pdf`); current canada.ca pages give none. The same page
+  says to report a failing SIN "even if it is not a valid number", and the CRA's own samples `123 456 789` and
+  `111 111 111` fail Luhn, so `from()` must never refuse on it, not even in 2.0 without a new ruling. No leading digit is
   refused (no ESDC "0 or 8 not assigned" text; the CRA ITN starts `08`/`09` and is indistinguishable by shape).
 - **CA override policy is `AnyIcaoSpelling`**, not the plan default: the Passport Program's change-name page lets an
   adult drop or invert given names and points to "alternative spellings" for letters it cannot print, so a passport
@@ -568,3 +576,20 @@ script classes use `\p{sc=Latin}` / `\p{sc=Cyrillic}` (Script property only); `c
   `InvalidDocumentNumberException` with one fixed message: `AmbiguousJurisdictionException` (subdivisions only) does
   not fit. Not a value object, so the Doctrine bridge needs no type for it (`EveryDocumentClassHasATypeTest` only
   scans `ValueObject` implementations).
+
+## 1.2 (2026-11-24 UTC)
+
+- **AU TFN accepts 8 digits** (ANAO 37 1998-99 § 1.5). Stored as written, no zero-padding: `12345678` !=
+  `012345678` (the ATO form field is right-justified and zero-padded, so data from ATO forms may carry the padded
+  form). `formatted()` groups from the right (`substr(0, -6)`), so the 9-digit output is unchanged. Before widening
+  any class, check it is in no factory candidate set (`grep -rn ClassName src/`); TFN is in none.
+- **AU TFN code numbers** (`000000000`, `111111111`, `333333333`, `444444444`, `987654321`, spec § 7.48) are accepted;
+  docs only, no `isTfnCode()`.
+- **GB CHI check digit**: PHS code (`chi_check.R`, commit `ee4e496`) counts as the official text (controller ruling,
+  ANS precedent). Mod 11 is `11 - r`, 11 → 0 (`% 11`), a 10 matches no digit; Mod 10 is Luhn over ten digits. Test
+  vectors need a month `1x` so the third weight is in play (months `0x` leave digit 3 zero and let weight mutants
+  escape).
+- **Masking candidates that would show more** (BR CGU/LDO CPF `***.012.389-**`, CN JR/T 0171 first/last third)
+  are docs only in 1.x: `masked()` may only hide more in a minor. CPF is listed as a 2.0 candidate.
+- Escaped equivalent mutant: `CastInt` on `(int) $digits[$i]` in `Checksum::iso7064Mod11Dash10()` (same as the other
+  `Checksum` CastInt mutants).

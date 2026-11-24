@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace MSSTC4PHP\ValueObject\Documents\Tests\Unit\Document\DE;
 
 use MSSTC4PHP\ValueObject\Documents\Document\DE\TaxIdentificationNumber;
+use MSSTC4PHP\ValueObject\Documents\Internal\Checksum;
 use MSSTC4PHP\ValueObject\Documents\Internal\Digits;
 use MSSTC4PHP\ValueObject\Documents\Internal\Mask;
 use MSSTC4PHP\ValueObject\Documents\Internal\Text;
@@ -15,9 +16,11 @@ use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
 
 /**
- * Expectations follow docs/sources/DE.md "Steuerliche Identifikationsnummer" (format only).
+ * Expectations follow docs/sources/DE.md "Steuerliche Identifikationsnummer": format only for `from()`, the ELSTER
+ * check digit reported by `hasValidCheckDigit()`.
  */
 #[CoversClass(TaxIdentificationNumber::class)]
+#[UsesClass(Checksum::class)]
 #[UsesClass(Digits::class)]
 #[UsesClass(Text::class)]
 #[UsesClass(Mask::class)]
@@ -32,9 +35,9 @@ final class TaxIdentificationNumberTest extends TestCase
     {
         yield 'eleven digits' => ['12345678901', '12345678901'];
         yield 'spaces and NBSP' => ["12 345 678\u{00A0}901", '12345678901'];
-        // Format only: no published algorithm, so any last digit is accepted.
+        // from() checks the format only (1.x), so a wrong check digit is accepted.
         yield 'last digit changed, accepted' => ['12345678902', '12345678902'];
-        // The "no leading zero" rule of the unpublished BZSt paper is not applied.
+        // The ELSTER structure rules are not applied.
         yield 'leading zero, accepted' => ['02345678901', '02345678901'];
         yield 'no repeated digit, accepted' => ['10234567895', '10234567895'];
     }
@@ -47,6 +50,49 @@ final class TaxIdentificationNumberTest extends TestCase
         self::assertSame($expected, $number->value);
         self::assertSame($expected, (string) $number);
         self::assertSame($expected, $number->jsonSerialize());
+    }
+
+    /**
+     * @return iterable<string, array{string}>
+     */
+    public static function elsterExamples(): iterable
+    {
+        yield 'TestID, leading zero' => ['02476291358'];
+        yield 'ITZ Bund 1' => ['86095742719'];
+        yield 'ITZ Bund 2' => ['47036892816'];
+        yield 'ITZ Bund 3, two adjacent 9s' => ['65929970489'];
+        yield 'ITZ Bund 4' => ['57549285017'];
+        yield 'ITZ Bund 5' => ['25768131411'];
+    }
+
+    #[DataProvider('elsterExamples')]
+    public function testReportsTheElsterExamplesAsValid(string $number): void
+    {
+        self::assertTrue(TaxIdentificationNumber::from($number)->hasValidCheckDigit());
+    }
+
+    /**
+     * @return iterable<string, array{string}>
+     */
+    public static function wrongCheckDigits(): iterable
+    {
+        yield 'last digit off by one' => ['86095742718'];
+        yield 'last digit zero' => ['86095742710'];
+        yield 'two leading digits swapped' => ['68095742719'];
+    }
+
+    #[DataProvider('wrongCheckDigits')]
+    public function testReportsAWrongCheckDigitAndStillAcceptsIt(string $number): void
+    {
+        $id = TaxIdentificationNumber::from($number);
+
+        self::assertFalse($id->hasValidCheckDigit());
+        self::assertSame($number, $id->value);
+    }
+
+    public function testReadsAComputedTenAsZero(): void
+    {
+        self::assertTrue(TaxIdentificationNumber::from('10000000000')->hasValidCheckDigit());
     }
 
     public function testMasks(): void
