@@ -167,6 +167,7 @@ official algorithm is published. A number with the right shape is accepted, neve
 | `Document\ID\FamilyCardNumber` | Nomor Kartu Keluarga, 16 digits | format only | none | Ditjen Dukcapil |
 | `Document\SA\NationalIdentityNumber` | National ID number, 10 digits starting with 1; **also the driving licence number** | ten digits; the first digit routes (ZATCA BR-KSA-F-10, a warning there) and is not checked; no check digit | none | ZATCA SDK v3.4.4 announcement |
 | `Document\SA\IqamaNumber` | Iqama number, 10 digits starting with 2; **also the driving licence number** | ten digits; the first digit routes (ZATCA BR-KSA-F-11) and is not checked; no check digit | none | ZATCA SDK v3.4.4 announcement |
+| `Document\SA\IdentityNumberFactory` | Routes a bare number by its first digit: `fromNumber()` / `tryFromNumber()` | `1` national ID, `2` iqama; any other first digit refused (never guessed); candidate set frozen for 1.x | n/a | ZATCA BR-KSA-F-10/F-11 |
 
 Names: `Name\<CC>\FamilyName`, `GivenName` and `PersonName` for DE, FR, IT, ES, NL, CH, GB, TR, US, CA, MX and BR, like
 the RU and AU ones; the Asian ones: see "Asian documents and names" below. Spain's `PersonName` has two surnames
@@ -198,6 +199,7 @@ encoded birth dates lack an officially stated century, so those classes expose t
 
 ```php
 use MSSTC4PHP\ValueObject\Documents\Document\CN\CitizenIdentityNumber;
+use MSSTC4PHP\ValueObject\Documents\Document\SA\IdentityNumberFactory;
 use MSSTC4PHP\ValueObject\Documents\Document\SA\IqamaNumber;
 use MSSTC4PHP\ValueObject\Documents\Icao\PersonName as IcaoPersonName;
 use MSSTC4PHP\ValueObject\Documents\Name\CN\{FamilyName, GivenName, PersonName};
@@ -207,6 +209,8 @@ $id = CitizenIdentityNumber::from('１１０１０５１９４９１２３１０
 $id->birthDate();                                                   // 1949-12-31 00:00 UTC
 $id->sex();                                                         // Sex::Female
 IqamaNumber::from('٢٣٤٥٦٧٨٩٠١');                                    // Arabic-Indic digits fold: 2345678901
+IdentityNumberFactory::fromNumber('1012345678');                    // NationalIdentityNumber (first digit 1; 2: IqamaNumber)
+IdentityNumberFactory::tryFromNumber('3012345678');                 // null: fits neither class by its first digit
 
 // China, Korea, Indonesia, Saudi Arabia, Indian Devanagari: the Latin form of the passport is required, never derived.
 $name = new PersonName(FamilyName::from('张'), GivenName::from('伟'), IcaoPersonName::from('ZHANG<<WEI'));
@@ -263,7 +267,12 @@ use MSSTC4PHP\ValueObject\Documents\Document\AU\Jurisdiction;
 
 $licence = DriverLicenceNumberFactory::fromNumberIn('01234567', Jurisdiction::NSW);   // NswDriverLicenceNumber
 DriverLicenceNumberFactory::jurisdictionsMatching('01234567');                       // [ACT, NSW, NT, QLD, TAS, VIC]
+DriverLicenceNumberFactory::tryFromNumberIn('01234567', Jurisdiction::WA);           // null (fromNumberIn() says why)
 ```
+
+Every factory method `from…()` has a `try…()` twin (`tryFromNumberIn()`, `tryFromNumber()`, since 1.1) with the same
+parameters: it returns null exactly where the `from…()` throws a value refusal (vo-base `InvalidValueObjectException`,
+including `AmbiguousJurisdictionException` and "(format not covered)"), so it is null when no candidate or several fit.
 
 **There is no AU `fromNumber()`:** with the formats published today every valid number fits two or more
 jurisdictions, so a bare number never tells the issuer. Pass the issuer to `fromNumberIn()`; `jurisdictionsMatching()`
@@ -282,6 +291,7 @@ DlIdNumberFactory::fromNumberIn('123456789', Jurisdiction::NY);   // NyDlIdNumbe
 DlIdNumberFactory::jurisdictionsMatching('Y620-9305-7270');       // [IL], among the covered jurisdictions
 DlIdNumberFactory::jurisdictionsMatching('123456789');            // 11 states
 DlIdNumberFactory::fromNumberIn('123456789', Jurisdiction::CA);   // "Invalid US-CA DL/ID number (format not covered)."
+DlIdNumberFactory::tryFromNumberIn('123456789', Jurisdiction::CA); // null
 ```
 
 `DlIdNumberFactory` covers the 30 jurisdictions with a published format. The 21 others have no class, and
@@ -313,6 +323,7 @@ $card->number();                                                       // OnHeal
 $card->versionCode();                                                  // OnHealthCardVersionCode "YM" (null if none printed)
 HealthCardNumberFactory::fromNumber('9876543217');                     // AmbiguousJurisdictionException: CA-NS, CA-ON
 HealthCardNumberFactory::fromNumber('123456789');                      // AmbiguousJurisdictionException, 6 jurisdictions
+HealthCardNumberFactory::tryFromNumber('123456789');                   // null (ambiguous); tryFromNumberIn() exists too
 ```
 
 The licence factory works like the US one (6 of 13 jurisdictions covered, no `fromNumber()`); the health card factory
@@ -334,6 +345,7 @@ use MSSTC4PHP\ValueObject\Documents\Document\MX\Jurisdiction;
 DriverLicenceNumberFactory::fromNumberIn('1234 5678 9012', Jurisdiction::MEX);   // MexDriverLicenceNumber, value 123456789012
 DriverLicenceNumberFactory::jurisdictionsMatching('123456789012');              // [MEX], the only covered entity
 DriverLicenceNumberFactory::fromNumberIn('123456789012', Jurisdiction::CMX);    // "Invalid MX-CMX driver's licence number (format not covered)."
+DriverLicenceNumberFactory::tryFromNumberIn('123456789012', Jurisdiction::CMX); // null
 ```
 
 Only the Estado de México publishes a number format (its validator's field rule: twelve digits). The other 31
@@ -351,6 +363,7 @@ IdentityCardNumberFactory::fromNumberIn('12.345.678-2', Jurisdiction::SP);   // 
 IdentityCardNumberFactory::jurisdictionsMatching('24.681.357-X');            // [SP], the only covered unit
 IdentityCardNumberFactory::jurisdictionsMatching('12.345.678-3');            // [] (wrong SP check character)
 IdentityCardNumberFactory::fromNumberIn('1234567', Jurisdiction::RJ);        // "Invalid BR-RJ identity card number (format not covered)."
+IdentityCardNumberFactory::tryFromNumberIn('1234567', Jurisdiction::RJ);     // null
 SpIdentityCardNumber::fromNumberAndCheckCharacter('1.234.567', null);         // card without a printed check character: value 012345672
 ```
 
@@ -654,8 +667,9 @@ foreigner registration number (no `HasBirthDate`).
   enforced, as UIDAI is the issuer. The Saudi first-digit rules 1 (national ID) and 2 (iqama) come from a ZATCA staff
   announcement on its developer forum, where they are warnings (`docs/sources/SA.md`); since 1.0 they only route a
   number to its class and refuse nothing. **Both SA classes accept the same ten digits**, so trying one class first
-  (`NationalIdentityNumber::tryFrom($n) ?? IqamaNumber::from($n)`) cannot tell them apart: branch on the first digit
-  (`1` national ID, `2` iqama) and decide what another first digit means in your context.
+  (`NationalIdentityNumber::tryFrom($n) ?? IqamaNumber::from($n)`) cannot tell them apart: route with
+  `IdentityNumberFactory::fromNumber()` (`1` national ID, `2` iqama, since 1.1), which refuses another first digit, and
+  decide what such a number means in your context (both classes still accept it).
 - **Asia, derived Latin names:** only JP derives one (MOFA Hepburn); `井上` (いのうえ) is derived `INOE` and needs the
   override `INOUE`. The other five countries require the Latin form of the passport.
 - **Birth dates:** a birth date in a number is checked against the calendar only where an official text makes the
@@ -755,7 +769,8 @@ Rules for minor releases:
   factory's `fromNumber()` in the next major, so a number that resolves to one class in 1.x keeps resolving to it.
   `fromNumber()` exists only where a bare number can identify one jurisdiction of a fully covered country (CA health
   cards; AU licences are fully covered, but every number fits several jurisdictions); it may be added, additively,
-  once that holds for another country.
+  once that holds for another country. `SA\IdentityNumberFactory::fromNumber()` routes by the first digit, not by
+  jurisdiction; its candidates (`NationalIdentityNumber` for `1`, `IqamaNumber` for `2`) are frozen for 1.x.
 - Enum cases may be added in a minor (a new subdivision, a new `Sex`); give every `match` over a package enum a
   default arm.
 - The package's interfaces (`Name\NationalPersonName`, the per-country document interfaces, `Contract\*`) are

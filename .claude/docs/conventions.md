@@ -87,6 +87,10 @@
   jurisdiction only (CA health cards; owner decision O2 and review CR-006 of 1.0): AU, US, CA licences, MX and BR have
   `fromNumberIn()` and `jurisdictionsMatching()` only (through `SubdivisionResolver::matches()`). The CA health base
   exposes `fitsLength()` as public `@internal` for the factory's message; no reflection (review CR-009).
+- **`try…()` twins on factories (1.1):** every public static `from…()` of a factory has a `try…()` with the same
+  parameters that catches vo-base `InvalidValueObjectException` only (it covers `InvalidDocumentNumberException` and
+  `AmbiguousJurisdictionException`) and returns null; one-line docblock "Null when no candidate or several fit; from…()
+  says which.", as in vo-gs1 and vo-identifiers.
 - **"Format not covered" message:** `fromNumberIn()` for a jurisdiction without a published format throws `Invalid
   <CC>-XX <document> (format not covered).`; `fromNumber()` of an unmatched number says "(fits no jurisdiction)" when
   some jurisdiction has the length, otherwise the length.

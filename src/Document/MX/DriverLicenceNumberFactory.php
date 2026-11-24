@@ -8,6 +8,7 @@ use MSSTC4PHP\ValueObject\Documents\Document\MX\DriverLicence\AbstractDriverLice
 use MSSTC4PHP\ValueObject\Documents\Document\MX\DriverLicence\MexDriverLicenceNumber;
 use MSSTC4PHP\ValueObject\Documents\Exception\InvalidDocumentNumberException;
 use MSSTC4PHP\ValueObject\Documents\Internal\SubdivisionResolver;
+use MSSTC4PHP\ValueObject\Exception\InvalidValueObjectException;
 
 /**
  * Builds the driver's licence number of a given entity and lists the covered entities a bare number fits. Only the
@@ -31,6 +32,16 @@ final class DriverLicenceNumberFactory
     public static function fromNumberIn(string $number, Jurisdiction $jurisdiction): DriverLicenceNumber
     {
         return self::coveredClassFor($jurisdiction)::from($number);
+    }
+
+    /** Null when no candidate or several fit; fromNumberIn() says which. */
+    public static function tryFromNumberIn(string $number, Jurisdiction $jurisdiction): ?DriverLicenceNumber
+    {
+        try {
+            return self::fromNumberIn($number, $jurisdiction);
+        } catch (InvalidValueObjectException) {
+            return null;
+        }
     }
 
     /**

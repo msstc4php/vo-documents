@@ -37,6 +37,7 @@ use MSSTC4PHP\ValueObject\Documents\Document\US\DlId\WiDlIdNumber;
 use MSSTC4PHP\ValueObject\Documents\Document\US\DlId\WyDlIdNumber;
 use MSSTC4PHP\ValueObject\Documents\Exception\InvalidDocumentNumberException;
 use MSSTC4PHP\ValueObject\Documents\Internal\SubdivisionResolver;
+use MSSTC4PHP\ValueObject\Exception\InvalidValueObjectException;
 
 /**
  * Builds the DL/ID number of a given jurisdiction and lists the covered jurisdictions a bare number fits (plain 7-9
@@ -60,6 +61,16 @@ final class DlIdNumberFactory
     public static function fromNumberIn(string $number, Jurisdiction $jurisdiction): DlIdNumber
     {
         return self::coveredClassFor($jurisdiction)::from($number);
+    }
+
+    /** Null when no candidate or several fit; fromNumberIn() says which. */
+    public static function tryFromNumberIn(string $number, Jurisdiction $jurisdiction): ?DlIdNumber
+    {
+        try {
+            return self::fromNumberIn($number, $jurisdiction);
+        } catch (InvalidValueObjectException) {
+            return null;
+        }
     }
 
     /**

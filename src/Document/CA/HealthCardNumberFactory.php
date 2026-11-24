@@ -22,6 +22,7 @@ use MSSTC4PHP\ValueObject\Documents\Document\CA\HealthCard\YtHealthCardNumber;
 use MSSTC4PHP\ValueObject\Documents\Exception\AmbiguousJurisdictionException;
 use MSSTC4PHP\ValueObject\Documents\Exception\InvalidDocumentNumberException;
 use MSSTC4PHP\ValueObject\Documents\Internal\SubdivisionResolver;
+use MSSTC4PHP\ValueObject\Exception\InvalidValueObjectException;
 
 /**
  * Builds the health card number of the jurisdiction a bare number belongs to, and never picks one of several: nine
@@ -61,12 +62,32 @@ final class HealthCardNumberFactory
         }
     }
 
+    /** Null when no candidate or several fit; fromNumber() says which. */
+    public static function tryFromNumber(string $number): ?HealthCardNumber
+    {
+        try {
+            return self::fromNumber($number);
+        } catch (InvalidValueObjectException) {
+            return null;
+        }
+    }
+
     /**
      * @throws InvalidDocumentNumberException when the number does not fit the jurisdiction's format
      */
     public static function fromNumberIn(string $number, Jurisdiction $jurisdiction): HealthCardNumber
     {
         return self::classFor($jurisdiction)::from($number);
+    }
+
+    /** Null when no candidate or several fit; fromNumberIn() says which. */
+    public static function tryFromNumberIn(string $number, Jurisdiction $jurisdiction): ?HealthCardNumber
+    {
+        try {
+            return self::fromNumberIn($number, $jurisdiction);
+        } catch (InvalidValueObjectException) {
+            return null;
+        }
     }
 
     /**

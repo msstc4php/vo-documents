@@ -299,4 +299,36 @@ final class HealthCardNumberFactoryTest extends TestCase
             'Invalid CA-BC health card number checksum.',
         );
     }
+
+    public function testTryFromNumberInBuildsWhatFromNumberInBuilds(): void
+    {
+        $built = HealthCardNumberFactory::tryFromNumberIn('9876543217', Jurisdiction::ON);
+
+        self::assertNotNull($built);
+        self::assertEquals(HealthCardNumberFactory::fromNumberIn('9876543217', Jurisdiction::ON), $built);
+    }
+
+    public function testTryFromNumberInIsNullForANumberTheJurisdictionRefuses(): void
+    {
+        self::assertNull(HealthCardNumberFactory::tryFromNumberIn('9876543217', Jurisdiction::BC));
+    }
+
+    public function testTryFromNumberBuildsWhatFromNumberBuilds(): void
+    {
+        $built = HealthCardNumberFactory::tryFromNumber('12345678');
+
+        self::assertInstanceOf(PeHealthCardNumber::class, $built);
+        self::assertEquals(HealthCardNumberFactory::fromNumber('12345678'), $built);
+    }
+
+    public function testTryFromNumberIsNullForNoMatch(): void
+    {
+        self::assertNull(HealthCardNumberFactory::tryFromNumber('1234567'));
+        self::assertNull(HealthCardNumberFactory::tryFromNumber('9876543217 YM'));
+    }
+
+    public function testTryFromNumberIsNullForAnAmbiguousNumber(): void
+    {
+        self::assertNull(HealthCardNumberFactory::tryFromNumber('9876543217'));
+    }
 }

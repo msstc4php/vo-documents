@@ -216,6 +216,24 @@ final class IdentityCardNumberFactoryTest extends TestCase
         );
     }
 
+    public function testTryFromNumberInBuildsWhatFromNumberInBuilds(): void
+    {
+        $built = IdentityCardNumberFactory::tryFromNumberIn('12.345.678-2', Jurisdiction::SP);
+
+        self::assertNotNull($built);
+        self::assertEquals(IdentityCardNumberFactory::fromNumberIn('12.345.678-2', Jurisdiction::SP), $built);
+    }
+
+    public function testTryFromNumberInIsNullForANumberTheJurisdictionRefuses(): void
+    {
+        self::assertNull(IdentityCardNumberFactory::tryFromNumberIn('12.345.678-3', Jurisdiction::SP));
+    }
+
+    public function testTryFromNumberInIsNullForAJurisdictionWithoutAPublishedFormat(): void
+    {
+        self::assertNull(IdentityCardNumberFactory::tryFromNumberIn('1234567', Jurisdiction::RJ));
+    }
+
     private function compare(Jurisdiction $left, Jurisdiction $right): int
     {
         return \array_search($left, Jurisdiction::cases(), true) <=> \array_search($right, Jurisdiction::cases(), true);

@@ -8,6 +8,7 @@ use MSSTC4PHP\ValueObject\Documents\Document\BR\IdentityCard\AbstractIdentityCar
 use MSSTC4PHP\ValueObject\Documents\Document\BR\IdentityCard\SpIdentityCardNumber;
 use MSSTC4PHP\ValueObject\Documents\Exception\InvalidDocumentNumberException;
 use MSSTC4PHP\ValueObject\Documents\Internal\SubdivisionResolver;
+use MSSTC4PHP\ValueObject\Exception\InvalidValueObjectException;
 
 /**
  * Builds the RG number of a given unit and lists the covered units a bare number fits. Only the units with a published
@@ -30,6 +31,16 @@ final class IdentityCardNumberFactory
     public static function fromNumberIn(string $number, Jurisdiction $jurisdiction): IdentityCardNumber
     {
         return self::coveredClassFor($jurisdiction)::from($number);
+    }
+
+    /** Null when no candidate or several fit; fromNumberIn() says which. */
+    public static function tryFromNumberIn(string $number, Jurisdiction $jurisdiction): ?IdentityCardNumber
+    {
+        try {
+            return self::fromNumberIn($number, $jurisdiction);
+        } catch (InvalidValueObjectException) {
+            return null;
+        }
     }
 
     /**

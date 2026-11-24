@@ -449,6 +449,24 @@ final class DlIdNumberFactoryTest extends TestCase
         );
     }
 
+    public function testTryFromNumberInBuildsWhatFromNumberInBuilds(): void
+    {
+        $built = DlIdNumberFactory::tryFromNumberIn('123456789', Jurisdiction::NY);
+
+        self::assertNotNull($built);
+        self::assertEquals(DlIdNumberFactory::fromNumberIn('123456789', Jurisdiction::NY), $built);
+    }
+
+    public function testTryFromNumberInIsNullForANumberTheJurisdictionRefuses(): void
+    {
+        self::assertNull(DlIdNumberFactory::tryFromNumberIn('12345678', Jurisdiction::NY));
+    }
+
+    public function testTryFromNumberInIsNullForAJurisdictionWithoutAPublishedFormat(): void
+    {
+        self::assertNull(DlIdNumberFactory::tryFromNumberIn('123456789', Jurisdiction::CA));
+    }
+
     private function compare(Jurisdiction $left, Jurisdiction $right): int
     {
         return \array_search($left, Jurisdiction::cases(), true) <=> \array_search($right, Jurisdiction::cases(), true);

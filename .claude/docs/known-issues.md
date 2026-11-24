@@ -562,6 +562,9 @@ script classes use `\p{sc=Latin}` / `\p{sc=Cyrillic}` (Script property only); `c
   `symfony/polyfill-intl-normalizer` (in `require`) supplies: `php -n -d extension=mbstring` (no intl) runs
   `ElectorKey::from()` and `Rfc::from()` correctly. Requiring `ext-intl` would refuse installs the package supports.
   Re-check if another intl class (`IntlChar`, `Transliterator`, `grapheme_*`) is ever used.
-- **No SA routing factory in 1.0 (CR-014 deferred).** Both SA classes accept the same ten digits; callers branch on the
-  first digit. A factory is additive (a minor), and its answer for a first digit other than 1 or 2 needs an exception
-  type that `AmbiguousJurisdictionException` (subdivisions only) does not fit.
+- **SA routing factory since 1.1 (CR-014).** Both SA classes accept the same ten digits; `SA\IdentityNumberFactory`
+  parses through `NationalIdentityNumber::from()` (same normalisation as both) and routes on `$value[0]`: `1` national
+  ID, `2` `IqamaNumber::from($value)`, anything else (and any number the classes refuse, chained as `previous`) a plain
+  `InvalidDocumentNumberException` with one fixed message: `AmbiguousJurisdictionException` (subdivisions only) does
+  not fit. Not a value object, so the Doctrine bridge needs no type for it (`EveryDocumentClassHasATypeTest` only
+  scans `ValueObject` implementations).

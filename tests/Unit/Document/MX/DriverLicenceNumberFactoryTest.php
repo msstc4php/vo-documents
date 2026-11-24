@@ -204,6 +204,24 @@ final class DriverLicenceNumberFactoryTest extends TestCase
         );
     }
 
+    public function testTryFromNumberInBuildsWhatFromNumberInBuilds(): void
+    {
+        $built = DriverLicenceNumberFactory::tryFromNumberIn('123456789012', Jurisdiction::MEX);
+
+        self::assertNotNull($built);
+        self::assertEquals(DriverLicenceNumberFactory::fromNumberIn('123456789012', Jurisdiction::MEX), $built);
+    }
+
+    public function testTryFromNumberInIsNullForANumberTheJurisdictionRefuses(): void
+    {
+        self::assertNull(DriverLicenceNumberFactory::tryFromNumberIn('12345678', Jurisdiction::MEX));
+    }
+
+    public function testTryFromNumberInIsNullForAJurisdictionWithoutAPublishedFormat(): void
+    {
+        self::assertNull(DriverLicenceNumberFactory::tryFromNumberIn('123456789012', Jurisdiction::CMX));
+    }
+
     private function compare(Jurisdiction $left, Jurisdiction $right): int
     {
         return \array_search($left, Jurisdiction::cases(), true) <=> \array_search($right, Jurisdiction::cases(), true);

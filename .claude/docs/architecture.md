@@ -196,6 +196,7 @@ letters; the Devanagari digits and the danda are not name characters).
 the required Latin form.
 
 `Document\SA\*` (plan 4): `AbstractIdentityNumber` (ten digits, `@internal`) with `NationalIdentityNumber` (first digit
-1) and `IqamaNumber` (first digit 2); the driving licence carries the same number (no class).
+1) and `IqamaNumber` (first digit 2); the driving licence carries the same number (no class). `IdentityNumberFactory`
+(1.1) routes a bare number by its first digit and refuses other first digits.
 `Name\SA\PersonName(given, ?father, ?grandfather, ?family, latin)` (own layout, parts on `AbstractArabicNamePart`:
 `\p{sc=Arabic}` letters, harakat U+064B-0652 and U+0670 after a letter, tatweel U+0640 removed).

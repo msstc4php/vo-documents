@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.1.0] - unreleased
+
+### Added
+
+- `tryFromNumberIn()` on every jurisdiction factory (AU, US, CA licences and health cards, MX, BR) and
+  `CA\HealthCardNumberFactory::tryFromNumber()`: null where the `from…()` twin throws a value refusal (vo-base
+  `InvalidValueObjectException`, including `AmbiguousJurisdictionException` and "(format not covered)").
+- `Document\SA\IdentityNumberFactory`: `fromNumber()` routes a bare number by its first digit (`1`
+  `NationalIdentityNumber`, `2` `IqamaNumber`, ZATCA BR-KSA-F-10/F-11) and refuses any other first digit with
+  `InvalidDocumentNumberException`; `tryFromNumber()` returns null instead. The two classes accept what they accepted;
+  the candidate set is frozen for 1.x.
+
 ## [1.0.0] - 2026-11-23
 
 First stable release: from here on a breaking change needs 2.0.

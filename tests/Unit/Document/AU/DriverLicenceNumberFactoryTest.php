@@ -172,4 +172,17 @@ final class DriverLicenceNumberFactoryTest extends TestCase
             'Invalid AU-WA driver licence number (wrong length).',
         );
     }
+
+    public function testTryFromNumberInBuildsWhatFromNumberInBuilds(): void
+    {
+        $built = DriverLicenceNumberFactory::tryFromNumberIn('01234567', Jurisdiction::NSW);
+
+        self::assertNotNull($built);
+        self::assertEquals(DriverLicenceNumberFactory::fromNumberIn('01234567', Jurisdiction::NSW), $built);
+    }
+
+    public function testTryFromNumberInIsNullForANumberTheJurisdictionRefuses(): void
+    {
+        self::assertNull(DriverLicenceNumberFactory::tryFromNumberIn('01234567', Jurisdiction::WA));
+    }
 }
