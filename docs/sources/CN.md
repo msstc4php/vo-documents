@@ -58,7 +58,15 @@ and validator sites.
   not stated in either text and is not enforced.
 - **Mask:** no official rule; last four characters (`**************002X`). The last four include position 17, the
   last digit of the sequence code, so a masked number still tells the sex by its parity (code review CR-023: the
-  package's default mask rule is kept, as no CN masking rule is quoted).
+  package's default mask rule is kept, as no binding CN masking rule is quoted). **Not adopted (docs only, read
+  2026-11-24 UTC):** JR/T 0171-2020 "个人金融信息保护技术规范" (中国人民银行, in force 2020-02-13), 附录A (资料性附录)
+  信息屏蔽, verbatim: "信息隐藏规则（缺省）：显示前 1/3 和后 1/3（向下取整），其他用*号代替，这样保留了部分信息，并且保证了信息的长度不变性，
+  对信息持有者更易辨别，如手机、身份证号码等。" Table A.1, row "1）身份证号码、军官证号码、护照号码": "使用缺省信息隐藏规则，如隐藏出生日期，身份证号码屏蔽后 6
+  位". The annex is informative (资料性), a financial-industry standard, read from a bank's copy
+  (<https://aibank.com/upload/attachs/2022/12/5-个人金融信息保护技术规范.pdf>, not a PBOC host), and inconsistent with
+  itself (the default shows 6 + 6 of 18 characters; the table example hides the birth date, positions 7-14, or "the
+  last 6"). Its default shows **more** characters than the current mask, and `masked()` may hide more in a minor,
+  never less. GB/T 35273-2020 § 7.2 states only the principle ("个人信息控制者宜对需展示的个人信息采取去标识化处理等措施").
 
 ## Foreigner's permanent residence card (`ForeignerPermanentResidenceNumber`, `LegacyForeignerPermanentResidenceNumber`)
 

@@ -123,6 +123,18 @@ only on secondary sites (Wikipedia, calculators); no reachable official page (IN
 DSN norm, SESAM-Vitale specifications) states it. The INSEE example `1 21 12 77 131 232 - 50` happens to satisfy it,
 but an example is not an algorithm. A NIR with any two-digit key is therefore accepted (owner's rule).
 
+ANS (Agence du numérique en santé), re-read 2026-11-24 UTC: the official texts make key validation mandatory but still
+give no formula. "Guide d'implémentation de l'identité INS" V2.0, official URL
+<https://industriels.esante.gouv.fr/sites/default/files/media/document/INS_Guide_implementation_V2_0.pdf> (behind a
+bot wall; read from the Internet Archive capture
+<https://web.archive.org/web/20250914154433id_/https://industriels.esante.gouv.fr/sites/default/files/media/document/INS_Guide_implementation_V2_0.pdf>),
+Règle 17 quoting the RNIV, verbatim: "Si le matricule n'est pas récupéré électroniquement, la saisie des 15 caractères
+du NIR et leur validation par la clé de contrôle est obligatoire pour toute recherche à partir du matricule INS."
+"Référentiel Identité Nationale de Santé" V2.1 (published by order in the JO of 2024-12-13; read from
+<https://web.archive.org/web/20260411202712id_/https://esante.gouv.fr/sites/default/files/media/document/ANS_Referentiel_Identite-Nationaled-de-Sante_V2.1.pdf>):
+"Une clé de contrôle à 2 chiffres complète le NIR." Neither PDF gives the computation (no "modulo", "97" or
+"complément"). Docs only: the key stays format only.
+
 Implemented (15 characters `S AA MM DD CCC NNN KK` after separators are removed and ASCII letters upper-cased):
 
 | Positions | Rule (source 5) | Exposed as |

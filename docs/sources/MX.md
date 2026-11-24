@@ -136,7 +136,11 @@ Rules applied:
   and nothing is mapped to ISO 3166-2:MX (the code for a birth abroad, `NE` in practice, is one of its entries).
 - The "palabras inconvenientes" catalogue (Anexo 01) is not applied either way: the substituted forms (`PXDO`) are
   ordinary letters and are accepted; the unsubstituted words are not refused (the catalogue is not published).
-- **Check digit: format only** (any digit). RENAPO names "un algoritmo" but publishes none.
+- **Check digit: format only** (any digit). RENAPO names "un algoritmo" but publishes none. Re-read 2026-11-24 UTC in
+  the DOF's own copy, <https://sidof.segob.gob.mx/notas/docFuente/5526717> (Instructivo, signed 2018-06-12), position
+  18: "Corresponde al dígito verificador, el cual es un carácter asignado por la Secretaría de Gobernación, a través de
+  la aplicación de un algoritmo que permite calcular y verificar la correcta conformación de la clave". It points to
+  the "Manual de Procedimientos para la Asignación de la CURP", which is not published. Docs only.
 - No display form; `masked()` keeps the last four characters (plan default).
 
 ## Clave de elector (`Document\MX\ElectorKey`)

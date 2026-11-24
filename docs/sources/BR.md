@@ -135,7 +135,18 @@ Rules applied:
   3166-2:BR code is derived. The digit is the region of the first registration address, not the current one.
 - `formatted()`: `280.012.389-38`, the grouping of the leaflet (`XXX.XXX.XX8 - XX`, written without spaces) and of SIPREV
   RV_01 ("no formato XXX.XXX.XXX-XX").
-- `masked()`: last four digits (plan default; no official masking rule read): `***.***.*89-38`.
+- `masked()`: last four digits (plan default): `***.***.*89-38`. **A federal masking practice exists but is not
+  adopted in 1.x** (read 2026-11-24 UTC): CGU Nota Técnica nº 1778/2019/CGUNE/CRG,
+  <https://repositorio.cgu.gov.br/bitstream/1/44436/11/Nota_Tecnica_1778_2019.pdf>, verbatim: "Desde então, foi
+  adotado um formato em que são ocultados os três primeiros e os dois últimos dígitos dos 11 que compõem o número de
+  CPF. A base legal para a adoção desse formato é a Lei de Diretrizes Orçamentárias (LDO), do exercício de 2011 (Lei
+  nº 12.309/2010), que previu a divulgação dos CPFs de terceirizados contratados por órgãos públicos com a ocultação
+  dos três primeiros dígitos e dos dois dígitos verificadores (Art. 87, § 5º). Tal previsão foi repetida nas LDO dos
+  exercícios seguintes." That shape, `***.012.389-**`, shows **six** digits, two more than the current mask, and
+  `masked()` may hide more in a minor, never less (README "Backward compatibility"). Recorded as a **2.0 candidate**.
+  (Lei 12.309/2010 art. 87 § 5 itself was not read on planalto.gov.br; quoted through the CGU note. TCU Resolution
+  354/2023 requiring the full CPF in TCU records was seen as a search snippet only; it is a records rule, not a
+  masking rule.)
 
 ## Título de eleitor (`Document\BR\VoterRegistrationNumber`)
 
@@ -608,7 +619,8 @@ verbatim quote above against the downloaded source, and the worked examples with
   searches are recorded above).
 - CNH número do espelho and número do formulário Renach.
 - Passport formats other than the PF's two letters and six digits.
-- A CPF masking rule (the plan default is used; no official rule was researched).
+- The CGU/LDO CPF mask (`***.012.389-**`, see "CPF"): it shows more digits than the current `masked()`, so it waits
+  for 2.0.
 - A Brazilian with no surname (the CNJ code requires one; indigenous registration rules were not researched).
 - RG of 26 units (all but BR-SP, above "RG per state — per unit"): no published format, or only an input
   limit; BA, CE, MG, PE, RJ, RN and RS to re-check when their hosts answer.

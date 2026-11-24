@@ -219,6 +219,11 @@ refused. `formatted()` `112-233-445 95`; `masked()` `***-***-*45 95`.
 publication of it was found (searched nalog.gov.ru, publication.pravo.gov.ru and the legal databases on 2026-11-13 UTC).
 Owner decision: a checksum is computed only when its algorithm is quoted from an official source. **Format only; the
 check digits are not verified because no official algorithm is published**: 12 digits, not all zeros (SFR 1.14).
+Re-checked 2026-11-24 UTC: Письмо ФНС России от 20.11.2025 № КВ-4-14/10475@ «О структуре ИНН и КПП» (found through
+<https://www.consultant.ru/law/podborki/kontrolnoe_chislo_inn/>, a legal database used only as a pointer) says
+"Вышеуказанные изменения не влекут изменений в методике расчета контрольного числа ИНН", and the FNS information note
+"Структура ИНН и методика расчета контрольного числа … не меняются": the method exists and is unchanged, but the FNS
+still publishes no weights. Docs only.
 
 **Where the plan loses to the source:** the plan's `taxOfficeCode()` (first four digits) holds only for INNs assigned
 under Order ММВ-7-6/435@ (NNNN = code of the assigning tax office). Since 01.01.2026 digits 3–4 are an "индекс,
