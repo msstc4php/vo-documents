@@ -78,6 +78,7 @@ final class CpfTest extends TestCase
 
         self::assertSame('280.012.389-38', $number->formatted());
         self::assertSame('***.***.*89-38', $number->masked());
+        self::assertSame('***.012.389-**', $number->cguMasked());
         self::assertSame('9', $number->fiscalRegion());
         self::assertSame('0', Cpf::from('123.456.780-62')->fiscalRegion());
     }

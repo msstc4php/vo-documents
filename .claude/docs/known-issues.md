@@ -593,6 +593,6 @@ script classes use `\p{sc=Latin}` / `\p{sc=Cyrillic}` (Script property only); `c
   vectors need a month `1x` so the third weight is in play (months `0x` leave digit 3 zero and let weight mutants
   escape).
 - **Masking candidates that would show more** (BR CGU/LDO CPF `***.012.389-**`, CN JR/T 0171 first/last third)
-  are docs only in 1.x: `masked()` may only hide more in a minor. CPF is listed as a 2.0 candidate.
+  are docs only in 1.x: `masked()` may only hide more in a minor. CPF: owner closed the 2.0 candidate (2026-11-27 UTC); `masked()` stays, `cguMasked()` (1.3.0) gives the CGU format.
 - Escaped equivalent mutant: `CastInt` on `(int) $digits[$i]` in `Checksum::iso7064Mod11Dash10()` (same as the other
   `Checksum` CastInt mutants).

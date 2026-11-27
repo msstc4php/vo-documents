@@ -67,6 +67,18 @@ final class Cpf extends AbstractStringValueObject implements Maskable
         return Mask::keepLastDigits($this->formatted(), 4);
     }
 
+    /**
+     * The CGU publication format (`***.012.389-**`): the first three digits and both check digits hidden, as the LDO 2011
+     * (Lei 12.309/2010, art. 87 § 5) set for the CPFs of outsourced staff published by public bodies. It shows six
+     * digits, more than {@see masked()}; use it only where that rule applies.
+     *
+     * @see https://github.com/msstc4php/vo-documents/blob/main/docs/sources/BR.md "CPF"
+     */
+    public function cguMasked(): string
+    {
+        return \sprintf('***.%s.%s-**', \substr($this->value, 3, 3), \substr($this->value, 6, 3));
+    }
+
     #[Override]
     protected function parse(string $value): string
     {

@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.3.0] - unreleased
+
+### Added
+
+- `Document\BR\Cpf::cguMasked()`: the CGU publication format `***.012.389-**` (first three digits and both check
+  digits hidden; LDO 2011, Lei 12.309/2010 art. 87 § 5, quoted through CGU Nota Técnica 1778/2019). `masked()` is
+  unchanged and stays the stricter mask; the CPF 2.0 candidate is closed.
+
 ## [1.2.0] - 2026-11-24
 
 ### Added

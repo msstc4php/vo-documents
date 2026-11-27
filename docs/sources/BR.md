@@ -143,7 +143,9 @@ Rules applied:
   nº 12.309/2010), que previu a divulgação dos CPFs de terceirizados contratados por órgãos públicos com a ocultação
   dos três primeiros dígitos e dos dois dígitos verificadores (Art. 87, § 5º). Tal previsão foi repetida nas LDO dos
   exercícios seguintes." That shape, `***.012.389-**`, shows **six** digits, two more than the current mask, and
-  `masked()` may hide more in a minor, never less (README "Backward compatibility"). Recorded as a **2.0 candidate**.
+  `masked()` may hide more in a minor, never less (README "Backward compatibility"). **Decision (owner, 2026-11-27 UTC):**
+  no 2.0 for it; `masked()` keeps the stricter last-four mask, and 1.3.0 adds `cguMasked()` with the CGU format for the
+  publication context the LDO rule covers.
   (Lei 12.309/2010 art. 87 § 5 itself was not read on planalto.gov.br; quoted through the CGU note. TCU Resolution
   354/2023 requiring the full CPF in TCU records was seen as a search snippet only; it is a records rule, not a
   masking rule.)
